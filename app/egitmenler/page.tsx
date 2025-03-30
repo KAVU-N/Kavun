@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { FaChalkboardTeacher, FaGraduationCap, FaStar, FaSearch, FaUniversity } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import ChatBox from '@/src/components/ChatBox';
 
 // Eğitmen tipi tanımı
 interface Instructor {
@@ -21,6 +22,7 @@ export default function InstructorsPage() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeChat, setActiveChat] = useState<Instructor | null>(null);
   const { user } = useAuth();
   const router = useRouter();
 
@@ -159,7 +161,7 @@ export default function InstructorsPage() {
                     
                     <button 
                       className="w-full mt-6 py-2 px-4 bg-[#FFB996] text-white rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300"
-                      onClick={() => {/* İletişim veya profil görüntüleme işlevi */}}
+                      onClick={() => setActiveChat(instructor)}
                     >
                       İletişime Geç
                     </button>
@@ -170,6 +172,14 @@ export default function InstructorsPage() {
           )}
         </div>
       </div>
+      
+      {/* Sohbet kutusu */}
+      {activeChat && (
+        <ChatBox 
+          instructor={activeChat} 
+          onClose={() => setActiveChat(null)} 
+        />
+      )}
     </div>
   );
 }
