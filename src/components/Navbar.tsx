@@ -10,17 +10,65 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const profileRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
   useEffect(() => {
+    setMounted(true);
+
+    // Sadece istemci tarafında çalışacak kodlar
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    
+    // Okunmamış mesajları sadece client tarafında kontrol et
+    if (user && mounted) {
+      checkUnreadMessages();
+    }
+    
+    const interval = setInterval(() => {
+      if (user && mounted) {
+        checkUnreadMessages();
+      }
+    }, 60000); // Her dakika kontrol et
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearInterval(interval);
+    };
+  }, [user, mounted]);
+
+  // Okunmamış mesajları kontrol et
+  const checkUnreadMessages = async () => {
+    try {
+      if (typeof window === 'undefined') return; // Sunucu tarafında çalışmayı engelle
+      
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('/api/messages/unread', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUnreadMessages(data.count || 0);
+      }
+    } catch (error) {
+      console.error('Okunmamış mesajlar kontrol edilemedi:', error);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,6 +101,33 @@ export default function Navbar() {
       </svg>
     )}
   ];
+
+  if (!mounted) {
+    return (
+      <div className={`fixed w-full z-50 transition-all duration-500 ${
+        isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'
+      }`}>
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex-shrink-0">
+              <Link href="/" className="flex items-center space-x-2 group">
+                <Image
+                  src="/logo.png"
+                  alt="Kavun Logo"
+                  width={40}
+                  height={40}
+                  className="mr-2"
+                />
+                <span className="text-2xl font-bold text-[#994D1C] group-hover:text-[#FF8B5E]">
+                  KAVUN
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <nav className={`fixed w-full z-50 transition-all duration-500 ${
@@ -130,6 +205,11 @@ export default function Navbar() {
                 >
                   <div className="relative w-8 h-8 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center transform transition-all duration-300 hover:rotate-6">
                     <span className="text-white font-medium">{user.name.charAt(0).toUpperCase()}</span>
+                    {unreadMessages > 0 && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
+                        {unreadMessages > 9 ? '9+' : unreadMessages}
+                      </div>
+                    )}
                   </div>
                   <span className="font-medium">{user.name}</span>
                   <svg
@@ -166,6 +246,23 @@ export default function Navbar() {
                         Profil
                       </Link>
                       <Link
+                        href="/mesajlarim"
+                        className="flex items-center justify-between px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                          </svg>
+                          <span>Mesajlarım</span>
+                        </div>
+                        {unreadMessages > 0 && (
+                          <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                            {unreadMessages > 9 ? '9+' : unreadMessages}
+                          </span>
+                        )}
+                      </Link>
+                      <Link
                         href="/ayarlar"
                         className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                         onClick={() => setIsProfileOpen(false)}
@@ -190,10 +287,10 @@ export default function Navbar() {
          
 
           {/* Mobile Menu Button */}
-          <div className="flex" ref={profileRef}>
+          <div className="flex md:hidden" ref={profileRef}>
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 rounded-xl transition-all duration-300 md:hidden"
+            className="p-2 rounded-xl transition-all duration-300"
           >
             <svg className="w-6 h-6 text-[#994D1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMenuOpen ? (
@@ -267,6 +364,23 @@ export default function Navbar() {
                   Profil
                 </Link>
                 <Link
+                  href="/mesajlarim"
+                  className="flex items-center justify-between px-4 py-2.5 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    <span>Mesajlarım</span>
+                  </div>
+                  {unreadMessages > 0 && (
+                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      {unreadMessages > 9 ? '9+' : unreadMessages}
+                    </span>
+                  )}
+                </Link>
+                <Link
                   href="/ayarlar"
                   className="flex items-center px-4 py-2.5 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                   onClick={() => setIsMenuOpen(false)}
@@ -299,8 +413,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/auth/register"
-                className="block px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium text-center
-                  transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
+                className="block px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium transition-all duration-300"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Kayıt Ol
