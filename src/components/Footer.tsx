@@ -9,7 +9,7 @@ export default function Footer() {
   const { user } = useAuth();
   
   return (
-    <footer className="bg-gradient-to-r from-[#FFB996] to-[#FFB996] border-t border-[#FFB996] mt-0">
+    <footer className="bg-gradient-to-r from-[#FFCDB2] to-[#FFCDB2] border-t border-[#FFCDB2] mt-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-wrap justify-between gap-8">
           {/* Brand Column */}
@@ -153,7 +153,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-[#FFB996]">
+        <div className="mt-12 pt-8 border-t border-[#FFCDB2]">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <p className="text-[#994D1C] text-sm">
               &copy; {currentYear} Kavun. Tüm hakları saklıdır.
