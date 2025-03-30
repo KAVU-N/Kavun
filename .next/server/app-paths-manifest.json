@@ -1,7 +1,6 @@
 {
   "/page": "app/page.js",
-  "/egitmenler/page": "app/egitmenler/page.js",
-  "/auth/register/page": "app/auth/register/page.js",
-  "/auth/verify/page": "app/auth/verify/page.js",
-  "/auth/login/page": "app/auth/login/page.js"
+  "/iletisim/page": "app/iletisim/page.js",
+  "/auth/login/page": "app/auth/login/page.js",
+  "/auth/register/page": "app/auth/register/page.js"
 }
