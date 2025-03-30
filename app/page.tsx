@@ -98,7 +98,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FFF5F0]">
       <Navbar />
-      <main className="py-20 pt-40 bg-[#FFECD9] flex-grow mb-0 pb-16">
+      <main className="py-20 pt-40 bg-[#FFE8D8] flex-grow mb-0 pb-16">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center">
             <div className="w-full max-w-3xl text-center mb-12">
