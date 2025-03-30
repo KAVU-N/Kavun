@@ -4,7 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { universities } from '@/data/universities';
+import Image from 'next/image';
+
+type Role = 'student' | 'teacher';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -21,24 +23,18 @@ export default function RegisterPage() {
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    const confirmPassword = formData.get('confirmPassword') as string;
-    const role = formData.get('role') as 'student' | 'teacher';
+    const passwordConfirm = formData.get('passwordConfirm') as string;
+    const role = formData.get('role') as Role;
     const university = formData.get('university') as string;
-
-    if (password !== confirmPassword) {
+    
+    if (password !== passwordConfirm) {
       setError('Şifreler eşleşmiyor');
       setLoading(false);
       return;
     }
-
-    if (password.length < 8) {
-      setError('Şifre en az 8 karakter olmalıdır');
-      setLoading(false);
-      return;
-    }
-
+    
     try {
-      const result = await register({ name, email, password, role, university });
+      await register({ name, email, password, role, university });
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       setError(err.message || 'Kayıt olurken bir hata oluştu');
@@ -48,23 +44,37 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FFF5F0] px-4 py-16 space-y-6">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 space-y-6">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-[#994D1C]">
-            Hesap Oluştur
+    <div className="container mx-auto flex flex-col md:flex-row gap-4">
+      {/* Illustration on the left */}
+      <div className="hidden md:flex md:flex-1 items-center justify-center">
+        <div className="relative w-full max-w-sm">
+          <Image 
+            src="/images/education-illustration.svg" 
+            alt="Education" 
+            width={380} 
+            height={380} 
+            className="object-contain"
+          />
+        </div>
+      </div>
+      
+      {/* Form on the right */}
+      <div className="flex-1">
+        <div className="mb-2">
+          <h2 className="text-2xl font-bold text-[#994D1C]">
+            Kayıt Ol
           </h2>
-          <p className="mt-2 text-sm text-[#6B3416]">
+          <p className="mt-1 text-xs text-[#6B3416]">
             Zaten hesabınız var mı?{' '}
             <Link href="/auth/login" className="font-medium text-[#FF8B5E] hover:text-[#994D1C] transition-colors">
               Giriş Yap
             </Link>
           </p>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        
+        <form onSubmit={handleSubmit} className="space-y-2.5">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-[#6B3416]">
+            <label htmlFor="name" className="block text-sm font-medium text-[#6B3416] mb-1">
               Ad Soyad
             </label>
             <input
@@ -72,12 +82,12 @@ export default function RegisterPage() {
               name="name"
               type="text"
               required
-              className="mt-1 block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-[#6B3416]">
+            <label htmlFor="email" className="block text-sm font-medium text-[#6B3416] mb-1">
               Email
             </label>
             <input
@@ -85,12 +95,12 @@ export default function RegisterPage() {
               name="email"
               type="email"
               required
-              className="mt-1 block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-[#6B3416]">
+            <label htmlFor="password" className="block text-sm font-medium text-[#6B3416] mb-1">
               Şifre
             </label>
             <input
@@ -99,56 +109,59 @@ export default function RegisterPage() {
               type="password"
               required
               minLength={8}
-              className="mt-1 block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
             />
-            <p className="mt-1 text-sm text-[#994D1C]">En az 8 karakter olmalıdır</p>
+            <p className="mt-1 text-xs text-[#6B3416]">En az 8 karakter olmalıdır</p>
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#6B3416]">
+            <label htmlFor="passwordConfirm" className="block text-sm font-medium text-[#6B3416] mb-1">
               Şifre Tekrar
             </label>
             <input
-              id="confirmPassword"
-              name="confirmPassword"
+              id="passwordConfirm"
+              name="passwordConfirm"
               type="password"
               required
-              className="mt-1 block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+              minLength={8}
+              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
             />
           </div>
 
           <div>
-            <label htmlFor="role" className="block text-sm font-medium text-[#6B3416]">
+            <label htmlFor="role" className="block text-sm font-medium text-[#6B3416] mb-1">
               Rol
             </label>
             <select
               id="role"
               name="role"
               required
-              className="mt-1 block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+              defaultValue=""
+              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
             >
-              <option value="">Rol seçin</option>
+              <option value="" disabled>Rol seçin</option>
               <option value="student">Öğrenci</option>
-              <option value="teacher">Eğitmen</option>
+              <option value="teacher">Öğretmen</option>
             </select>
           </div>
 
           <div>
-            <label htmlFor="university" className="block text-sm font-medium text-[#6B3416]">
+            <label htmlFor="university" className="block text-sm font-medium text-[#6B3416] mb-1">
               Üniversite
             </label>
             <select
               id="university"
               name="university"
               required
-              className="mt-1 block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+              defaultValue=""
+              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
             >
-              <option value="">Üniversite seçin</option>
-              {universities.map((university, index) => (
-                <option key={index} value={university}>
-                  {university}
-                </option>
-              ))}
+              <option value="" disabled>Üniversite seçin</option>
+              <option value="ankara">Ankara Üniversitesi</option>
+              <option value="istanbul">İstanbul Üniversitesi</option>
+              <option value="ege">Ege Üniversitesi</option>
+              <option value="odtu">ODTÜ</option>
+              <option value="bogazici">Boğaziçi Üniversitesi</option>
             </select>
           </div>
 
@@ -161,10 +174,14 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-semibold py-3 px-6 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+            className="w-full bg-[#FF9B6A] text-white font-semibold py-1.5 px-4 rounded-md hover:bg-[#FF8B5E] transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 mt-1"
           >
-            {loading ? 'Kaydediliyor...' : 'Kayıt Ol'}
+            {loading ? 'Kayıt Yapılıyor...' : 'Kayıt Ol'}
           </button>
+          
+          <p className="mt-2 text-xs text-center text-[#6B3416]">
+            By signing up, you agree to our <a href="#" className="text-[#FF8B5E] hover:text-[#994D1C]">Terms of Use</a> and <a href="#" className="text-[#FF8B5E] hover:text-[#994D1C]">Privacy Policy</a>.
+          </p>
         </form>
       </div>
     </div>

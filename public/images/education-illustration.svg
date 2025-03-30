@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="250" cy="250" r="200" fill="white" stroke="black" stroke-width="2"/>
+  
+  <!-- Grid and icons in background -->
+  <rect x="170" y="120" width="30" height="30" fill="none" stroke="black" stroke-width="1"/>
+  <rect x="210" y="120" width="30" height="30" fill="none" stroke="black" stroke-width="1"/>
+  <rect x="250" y="120" width="30" height="30" fill="none" stroke="black" stroke-width="1"/>
+  
+  <rect x="170" y="160" width="30" height="30" fill="none" stroke="black" stroke-width="1"/>
+  <rect x="210" y="160" width="30" height="30" fill="none" stroke="black" stroke-width="1"/>
+  <rect x="250" y="160" width="30" height="30" fill="none" stroke="black" stroke-width="1"/>
+  
+  <!-- Document icon -->
+  <rect x="180" y="200" width="40" height="50" fill="white" stroke="black" stroke-width="1"/>
+  <line x1="190" y1="215" x2="210" y2="215" stroke="black" stroke-width="1"/>
+  <line x1="190" y1="225" x2="210" y2="225" stroke="black" stroke-width="1"/>
+  <line x1="190" y1="235" x2="210" y2="235" stroke="black" stroke-width="1"/>
+  
+  <!-- Shapes -->
+  <polygon points="250,300 270,330 230,330" fill="none" stroke="black" stroke-width="1"/>
+  <circle cx="290" cy="310" r="15" fill="none" stroke="black" stroke-width="1"/>
+  <rect x="310" y="295" width="30" height="30" fill="none" stroke="black" stroke-width="1"/>
+  
+  <!-- Person on right (teacher) -->
+  <circle cx="350" cy="180" r="20" fill="#6B3416"/>
+  <path d="M340,200 L330,280 L350,280 L370,280 L360,200" fill="black"/>
+  <path d="M330,280 L320,380 L340,380 L350,280" fill="white" stroke="black" stroke-width="2" stroke-dasharray="4"/>
+  <path d="M370,280 L380,380 L360,380 L350,280" fill="white" stroke="black" stroke-width="2" stroke-dasharray="4"/>
+  
+  <!-- Arms for teacher -->
+  <path d="M340,220 L280,250" stroke="black" stroke-width="8"/>
+  <path d="M360,220 L420,250" stroke="black" stroke-width="8"/>
+  
+  <!-- Person on left (student) -->
+  <circle cx="150" cy="180" r="20" fill="#FF8B5E"/>
+  <rect x="130" y="200" width="40" height="80" fill="white" stroke="black" stroke-width="2"/>
+  <rect x="130" y="280" width="20" height="100" fill="black"/>
+  <rect x="150" y="280" width="20" height="100" fill="black"/>
+  
+  <!-- Arms for student -->
+  <path d="M130,230 L100,260" stroke="black" stroke-width="2"/>
+  <path d="M170,230 L200,260" stroke="black" stroke-width="2"/>
+  
+  <!-- Cursor arrow -->
+  <polygon points="200,260 220,240 225,255 240,245 200,280" fill="black"/>
+  
+  <!-- Striped pattern for student shirt -->
+  <line x1="135" y1="210" x2="165" y2="210" stroke="black" stroke-width="1"/>
+  <line x1="135" y1="220" x2="165" y2="220" stroke="black" stroke-width="1"/>
+  <line x1="135" y1="230" x2="165" y2="230" stroke="black" stroke-width="1"/>
+  <line x1="135" y1="240" x2="165" y2="240" stroke="black" stroke-width="1"/>
+  <line x1="135" y1="250" x2="165" y2="250" stroke="black" stroke-width="1"/>
+  <line x1="135" y1="260" x2="165" y2="260" stroke="black" stroke-width="1"/>
+  <line x1="135" y1="270" x2="165" y2="270" stroke="black" stroke-width="1"/>
+</svg>
