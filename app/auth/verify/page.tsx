@@ -57,8 +57,8 @@ export default function VerifyPage() {
 
   if (!email) {
     return (
-      <div className="text-center space-y-4">
-        <div className="text-[#994D1C] font-medium">
+      <div className="flex flex-col items-center justify-center h-full space-y-4">
+        <div className="text-[#994D1C] font-medium text-center">
           Geçersiz veya süresi dolmuş doğrulama bağlantısı.
         </div>
         <Link
@@ -72,18 +72,18 @@ export default function VerifyPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold text-[#994D1C] text-center">
+    <div className="flex flex-col items-center justify-center h-full">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-[#994D1C] mb-2">
           Email Doğrulama
         </h2>
-        <p className="mt-2 text-sm text-[#6B3416] text-center">
+        <p className="text-sm text-[#6B3416]">
           Email adresinize gönderilen 6 haneli doğrulama kodunu giriniz.
         </p>
       </div>
 
       {success ? (
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 w-full max-w-xs">
           <div className="text-[#994D1C] font-medium">
             {success}
           </div>
@@ -92,15 +92,15 @@ export default function VerifyPage() {
           </p>
           <Link
             href="/auth/login"
-            className="text-[#FF8B5E] hover:text-[#994D1C] transition-colors font-medium"
+            className="inline-block text-[#FF8B5E] hover:text-[#994D1C] transition-colors font-medium mt-2"
           >
             Hemen Giriş Yap
           </Link>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-xs">
           <div>
-            <label htmlFor="code" className="block text-sm font-medium text-[#6B3416]">
+            <label htmlFor="code" className="block text-sm font-medium text-[#6B3416] mb-1">
               Doğrulama Kodu
             </label>
             <input
@@ -109,7 +109,7 @@ export default function VerifyPage() {
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.target.value)}
               placeholder="123456"
-              className="mt-1 block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+              className="w-full rounded-md border border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-2"
               maxLength={6}
               required
             />
@@ -124,7 +124,7 @@ export default function VerifyPage() {
           <button
             type="submit"
             disabled={loading || !verificationCode}
-            className="w-full bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-semibold py-3 px-6 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+            className="w-full bg-[#FFB996] text-white font-medium py-2 px-4 rounded-md hover:bg-[#FF8B5E] transition-all duration-300 disabled:opacity-50 mt-2"
           >
             {loading ? 'Doğrulanıyor...' : 'Doğrula'}
           </button>
