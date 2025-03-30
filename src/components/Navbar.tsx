@@ -121,7 +121,7 @@ export default function Navbar() {
             )}
             
             {user && (
-              <div className="flex" ref={profileRef}>
+              <div className="relative" ref={profileRef}>
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
@@ -143,7 +143,15 @@ export default function Navbar() {
                 </button>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-10 border border-[#FFE5D9]">
+                  <div 
+                    style={{ 
+                      position: 'fixed', 
+                      top: '64px', 
+                      right: '16px',
+                      zIndex: 50 
+                    }} 
+                    className="w-48 bg-white rounded-xl shadow-lg py-2 border border-[#FFE5D9]"
+                  >
                     <div className="px-4 py-3 border-b border-[#FFE5D9]">
                       <p className="text-sm font-medium text-[#6B3416]">{user.name}</p>
                       <p className="text-xs text-[#994D1C] truncate">{user.email}</p>
