@@ -1,4 +1,4 @@
-// File: C:\Users\eren\Documents\GitHub\kavun\app\auth\register\page.tsx
+// File: C:\Users\eren\Kavun\app\auth\register\page.tsx
 import * as entry from '../../../../../app/auth/register/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

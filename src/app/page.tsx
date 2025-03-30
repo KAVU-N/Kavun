@@ -13,7 +13,7 @@ export default function Home() {
     const displayFooter = () => {
       const footer = document.querySelector('footer');
       if (footer) {
-        footer.style.backgroundColor = "#FFF5F0";
+        footer.style.backgroundColor = "white";
         footer.style.borderTopColor = "#FFE5D9";
         footer.style.color = "#6B3416";
         footer.style.display = "block";
@@ -36,13 +36,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white" style={{backgroundColor: 'white !important', color: '#6B3416 !important'}}>
       {/* Hero Section */}
-      <section className="relative pt-20 pb-16 md:pt-24 md:pb-24">
-        {/* Background gradients */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-20 -right-20 w-96 h-96 bg-[#FFE5D9]/40 rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-[#FFB996]/30 rounded-full blur-3xl" />
-        </div>
-        
+      <section className="relative pt-20 pb-16 md:pt-24 md:pb-24 bg-white" style={{backgroundColor: 'white !important'}}>
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 lg:pr-12 mb-10 lg:mb-0">
@@ -75,8 +69,7 @@ export default function Home() {
             </div>
             <div className="lg:w-1/2">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#FFE5D9] to-[#FFB996]/30 rounded-2xl blur-2xl transform scale-95 rotate-3" />
-                <div className="relative z-10 rounded-2xl shadow-xl overflow-hidden bg-[#FFE5D9]/50 h-[350px] flex items-center justify-center">
+                <div className="relative z-10 rounded-2xl shadow-xl overflow-hidden bg-white h-[350px] flex items-center justify-center" style={{backgroundColor: 'white !important'}}>
                   <div className="text-[#994D1C] text-xl">Resim burada görünecek</div>
                 </div>
               </div>
@@ -86,7 +79,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-[#FFF5F0]" style={{backgroundColor: '#FFF5F0 !important'}}>
+      <section className="py-16 bg-white" style={{backgroundColor: 'white !important'}}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-[#6B3416] mb-4" style={{color: '#6B3416 !important'}}>Neden Kavun?</h2>
@@ -145,23 +138,23 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16">
+      <section className="py-16 bg-white" style={{backgroundColor: 'white !important'}}>
         <div className="container mx-auto px-4">
-          <div className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] rounded-2xl p-8 md:p-12 shadow-lg" style={{backgroundColor: '#FFB996 !important'}}>
+          <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg" style={{backgroundColor: 'white !important'}}>
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0 md:mr-8">
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{color: 'white !important'}}>
+                <h2 className="text-2xl md:text-3xl font-bold text-[#6B3416] mb-3" style={{color: '#6B3416 !important'}}>
                   Öğrenme Yolculuğuna Hemen Başla
                 </h2>
-                <p className="text-white/90 max-w-lg" style={{color: 'white !important'}}>
+                <p className="text-[#994D1C] max-w-lg" style={{color: '#994D1C !important'}}>
                   Binlerce öğrenci ve eğitmen arasındaki topluluğumuza katıl, geleceğini şekillendir.
                 </p>
               </div>
               <Link
                 href="/auth/register"
-                className="whitespace-nowrap px-8 py-3 rounded-full bg-white text-[#FF8B5E] font-medium 
-                  transition-all duration-300 hover:bg-[#FFF5F0] hover:shadow-lg hover:scale-105 active:scale-[0.98]"
-                style={{backgroundColor: 'white !important', color: '#FF8B5E !important'}}
+                className="whitespace-nowrap px-8 py-3 rounded-full bg-[#FFB996] text-white font-medium 
+                  transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-[0.98]"
+                style={{backgroundColor: '#FFB996 !important', color: 'white !important'}}
               >
                 Ücretsiz Kaydol
               </Link>
@@ -171,9 +164,9 @@ export default function Home() {
       </section>
 
       {/* Özel Footer - Direkt buraya yerleştirildi */}
-      <footer className="bg-gradient-to-r from-[#FFF5F0] to-white border-t border-[#FFE5D9] py-8 relative z-50" 
+      <footer className="bg-white border-t border-[#FFE5D9] py-8 relative z-50" 
         style={{
-          backgroundColor: '#FFF5F0 !important', 
+          backgroundColor: 'white !important', 
           borderTopColor: '#FFE5D9 !important', 
           color: '#6B3416 !important',
           position: 'relative',

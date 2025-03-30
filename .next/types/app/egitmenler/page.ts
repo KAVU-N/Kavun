@@ -1,4 +1,4 @@
-// File: C:\Users\eren\Documents\GitHub\kavun\app\egitmenler\page.tsx
+// File: C:\Users\eren\Kavun\app\egitmenler\page.tsx
 import * as entry from '../../../../app/egitmenler/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
