@@ -24,21 +24,21 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" style={{backgroundColor: 'white !important'}}>
+    <html lang="en" style={{backgroundColor: '#FFF5F0 !important'}}>
       <head>
         <link rel="icon" href="/logo.ico" />
         <style>{`
           html, body {
-            background-color: white !important;
-            background: white !important;
+            background-color: #FFF5F0 !important;
+            background: #FFF5F0 !important;
           }
         `}</style>
       </head>
-      <body className={inter.className} style={{backgroundColor: 'white !important', background: 'white !important'}}>
+      <body className={inter.className} style={{backgroundColor: '#FFF5F0 !important', background: '#FFF5F0 !important'}}>
         <AuthProvider>
-          <div className="flex flex-col min-h-screen" style={{backgroundColor: 'white !important', background: 'white !important'}}>
+          <div className="flex flex-col min-h-screen" style={{backgroundColor: '#FFF5F0 !important', background: '#FFF5F0 !important'}}>
             <Navbar />
-            <div className="flex-grow" style={{backgroundColor: 'white !important', background: 'white !important'}}>
+            <div className="flex-grow" style={{backgroundColor: '#FFF5F0 !important', background: '#FFF5F0 !important'}}>
               <Toaster 
                 position="top-right"
                 toastOptions={{
