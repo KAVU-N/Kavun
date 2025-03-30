@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
-// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\api\auth\logout\route.ts
-=======
 // File: C:\Users\eren\Kavun\app\api\auth\logout\route.ts
->>>>>>> Stashed changes
 import * as entry from '../../../../../../app/api/auth/logout/route.js'
 import type { NextRequest } from 'next/server.js'
 

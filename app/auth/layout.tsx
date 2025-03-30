@@ -12,13 +12,13 @@ export default function AuthLayout({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="relative max-w-5xl w-full bg-white rounded-xl shadow-2xl p-6 mt-8"
+        className="relative max-w-[480px] min-h-[300px] bg-white rounded-xl shadow-2xl p-10 mt-8 flex flex-col justify-center"
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="relative"
+          className="relative flex-1 flex flex-col justify-center"
         >
           {children}
         </motion.div>

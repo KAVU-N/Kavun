@@ -1,4 +1,4 @@
-// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\api\auth\user\route.ts
+// File: C:\Users\eren\Kavun\app\api\auth\user\route.ts
 import * as entry from '../../../../../../app/api/auth/user/route.js'
 import type { NextRequest } from 'next/server.js'
 

@@ -1,4 +1,4 @@
-// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\api\auth\verify\route.ts
+// File: C:\Users\eren\Kavun\app\api\auth\verify\route.ts
 import * as entry from '../../../../../../app/api/auth/verify/route.js'
 import type { NextRequest } from 'next/server.js'
 
