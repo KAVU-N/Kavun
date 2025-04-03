@@ -1,13 +1,7 @@
 {
-  "/page": "app/page.js",
-  "/egitmenler/page": "app/egitmenler/page.js",
-  "/mesajlarim/page": "app/mesajlarim/page.js",
+  "/api/users/[id]/route": "app/api/users/[id]/route.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/api/conversations/route": "app/api/conversations/route.js",
-  "/iletisim/page": "app/iletisim/page.js",
-  "/api/instructors/route": "app/api/instructors/route.js",
-  "/api/socket/route": "app/api/socket/route.js",
   "/api/messages/route": "app/api/messages/route.js",
-  "/auth/register/page": "app/auth/register/page.js",
-  "/auth/login/page": "app/auth/login/page.js"
+  "/mesajlarim/page": "app/mesajlarim/page.js",
+  "/api/conversations/route": "app/api/conversations/route.js"
 }

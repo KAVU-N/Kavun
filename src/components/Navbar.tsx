@@ -16,10 +16,15 @@ export default function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
+  // İstemci tarafında olduğumuzu işaretleyen effect
   useEffect(() => {
     setMounted(true);
+  }, []);
 
-    // Sadece istemci tarafında çalışacak kodlar
+  // Scroll ve mesaj kontrolü için effect
+  useEffect(() => {
+    if (!mounted) return;
+    
     const handleScroll = () => {
       if (window.scrollY > 20) {
         setIsScrolled(true);
@@ -31,12 +36,12 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     
     // Okunmamış mesajları sadece client tarafında kontrol et
-    if (user && mounted) {
+    if (user) {
       checkUnreadMessages();
     }
     
     const interval = setInterval(() => {
-      if (user && mounted) {
+      if (user) {
         checkUnreadMessages();
       }
     }, 60000); // Her dakika kontrol et
@@ -45,13 +50,27 @@ export default function Navbar() {
       window.removeEventListener('scroll', handleScroll);
       clearInterval(interval);
     };
-  }, [user, mounted]);
+  }, [mounted, user]);
+
+  // Profil menüsü dışında bir yere tıklandığında menüyü kapat
+  useEffect(() => {
+    if (!mounted) return;
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [mounted]);
 
   // Okunmamış mesajları kontrol et
   const checkUnreadMessages = async () => {
     try {
-      if (typeof window === 'undefined') return; // Sunucu tarafında çalışmayı engelle
-      
       const token = localStorage.getItem('token');
       if (!token) return;
 
@@ -66,30 +85,17 @@ export default function Navbar() {
         setUnreadMessages(data.count || 0);
       }
     } catch (error) {
-      console.error('Okunmamış mesajlar kontrol edilemedi:', error);
+      console.error('Okunmamış mesajlar kontrol edilirken hata oluştu:', error);
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setIsProfileOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
-
-  const handleLogout = () => {
-    setIsProfileOpen(false);
-    logout();
-  };
-
+  // Navigasyon linkleri
   const navLinks = [
+    { href: '/', label: 'Ana Sayfa', icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+    )},
     { href: '/egitmenler', label: 'Eğitmenler', icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -102,326 +108,286 @@ export default function Navbar() {
     )}
   ];
 
-  if (!mounted) {
-    return (
-      <div className={`fixed w-full z-50 transition-all duration-500 ${
-        isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'
-      }`}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex-shrink-0">
-              <Link href="/" className="flex items-center space-x-2 group">
-                <Image
-                  src="/logo.png"
-                  alt="Kavun Logo"
-                  width={40}
-                  height={40}
-                  className="mr-2"
-                />
-                <span className="text-2xl font-bold text-[#994D1C] group-hover:text-[#FF8B5E]">
-                  KAVUN
-                </span>
-              </Link>
+  // Hem sunucu hem de istemci tarafında aynı yapıyı render edelim
+  return (
+    <div className="fixed w-full z-50">
+      {/* Sunucu tarafında boş bir div render et, istemci tarafında gerçek içeriği göster */}
+      {!mounted ? (
+        <div className="w-full py-4">
+          <div className="mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex-shrink-0">
+                <div className="flex items-center space-x-2">
+                  <div className="w-10 h-10 mr-2"></div>
+                  <span className="text-2xl font-bold text-[#994D1C]">KAVUN</span>
+                </div>
+              </div>
+              <div className="hidden md:flex items-center justify-center flex-1">
+                <div className="flex items-center space-x-1"></div>
+              </div>
+              <div className="hidden md:flex items-center justify-end space-x-4">
+                <div className="flex items-center space-x-4"></div>
+              </div>
+              <div className="flex md:hidden">
+                <button className="p-2 rounded-xl"></button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <nav className={`fixed w-full z-50 transition-all duration-500 ${
-      isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'
-    }`}>
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo - LEFT */}
-          <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center space-x-2 group">
-              <Image
-                src="/logo.png"
-                alt="Kavun Logo"
-                width={40}
-                height={40}
-                className="mr-2"
-              />
-              <span className={`text-2xl font-bold transition-all duration-300 ${
-                isScrolled ? 'text-[#6B3416]' : 'text-[#994D1C]'
-              } group-hover:text-[#FF8B5E]`}>
-                KAVUN
-              </span>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation - CENTER */}
-          <div className="hidden md:flex items-center justify-center">
-            <div className="flex items-center space-x-1">
-              {navLinks
-                .filter(link => link.label !== 'Eğitmenler' || user)
-                .map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                      pathname === link.href
-                        ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
-                        : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0] hover:scale-105'
-                    }`}
-                  >
-                    {link.icon}
-                    <span>{link.label}</span>
-                  </Link>
-                ))}
-            </div>
-          </div>
-
-          {/* Profile/Auth Section - RIGHT */}
-          <div className="hidden md:flex items-center justify-end space-x-4">
-            {!user && (
-              <div className="flex items-center space-x-4">
-                <Link
-                  href="/auth/login"
-                  className="px-6 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] font-medium transition-all duration-300 hover:bg-[#FFF5F0] hover:scale-105"
-                >
-                  Giriş Yap
-                </Link>
-                <Link
-                  href="/auth/register"
-                  className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
-                    transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
-                >
-                  Kayıt Ol
+      ) : (
+        <nav className={`w-full transition-all duration-500 ${
+          isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'
+        }`}>
+          <div className="mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              {/* Logo - LEFT */}
+              <div className="flex-shrink-0">
+                <Link href="/" className="flex items-center space-x-2 group">
+                  <Image
+                    src="/logo.png"
+                    alt="Kavun Logo"
+                    width={40}
+                    height={40}
+                    className="mr-2"
+                  />
+                  <span className={`text-2xl font-bold transition-all duration-300 ${
+                    isScrolled ? 'text-[#6B3416]' : 'text-[#994D1C]'
+                  } group-hover:text-[#FF8B5E]`}>
+                    KAVUN
+                  </span>
                 </Link>
               </div>
-            )}
-            
-            {user && (
-              <div className="relative" ref={profileRef}>
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                    isProfileOpen ? 'bg-[#FFF5F0] text-[#6B3416] shadow-sm' : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0] hover:scale-105'
-                  }`}
-                >
-                  <div className="relative w-8 h-8 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center transform transition-all duration-300 hover:rotate-6">
-                    <span className="text-white font-medium">{user.name.charAt(0).toUpperCase()}</span>
-                    {unreadMessages > 0 && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
-                        {unreadMessages > 9 ? '9+' : unreadMessages}
+
+              {/* Desktop Navigation - CENTER */}
+              <div className="hidden md:flex items-center justify-center flex-1">
+                <div className="flex items-center space-x-1">
+                  {navLinks
+                    .filter(link => link.label !== 'Eğitmenler' || user)
+                    .map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                          pathname === link.href
+                            ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
+                            : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0] hover:scale-105'
+                        }`}
+                      >
+                        {link.icon}
+                        <span>{link.label}</span>
+                      </Link>
+                    ))}
+                </div>
+              </div>
+
+              {/* Profile/Auth Section - RIGHT */}
+              <div className="hidden md:flex items-center justify-end space-x-4">
+                {!user && (
+                  <div className="flex items-center space-x-4">
+                    <Link
+                      href="/auth/login"
+                      className="px-6 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] font-medium transition-all duration-300 hover:bg-[#FFF5F0] hover:scale-105"
+                    >
+                      Giriş Yap
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
+                        transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
+                    >
+                      Kayıt Ol
+                    </Link>
+                  </div>
+                )}
+                
+                {user && (
+                  <div className="relative" ref={profileRef}>
+                    <button
+                      onClick={() => setIsProfileOpen(!isProfileOpen)}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                        isProfileOpen ? 'bg-[#FFF5F0] text-[#6B3416] shadow-sm' : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0] hover:scale-105'
+                      }`}
+                    >
+                      <div className="relative w-8 h-8 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center transform transition-all duration-300 hover:rotate-6">
+                        <span className="text-white font-medium">{user.name.charAt(0).toUpperCase()}</span>
+                        {unreadMessages > 0 && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
+                            {unreadMessages > 9 ? '9+' : unreadMessages}
+                          </div>
+                        )}
+                      </div>
+                      <span className="font-medium">{user.name}</span>
+                      <svg
+                        className={`w-4 h-4 transition-transform duration-300 ${isProfileOpen ? 'transform rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {/* Profile Dropdown */}
+                    {isProfileOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-10 border border-[#FFE5D9]">
+                        <Link
+                          href="/profil"
+                          className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span>Profilim</span>
+                          </div>
+                        </Link>
+                        <Link
+                          href="/mesajlarim"
+                          className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <div className="relative">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                              </svg>
+                              {unreadMessages > 0 && (
+                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                              )}
+                            </div>
+                            <span>Mesajlarım</span>
+                          </div>
+                        </Link>
+                        <button
+                          onClick={logout}
+                          className="w-full text-left px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span>Çıkış Yap</span>
+                          </div>
+                        </button>
                       </div>
                     )}
                   </div>
-                  <span className="font-medium">{user.name}</span>
-                  <svg
-                    className={`w-4 h-4 transition-transform duration-300 ${isProfileOpen ? 'transform rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                )}
+              </div>
+
+              {/* Mobile Menu Button */}
+              <div className="flex md:hidden">
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="p-2 rounded-xl transition-all duration-300"
+                >
+                  <svg className="w-6 h-6 text-[#994D1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {isMenuOpen ? (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    ) : (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    )}
                   </svg>
                 </button>
+              </div>
+            </div>
+          </div>
 
-                {isProfileOpen && (
-                  <div 
-                    style={{ 
-                      position: 'fixed', 
-                      top: '64px', 
-                      right: '16px',
-                      zIndex: 50 
-                    }} 
-                    className="w-48 bg-white rounded-xl shadow-lg py-2 border border-[#FFE5D9]"
-                  >
-                    <div className="px-4 py-3 border-b border-[#FFE5D9]">
-                      <p className="text-sm font-medium text-[#6B3416]">{user.name}</p>
-                      <p className="text-xs text-[#994D1C] truncate">{user.email}</p>
-                      <p className="text-xs text-[#994D1C] truncate">{user.university}</p>
-                    </div>
-                    <div className="py-2">
-                      <Link
-                        href="/profil"
-                        className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        Profil
-                      </Link>
-                      <Link
-                        href="/mesajlarim"
-                        className="flex items-center justify-between px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                          </svg>
-                          <span>Mesajlarım</span>
-                        </div>
-                        {unreadMessages > 0 && (
-                          <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                            {unreadMessages > 9 ? '9+' : unreadMessages}
-                          </span>
-                        )}
-                      </Link>
-                      <Link
-                        href="/ayarlar"
-                        className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        Ayarlar
-                      </Link>
-
-                      <button
-                        onClick={logout}
-                        className="w-full flex items-center space-x-2 px-3 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0] transition-all duration-300"
-                      >
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className="md:hidden bg-white shadow-lg rounded-b-xl overflow-hidden">
+              <div className="px-4 py-3 space-y-1">
+                {navLinks
+                  .filter(link => link.label !== 'Eğitmenler' || user)
+                  .map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                        pathname === link.href
+                          ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
+                          : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0]'
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {link.icon}
+                      <span>{link.label}</span>
+                    </Link>
+                  ))}
+                
+                {!user ? (
+                  <div className="flex flex-col space-y-2 mt-4">
+                    <Link
+                      href="/auth/login"
+                      className="px-6 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] font-medium transition-all duration-300 hover:bg-[#FFF5F0] text-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Giriş Yap
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
+                        transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 text-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Kayıt Ol
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2 mt-4 border-t border-[#FFE5D9] pt-4">
+                    <Link
+                      href="/profil"
+                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span>Profilim</span>
+                    </Link>
+                    <Link
+                      href="/mesajlarim"
+                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <div className="relative">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                         </svg>
-                        <span>Çıkış Yap</span>
-                      </button>
-                    </div>
+                        {unreadMessages > 0 && (
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                        )}
+                      </div>
+                      <span>Mesajlarım</span>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0] text-left"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      <span>Çıkış Yap</span>
+                    </button>
                   </div>
                 )}
               </div>
-            )}
-         
-
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden" ref={profileRef}>
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 rounded-xl transition-all duration-300"
-          >
-            <svg className="w-6 h-6 text-[#994D1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
-          </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden mt-4 pb-4 border-t border-[#FFE5D9]">
-          <div className="pt-4 pb-3 space-y-2">
-            {navLinks
-              .filter(link => link.label !== 'Eğitmenler' || user)
-              .map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center space-x-3 px-4 py-2.5 rounded-xl transition-all duration-300 ${
-                    pathname === link.href
-                      ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
-                      : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0]'
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.icon}
-                  <span>{link.label}</span>
-                </Link>
-              ))}
-          </div>
-
-          {user ? (
-            <div className="pt-4 mt-4 border-t border-[#FFE5D9]">
-              <div className="px-4 mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center">
-                    <span className="text-white font-medium text-lg">{user.name.charAt(0).toUpperCase()}</span>
-                  </div>
-                  <div>
-                    <p className="text-sm text-[#6B3416] font-medium">{user.name}</p>
-                    <p className="text-xs text-[#994D1C]">{user.email}</p>
-                    <p className="text-xs text-[#994D1C]">{user.university}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Link
-                  href="/profil"
-                  className="flex items-center px-4 py-2.5 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  Profil
-                </Link>
-                <Link
-                  href="/mesajlarim"
-                  className="flex items-center justify-between px-4 py-2.5 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                    </svg>
-                    <span>Mesajlarım</span>
-                  </div>
-                  {unreadMessages > 0 && (
-                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                      {unreadMessages > 9 ? '9+' : unreadMessages}
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  href="/ayarlar"
-                  className="flex items-center px-4 py-2.5 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  Ayarlar
-                </Link>
-                <button
-                  onClick={logout}
-                  className="w-full flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-300"
-                >
-                  <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  Çıkış Yap
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="pt-4 mt-4 border-t border-[#FFE5D9] space-y-2">
-              <Link
-                href="/auth/login"
-                className="block px-4 py-2.5 rounded-xl text-[#994D1C] hover:text-[#6B3416] font-medium transition-all duration-300 hover:bg-[#FFF5F0]"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Giriş Yap
-              </Link>
-              <Link
-                href="/auth/register"
-                className="block px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium transition-all duration-300"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Kayıt Ol
-              </Link>
             </div>
           )}
-        </div>
+        </nav>
       )}
-    </nav>
+    </div>
   );
 }

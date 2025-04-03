@@ -30,7 +30,9 @@ const conversationSchema = new Schema({
 });
 
 // Katılımcılar için benzersiz indeks oluşturma
-conversationSchema.index({ participants: 1 }, { unique: true });
+// Önceki indeks, aynı katılımcılar arasında birden fazla konuşma oluşturulmasını engelliyordu
+// Yeni indeks, katılımcıların sıralanmış bir şekilde benzersiz olmasını sağlayacak
+conversationSchema.index({ participants: 1 }, { unique: false });
 
 // Model oluşturma
 const Conversation = mongoose.models.Conversation || mongoose.model('Conversation', conversationSchema);

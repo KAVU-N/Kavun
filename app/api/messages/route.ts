@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Message from '@/models/Message';
+import User from '@/models/User';
+import Conversation from '@/models/Conversation';
 import { headers } from 'next/headers';
 import jwt from 'jsonwebtoken';
 
@@ -17,8 +19,13 @@ async function getUserFromToken(req: Request) {
   }
   
   try {
+    console.log('Token doğrulanıyor...');
+    
     // JWT_SECRET değeri .env dosyasından okunmalıdır
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret') as {
+    const jwtSecret = process.env.JWT_SECRET || 'default_secret';
+    console.log('JWT Secret kullanılıyor (ilk 5 karakter):', jwtSecret.substring(0, 5) + '...');
+    
+    const decoded = jwt.verify(token, jwtSecret) as {
       id?: string;
       _id?: string;
       userId?: string;
@@ -28,8 +35,11 @@ async function getUserFromToken(req: Request) {
       university?: string;
     };
     
-    // Debug için token içeriği
-    console.log('JWT token decoded:', decoded);
+    console.log('Token başarıyla doğrulandı:', {
+      email: decoded.email,
+      name: decoded.name,
+      id: decoded.userId || decoded.id || decoded._id
+    });
     
     // Kullanıcı ID'sini standartlaştır - userId, id veya _id hangisi varsa onu kullan
     return {
@@ -44,53 +54,91 @@ async function getUserFromToken(req: Request) {
 
 // Belirli bir konuşmadaki mesajları getir
 export async function GET(request: Request) {
+  console.log('GET /api/messages isteği alındı');
+  
   try {
+    // URL parametrelerini al
+    const { searchParams } = new URL(request.url);
+    const receiverId = searchParams.get('receiverId');
+    
+    console.log('Alınan parametreler:', { receiverId });
+    
+    if (!receiverId) {
+      console.error('receiverId parametresi eksik');
+      return NextResponse.json({ error: 'receiverId parametresi gerekli' }, { status: 400 });
+    }
+    
+    // Kullanıcı kimliğini doğrula
     const user = await getUserFromToken(request);
     if (!user) {
+      console.error('Geçersiz veya eksik token');
       return NextResponse.json({ error: 'Oturum açmanız gerekiyor' }, { status: 401 });
     }
-
+    
     console.log('GET Messages - User info from token:', user);
-
+    
     // User ID kontrolü
     if (!user.id) {
+      console.error('Token içinde kullanıcı ID bilgisi yok');
       return NextResponse.json({ error: 'Kullanıcı kimliği bulunamadı' }, { status: 400 });
     }
-
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
     
-    if (!userId) {
-      return NextResponse.json({ error: 'Kullanıcı ID gereklidir' }, { status: 400 });
-    }
-
+    // MongoDB bağlantısı
     try {
+      console.log('MongoDB bağlantısı kuruluyor...');
       await connectDB();
       console.log('MongoDB bağlantısı başarılı');
     } catch (dbError) {
       console.error('MongoDB bağlantı hatası:', dbError);
       return NextResponse.json({ error: 'Veritabanı bağlantı hatası' }, { status: 500 });
     }
-
-    // İki kullanıcı arasındaki mesajları bul
+    
+    // İki kullanıcı arasındaki tüm mesajları bul
+    console.log(`Kullanıcı ID: ${user.id} ve alıcı ID: ${receiverId} arasındaki mesajlar aranıyor...`);
+    
     const messages = await Message.find({
       $or: [
-        { sender: user.id, receiver: userId },
-        { sender: userId, receiver: user.id }
+        { sender: user.id, receiver: receiverId },
+        { sender: receiverId, receiver: user.id }
       ]
     }).sort({ createdAt: 1 });
-
-    // Kullanıcının alıcı olduğu okunmamış mesajları okundu olarak işaretle
+    
+    console.log('Bulunan mesaj sayısı:', messages.length);
+    
+    // Karşı kullanıcının bilgilerini al
+    const otherUser = await User.findById(receiverId, 'name email profilePicture');
+    if (!otherUser) {
+      console.error('Karşı kullanıcı bulunamadı:', receiverId);
+      return NextResponse.json({ error: 'Karşı kullanıcı bulunamadı' }, { status: 404 });
+    }
+    
+    console.log('Karşı kullanıcı bulundu:', otherUser.name);
+    
+    // Okunmamış mesajları okundu olarak işaretle
     await Message.updateMany(
-      { sender: userId, receiver: user.id, read: false },
+      { sender: receiverId, receiver: user.id, read: false },
       { read: true }
     );
-
-    return NextResponse.json(messages);
-  } catch (error) {
+    
+    // Mesajları frontend için formatlayıp döndür
+    const formattedMessages = messages.map(message => ({
+      _id: message._id,
+      sender: message.sender,
+      receiver: message.receiver,
+      content: message.content,
+      createdAt: message.createdAt,
+      read: message.read,
+      isMine: message.sender.toString() === user.id
+    }));
+    
+    return NextResponse.json({
+      messages: formattedMessages,
+      user: otherUser
+    });
+  } catch (error: any) {
     console.error('Mesajlar getirilemedi:', error);
     return NextResponse.json(
-      { error: 'Mesajlar getirilemedi' },
+      { error: `Mesajlar getirilemedi: ${error.message || 'Bilinmeyen hata'}` },
       { status: 500 }
     );
   }
@@ -98,95 +146,104 @@ export async function GET(request: Request) {
 
 // Yeni mesaj gönder
 export async function POST(request: Request) {
+  console.log('POST /api/messages isteği alındı');
+  
   try {
+    // Kullanıcı kimliğini doğrula
     const user = await getUserFromToken(request);
     if (!user) {
+      console.error('Geçersiz veya eksik token');
       return NextResponse.json({ error: 'Oturum açmanız gerekiyor' }, { status: 401 });
     }
-
+    
     console.log('POST Message - User info from token:', user);
-
+    
     // User ID kontrolü
     if (!user.id) {
-      console.error('Kullanıcı ID bulunamadı:', user);
+      console.error('Token içinde kullanıcı ID bilgisi yok');
       return NextResponse.json({ error: 'Kullanıcı kimliği bulunamadı' }, { status: 400 });
     }
-
+    
+    // MongoDB bağlantısı
     try {
+      console.log('MongoDB bağlantısı kuruluyor...');
       await connectDB();
       console.log('MongoDB bağlantısı başarılı');
     } catch (dbError) {
       console.error('MongoDB bağlantı hatası:', dbError);
       return NextResponse.json({ error: 'Veritabanı bağlantı hatası' }, { status: 500 });
     }
-
+    
+    // İstek verilerini al
     let data;
     try {
       data = await request.json();
-      console.log('İstek verisi:', data);
+      console.log('İstek verisi:', { ...data, content: data.content?.substring(0, 20) + '...' });
     } catch (parseError) {
       console.error('İstek verisi çözümlemede hata:', parseError);
       return NextResponse.json({ error: 'İstek verisi çözümlenemedi' }, { status: 400 });
     }
     
+    // Gerekli alanları kontrol et
     if (!data.receiver || !data.content) {
-      return NextResponse.json(
-        { error: 'Alıcı ve mesaj içeriği gereklidir' },
-        { status: 400 }
-      );
+      console.error('Eksik alanlar:', { receiver: !!data.receiver, content: !!data.content });
+      return NextResponse.json({ error: 'receiver ve content alanları zorunludur' }, { status: 400 });
     }
-
-    console.log('Mesaj oluşturuluyor:', {
+    
+    // Alıcı kullanıcının var olup olmadığını kontrol et
+    const receiverExists = await User.findById(data.receiver);
+    if (!receiverExists) {
+      console.error('Alıcı kullanıcı bulunamadı:', data.receiver);
+      return NextResponse.json({ error: 'Alıcı kullanıcı bulunamadı' }, { status: 404 });
+    }
+    
+    // Yeni mesaj oluştur
+    const newMessage = await Message.create({
       sender: user.id,
       receiver: data.receiver,
-      content: data.content
+      content: data.content,
+      read: false
     });
-
-    // Yeni mesaj oluştur
-    try {
-      const message = await Message.create({
-        sender: user.id,
-        receiver: data.receiver,
-        content: data.content
+    
+    console.log('Yeni mesaj oluşturuldu:', newMessage._id);
+    
+    // İki kullanıcı arasında bir konuşma var mı kontrol et
+    let conversation = await Conversation.findOne({
+      participants: { $all: [user.id, data.receiver], $size: 2 }
+    });
+    
+    // Konuşma yoksa yeni bir konuşma oluştur
+    if (!conversation) {
+      console.log('Yeni konuşma oluşturuluyor...');
+      conversation = await Conversation.create({
+        participants: [user.id, data.receiver],
+        lastMessage: data.content
       });
-
-      console.log('Mesaj başarıyla oluşturuldu:', message);
-      
-      return NextResponse.json(message);
-    } catch (createError: any) {
-      console.error('Mesaj oluşturma hatası:', createError);
-      
-      // MongoDB validation hatası detaylarını göster
-      if (createError.name === 'ValidationError') {
-        const validationErrors: {[key: string]: string} = {};
-        
-        for (const field in createError.errors) {
-          validationErrors[field] = createError.errors[field].message;
-        }
-        
-        console.error('Validasyon hataları:', validationErrors);
-        return NextResponse.json({ error: 'Validasyon hatası', details: validationErrors }, { status: 400 });
-      }
-      
-      // Mongoose cast error - genellikle ObjectId hatası
-      if (createError.name === 'CastError') {
-        console.error('Cast hatası:', {
-          path: createError.path,
-          value: createError.value, 
-          kind: createError.kind
-        });
-        return NextResponse.json({ 
-          error: 'Geçersiz veri formatı', 
-          details: `${createError.path} için geçersiz değer: ${createError.value}` 
-        }, { status: 400 });
-      }
-      
-      return NextResponse.json({ error: 'Mesaj oluşturulamadı', details: createError.message }, { status: 500 });
+    } else {
+      // Varolan konuşmanın son mesajını güncelle
+      conversation.lastMessage = data.content;
+      conversation.updatedAt = new Date();
+      await conversation.save();
     }
+    
+    console.log('Konuşma güncellendi:', conversation._id);
+    
+    // Mesajı frontend için formatlayıp döndür
+    const formattedMessage = {
+      _id: newMessage._id,
+      sender: newMessage.sender,
+      receiver: newMessage.receiver,
+      content: newMessage.content,
+      createdAt: newMessage.createdAt,
+      read: newMessage.read,
+      isMine: true
+    };
+    
+    return NextResponse.json(formattedMessage, { status: 201 });
   } catch (error: any) {
-    console.error('Mesaj gönderilemedi - Genel hata:', error);
+    console.error('Mesaj gönderilemedi:', error);
     return NextResponse.json(
-      { error: 'Mesaj gönderilemedi', details: error.message },
+      { error: `Mesaj gönderilemedi: ${error.message || 'Bilinmeyen hata'}` },
       { status: 500 }
     );
   }
