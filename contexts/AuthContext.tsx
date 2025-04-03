@@ -45,12 +45,17 @@ const AuthContext = createContext<AuthContextType>({
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with loading true
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const loadUser = () => {
+    // Mark component as mounted (client-side only)
+    setMounted(true);
+
+    // Only run on client-side
+    if (typeof window !== 'undefined') {
       try {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
@@ -62,9 +67,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } finally {
         setLoading(false);
       }
-    };
-
-    loadUser();
+    } else {
+      // If on server-side, just set loading to false
+      setLoading(false);
+    }
   }, []);
 
   const login = async (data: LoginData) => {
@@ -87,8 +93,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setUser(result.user);
-      localStorage.setItem('user', JSON.stringify(result.user));
-      localStorage.setItem('token', result.token);
+      
+      // Only access localStorage on client-side
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(result.user));
+        localStorage.setItem('token', result.token);
+      }
 
       router.push('/');
     } catch (err: any) {
@@ -119,8 +129,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setUser(result.user);
-      localStorage.setItem('user', JSON.stringify(result.user));
-      localStorage.setItem('token', result.token);
+      
+      // Only access localStorage on client-side
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(result.user));
+        localStorage.setItem('token', result.token);
+      }
 
       router.push('/');
     } catch (err: any) {
@@ -146,8 +160,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setUser(null);
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
+      
+      // Only access localStorage on client-side
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
 
       router.push('/auth/login');
     } catch (err: any) {
@@ -157,6 +175,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     }
   };
+
+  // If not mounted yet (server-side), provide a minimal version
+  if (!mounted) {
+    return (
+      <AuthContext.Provider
+        value={{
+          user: null,
+          loading: true,
+          error: null,
+          login: async () => {},
+          register: async () => {},
+          logout: async () => {},
+        }}
+      >
+        {children}
+      </AuthContext.Provider>
+    );
+  }
 
   return (
     <AuthContext.Provider

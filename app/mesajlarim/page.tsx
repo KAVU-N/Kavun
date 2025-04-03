@@ -55,27 +55,46 @@ export default function MessagesPage() {
         return;
       }
 
-      console.log('Konuşmalar getiriliyor, token:', token.substring(0, 10) + '...');
+      console.log('Konuşmalar getiriliyor, token mevcut:', !!token);
       
+      // API isteği
       const response = await fetch('/api/conversations', {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
 
+      console.log('API yanıtı status:', response.status);
+
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { error: errorText || 'Bilinmeyen hata' };
+        }
+        
         console.error('API Hatası:', errorData);
-        throw new Error(errorData.error || 'Konuşmalar yüklenemedi');
+        throw new Error(errorData.error || `HTTP hata: ${response.status}`);
       }
 
       const data = await response.json();
       console.log('Alınan konuşmalar:', data);
-      setConversations(data);
+      
+      if (Array.isArray(data)) {
+        setConversations(data);
+      } else {
+        console.error('Beklenen dizi formatında veri alınamadı:', data);
+        setConversations([]);
+      }
+      
       setLoading(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Konuşmalar yüklenirken hata oluştu:', err);
-      setError('Konuşmalar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      setError(`Konuşmalar yüklenirken bir hata oluştu: ${err.message || 'Bilinmeyen hata'}`);
       setLoading(false);
     }
   };
@@ -144,9 +163,9 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-[#FF8B5E] mb-8">Mesajlarım</h1>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="container mx-auto px-4 py-8 pt-24 flex-shrink-0">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">Mesajlarım</h1>
         
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -171,7 +190,7 @@ export default function MessagesPage() {
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Henüz mesajınız yok</h3>
                   <p className="text-gray-600 mb-4">Eğitmenlerle mesajlaşmaya başlamak için profillerini ziyaret edebilirsiniz.</p>
-                  <Link href="/eğitmenler" className="bg-[#FF8B5E] text-white px-4 py-2 rounded hover:bg-[#FF7F50] transition-colors">
+                  <Link href="/egitmenler" className="bg-[#FF8B5E] text-white px-4 py-2 rounded hover:bg-[#FF7F50] transition-colors">
                     Eğitmenleri Keşfet
                   </Link>
                 </div>
@@ -200,17 +219,19 @@ export default function MessagesPage() {
                           </div>
                         )}
                         {conversation.unread > 0 && (
-                          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white">
-                            {conversation.unread > 9 ? '9+' : conversation.unread}
-                          </span>
+                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs">{conversation.unread > 9 ? '9+' : conversation.unread}</span>
+                          </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-[#6B3416]">{conversation.name}</p>
-                        <p className="text-sm text-[#994D1C] truncate">{conversation.lastMessage}</p>
-                      </div>
-                      <div className="text-xs text-[#994D1C]/70">
-                        {conversation.date}
+                        <div className="flex justify-between items-center">
+                          <h3 className="text-sm font-medium text-gray-900 truncate">{conversation.name}</h3>
+                          <span className="text-xs text-gray-500">{conversation.date}</span>
+                        </div>
+                        <p className={`text-xs truncate ${conversation.unread > 0 ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
+                          {conversation.lastMessage}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -218,63 +239,36 @@ export default function MessagesPage() {
               )}
             </div>
 
-            <div className="bg-white rounded-lg shadow-md overflow-hidden lg:col-span-2 h-full flex flex-col">
+            {/* Sağ Panel */}
+            <div className="lg:col-span-2 h-full flex flex-col overflow-hidden">
               {selectedUser ? (
-                <div className="h-full flex flex-col">
-                  <div className="p-4 bg-[#FFE5D9] flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      {selectedUser.profilePicture ? (
-                        <Image
-                          src={selectedUser.profilePicture}
-                          alt={selectedUser.name}
-                          width={40}
-                          height={40}
-                          className="rounded-full"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                          <span className="text-white font-medium">{selectedUser.name.charAt(0).toUpperCase()}</span>
-                        </div>
-                      )}
-                      <h2 className="text-[#994D1C] font-medium">{selectedUser.name}</h2>
-                    </div>
-                    <button
-                      onClick={handleChatClose}
-                      className="text-[#994D1C] hover:bg-white/20 p-2 rounded-full transition-colors duration-300"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="flex-1 p-4">
-                    <ChatBox
-                      instructor={selectedUser}
-                      containerStyles={{
-                        position: 'relative',
-                        bottom: 'auto',
-                        right: 'auto',
-                        maxWidth: '100%',
-                        height: '500px',
-                        boxShadow: 'none',
-                        margin: 0,
-                        border: 'none'
-                      }}
-                      embedded={true}
-                    />
-                  </div>
+                <div className="bg-white rounded-lg shadow-md h-full flex flex-col overflow-hidden">
+                  <ChatBox 
+                    instructor={{
+                      _id: selectedUser._id,
+                      name: selectedUser.name,
+                      email: selectedUser.email,
+                      university: selectedUser.university,
+                      role: selectedUser.role
+                    }}
+                    onClose={handleChatClose}
+                    embedded={true}
+                  />
                 </div>
               ) : (
-                <div className="h-full flex items-center justify-center p-8 text-center">
-                  <div>
-                    <svg className="w-16 h-16 mx-auto text-[#994D1C] opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white rounded-lg shadow-md h-full flex flex-col items-center justify-center p-6 text-center">
+                  <div className="w-24 h-24 bg-[#FFE5D9] rounded-full flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-[#FF8B5E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
-                    <h3 className="text-xl font-medium text-[#994D1C] mt-4 mb-2">Bir konuşma seçin</h3>
-                    <p className="text-[#994D1C]/70">
-                      Mesajlarınızı görüntülemek için sol taraftan bir konuşma seçin
-                    </p>
                   </div>
+                  <h2 className="text-xl font-medium text-gray-900 mb-2">Mesajlaşmaya Başlayın</h2>
+                  <p className="text-gray-600 max-w-md mb-6">
+                    Sol taraftan bir konuşma seçin veya eğitmen profillerini ziyaret ederek yeni bir mesajlaşma başlatın.
+                  </p>
+                  <Link href="/egitmenler" className="bg-[#FF8B5E] text-white px-6 py-2 rounded-lg hover:bg-[#FF7F50] transition-colors">
+                    Eğitmenleri Keşfet
+                  </Link>
                 </div>
               )}
             </div>
