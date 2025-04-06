@@ -1,10 +1,6 @@
 {
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/ilan-ver/page": "app/ilan-ver/page.js",
-  "/ilanlarim/page": "app/ilanlarim/page.js",
-  "/api/instructors/route": "app/api/instructors/route.js",
-  "/egitmenler/page": "app/egitmenler/page.js",
-  "/auth/register/page": "app/auth/register/page.js",
   "/auth/login/page": "app/auth/login/page.js",
+  "/auth/register/page": "app/auth/register/page.js",
   "/auth/verify/page": "app/auth/verify/page.js"
 }
