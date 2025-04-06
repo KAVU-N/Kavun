@@ -68,16 +68,46 @@ export async function POST(req: Request) {
 
     // Email doğrulaması kontrolü
     if (!user.isVerified) {
-      return NextResponse.json(
-        { error: 'Lütfen önce email adresinizi doğrulayın' },
-        { 
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Credentials': 'true'
+      // Doğrulama kodu oluştur ve gönder
+      const { generateVerificationCode, sendVerificationEmail } = await import('@/lib/mail');
+      const verificationCode = generateVerificationCode();
+      const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 dakika
+      
+      // Kullanıcı bilgilerini güncelle
+      user.verificationCode = verificationCode;
+      user.verificationCodeExpires = verificationCodeExpires;
+      await user.save();
+      
+      try {
+        await sendVerificationEmail(user.email, verificationCode);
+        
+        return NextResponse.json(
+          { 
+            error: 'Lütfen önce email adresinizi doğrulayın',
+            needsVerification: true,
+            email: user.email
+          },
+          { 
+            status: 403,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Credentials': 'true'
+            }
           }
-        }
-      );
+        );
+      } catch (emailError) {
+        console.error('Doğrulama e-postası gönderme hatası:', emailError);
+        return NextResponse.json(
+          { error: 'Doğrulama e-postası gönderilirken bir hata oluştu' },
+          { 
+            status: 500,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Credentials': 'true'
+            }
+          }
+        );
+      }
     }
 
     // Şifre kontrolü

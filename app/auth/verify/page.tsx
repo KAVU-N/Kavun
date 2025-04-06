@@ -2,11 +2,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function VerifyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
+  const { setUser } = useAuth();
   const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -33,21 +35,52 @@ export default function VerifyPage() {
         throw new Error(data.error || 'Email doğrulama sırasında bir hata oluştu');
       }
 
-      setSuccess('Email adresiniz başarıyla doğrulandı! Giriş sayfasına yönlendiriliyorsunuz...');
-      
-      // Start countdown
-      const timer = setInterval(() => {
-        setRemainingTime((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            router.push('/auth/login');
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      // Kullanıcıyı otomatik olarak giriş yaptır
+      if (data.user && data.token) {
+        // Kullanıcı bilgilerini ve token'ı kaydet
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+        
+        // Kullanıcı state'ini güncelle
+        setUser(data.user);
+        
+        setSuccess('Email adresiniz başarıyla doğrulandı! Ana sayfaya yönlendiriliyorsunuz...');
+        
+        // Start countdown
+        const timer = setInterval(() => {
+          setRemainingTime((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              // Kullanıcı rolüne göre yönlendir
+              if (data.user.role === 'student') {
+                router.push('/egitmenler');
+              } else {
+                router.push('/');
+              }
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
 
-      return () => clearInterval(timer);
+        return () => clearInterval(timer);
+      } else {
+        setSuccess('Email adresiniz başarıyla doğrulandı! Giriş sayfasına yönlendiriliyorsunuz...');
+        
+        // Start countdown
+        const timer = setInterval(() => {
+          setRemainingTime((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              router.push('/auth/login');
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+
+        return () => clearInterval(timer);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Email doğrulama sırasında bir hata oluştu');
     } finally {

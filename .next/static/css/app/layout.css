@@ -814,14 +814,14 @@ video {
 .w-96 {
   width: 24rem;
 }
+.w-\[300px\] {
+  width: 300px;
+}
 .w-auto {
   width: auto;
 }
 .w-full {
   width: 100%;
-}
-.w-\[300px\] {
-  width: 300px;
 }
 .min-w-0 {
   min-width: 0px;
