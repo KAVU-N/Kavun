@@ -74,9 +74,9 @@ export async function GET(request: Request) {
       );
     }
     
-    // Önce belirtilen üniversitedeki öğretmenleri bul
+    // Önce belirtilen üniversitedeki öğretmenleri bul - case insensitive arama yap
     const teachers = await User.find({
-      university: university,
+      university: { $regex: new RegExp('^' + university + '$', 'i') },
       role: 'teacher'
     }).select('_id');
     
