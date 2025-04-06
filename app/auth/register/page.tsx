@@ -1,18 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
+import { universities } from '@/data/universities';
 
 type Role = 'student' | 'teacher';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const role = searchParams.get('role') as Role || 'student';
+  const universityFromParam = searchParams.get('university') || '';
   const { register } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(universityFromParam);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [localUniversities, setLocalUniversities] = useState<string[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [selectedUniversity, setSelectedUniversity] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,7 +34,6 @@ export default function RegisterPage() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const passwordConfirm = formData.get('passwordConfirm') as string;
-    const role = formData.get('role') as Role;
     const university = formData.get('university') as string;
     
     if (password !== passwordConfirm) {
@@ -42,6 +51,25 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Veritabanından üniversiteleri getiren kod
+    const fetchUniversities = async () => {
+      try {
+        // Data dosyasından üniversiteleri kullanıyoruz
+        setLocalUniversities(universities);
+        
+        if (universityFromParam) {
+          setSearchTerm(universityFromParam);
+          setSelectedUniversity(universityFromParam);
+        }
+      } catch (error) {
+        console.error('Üniversiteler yüklenirken hata oluştu:', error);
+      }
+    };
+
+    fetchUniversities();
+  }, [universityFromParam]);
 
   return (
     <div className="container mx-auto flex flex-col md:flex-row gap-4">
@@ -136,10 +164,9 @@ export default function RegisterPage() {
               id="role"
               name="role"
               required
-              defaultValue=""
+              defaultValue={role}
               className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
             >
-              <option value="" disabled>Rol seçin</option>
               <option value="student">Öğrenci</option>
               <option value="teacher">Öğretmen</option>
             </select>
@@ -149,20 +176,52 @@ export default function RegisterPage() {
             <label htmlFor="university" className="block text-sm font-medium text-[#6B3416] mb-1">
               Üniversite
             </label>
-            <select
-              id="university"
-              name="university"
-              required
-              defaultValue=""
-              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
-            >
-              <option value="" disabled>Üniversite seçin</option>
-              <option value="ankara">Ankara Üniversitesi</option>
-              <option value="istanbul">İstanbul Üniversitesi</option>
-              <option value="ege">Ege Üniversitesi</option>
-              <option value="odtu">ODTÜ</option>
-              <option value="bogazici">Boğaziçi Üniversitesi</option>
-            </select>
+            <div className="relative">
+              <input
+                id="university"
+                name="university"
+                type="text"
+                required
+                placeholder="Üniversitenizi seçin..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setShowDropdown(true);
+                  setSelectedUniversity(e.target.value);
+                }}
+                onFocus={() => setShowDropdown(true)}
+                onBlur={() => {
+                  setTimeout(() => setShowDropdown(false), 200);
+                }}
+                className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
+              />
+              {showDropdown && (
+                <div 
+                  ref={dropdownRef}
+                  className="absolute w-full mt-1 bg-white border border-[#FFE5D9] rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto"
+                >
+                  {localUniversities.filter(uni => 
+                    uni.toLowerCase().includes(searchTerm.toLowerCase())
+                  ).slice(0, 10).map((uni, index) => (
+                    <div
+                      key={index}
+                      className={`group px-4 py-3 hover:bg-gradient-to-r hover:from-[#FFE5D9] hover:to-[#FFF5F0] cursor-pointer transition-all duration-200
+                        ${index === activeIndex ? 'bg-gradient-to-r from-[#FFE5D9] to-[#FFF5F0]' : ''}`}
+                      onClick={() => {
+                        setSearchTerm(uni);
+                        setSelectedUniversity(uni);
+                        setShowDropdown(false);
+                      }}
+                    >
+                      <div className={`transition-colors duration-200
+                        ${index === activeIndex ? 'text-[#6B3416]' : 'text-[#994D1C] group-hover:text-[#6B3416]'}`}>
+                        {uni}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {error && (
