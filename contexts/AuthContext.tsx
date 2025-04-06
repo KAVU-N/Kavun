@@ -101,7 +101,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('token', result.token);
       }
 
-      router.push('/');
+      // Redirect student users to instructors page, others to home page
+      if (result.user.role === 'student') {
+        router.push('/egitmenler');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       setError(err.message);
       throw err;
@@ -137,7 +142,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('token', result.token);
       }
 
-      router.push('/');
+      // Redirect student users to instructors page, others to home page
+      if (result.user.role === 'student') {
+        router.push('/egitmenler');
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       setError(err.message);
       throw err;

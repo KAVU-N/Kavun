@@ -23,7 +23,6 @@ export default function LoginPage() {
 
     try {
       await login({ email, password });
-      router.push('/');
     } catch (err: any) {
       setError(err.message || 'Giriş yaparken bir hata oluştu');
     } finally {
