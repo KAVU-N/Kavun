@@ -252,7 +252,8 @@ export async function POST(req: Request) {
       { 
         message: 'Kayıt başarılı! Lütfen e-posta adresinizi doğrulayın.',
         redirectUrl: `/auth/verify?email=${encodeURIComponent(email)}`,
-        email
+        email,
+        role // Rol bilgisini API yanıtına ekleyelim
       },
       { 
         status: 201,

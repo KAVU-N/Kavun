@@ -12,7 +12,7 @@ type Role = 'student' | 'teacher';
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const role = searchParams.get('role') as Role || 'student';
+  const defaultRole = searchParams.get('role') as Role || 'student';
   const universityFromParam = searchParams.get('university') || '';
   const { register } = useAuth();
   const [error, setError] = useState('');
@@ -22,6 +22,7 @@ export default function RegisterPage() {
   const [localUniversities, setLocalUniversities] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [selectedUniversity, setSelectedUniversity] = useState('');
+  const [selectedRole, setSelectedRole] = useState<Role>(defaultRole);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,6 +37,8 @@ export default function RegisterPage() {
     const passwordConfirm = formData.get('passwordConfirm') as string;
     const university = formData.get('university') as string;
     
+    console.log("Formdan seçilen rol:", selectedRole);
+    
     if (password !== passwordConfirm) {
       setError('Şifreler eşleşmiyor');
       setLoading(false);
@@ -43,7 +46,8 @@ export default function RegisterPage() {
     }
     
     try {
-      await register({ name, email, password, role, university });
+      // URL parametresindeki rol yerine state'te tutulan rolü kullan
+      await register({ name, email, password, role: selectedRole, university });
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       setError(err.message || 'Kayıt olurken bir hata oluştu');
@@ -164,7 +168,8 @@ export default function RegisterPage() {
               id="role"
               name="role"
               required
-              defaultValue={role}
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value as Role)}
               className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
             >
               <option value="student">Öğrenci</option>
