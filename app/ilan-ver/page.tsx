@@ -51,28 +51,53 @@ export default function IlanVerPage() {
       return;
     }
     
+    if (!formData.duration.trim()) {
+      setError('Lütfen süre bilgisi girin');
+      return;
+    }
+    
     try {
       setIsSubmitting(true);
       setError('');
       
-      // API endpoint'e istek at (henüz mevcut değil)
-      // const response = await fetch('/api/ilanlar/create', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${localStorage.getItem('token')}`
-      //   },
-      //   body: JSON.stringify(formData)
-      // });
+      // Kullanıcı bilgisini kontrol et
+      if (!user || !user.id) {
+        setError('Kullanıcı kimliği bulunamadı. Lütfen tekrar giriş yapın.');
+        setIsSubmitting(false);
+        return;
+      }
       
-      // if (!response.ok) {
-      //   throw new Error('İlan oluşturulurken bir hata oluştu');
-      // }
+      // Token al
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Oturum bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
+        setIsSubmitting(false);
+        return;
+      }
       
-      // const data = await response.json();
+      console.log('Listing creation data:', {
+        ...formData,
+        userId: user.id
+      });
       
-      // Başarılı yanıt simülasyonu
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/api/ilanlar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...formData,
+          userId: user.id
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'İlan oluşturulurken bir hata oluştu');
+      }
+      
+      const data = await response.json();
       
       setSuccess('İlanınız başarıyla oluşturuldu!');
       setFormData({
@@ -86,12 +111,23 @@ export default function IlanVerPage() {
       
       // İlan oluşturulduktan sonra ilanlarım sayfasına yönlendir
       setTimeout(() => {
-        router.push('/ilanlarim');
-      }, 2000);
+        router.push('/ilanlarim?refresh=true');
+      }, 1500);
       
-    } catch (err) {
+    } catch (err: any) {
       console.error('İlan oluşturulurken hata:', err);
-      setError('İlan oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      // Daha detaylı hata mesajı göster
+      setError(err.message || 'İlan oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      
+      // Hata detaylarını konsola yazdır
+      if (err.response) {
+        try {
+          const errorData = await err.response.json();
+          console.error('API error details:', errorData);
+        } catch (e) {
+          console.error('Error parsing API error:', e);
+        }
+      }
     } finally {
       setIsSubmitting(false);
     }

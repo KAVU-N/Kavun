@@ -78,48 +78,54 @@ export default function InstructorsPage() {
   // Eğer kullanıcı henüz yüklenmemişse veya giriş yapmamışsa yükleniyor göster
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFB996] to-[#FFECEC] flex items-center justify-center">
-        <div className="text-center p-8 max-w-md mx-auto bg-white rounded-xl shadow-lg">
-          <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin mx-auto mb-4"></div>
-          <h2 className="text-2xl font-bold text-[#994D1C] mb-2">Yükleniyor...</h2>
-          <p className="text-[#6B3416]">Giriş yapmanız gerekiyor.</p>
-          <p className="text-[#6B3416] mt-2">Giriş sayfasına yönlendiriliyorsunuz.</p>
+      <div className="min-h-screen bg-white pt-20">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center items-center py-12">
+            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
+    <div className="min-h-screen bg-white pt-24 pb-16">
       <div className="container mx-auto px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-[#6B3416] mb-4">Eğitmenlerimiz</h1>
-            <p className="text-[#994D1C] max-w-2xl mx-auto">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-[#6B3416] mb-2">Eğitmenlerimiz</h1>
+            <p className="text-[#994D1C]">
+              <FaUniversity className="inline-block mr-2" />
               {user?.university ? `${user.university} üniversitesindeki eğitmenlerimizle tanışın ve ihtiyacınıza en uygun eğitmeni seçin.` : 'Alanında uzman eğitmenlerimizle tanışın ve ihtiyacınıza en uygun eğitmeni seçin.'}
             </p>
           </div>
 
-          {/* Arama Bölümü */}
-          <div className="max-w-xl mx-auto mb-12">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Ders veya eğitmen ara..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white border border-[#FFE5D9] rounded-full outline-none transition-all duration-200
-                  hover:border-[#FFB996] focus:border-[#FFB996] focus:ring-2 focus:ring-[#FFB996]/20"
-              />
-              <div className="absolute inset-y-0 left-4 flex items-center">
-                <FaSearch className="text-[#FFB996]" />
+          {/* Arama ve Filtre */}
+          <div className="mb-8">
+            <div className="flex flex-col md:flex-row gap-4 mb-4">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Eğitmen ara..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-3 pl-10 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
+                />
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
+              <button
+                onClick={() => setSelectedDepartment(null)}
+                className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-xl font-medium"
+              >
+                Ara
+              </button>
             </div>
           </div>
 
           {/* Ders Filtreleri */}
-          <div className="max-w-full mx-auto mb-8 overflow-x-auto">
-            <div className="flex space-x-3 px-4 py-2 min-w-max">
+          <div className="bg-white p-6 rounded-xl shadow-md mb-6">
+            <h3 className="text-lg font-medium text-[#6B3416] mb-3">Uzmanlık Alanları</h3>
+            <div className="flex flex-wrap gap-2">
               {[
                 'Bilgisayar Mühendisliği',
                 'Diş Hekimliği',
@@ -136,10 +142,10 @@ export default function InstructorsPage() {
               ].map((bolum) => (
                 <button
                   key={bolum}
-                  className={`whitespace-nowrap px-4 py-2 border rounded-lg text-sm transition-all duration-200
+                  className={`px-4 py-2 rounded-lg text-sm transition-all duration-200
                     ${selectedDepartment === bolum 
-                      ? 'bg-[#FFB996] text-white border-[#FFB996] font-medium' 
-                      : 'bg-white text-[#994D1C] border-[#FFE5D9] hover:bg-[#FFB996] hover:text-white hover:border-[#FFB996]'
+                      ? 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium' 
+                      : 'bg-[#FFE5D9] text-[#6B3416] hover:bg-[#FFB996] hover:text-white'
                     }`}
                   onClick={() => setSelectedDepartment(selectedDepartment === bolum ? null : bolum)}
                 >
@@ -155,57 +161,59 @@ export default function InstructorsPage() {
               <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
             </div>
           ) : error ? (
-            <div className="text-center py-12">
-              <p className="text-[#FF8B5E] font-medium">{error}</p>
+            <div className="bg-white p-6 rounded-xl shadow-md">
+              <p className="text-red-500 text-center">{error}</p>
             </div>
           ) : instructors.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-[#994D1C] font-medium">Aradığınız kriterlere uygun eğitmen bulunamadı.</p>
+            <div className="bg-white p-8 rounded-xl shadow-md text-center">
+              <p className="text-[#994D1C] mb-4">
+                {searchTerm || selectedDepartment
+                  ? `Aradığınız kriterlere uygun eğitmen bulunamadı.`
+                  : 'Henüz hiç eğitmen bulunmuyor.'}
+              </p>
+              <p className="text-gray-600">
+                Farklı arama kriterleri deneyebilirsiniz.
+              </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {instructors.map((instructor, index) => (
-                <div key={instructor._id || index} className="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:translate-y-[-5px]">
-                  <div className="p-6">
-                    <div className="flex items-center mb-4">
-                      <div className="w-16 h-16 bg-[#FFB996] rounded-full flex items-center justify-center text-white text-2xl font-bold mr-4">
-                        {instructor.name.charAt(0)}
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-[#6B3416]">{instructor.name}</h3>
-                        <div className="flex items-center text-[#994D1C]">
-                          <FaUniversity className="mr-1" />
-                          <span>{instructor.university}</span>
-                        </div>
-                      </div>
+                <div key={instructor._id || index} className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-center mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3">
+                      {instructor.name.charAt(0).toUpperCase()}
                     </div>
+                    <div>
+                      <h3 className="font-medium text-gray-800">{instructor.name}</h3>
+                      <p className="text-sm text-gray-600">{instructor.expertise || 'Eğitmen'}</p>
+                    </div>
+                  </div>
                     
-                    <div className="border-t border-[#FFE5D9] pt-4 mt-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center">
-                          <FaGraduationCap className="text-[#FFB996] mr-2" />
-                          <span className="text-[#994D1C]">Eğitmen</span>
-                        </div>
-                        <div className="flex items-center">
-                          <FaChalkboardTeacher className="text-[#FFB996] mr-2" />
-                          <span className="text-[#994D1C]">Üye: {new Date(instructor.createdAt).toLocaleDateString('tr-TR')}</span>
-                        </div>
-                      </div>
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div className="flex items-center">
+                      <FaChalkboardTeacher className="text-purple-600 mr-2" />
+                      <span className="text-gray-800">{instructor.expertise || 'Genel Eğitmen'}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <FaGraduationCap className="text-blue-600 mr-2" />
+                      <span className="text-gray-800">3+ Yıl Deneyim</span>
+                    </div>
+                    <div className="flex items-center">
+                      <FaStar className="text-orange-600 mr-2" />
+                      <span className="text-gray-800">4.8/5 Puan</span>
+                    </div>
+                    <div className="flex items-center">
+                      <FaUniversity className="text-green-600 mr-2" />
+                      <span className="text-gray-800 line-clamp-1">{instructor.university}</span>
+                    </div>
+                  </div>
 
-                      {/* Uzmanlık Alanı */}
-                      <div className="mt-4 p-3 bg-[#FFF5F0] rounded-lg">
-                        <p className="text-sm text-[#994D1C]">
-                          <span className="font-medium">Ders Anlatımı: </span>
-                          {instructor.expertise || "Belirtilmemiş"}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <button 
-                      className="w-full mt-6 py-2 px-4 bg-[#FFB996] text-white rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300"
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg text-sm font-medium hover:shadow-md transition-all duration-300"
                       onClick={() => setActiveChat(instructor)}
                     >
-                      İletişime Geç
+                      Mesaj Gönder
                     </button>
                   </div>
                 </div>
