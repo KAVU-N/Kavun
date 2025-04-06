@@ -167,6 +167,22 @@ export default function Navbar() {
                         <span>{link.label}</span>
                       </Link>
                     ))}
+                  
+                  {user && user.role === 'teacher' && (
+                    <Link
+                      href="/ilan-ver"
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                        pathname === '/ilan-ver'
+                          ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
+                          : 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105'
+                      }`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      <span>İlan Ver</span>
+                    </Link>
+                  )}
                 </div>
               </div>
 
@@ -247,6 +263,19 @@ export default function Navbar() {
                             <span>Mesajlarım</span>
                           </div>
                         </Link>
+                        {user.role === 'teacher' && (
+                          <Link
+                            href="/ilanlarim"
+                            className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                              <span>İlanlarım</span>
+                            </div>
+                          </Link>
+                        )}
                         <button
                           onClick={logout}
                           className="w-full text-left px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
@@ -314,6 +343,23 @@ export default function Navbar() {
                     </Link>
                   ))}
                 
+                {user && user.role === 'teacher' && (
+                  <Link
+                    href="/ilan-ver"
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                      pathname === '/ilan-ver'
+                        ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
+                        : 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white'
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>İlan Ver</span>
+                  </Link>
+                )}
+                
                 {!user ? (
                   <div className="flex flex-col space-y-2 mt-4">
                     <Link
@@ -359,6 +405,18 @@ export default function Navbar() {
                       </div>
                       <span>Mesajlarım</span>
                     </Link>
+                    {user.role === 'teacher' && (
+                      <Link
+                        href="/ilanlarim"
+                        className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <span>İlanlarım</span>
+                      </Link>
+                    )}
                     <button
                       onClick={() => {
                         logout();

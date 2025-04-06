@@ -1,0 +1,164 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+
+interface Ilan {
+  _id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  status: 'active' | 'inactive';
+}
+
+export default function IlanlarimPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const [ilanlar, setIlanlar] = useState<Ilan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/login');
+    } else if (!loading && user && user.role !== 'teacher') {
+      router.push('/');
+    }
+  }, [user, loading, router]);
+
+  useEffect(() => {
+    const fetchIlanlar = async () => {
+      if (!user) return;
+      
+      try {
+        setIsLoading(true);
+        // API endpoint'e istek at (henüz mevcut değil)
+        // const response = await fetch('/api/ilanlar');
+        // const data = await response.json();
+        // setIlanlar(data);
+        
+        // Şimdilik örnek veriler ile gösterim
+        setIlanlar([
+          {
+            _id: '1',
+            title: 'Veri Yapıları ve Algoritmalar Dersi',
+            description: 'Haftalık 2 saat online veri yapıları ve algoritmalar dersi verilecektir.',
+            createdAt: '2023-10-15T12:00:00Z',
+            updatedAt: '2023-10-15T12:00:00Z',
+            status: 'active'
+          },
+          {
+            _id: '2',
+            title: 'Java Programlama Dersi',
+            description: 'Temelden ileri seviyeye Java programlama eğitimi verilir.',
+            createdAt: '2023-10-10T10:00:00Z',
+            updatedAt: '2023-10-10T10:00:00Z',
+            status: 'active'
+          }
+        ]);
+        setError('');
+      } catch (err) {
+        console.error('İlanlar yüklenirken hata oluştu:', err);
+        setError('İlanlar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (user && user.role === 'teacher') {
+      fetchIlanlar();
+    }
+  }, [user]);
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-[#FFF5F0] pt-20">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center items-center py-12">
+            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (user && user.role !== 'teacher') {
+    return null; // Yönlendirme yapıldığı için render etmeye gerek yok
+  }
+
+  return (
+    <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
+      <div className="container mx-auto px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-[#6B3416]">İlanlarım</h1>
+            <button className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg flex items-center gap-2 hover:shadow-lg transition-all duration-300">
+              <FaPlus />
+              <span>Yeni İlan Ekle</span>
+            </button>
+          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+            </div>
+          ) : error ? (
+            <div className="bg-white p-6 rounded-xl shadow-md">
+              <p className="text-red-500 text-center">{error}</p>
+            </div>
+          ) : ilanlar.length === 0 ? (
+            <div className="bg-white p-8 rounded-xl shadow-md text-center">
+              <p className="text-[#994D1C] mb-4">Henüz hiç ilan oluşturmadınız.</p>
+              <button className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg inline-flex items-center gap-2 hover:shadow-lg transition-all duration-300">
+                <FaPlus />
+                <span>İlk İlanınızı Ekleyin</span>
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {ilanlar.map((ilan) => (
+                <div key={ilan._id} className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h2 className="text-xl font-bold text-[#6B3416] mb-2">{ilan.title}</h2>
+                      <p className="text-[#994D1C] mb-4">{ilan.description}</p>
+                      <div className="text-sm text-gray-500">
+                        <span>Oluşturulma: {new Date(ilan.createdAt).toLocaleDateString('tr-TR')}</span>
+                        <span className="mx-2">•</span>
+                        <span>Güncelleme: {new Date(ilan.updatedAt).toLocaleDateString('tr-TR')}</span>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button className="p-2 text-blue-500 hover:bg-blue-50 rounded-full transition-colors duration-300">
+                        <FaEdit />
+                      </button>
+                      <button className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors duration-300">
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex justify-between items-center">
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      ilan.status === 'active' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {ilan.status === 'active' ? 'Aktif' : 'Pasif'}
+                    </div>
+                    <button className="px-4 py-1.5 bg-[#FFE5D9] text-[#994D1C] rounded-lg text-sm hover:bg-[#FFB996] hover:text-white transition-colors duration-300">
+                      Başvuruları Görüntüle
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+} 

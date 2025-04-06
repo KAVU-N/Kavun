@@ -10,6 +10,7 @@ interface User {
   role: 'student' | 'teacher';
   university: string;
   isVerified: boolean;
+  expertise?: string; // Uzmanlık alanı/verdiği ders
 }
 
 interface LoginData {

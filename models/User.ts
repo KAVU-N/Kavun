@@ -13,6 +13,7 @@ export interface IUser extends Document {
   verificationCodeExpires?: Date;
   resetPasswordCode?: string;
   resetPasswordExpires?: Date;
+  expertise?: string; // Uzmanlık alanı/verdiği ders
   createdAt: Date;
 }
 
@@ -65,6 +66,11 @@ const userSchema = new Schema({
   verificationCodeExpires: Date,
   resetPasswordCode: String,
   resetPasswordExpires: Date,
+  expertise: {
+    type: String,
+    default: '',
+    trim: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

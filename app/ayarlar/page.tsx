@@ -10,12 +10,16 @@ interface UserDetails {
   role: string;
   university: string;
   isVerified: boolean;
+  expertise?: string;
 }
 
 export default function AyarlarPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('hesap');
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [expertise, setExpertise] = useState('');
+  const [updateMessage, setUpdateMessage] = useState('');
+  const [updateError, setUpdateError] = useState('');
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -27,6 +31,7 @@ export default function AyarlarPage() {
           if (response.ok) {
             console.log('User details:', data.user);
             setUserDetails(data.user);
+            setExpertise(data.user.expertise || '');
           } else {
             console.error('Error fetching user details:', data.error);
           }
@@ -38,6 +43,44 @@ export default function AyarlarPage() {
 
     fetchUserDetails();
   }, [user?.id]);
+
+  const handleExpertiseUpdate = async () => {
+    if (!user?.id) return;
+    
+    try {
+      setUpdateMessage('');
+      setUpdateError('');
+      
+      const response = await fetch('/api/auth/update-expertise', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          expertise,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setUpdateMessage('Uzmanlık alanı başarıyla güncellendi');
+        // Kullanıcı bilgilerini güncelle
+        if (userDetails) {
+          setUserDetails({
+            ...userDetails,
+            expertise,
+          });
+        }
+      } else {
+        setUpdateError(data.error || 'Güncelleme sırasında bir hata oluştu');
+      }
+    } catch (error) {
+      console.error('Güncelleme hatası:', error);
+      setUpdateError('Beklenmeyen bir hata oluştu');
+    }
+  };
 
   // Debug için
   console.log('Context user:', user);
@@ -118,6 +161,39 @@ export default function AyarlarPage() {
                       {userDetails?.role === 'student' ? 'Öğrenci' : 'Eğitmen'}
                     </div>
                   </div>
+
+                  {userDetails?.role === 'teacher' && (
+                    <div>
+                      <label htmlFor="expertise" className="block text-sm font-medium text-[#6B3416]">
+                        Verdiğiniz Ders / Uzmanlık Alanı
+                      </label>
+                      <div className="mt-1 flex">
+                        <input
+                          id="expertise"
+                          name="expertise"
+                          type="text"
+                          value={expertise}
+                          onChange={(e) => setExpertise(e.target.value)}
+                          placeholder="Örn: Veri Yapıları, Algoritmalar, Java Programlama..."
+                          className="flex-grow block rounded-lg border border-[#FFE5D9] px-3 py-2 text-[#6B3416] shadow-sm focus:border-[#FF8B5E] focus:outline-none focus:ring-1 focus:ring-[#FF8B5E]"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleExpertiseUpdate}
+                          className="ml-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
+                            transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
+                        >
+                          Güncelle
+                        </button>
+                      </div>
+                      {updateMessage && (
+                        <p className="mt-2 text-sm text-green-600">{updateMessage}</p>
+                      )}
+                      {updateError && (
+                        <p className="mt-2 text-sm text-red-600">{updateError}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
