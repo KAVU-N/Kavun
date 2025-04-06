@@ -134,21 +134,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(result.error || 'Kayıt olurken bir hata oluştu');
       }
 
-      setUser(result.user);
+      // API yanıtını kontrol et - user nesnesi farklı yerlerde olabilir
+      let userData = null;
+      
+      // 1. result.user içinde olabilir
+      if (result.user) {
+        userData = result.user;
+        console.log("API yanıtı result.user içinde bulundu:", userData);
+      } 
+      // 2. Doğrudan result içinde olabilir (id, name, email gibi alanlar varsa)
+      else if (result.id || result._id || result.name || result.email) {
+        userData = result;
+        console.log("API yanıtı doğrudan result içinde bulundu:", userData);
+      }
+      // 3. Hiçbir kullanıcı verisi yoksa, kayıt verilerinden oluştur
+      else {
+        console.log("API yanıtında kullanıcı verisi bulunamadı, geçici kullanıcı oluşturuluyor");
+        // Geçici bir ID oluştur
+        const tempId = Math.random().toString(36).substring(2, 15);
+        userData = {
+          id: tempId,
+          name: data.name,
+          email: data.email,
+          role: data.role,
+          university: data.university,
+          isVerified: false
+        };
+      }
+
+      // Kullanıcının seçtiği rolü logla
+      console.log("Kullanıcının kayıt formunda seçtiği rol:", data.role);
+      console.log("API yanıtında gelen rol (varsa):", userData.role);
+
+      // API'den gelen kullanıcı nesnesini doğrula ve gerekirse varsayılan değerler ata
+      const validatedUser: User = {
+        id: userData.id || userData._id || '',
+        name: userData.name || data.name || '',
+        email: userData.email || data.email || '',
+        // Öncelikle kullanıcının kayıt formunda seçtiği rolü kullan
+        role: data.role || userData.role || 'student',
+        university: userData.university || data.university || '',
+        isVerified: userData.isVerified || false,
+        expertise: userData.expertise
+      };
+
+      console.log("Doğrulanmış kullanıcı verisi:", validatedUser);
+      setUser(validatedUser);
       
       // Only access localStorage on client-side
       if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(result.user));
+        localStorage.setItem('user', JSON.stringify(validatedUser));
         localStorage.setItem('token', result.token);
       }
 
       // Redirect student users to instructors page, others to home page
-      if (result.user.role === 'student') {
+      if (validatedUser.role === 'student') {
         router.push('/egitmenler');
       } else {
         router.push('/');
       }
     } catch (err: any) {
+      console.error("Kayıt hatası:", err);
       setError(err.message);
       throw err;
     } finally {
