@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import User from '@/models/User';
+import User, { IUser } from '@/models/User';
 import connectDB from '@/lib/mongodb';
 
 export async function OPTIONS() {
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       verificationCode: code,
       verificationCodeExpires: { $gt: new Date() },
       isVerified: false
-    });
+    }) as IUser | null;
 
     if (!user) {
       return NextResponse.json(
@@ -58,10 +58,34 @@ export async function POST(req: Request) {
     user.verificationCodeExpires = undefined;
     await user.save();
 
+    // JWT token oluştur
+    const jwt = await import('jsonwebtoken');
+    const token = jwt.default.sign(
+      { 
+        userId: user._id.toString(),
+        email: user.email,
+        role: user.role
+      },
+      process.env.JWT_SECRET || 'default-secret',
+      { expiresIn: '7d' }
+    );
+
+    // Kullanıcı bilgilerini hazırla
+    const userData = {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      university: user.university,
+      isVerified: true,
+      expertise: user.expertise
+    };
+
     return NextResponse.json(
       { 
         message: 'Email başarıyla doğrulandı',
-        redirectUrl: '/auth/login'
+        user: userData,
+        token: token
       },
       { 
         status: 200,

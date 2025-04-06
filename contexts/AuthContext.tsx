@@ -33,6 +33,7 @@ interface AuthContextType {
   login: (data: LoginData) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
+  setUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -42,6 +43,7 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   register: async () => {},
   logout: async () => {},
+  setUser: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -88,6 +90,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       const result = await response.json();
+
+      // Kullanıcı kayıtlı ama email doğrulanmamış
+      if (response.status === 403 && result.needsVerification) {
+        setError('Lütfen önce email adresinizi doğrulayın');
+        // Doğrulama sayfasına yönlendir
+        router.push(`/auth/verify?email=${encodeURIComponent(result.email)}`);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(result.error || 'Giriş yapılırken bir hata oluştu');
@@ -179,20 +189,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
 
       console.log("Doğrulanmış kullanıcı verisi:", validatedUser);
-      setUser(validatedUser);
       
-      // Only access localStorage on client-side
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(validatedUser));
-        localStorage.setItem('token', result.token);
-      }
-
-      // Redirect student users to instructors page, others to home page
-      if (validatedUser.role === 'student') {
-        router.push('/egitmenler');
-      } else {
-        router.push('/');
-      }
+      // Kullanıcı doğrulama sayfasına yönlendir
+      router.push(`/auth/verify?email=${encodeURIComponent(validatedUser.email)}`);
+      
+      // Kullanıcı bilgilerini ve token'ı kaydetmiyoruz - doğrulama sonrası yapılacak
     } catch (err: any) {
       console.error("Kayıt hatası:", err);
       setError(err.message);
@@ -244,6 +245,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           login: async () => {},
           register: async () => {},
           logout: async () => {},
+          setUser: () => {},
         }}
       >
         {children}
@@ -260,6 +262,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         register,
         logout,
+        setUser,
       }}
     >
       {children}
