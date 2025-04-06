@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 // File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\egitmenler\page.tsx
+=======
+// File: C:\Users\eren\Kavun, organization\app\egitmenler\page.tsx
+>>>>>>> Stashed changes
 import * as entry from '../../../../app/egitmenler/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

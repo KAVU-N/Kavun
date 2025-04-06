@@ -10,9 +10,14 @@ interface Ilan {
   _id: string;
   title: string;
   description: string;
+  price: number;
+  method: string;
+  duration: number;
+  frequency: string;
   createdAt: string;
   updatedAt: string;
   status: 'active' | 'inactive';
+  userId: string;
 }
 
 export default function IlanlarimPage() {
@@ -36,30 +41,35 @@ export default function IlanlarimPage() {
       
       try {
         setIsLoading(true);
-        // API endpoint'e istek at (henüz mevcut değil)
-        // const response = await fetch('/api/ilanlar');
-        // const data = await response.json();
-        // setIlanlar(data);
         
-        // Şimdilik örnek veriler ile gösterim
-        setIlanlar([
-          {
-            _id: '1',
-            title: 'Veri Yapıları ve Algoritmalar Dersi',
-            description: 'Haftalık 2 saat online veri yapıları ve algoritmalar dersi verilecektir.',
-            createdAt: '2023-10-15T12:00:00Z',
-            updatedAt: '2023-10-15T12:00:00Z',
-            status: 'active'
-          },
-          {
-            _id: '2',
-            title: 'Java Programlama Dersi',
-            description: 'Temelden ileri seviyeye Java programlama eğitimi verilir.',
-            createdAt: '2023-10-10T10:00:00Z',
-            updatedAt: '2023-10-10T10:00:00Z',
-            status: 'active'
+        // URL'den refresh parametresini kontrol et
+        const searchParams = new URLSearchParams(window.location.search);
+        const refresh = searchParams.get('refresh');
+        
+        if (refresh === 'true') {
+          // URL'den refresh parametresini kaldır
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, '', newUrl);
+        }
+        
+        // Token al
+        const token = localStorage.getItem('token');
+        
+        // API endpoint'e istek at
+        const response = await fetch(`/api/ilanlar?userId=${user.id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           }
-        ]);
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'İlanlar getirilirken bir hata oluştu');
+        }
+        
+        const data = await response.json();
+        setIlanlar(data);
         setError('');
       } catch (err) {
         console.error('İlanlar yüklenirken hata oluştu:', err);
@@ -72,11 +82,39 @@ export default function IlanlarimPage() {
     if (user && user.role === 'teacher') {
       fetchIlanlar();
     }
-  }, [user]);
+  }, [user, router]);
+
+  // İlan silme işlemi
+  const handleDelete = async (ilanId: string) => {
+    if (!confirm('Bu ilanı silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`/api/ilanlar/${ilanId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('İlan silinirken bir hata oluştu');
+      }
+      
+      // Başarılı silme işleminden sonra listeyi güncelle
+      setIlanlar(prev => prev.filter(ilan => ilan._id !== ilanId));
+    } catch (err) {
+      console.error('İlan silme hatası:', err);
+      alert('İlan silinirken bir hata oluştu');
+    }
+  };
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-[#FFF5F0] pt-20">
+      <div className="min-h-screen bg-white pt-20">
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center py-12">
             <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
@@ -91,12 +129,15 @@ export default function IlanlarimPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
+    <div className="min-h-screen bg-white pt-24 pb-16">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-[#6B3416]">İlanlarım</h1>
-            <button className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg flex items-center gap-2 hover:shadow-lg transition-all duration-300">
+            <button 
+              onClick={() => router.push('/ilan-ver')}
+              className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg flex items-center gap-2 hover:shadow-lg transition-all duration-300"
+            >
               <FaPlus />
               <span>Yeni İlan Ekle</span>
             </button>
@@ -113,7 +154,10 @@ export default function IlanlarimPage() {
           ) : ilanlar.length === 0 ? (
             <div className="bg-white p-8 rounded-xl shadow-md text-center">
               <p className="text-[#994D1C] mb-4">Henüz hiç ilan oluşturmadınız.</p>
-              <button className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg inline-flex items-center gap-2 hover:shadow-lg transition-all duration-300">
+              <button 
+                onClick={() => router.push('/ilan-ver')}
+                className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg inline-flex items-center gap-2 hover:shadow-lg transition-all duration-300"
+              >
                 <FaPlus />
                 <span>İlk İlanınızı Ekleyin</span>
               </button>
@@ -126,6 +170,26 @@ export default function IlanlarimPage() {
                     <div>
                       <h2 className="text-xl font-bold text-[#6B3416] mb-2">{ilan.title}</h2>
                       <p className="text-[#994D1C] mb-4">{ilan.description}</p>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <p className="text-sm text-gray-600">Ücret</p>
+                          <p className="font-medium text-[#6B3416]">{ilan.price} ₺/Saat</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Süre</p>
+                          <p className="font-medium text-[#6B3416]">{ilan.duration} Saat</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Yöntem</p>
+                          <p className="font-medium text-[#6B3416] capitalize">{ilan.method}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Sıklık</p>
+                          <p className="font-medium text-[#6B3416] capitalize">{ilan.frequency}</p>
+                        </div>
+                      </div>
+                      
                       <div className="text-sm text-gray-500">
                         <span>Oluşturulma: {new Date(ilan.createdAt).toLocaleDateString('tr-TR')}</span>
                         <span className="mx-2">•</span>
@@ -133,10 +197,16 @@ export default function IlanlarimPage() {
                       </div>
                     </div>
                     <div className="flex space-x-2">
-                      <button className="p-2 text-blue-500 hover:bg-blue-50 rounded-full transition-colors duration-300">
+                      <button 
+                        onClick={() => router.push(`/ilan-duzenle/${ilan._id}`)}
+                        className="p-2 text-blue-500 hover:bg-blue-50 rounded-full transition-colors duration-300"
+                      >
                         <FaEdit />
                       </button>
-                      <button className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors duration-300">
+                      <button 
+                        onClick={() => handleDelete(ilan._id)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors duration-300"
+                      >
                         <FaTrash />
                       </button>
                     </div>

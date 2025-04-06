@@ -1,0 +1,232 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { FaArrowLeft, FaCalendarAlt, FaClock, FaMoneyBillWave, FaChalkboardTeacher, FaUniversity, FaUser } from 'react-icons/fa';
+
+interface Teacher {
+  _id: string;
+  name: string;
+  email: string;
+  university: string;
+  expertise: string;
+}
+
+interface Ilan {
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  method: string;
+  duration: number;
+  frequency: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+  teacher: Teacher;
+}
+
+export default function IlanDetayPage({ params }: { params: { id: string } }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const [ilan, setIlan] = useState<Ilan | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/login');
+    }
+  }, [user, loading, router]);
+
+  useEffect(() => {
+    const fetchIlanDetay = async () => {
+      if (!params.id) return;
+      
+      try {
+        setIsLoading(true);
+        
+        // API endpoint'e istek at
+        const response = await fetch(`/api/ilanlar/${params.id}`);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'İlan detayları getirilirken bir hata oluştu');
+        }
+        
+        const data = await response.json();
+        setIlan(data);
+        setError('');
+      } catch (err: any) {
+        console.error('İlan detayları yüklenirken hata oluştu:', err);
+        setError('İlan detayları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (params.id) {
+      fetchIlanDetay();
+    }
+  }, [params.id]);
+
+  // Frekans bilgisini Türkçe'ye çevir
+  const getFrequencyText = (frequency: string) => {
+    switch (frequency) {
+      case 'daily':
+        return 'Günlük';
+      case 'weekly':
+        return 'Haftalık';
+      case 'monthly':
+        return 'Aylık';
+      case 'flexible':
+        return 'Esnek';
+      default:
+        return frequency;
+    }
+  };
+
+  // Tarih formatla
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('tr-TR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-white pt-20">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center items-center py-12">
+            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-white pt-24 pb-16">
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto">
+          {/* Geri Butonu */}
+          <div className="mb-6">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center text-[#6B3416] hover:text-[#994D1C] transition-colors"
+            >
+              <FaArrowLeft className="mr-2" />
+              Geri Dön
+            </button>
+          </div>
+
+          {/* İçerik */}
+          {isLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+            </div>
+          ) : error ? (
+            <div className="bg-white p-6 rounded-xl shadow-md">
+              <p className="text-red-500 text-center">{error}</p>
+            </div>
+          ) : !ilan ? (
+            <div className="bg-white p-8 rounded-xl shadow-md text-center">
+              <p className="text-[#994D1C] mb-4">İlan bulunamadı.</p>
+              <Link 
+                href="/ilanlar"
+                className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg text-sm font-medium hover:shadow-md transition-all duration-300"
+              >
+                Tüm İlanlara Dön
+              </Link>
+            </div>
+          ) : (
+            <div className="bg-white p-8 rounded-xl shadow-lg">
+              <h1 className="text-3xl font-bold text-[#6B3416] mb-4">{ilan.title}</h1>
+              
+              {/* Öğretmen Bilgisi */}
+              <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white text-xl font-bold mr-4">
+                  {ilan.teacher?.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-[#6B3416]">{ilan.teacher?.name}</h2>
+                  <p className="text-[#994D1C]">{ilan.teacher?.expertise || 'Öğretmen'}</p>
+                  <p className="text-gray-600 flex items-center mt-1">
+                    <FaUniversity className="mr-1 text-sm" />
+                    {ilan.teacher?.university}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Ders Detayları */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-[#6B3416] mb-4">Ders Detayları</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <FaMoneyBillWave className="text-green-600 text-xl mr-3" />
+                    <div>
+                      <p className="text-sm text-gray-600">Saatlik Ücret</p>
+                      <p className="font-semibold text-gray-800">{ilan.price} ₺</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <FaClock className="text-blue-600 text-xl mr-3" />
+                    <div>
+                      <p className="text-sm text-gray-600">Ders Süresi</p>
+                      <p className="font-semibold text-gray-800">{ilan.duration} Saat</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <FaChalkboardTeacher className="text-purple-600 text-xl mr-3" />
+                    <div>
+                      <p className="text-sm text-gray-600">Ders Yöntemi</p>
+                      <p className="font-semibold text-gray-800 capitalize">{ilan.method}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <FaCalendarAlt className="text-orange-600 text-xl mr-3" />
+                    <div>
+                      <p className="text-sm text-gray-600">Ders Sıklığı</p>
+                      <p className="font-semibold text-gray-800">{getFrequencyText(ilan.frequency)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Açıklama */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-[#6B3416] mb-4">Ders Açıklaması</h3>
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <p className="text-gray-800 whitespace-pre-line">{ilan.description}</p>
+                </div>
+              </div>
+              
+              {/* İlan Tarihi */}
+              <div className="text-sm text-gray-500 mb-8">
+                İlan Tarihi: {formatDate(ilan.createdAt)}
+              </div>
+              
+              {/* İletişim Butonu */}
+              <div className="flex justify-center">
+                <Link
+                  href={`/mesajlar?recipient=${ilan.userId}`}
+                  className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-xl font-medium hover:shadow-md transition-all duration-300 flex items-center"
+                >
+                  <FaUser className="mr-2" />
+                  Öğretmen ile İletişime Geç
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 // File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\ilanlarim\page.tsx
+=======
+// File: C:\Users\eren\Kavun, organization\app\ilanlarim\page.tsx
+>>>>>>> Stashed changes
 import * as entry from '../../../../app/ilanlarim/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

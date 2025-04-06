@@ -1,8 +1,20 @@
 {
+<<<<<<< Updated upstream
   "/ilanlarim/page": "app/ilanlarim/page.js",
   "/api/auth/register/route": "app/api/auth/register/route.js",
   "/egitmenler/page": "app/egitmenler/page.js",
   "/auth/login/page": "app/auth/login/page.js",
   "/auth/verify/page": "app/auth/verify/page.js",
   "/auth/register/page": "app/auth/register/page.js"
+=======
+  "/profil/page": "app/profil/page.js",
+  "/egitmenler/page": "app/egitmenler/page.js",
+  "/ilanlar/page": "app/ilanlar/page.js",
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+  "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js",
+  "/api/instructors/route": "app/api/instructors/route.js",
+  "/ilanlar/[id]/page": "app/ilanlar/[id]/page.js",
+  "/api/ilanlar/[id]/route": "app/api/ilanlar/[id]/route.js",
+  "/auth/login/page": "app/auth/login/page.js"
+>>>>>>> Stashed changes
 }

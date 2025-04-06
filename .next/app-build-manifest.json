@@ -1,10 +1,20 @@
 {
   "pages": {
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+    ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
+    ],
+    "/egitmenler/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/egitmenler/page.js"
     ],
     "/auth/layout": [
       "static/chunks/webpack.js",
@@ -21,21 +31,34 @@
       "static/chunks/main-app.js",
       "static/chunks/app/auth/login/page.js"
     ],
+    "/auth/register/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/register/page.js"
+    ],
     "/auth/verify/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/auth/verify/page.js"
     ],
+<<<<<<< Updated upstream
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
+=======
+    "/ilanlarim/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilanlarim/page.js"
+>>>>>>> Stashed changes
     ],
     "/ilan-ver/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/ilan-ver/page.js"
     ],
+<<<<<<< Updated upstream
     "/ilanlarim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -45,6 +68,27 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/egitmenler/page.js"
+=======
+    "/ilanlar/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilanlar/page.js"
+    ],
+    "/ilanlar/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilanlar/[id]/page.js"
+    ],
+    "/mesajlarim/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/mesajlarim/page.js"
+    ],
+    "/profil/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/profil/page.js"
+>>>>>>> Stashed changes
     ]
   }
 }
