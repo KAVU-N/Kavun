@@ -350,7 +350,7 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     height: embedded ? '100%' : '350px',
     maxHeight: embedded ? '100%' : '350px',
     width: embedded ? '100%' : '384px', // w-96 = 24rem = 384px
-    zIndex: 50,
+    zIndex: 40, // z-index değerini 50'den 40'a düşürdük
     display: 'flex',
     flexDirection: 'column',
     borderRadius: embedded ? '0.5rem' : '0.75rem',

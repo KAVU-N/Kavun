@@ -235,7 +235,7 @@ export default function Navbar() {
                     
                     {/* Profile Dropdown */}
                     {isProfileOpen && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-10 border border-[#FFE5D9]">
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9]">
                         <Link
                           href="/profil"
                           className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
