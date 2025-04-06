@@ -43,6 +43,7 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [chatBoxHeight, setChatBoxHeight] = useState(400); // Tam açık yükseklik
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   // Mesajları yükleme
   useEffect(() => {
@@ -321,15 +322,19 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
           className={`flex ${message.isMine ? 'justify-end' : 'justify-start'} mb-2`}
         >
           <div 
-            className={`max-w-[75%] rounded-2xl px-4 py-2 ${
+            className={`max-w-[75%] rounded-lg px-2 py-1 ${
               message.isMine 
                 ? 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-tr-none' 
                 : 'bg-white border border-[#FFE5D9] text-gray-800 rounded-tl-none'
             } ${isFirstMessageOfGroup ? 'mt-2' : 'mt-1'} ${isLastMessageOfGroup ? 'mb-2' : 'mb-1'}`}
           >
             <div className="text-sm">{message.content}</div>
-            <div className={`text-xs mt-1 ${message.isMine ? 'text-white/70' : 'text-gray-500'}`}>
+            <div 
+              className={`flex justify-end ${message.isMine ? 'text-white/70' : 'text-gray-500'}`}
+              style={{ fontSize: '0.5rem', lineHeight: '0.7rem', marginTop: '3px' }}
+            >
               {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {message.isMine && <span className="ml-1">✓</span>}
             </div>
           </div>
         </div>
@@ -342,8 +347,8 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     position: embedded ? 'relative' : 'fixed',
     right: embedded ? undefined : '20px',
     bottom: embedded ? undefined : '20px',
-    height: embedded ? '100%' : '500px',
-    maxHeight: embedded ? '100%' : '500px',
+    height: embedded ? '100%' : '350px',
+    maxHeight: embedded ? '100%' : '350px',
     width: embedded ? '100%' : '384px', // w-96 = 24rem = 384px
     zIndex: 50,
     display: 'flex',
@@ -363,18 +368,20 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
         ...chatBoxStyle,
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
-        maxHeight: '100%'
+        height: embedded ? 'calc(100vh - 200px)' : (isMinimized ? '50px' : '300px'), // Embedded ise tam yükseklik, değilse minimize durumuna göre
+        maxHeight: embedded ? 'calc(100vh - 200px)' : (isMinimized ? '50px' : '300px'), // Maksimum yüksekliği de sınırladık
+        transition: 'height 0.3s ease, max-height 0.3s ease' // Animasyon ekledik
       }}
       className="bg-white"
     >
       {/* Chat Header */}
       <div 
-        className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] p-3 flex items-center justify-between cursor-pointer"
+        className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] p-2 flex items-center justify-between cursor-pointer"
         style={{ flexShrink: 0 }}
+        onClick={() => !embedded && setIsMinimized(!isMinimized)} // Sadece embedded olmadığında minimize özelliği aktif
       >
         <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3 relative">
+          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mr-3 relative">
             <span className="text-[#FF8B5E] font-bold">{instructor.name.charAt(0)}</span>
             {Array.isArray(messages) && messages.filter(msg => !msg.read && msg.sender === instructor._id).length > 0 && (
               <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
@@ -383,108 +390,128 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
             )}
           </div>
           <div>
-            <h3 className="text-white font-medium">{instructor.name}</h3>
+            <h3 className="text-white font-medium text-sm">{instructor.name}</h3>
             <p className="text-white/70 text-xs">{instructor.university}</p>
           </div>
         </div>
-        <div className="flex">
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose?.();
-            }}
-            className="text-white/80 hover:text-white transition-colors duration-300"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      
-      {/* Chat Messages */}
-      <div 
-        ref={messagesContainerRef}
-        className="overflow-y-auto p-4 bg-[#FFFBF8]"
-        style={{ 
-          flexGrow: 1,
-          height: 'calc(100% - 130px)' // Header + Input alanı için yer bırak
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#FF8B5E]"></div>
-          </div>
-        ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
-            <Image 
-              src="/images/chat-empty.svg" 
-              alt="No messages" 
-              width={100} 
-              height={100} 
-              className="mb-4 opacity-50"
-            />
-            <p className="text-sm">Henüz mesaj yok. Sohbeti başlatmak için bir mesaj gönder!</p>
-          </div>
-        ) : (
-          <>
-            {renderMessages()}
-            {isTyping && (
-              <div className="flex items-center text-gray-500 text-sm mt-2">
-                <div className="flex space-x-1 mr-2">
-                  <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                </div>
-                <span>{instructor.name} yazıyor...</span>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </>
-        )}
-      </div>
-      
-      {/* Chat Input - Sabit Alt Kısım */}
-      <div 
-        className="bg-white border-t border-[#FFE5D9] p-3" 
-        style={{ 
-          flexShrink: 0,
-          minHeight: '70px',
-          position: 'relative',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 10,
-          width: '100%'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <form onSubmit={sendMessage} className="w-full h-full">
-          <div className="flex items-center w-full h-full space-x-2">
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Mesajınızı yazın..."
-              className="flex-1 border border-[#FFE5D9] rounded-xl py-2 px-4 focus:outline-none focus:border-[#FF8B5E] transition-colors duration-300"
-              autoComplete="off"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <button
-              type="submit"
-              disabled={!newMessage.trim()}
-              className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white p-2 rounded-xl disabled:opacity-50 flex items-center justify-center w-[42px] h-[42px] hover:shadow-md transition-all duration-300"
-              aria-label="Mesaj gönder"
+        <div className="flex items-center">
+          {!isMinimized && onClose && (
+            <button 
+              onClick={(e) => {
+                e.stopPropagation(); // Tıklamanın üst öğeye yayılmasını engelle
+                onClose();
+              }} 
+              className="text-white hover:text-white/80"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-          </div>
-        </form>
+          )}
+          {!embedded && ( // Sadece embedded olmadığında minimize/maximize ikonunu göster
+            <div className="ml-2 text-white">
+              {isMinimized ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Mesaj Listesi ve Giriş Alanı - Embedded ise her zaman göster, değilse minimize durumuna göre göster */}
+      {(embedded || !isMinimized) && (
+        <>
+          {/* Mesaj Listesi */}
+          <div 
+            ref={messagesContainerRef}
+            className="overflow-y-auto p-4 bg-[#FFFBF8]"
+            style={{ 
+              flexGrow: 1,
+              height: 'calc(100% - 90px)' // Header + Input alanı için yer bırak
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#FF8B5E]"></div>
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
+                <Image 
+                  src="/images/chat-empty.svg" 
+                  alt="No messages" 
+                  width={100} 
+                  height={100} 
+                  className="mb-4 opacity-50"
+                />
+                <p className="text-sm">Henüz mesaj yok. Sohbeti başlatmak için bir mesaj gönder!</p>
+              </div>
+            ) : (
+              <>
+                {renderMessages()}
+                {isTyping && (
+                  <div className="flex items-center text-gray-500 text-sm mt-2">
+                    <div className="flex space-x-1 mr-2">
+                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                    <span>{instructor.name} yazıyor...</span>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </>
+            )}
+          </div>
+          
+          {/* Chat Input - Sabit Alt Kısım */}
+          <div 
+            className="bg-white border-t border-[#FFE5D9] p-3" 
+            style={{ 
+              flexShrink: 0,
+              minHeight: '70px',
+              position: 'relative',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 10,
+              width: '100%'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <form onSubmit={sendMessage} className="w-full h-full">
+              <div className="flex items-center w-full h-full space-x-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Mesajınızı yazın..."
+                  className="flex-1 border border-[#FFE5D9] rounded-xl py-2 px-4 focus:outline-none focus:border-[#FF8B5E] transition-colors duration-300"
+                  autoComplete="off"
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim()}
+                  className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white p-2 rounded-xl disabled:opacity-50 flex items-center justify-center w-[42px] h-[42px] hover:shadow-md transition-all duration-300"
+                  aria-label="Mesaj gönder"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </>
+      )}
     </div>
   );
 };

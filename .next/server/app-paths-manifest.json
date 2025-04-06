@@ -1,9 +1,15 @@
 {
-  "/egitmenler/page": "app/egitmenler/page.js",
-  "/profil/page": "app/profil/page.js",
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
   "/page": "app/page.js",
+<<<<<<< Updated upstream
   "/mesajlarim/page": "app/mesajlarim/page.js",
+  "/egitmenler/page": "app/egitmenler/page.js",
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+=======
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+  "/egitmenler/page": "app/egitmenler/page.js",
+  "/mesajlarim/page": "app/mesajlarim/page.js",
+  "/api/messages/route": "app/api/messages/route.js",
   "/api/instructors/route": "app/api/instructors/route.js",
+>>>>>>> Stashed changes
   "/auth/login/page": "app/auth/login/page.js"
 }
