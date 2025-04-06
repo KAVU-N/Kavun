@@ -15,6 +15,7 @@ interface Instructor {
   university: string;
   role: string;
   createdAt: string;
+  expertise: string; // Uzmanlık alanı/verdiği ders
 }
 
 export default function InstructorsPage() {
@@ -23,6 +24,7 @@ export default function InstructorsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeChat, setActiveChat] = useState<Instructor | null>(null);
+  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const { user } = useAuth();
   const router = useRouter();
 
@@ -103,7 +105,7 @@ export default function InstructorsPage() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Eğitmen ara..."
+                placeholder="Ders ara..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-white border border-[#FFE5D9] rounded-full outline-none transition-all duration-200
@@ -112,6 +114,38 @@ export default function InstructorsPage() {
               <div className="absolute inset-y-0 left-4 flex items-center">
                 <FaSearch className="text-[#FFB996]" />
               </div>
+            </div>
+          </div>
+
+          {/* Ders Filtreleri */}
+          <div className="max-w-full mx-auto mb-8 overflow-x-auto">
+            <div className="flex space-x-3 px-4 py-2 min-w-max">
+              {[
+                'Bilgisayar Mühendisliği',
+                'Diş Hekimliği',
+                'Tıp',
+                'Hukuk',
+                'Makine Mühendisliği',
+                'Elektrik-Elektronik Mühendisliği',
+                'İşletme',
+                'Psikoloji',
+                'Mimarlık',
+                'Endüstri Mühendisliği',
+                'İnşaat Mühendisliği',
+                'Yazılım Mühendisliği'
+              ].map((bolum) => (
+                <button
+                  key={bolum}
+                  className={`whitespace-nowrap px-4 py-2 border rounded-lg text-sm transition-all duration-200
+                    ${selectedDepartment === bolum 
+                      ? 'bg-[#FFB996] text-white border-[#FFB996] font-medium' 
+                      : 'bg-white text-[#994D1C] border-[#FFE5D9] hover:bg-[#FFB996] hover:text-white hover:border-[#FFB996]'
+                    }`}
+                  onClick={() => setSelectedDepartment(selectedDepartment === bolum ? null : bolum)}
+                >
+                  {bolum}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -156,6 +190,14 @@ export default function InstructorsPage() {
                           <FaChalkboardTeacher className="text-[#FFB996] mr-2" />
                           <span className="text-[#994D1C]">Üye: {new Date(instructor.createdAt).toLocaleDateString('tr-TR')}</span>
                         </div>
+                      </div>
+
+                      {/* Uzmanlık Alanı */}
+                      <div className="mt-4 p-3 bg-[#FFF5F0] rounded-lg">
+                        <p className="text-sm text-[#994D1C]">
+                          <span className="font-medium">Ders Anlatımı: </span>
+                          {instructor.expertise || "Belirtilmemiş"}
+                        </p>
                       </div>
                     </div>
                     

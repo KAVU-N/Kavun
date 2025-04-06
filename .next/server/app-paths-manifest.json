@@ -1,7 +1,9 @@
 {
-  "/api/users/[id]/route": "app/api/users/[id]/route.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/api/messages/route": "app/api/messages/route.js",
   "/mesajlarim/page": "app/mesajlarim/page.js",
-  "/api/conversations/route": "app/api/conversations/route.js"
+  "/egitmenler/page": "app/egitmenler/page.js",
+  "/iletisim/page": "app/iletisim/page.js",
+  "/page": "app/page.js",
+  "/api/instructors/route": "app/api/instructors/route.js",
+  "/auth/login/page": "app/auth/login/page.js"
 }
