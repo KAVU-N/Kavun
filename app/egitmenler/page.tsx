@@ -105,7 +105,7 @@ export default function InstructorsPage() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Ders ara..."
+                placeholder="Ders veya eğitmen ara..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-white border border-[#FFE5D9] rounded-full outline-none transition-all duration-200

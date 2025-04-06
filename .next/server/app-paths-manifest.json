@@ -1,10 +1,9 @@
 {
-<<<<<<< Updated upstream
+  "/egitmenler/page": "app/egitmenler/page.js",
+  "/profil/page": "app/profil/page.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/iletisim/page": "app/iletisim/page.js",
-  "/page": "app/page.js"
-=======
   "/page": "app/page.js",
-  "/auth/register/page": "app/auth/register/page.js"
->>>>>>> Stashed changes
+  "/mesajlarim/page": "app/mesajlarim/page.js",
+  "/api/instructors/route": "app/api/instructors/route.js",
+  "/auth/login/page": "app/auth/login/page.js"
 }

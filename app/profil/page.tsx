@@ -5,16 +5,16 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function ProfilePage() {
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!loading && !user) {
       router.push('/auth/login');
     }
-  }, [user, isLoading, router]);
+  }, [user, loading, router]);
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#FFF5F0] pt-20">
         <div className="max-w-4xl mx-auto px-6">
@@ -61,6 +61,15 @@ export default function ProfilePage() {
                 {user.role === 'student' ? 'Öğrenci' : 'Öğretmen'}
               </p>
             </div>
+
+            {user.role === 'teacher' && (
+              <div>
+                <h2 className="text-sm font-medium text-[#994D1C]">Verdiği Ders / Uzmanlık Alanı</h2>
+                <p className="mt-1 text-lg text-[#6B3416]">
+                  {user.expertise || 'Belirtilmemiş'}
+                </p>
+              </div>
+            )}
 
             <div>
               <h2 className="text-sm font-medium text-[#994D1C]">Hesap Durumu</h2>
