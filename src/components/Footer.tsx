@@ -75,6 +75,11 @@ export default function Footer() {
                 </li>
               )}
               <li>
+                <Link href="/iletisim" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
+                  İletişim
+                </Link>
+              </li>
+              <li>
                 <Link href="/hakkimizda" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
                   Hakkımızda
                 </Link>
