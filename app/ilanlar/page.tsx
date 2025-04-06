@@ -70,6 +70,9 @@ export default function IlanlarPage() {
           ? `/api/ilanlar/university?university=${encodeURIComponent(user.university)}&search=${encodeURIComponent(searchTerm)}` 
           : `/api/ilanlar/university?university=${encodeURIComponent(user.university)}`;
         
+        console.log('Fetching listings from URL:', url);
+        console.log('User university:', user.university);
+        
         const response = await fetch(url);
         
         if (!response.ok) {
@@ -78,6 +81,9 @@ export default function IlanlarPage() {
         }
         
         const data = await response.json();
+        console.log('Received listings data:', data);
+        console.log('Number of listings found:', data.length);
+        
         setIlanlar(data);
         setError('');
       } catch (err: any) {
@@ -337,14 +343,25 @@ export default function IlanlarPage() {
                   <div className="border-t border-gray-100 my-4"></div>
                   
                   {/* Öğretmen Bilgisi */}
-                  <div className="flex items-center mb-4">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3 shadow-sm group-hover:shadow-md transition-all duration-300">
-                      {ilan.teacher?.name.charAt(0).toUpperCase()}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3 shadow-sm group-hover:shadow-md transition-all duration-300">
+                        {ilan.teacher?.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-800">{ilan.teacher?.name}</p>
+                        <p className="text-xs text-gray-500">{ilan.teacher?.expertise || 'Öğretmen'}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-800">{ilan.teacher?.name}</p>
-                      <p className="text-xs text-gray-500">{ilan.teacher?.expertise || 'Öğretmen'}</p>
-                    </div>
+                    <Link 
+                      href={`/ogretmen-ilanlari/${ilan.teacher._id}`}
+                      className="text-sm text-[#FF8B5E] hover:text-[#FF6B1A] hover:underline transition-colors flex items-center"
+                    >
+                      <span>Tüm İlanları</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
                   </div>
                   
                   {/* Özellikler */}
@@ -368,12 +385,20 @@ export default function IlanlarPage() {
                   </div>
                   
                   {/* Buton */}
-                  <Link 
-                    href={`/ilanlar/${ilan._id}`}
-                    className="block w-full text-center py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg font-medium hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 transform group-hover:translate-y-[-2px]"
-                  >
-                    Detayları Gör
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link 
+                      href={`/ilan/${ilan._id}`}
+                      className="block flex-1 text-center py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg font-medium hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 transform group-hover:translate-y-[-2px]"
+                    >
+                      Detayları Gör
+                    </Link>
+                    <Link 
+                      href={`/ogretmen-ilanlari/${ilan.teacher._id}`}
+                      className="block py-3 px-3 bg-[#FFF5F0] text-[#FF8B5E] rounded-lg font-medium hover:bg-[#FFE5D9] transition-all duration-300 transform group-hover:translate-y-[-2px]"
+                    >
+                      <FaChalkboardTeacher size={18} />
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>

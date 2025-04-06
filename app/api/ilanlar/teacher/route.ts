@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import mongoose from 'mongoose';
 
-// İlan şeması (app/api/ilanlar/route.ts ile aynı)
+// İlan şeması
 const ilanSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -57,64 +57,56 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
-// GET - Belirli bir üniversitedeki aktif ilanları getir
+// GET - Belirli bir öğretmenin tüm aktif ilanlarını getir
 export async function GET(request: Request) {
   try {
     await connectDB();
     
-    // URL'den üniversite parametresini al
+    // URL'den öğretmen ID parametresini al
     const { searchParams } = new URL(request.url);
-    const university = searchParams.get('university');
-    const searchTerm = searchParams.get('search') || '';
+    const teacherId = searchParams.get('teacherId');
     
-    if (!university) {
+    if (!teacherId) {
       return NextResponse.json(
-        { error: 'Üniversite parametresi gereklidir' },
+        { error: 'Öğretmen ID parametresi gereklidir' },
         { status: 400 }
       );
     }
     
-    // Önce belirtilen üniversitedeki öğretmenleri bul - case insensitive arama yap
-    const teachers = await User.find({
-      university: { $regex: new RegExp('^' + university + '$', 'i') },
+    // Öğretmenin bilgilerini kontrol et
+    const teacher = await User.findOne({ 
+      _id: teacherId,
       role: 'teacher'
-    }).select('_id');
+    });
     
-    const teacherIds = teachers.map(teacher => teacher._id.toString());
-    
-    // Arama filtresi oluştur
-    let query: any = {
-      userId: { $in: teacherIds },
-      status: 'active'
-    };
-    
-    // Eğer arama terimi varsa başlık ve açıklamada ara
-    if (searchTerm) {
-      query.$or = [
-        { title: { $regex: searchTerm, $options: 'i' } },
-        { description: { $regex: searchTerm, $options: 'i' } }
-      ];
+    if (!teacher) {
+      return NextResponse.json(
+        { error: 'Öğretmen bulunamadı' },
+        { status: 404 }
+      );
     }
     
-    // İlanları bul
-    const ilanlar = await Ilan.find(query).sort({ createdAt: -1 });
+    // Öğretmenin aktif ilanlarını bul
+    const ilanlar = await Ilan.find({
+      userId: teacherId,
+      status: 'active'
+    }).sort({ createdAt: -1 });
     
-    // Her ilan için öğretmen bilgilerini ekle
-    const ilanlarWithTeachers = await Promise.all(
-      ilanlar.map(async (ilan) => {
-        const teacher = await User.findOne({ _id: ilan.userId })
-          .select('name email university expertise');
-        
-        return {
-          ...ilan.toObject(),
-          teacher: teacher ? teacher.toObject() : null
-        };
-      })
-    );
+    // Öğretmen bilgilerini her ilana ekle
+    const ilanlarWithTeacher = ilanlar.map(ilan => ({
+      ...ilan.toObject(),
+      teacher: {
+        _id: teacher._id,
+        name: teacher.name,
+        email: teacher.email,
+        university: teacher.university,
+        expertise: teacher.expertise
+      }
+    }));
     
-    return NextResponse.json(ilanlarWithTeachers);
+    return NextResponse.json(ilanlarWithTeacher);
   } catch (error: any) {
-    console.error('Üniversite ilanları getirme hatası:', error);
+    console.error('Öğretmen ilanları getirme hatası:', error);
     return NextResponse.json(
       { error: error.message || 'İlanlar getirilirken bir hata oluştu' },
       { status: 500 }
