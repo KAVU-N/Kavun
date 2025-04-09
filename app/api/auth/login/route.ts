@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 
     // Debug için
     console.log('Found user:', {
-      id: user._id,
+      id: user._id ? user._id.toString() : '',
       name: user.name,
       email: user.email,
       role: user.role,
@@ -128,7 +128,7 @@ export async function POST(req: Request) {
     // JWT token oluştur
     const token = jwt.sign(
       { 
-        userId: user._id,
+        userId: user._id ? user._id.toString() : '',
         email: user.email,
         role: user.role
       },
@@ -138,7 +138,7 @@ export async function POST(req: Request) {
 
     // Debug için
     console.log('Login successful, returning user data:', {
-      id: user._id,
+      id: user._id ? user._id.toString() : '',
       name: user.name,
       email: user.email,
       role: user.role,
@@ -148,7 +148,7 @@ export async function POST(req: Request) {
 
     // Password alanını response'dan çıkar
     const userWithoutPassword = {
-      id: user._id.toString(),
+      id: user._id ? user._id.toString() : '',
       name: user.name,
       email: user.email,
       role: user.role,
