@@ -1,25 +1,207 @@
 {
   "pages": {
-    "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+    "/_not-found": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/app/_not-found-1536e39e67103c02.js"
     ],
     "/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/layout.css",
-      "static/chunks/app/layout.js"
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/703-4c65d96eb86f4729.js",
+      "static/chunks/478-ba2f3e672ce233a7.js",
+      "static/chunks/160-7bb63b615546a3be.js",
+      "static/css/aec539bb0326b3e7.css",
+      "static/chunks/app/layout-063b6d4a68b5855c.js"
     ],
-    "/ilanlar/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/ilanlar/page.js"
+    "/ayarlar/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/app/ayarlar/page-2df804de7b65af8e.js"
+    ],
+    "/courses/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
+      "static/chunks/450-0fc77b19046ddb60.js",
+      "static/chunks/app/courses/page-8042b8bbc62a64db.js"
+    ],
+    "/egitmenler/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
+      "static/chunks/703-4c65d96eb86f4729.js",
+      "static/chunks/323-395718c100b134f8.js",
+      "static/chunks/49-20d1e826754d629c.js",
+      "static/chunks/app/egitmenler/page-8a2c93f77b1ff3a1.js"
+    ],
+    "/contact/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
+      "static/chunks/450-0fc77b19046ddb60.js",
+      "static/chunks/app/contact/page-b064316c4c6c3295.js"
+    ],
+    "/ilanlar/[id]/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/app/ilanlar/[id]/page-e0acf812b6f12cdf.js"
+    ],
+    "/ilan-ver/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
+      "static/chunks/app/ilan-ver/page-ea6542fdb65e7b9c.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/703-4c65d96eb86f4729.js",
+      "static/chunks/160-7bb63b615546a3be.js",
+      "static/chunks/app/page-fe9e58dfffa29bd9.js"
+    ],
+    "/ilanlarim/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
+      "static/chunks/app/ilanlarim/page-449d711f0c7dd228.js"
     ],
     "/ilan/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/ilan/[id]/page.js"
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/app/ilan/[id]/page-5a9c9a505fec997e.js"
+    ],
+    "/ilanlar/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/app/ilanlar/page-d379a2212a645cb5.js"
+    ],
+    "/iletisim/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
+      "static/chunks/450-0fc77b19046ddb60.js",
+      "static/chunks/app/iletisim/page-46b125c9e52328ad.js"
+    ],
+    "/mesajlarim/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/703-4c65d96eb86f4729.js",
+      "static/chunks/323-395718c100b134f8.js",
+      "static/chunks/49-20d1e826754d629c.js",
+      "static/chunks/app/mesajlarim/page-3c1a67a05942ad0c.js"
+    ],
+    "/ogretmen-ilanlari/[teacherId]/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/app/ogretmen-ilanlari/[teacherId]/page-f9716f09f2fea79d.js"
+    ],
+    "/projects/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/703-4c65d96eb86f4729.js",
+      "static/chunks/450-0fc77b19046ddb60.js",
+      "static/chunks/app/projects/page-429ad8e9addfc0bb.js"
+    ],
+    "/profil/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/app/profil/page-2ee17aef822ceda6.js"
+    ],
+    "/auth/forgot-password/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/app/auth/forgot-password/page-edb8b35fbb22cfe0.js"
+    ],
+    "/auth/layout": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/450-0fc77b19046ddb60.js",
+      "static/chunks/app/auth/layout-b80e06d845f86296.js"
+    ],
+    "/auth/login/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/703-4c65d96eb86f4729.js",
+      "static/chunks/app/auth/login/page-3abd5c7a32e604c1.js"
+    ],
+    "/auth/register/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/703-4c65d96eb86f4729.js",
+      "static/chunks/app/auth/register/page-a713bcdd284bc96f.js"
+    ],
+    "/auth/verify/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/app/auth/verify/page-8cfd95c4f38c6081.js"
+    ],
+    "/auth/reset-password/page": [
+      "static/chunks/webpack-13ef4b9331ab590c.js",
+      "static/chunks/fd9d1056-02d6826fcca2c53d.js",
+      "static/chunks/69-3d01a8691fbf333c.js",
+      "static/chunks/main-app-55e1d970310db88b.js",
+      "static/chunks/792-93032466eb6338ab.js",
+      "static/chunks/app/auth/reset-password/page-f65c8678d66354b3.js"
     ]
   }
 }
