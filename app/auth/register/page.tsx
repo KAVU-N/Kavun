@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { universities } from '@/data/universities';
 
-type Role = 'student' | 'teacher';
+type Role = 'student' | 'instructor';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -36,6 +36,9 @@ export default function RegisterPage() {
     const password = formData.get('password') as string;
     const passwordConfirm = formData.get('passwordConfirm') as string;
     const university = formData.get('university') as string;
+    const expertise = formData.get('expertise') as string;
+    const gradeValue = formData.get('grade') as string;
+    const grade = gradeValue ? parseInt(gradeValue) : undefined;
     
     console.log("Formdan seçilen rol:", selectedRole);
     
@@ -47,7 +50,7 @@ export default function RegisterPage() {
     
     try {
       // URL parametresindeki rol yerine state'te tutulan rolü kullan
-      await register({ name, email, password, role: selectedRole, university });
+      await register({ name, email, password, role: selectedRole, university, expertise, grade });
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       setError(err.message || 'Kayıt olurken bir hata oluştu');
@@ -173,7 +176,7 @@ export default function RegisterPage() {
               className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
             >
               <option value="student">Öğrenci</option>
-              <option value="teacher">Öğretmen</option>
+              <option value="instructor">Eğitmen</option>
             </select>
           </div>
 
@@ -227,6 +230,39 @@ export default function RegisterPage() {
                 </div>
               )}
             </div>
+          </div>
+
+          <div>
+            <label htmlFor="expertise" className="block text-sm font-medium text-[#6B3416] mb-1">
+              Okuduğu Bölüm
+            </label>
+            <input
+              id="expertise"
+              name="expertise"
+              type="text"
+              placeholder="Örn: Bilgisayar Mühendisliği, Psikoloji, Tıp..."
+              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="grade" className="block text-sm font-medium text-[#6B3416] mb-1">
+              Kaçıncı Sınıf
+            </label>
+            <select
+              id="grade"
+              name="grade"
+              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
+            >
+              <option value="">Seçiniz</option>
+              <option value="1">1. Sınıf</option>
+              <option value="2">2. Sınıf</option>
+              <option value="3">3. Sınıf</option>
+              <option value="4">4. Sınıf</option>
+              <option value="5">5. Sınıf</option>
+              <option value="6">6. Sınıf</option>
+              <option value="0">Mezun</option>
+            </select>
           </div>
 
           {error && (

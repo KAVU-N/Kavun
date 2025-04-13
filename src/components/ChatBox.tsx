@@ -491,8 +491,8 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Ders Al butonu - Sadece öğrenci için göster ve öğretmen rolüne sahip kişilerle konuşurken */}
-            {user?.role === 'student' && instructor.role === 'teacher' && (
+            {/* Ders Al butonu - Sadece öğrenci için göster ve eğitmen rolüne sahip kişilerle konuşurken */}
+            {user?.role === 'student' && instructor.role === 'instructor' && (
               <div className="mb-3">
                 <button 
                   onClick={() => router.push(`/derslerim/olustur?instructorId=${instructor._id}`)}

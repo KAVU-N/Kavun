@@ -15,15 +15,17 @@ export default function IlanVerPage() {
     method: 'online', // 'online', 'yüzyüze' veya 'hibrit'
     duration: '',
     frequency: 'weekly', // 'daily', 'weekly', 'monthly', 'flexible'
+    instructorFrom: '', // Dersi aldığı eğitmen bilgisi
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Sadece eğitmen (instructor) rolüne sahip kullanıcıların erişimine izin ver
   useEffect(() => {
     if (!loading && !user) {
       router.push('/auth/login');
-    } else if (!loading && user && user.role !== 'teacher') {
+    } else if (!loading && user && user.role !== 'instructor') {
       router.push('/');
     }
   }, [user, loading, router]);
@@ -107,6 +109,7 @@ export default function IlanVerPage() {
         method: 'online',
         duration: '',
         frequency: 'weekly',
+        instructorFrom: '',
       });
       
       // İlan oluşturulduktan sonra ilanlarım sayfasına yönlendir
@@ -133,7 +136,7 @@ export default function IlanVerPage() {
     }
   };
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#FFF5F0] pt-20">
         <div className="container mx-auto px-4">
@@ -144,9 +147,25 @@ export default function IlanVerPage() {
       </div>
     );
   }
-
-  if (user && user.role !== 'teacher') {
-    return null; // Yönlendirme yapıldığı için render etmeye gerek yok
+  
+  // Kullanıcı giriş yapmamış veya eğitmen değilse içeriği gösterme
+  if (!user || user.role !== 'instructor') {
+    return (
+      <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <h1 className="text-3xl font-bold text-[#6B3416] mb-4">Erişim Engellendi</h1>
+            <p className="text-[#994D1C] mb-6">Bu sayfaya erişmek için eğitmen hesabıyla giriş yapmanız gerekmektedir.</p>
+            <button
+              onClick={() => router.push('/')}
+              className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-lg"
+            >
+              Ana Sayfaya Dön
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -262,6 +281,21 @@ export default function IlanVerPage() {
                     <option value="monthly">Aylık</option>
                     <option value="flexible">Esnek</option>
                   </select>
+                </div>
+                
+                <div className="md:col-span-2">
+                  <label htmlFor="instructorFrom" className="block text-[#6B3416] font-medium mb-2">
+                    Dersi Aldığınız Eğitmen
+                  </label>
+                  <input
+                    type="text"
+                    id="instructorFrom"
+                    name="instructorFrom"
+                    value={formData.instructorFrom}
+                    onChange={handleChange}
+                    placeholder="Örn: Ankara Üniversitesi, Prof. Dr. Ahmet Yılmaz"
+                    className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
+                  />
                 </div>
               </div>
               

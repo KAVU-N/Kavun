@@ -16,7 +16,7 @@ export default function Home() {
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleRoleSelect = (role: 'student' | 'teacher') => {
+  const handleRoleSelect = (role: 'student' | 'instructor') => {
     router.push(`/auth/register?role=${role}&university=${encodeURIComponent(searchTerm)}`);
   };
 
@@ -261,7 +261,7 @@ export default function Home() {
                 Öğrenci Olarak Devam Et
               </button>
               <button
-                onClick={() => handleRoleSelect('teacher')}
+                onClick={() => handleRoleSelect('instructor')}
                 className="w-full px-8 py-3 bg-[#FFE5D9] text-[#994D1C] font-semibold rounded-full hover:bg-[#FFB996] hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                 aria-label="Eğitmen olarak devam et"
               >

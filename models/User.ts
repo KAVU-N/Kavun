@@ -6,14 +6,15 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: 'student' | 'teacher';
+  role: 'student' | 'instructor';
   university: string;
+  grade?: number; // Kaçıncı sınıf olduğu bilgisi
   isVerified: boolean;
   verificationCode?: string;
   verificationCodeExpires?: Date;
   resetPasswordCode?: string;
   resetPasswordExpires?: Date;
-  expertise?: string; // Uzmanlık alanı/verdiği ders
+  expertise?: string; // Okuduğu bölüm
   createdAt: Date;
 }
 
@@ -29,7 +30,7 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: [true, 'Email alanı zorunludur'],
-    unique: true,
+    // unique: true, // Buradaki unique'i kaldırıyoruz, aşağıda index olarak tanımlıyoruz
     trim: true,
     lowercase: true,
     validate: {
@@ -49,7 +50,7 @@ const userSchema = new Schema({
     type: String,
     required: [true, 'Rol alanı zorunludur'],
     enum: {
-      values: ['student', 'teacher'],
+      values: ['student', 'instructor'],
       message: 'Geçerli bir rol seçiniz'
     }
   },
@@ -57,6 +58,11 @@ const userSchema = new Schema({
     type: String,
     required: [true, 'Üniversite alanı zorunludur'],
     trim: true
+  },
+  grade: {
+    type: Number,
+    min: [1, 'Sınıf en az 1 olabilir'],
+    max: [6, 'Sınıf en fazla 6 olabilir']
   },
   isVerified: {
     type: Boolean,

@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { name, email, password, role, university } = body;
+    const { name, email, password, role, university, expertise, grade } = body;
 
     // Validasyon
     if (!name || !email || !password || !role || !university) {
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
     }
 
     // Rol kontrolü
-    if (!['student', 'teacher'].includes(role)) {
+    if (!['student', 'instructor'].includes(role)) {
       return NextResponse.json(
         { error: 'Geçersiz rol' },
         { 
@@ -179,6 +179,8 @@ export async function POST(req: Request) {
         password: hashedPassword,
         role,
         university,
+        expertise,
+        grade,
         verificationCode,
         verificationCodeExpires,
         isVerified: false
@@ -205,6 +207,8 @@ export async function POST(req: Request) {
         email: user.email,
         role: user.role,
         university: user.university,
+        expertise: user.expertise,
+        grade: user.grade,
         isVerified: user.isVerified
       });
 

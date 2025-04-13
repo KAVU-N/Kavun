@@ -27,6 +27,7 @@ interface Ilan {
   updatedAt: string;
   userId: string;
   teacher: Teacher;
+  instructorFrom: string;
 }
 
 export default function IlanDetayPage({ params }: { params: { id: string } }) {
@@ -191,6 +192,10 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                 <div className="mb-8">
                   <h2 className="text-xl font-bold text-[#6B3416] mb-4">Ek Bilgiler</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-[#FFF9F5] p-4 rounded-lg">
+                      <p className="text-sm font-medium text-[#994D1C] mb-1">Eğitim Aldığı Öğretmen:</p>
+                      <p className="text-gray-700 font-medium">{ilan.instructorFrom || 'Belirtilmemiş'}</p>
+                    </div>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-sm text-gray-600 mb-1">Ders Sıklığı</p>
                       <p className="font-medium text-[#6B3416]">{getFrequencyText(ilan.frequency)}</p>
@@ -203,7 +208,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                 </div>
                 
                 <div className="mb-8">
-                  <h2 className="text-xl font-bold text-[#6B3416] mb-4">Öğretmen Hakkında</h2>
+                  <h2 className="text-xl font-bold text-[#6B3416] mb-4">Eğitmen Hakkında</h2>
                   <div className="bg-[#FFF9F5] p-6 rounded-lg flex items-start">
                     <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white text-2xl font-bold mr-4">
                       {ilan.teacher?.name.charAt(0).toUpperCase()}
@@ -213,10 +218,10 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                       <p className="text-[#994D1C] mb-2">{ilan.teacher?.university}</p>
                       <p className="text-gray-600 mb-4">{ilan.teacher?.expertise || 'Belirtilmemiş'}</p>
                       <Link 
-                        href={`/ogretmen-ilanlari/${ilan.teacher?._id}`}
+                        href={`/egitmen-ilanlari/${ilan.teacher?._id}`}
                         className="inline-flex items-center text-[#FF8B5E] hover:text-[#FF6B1A] font-medium"
                       >
-                        <span>Öğretmenin Tüm İlanlarını Gör</span>
+                        <span>Eğitmenin Tüm İlanlarını Gör</span>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
@@ -239,7 +244,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                     }}
                     className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg hover:shadow-md transition-all duration-300"
                   >
-                    Öğretmene Mesaj Gönder
+                    Eğitmene Mesaj Gönder
                   </button>
                 </div>
               </div>

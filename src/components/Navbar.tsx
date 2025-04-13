@@ -6,10 +6,28 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 
+// Custom hook for media query
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
+  }, [matches, query]);
+
+  return matches;
+}
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [mounted, setMounted] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -28,7 +46,7 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     
     // Okunmamış mesajları kontrol et
-    if (user) {
+    if (mounted && user) {
       checkUnreadMessages();
     }
     
@@ -97,11 +115,6 @@ export default function Navbar() {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
       </svg>
     )},
-    { href: '/egitmenler', label: 'Eğitmenler', icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-      </svg>
-    )},
     { href: '/derslerim', label: 'Derslerim', icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -111,8 +124,9 @@ export default function Navbar() {
 
   // İstemci tarafında render edilecek içerik
   const renderClientContent = () => {
-    // Eğer kullanıcı öğretmen rolüne sahipse ve rol tanımlıysa "İlan Ver" butonunu göster
-    const showTeacherButton = user && typeof user.role === 'string' && user.role === 'teacher';
+    // Eğer kullanıcı eğitmen rolüne sahipse ve rol tanımlıysa "İlan Ver" butonunu göster
+    // mounted kontrolüne gerek yok, çünkü bu fonksiyon zaten sadece mounted true olduğunda çağrılıyor
+    const showTeacherButton = user && typeof user.role === 'string' && (user.role === 'instructor' || user.role === 'teacher');
     
     return (
       <nav className={`w-full transition-all duration-500 ${
@@ -137,6 +151,27 @@ export default function Navbar() {
                 </span>
               </Link>
             </div>
+
+            {/* Mobile Menu Button - Only visible when menu is closed */}
+            {!isMenuOpen && (
+              <div className="flex md:hidden">
+                {isMobile && (
+                  <button
+                    onClick={() => setIsMenuOpen(true)}
+                    className="p-2 rounded-xl transition-all duration-300"
+                  >
+                    <svg className="w-6 h-6 text-[#994D1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Desktop Navigation - CENTER */}
             <div className="hidden md:flex items-center justify-center flex-1">
@@ -173,9 +208,9 @@ export default function Navbar() {
                       <span>İlan Ver</span>
                     </Link>
                     <Link
-                      href="/derslerim/ekle"
+                      href="/derslerim/olustur"
                       className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                        pathname === '/derslerim/ekle'
+                        pathname === '/derslerim/olustur'
                           ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
                           : 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105'
                       }`}
@@ -278,7 +313,7 @@ export default function Navbar() {
                           <span>Derslerim</span>
                         </div>
                       </Link>
-                      {user.role === 'teacher' && (
+                      {(user.role === 'instructor' || user.role === 'teacher') && (
                         <>
                           <Link
                             href="/ilanlarim"
@@ -292,7 +327,7 @@ export default function Navbar() {
                             </div>
                           </Link>
                           <Link
-                            href="/derslerim/ekle"
+                            href="/derslerim/olustur"
                             className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                           >
                             <div className="flex items-center space-x-2">
@@ -321,37 +356,28 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className="flex md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-xl transition-all duration-300"
-              >
-                <svg className="w-6 h-6 text-[#994D1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {isMenuOpen ? (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  ) : (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  )}
-                </svg>
-              </button>
-            </div>
+            {/* Eski hamburger menü düğmesi kaldırıldı */}
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white shadow-lg rounded-b-xl overflow-hidden">
+            <div className="flex justify-end px-4 pt-2">
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="p-2 rounded-xl transition-all duration-300"
+              >
+                <svg className="w-6 h-6 text-[#994D1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
             <div className="px-4 py-3 space-y-1">
               {navLinks
                 .map((link) => (
@@ -370,21 +396,37 @@ export default function Navbar() {
                   </Link>
                 ))}
               
-              {user && user.role === 'teacher' && (
-                <Link
-                  href="/ilan-ver"
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                    pathname === '/ilan-ver'
-                      ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
-                      : 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white'
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <span>İlan Ver</span>
-                </Link>
+              {mounted && user && (user.role === 'instructor' || user.role === 'teacher') && (
+                <>
+                  <Link
+                    href="/ilan-ver"
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                      pathname === '/ilan-ver'
+                        ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
+                        : 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white'
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>İlan Ver</span>
+                  </Link>
+                  <Link
+                    href="/derslerim/olustur"
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                      pathname === '/derslerim/olustur'
+                        ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
+                        : 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white'
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Ders Oluştur</span>
+                  </Link>
+                </>
               )}
               
               {!user ? (
@@ -432,17 +474,39 @@ export default function Navbar() {
                     </div>
                     <span>Mesajlarım</span>
                   </Link>
+                  <Link
+                    href="/derslerim"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>Derslerim</span>
+                  </Link>
                   {user.role === 'teacher' && (
-                    <Link
-                      href="/ilanlarim"
-                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                      <span>İlanlarım</span>
-                    </Link>
+                    <>
+                      <Link
+                        href="/ilanlarim"
+                        className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <span>İlanlarım</span>
+                      </Link>
+                      <Link
+                        href="/derslerim/ekle"
+                        className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <span>Ders Oluştur</span>
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={() => {
@@ -466,9 +530,12 @@ export default function Navbar() {
   };
 
   // Sunucu ve istemci tarafı render arasındaki farkı gidermek için
-  return (
-    <div className="fixed w-full z-50">
-      {!mounted ? (
+  // useEffect içinde mounted state'ini güncellediğimiz için, bu component ilk render edildiğinde
+  // mounted false olacak ve sadece sunucu tarafında render edilebilecek içeriği göstereceğiz
+  if (!mounted) {
+    // Sunucu tarafında minimal bir yapı render et
+    return (
+      <div className="fixed w-full z-50">
         <div className="w-full py-4">
           <div className="mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -484,15 +551,17 @@ export default function Navbar() {
               <div className="hidden md:flex items-center justify-end space-x-4">
                 <div className="flex items-center space-x-4"></div>
               </div>
-              <div className="flex md:hidden">
-                <button className="p-2 rounded-xl"></button>
-              </div>
             </div>
           </div>
         </div>
-      ) : (
-        renderClientContent()
-      )}
+      </div>
+    );
+  }
+  
+  // İstemci tarafında (mounted true olduğunda) tam içeriği render et
+  return (
+    <div className="fixed w-full z-50">
+      {renderClientContent()}
     </div>
   );
 }

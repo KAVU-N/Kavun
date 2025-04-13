@@ -235,14 +235,14 @@ export default function DersDetayPage({ params }: PageProps) {
     );
   }
 
-  // Öğretmen ve öğrenci bilgilerini alma
+  // Eğitmen ve öğrenci bilgilerini alma
   const teacher = lesson.teacherId || {};
   const student = lesson.studentId || {};
   
   // Kullanıcı rolüne göre karşı tarafın bilgilerini gösterme
-  const otherUserName = user?.role === 'teacher' ? student.name : teacher.name;
-  const otherUserRole = user?.role === 'teacher' ? 'Öğrenci' : 'Öğretmen';
-  const otherUserEmail = user?.role === 'teacher' ? student.email : teacher.email;
+  const otherUserName = user?.role === 'instructor' ? student.name : teacher.name;
+  const otherUserRole = user?.role === 'instructor' ? 'Öğrenci' : 'Eğitmen';
+  const otherUserEmail = user?.role === 'instructor' ? student.email : teacher.email;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -324,7 +324,7 @@ export default function DersDetayPage({ params }: PageProps) {
                 
                 {/* İletişim butonu */}
                 <Link
-                  href={`/mesajlarim?recipient=${user?.role === 'teacher' ? student._id : teacher._id}`}
+                  href={`/mesajlarim?recipient=${user?.role === 'instructor' ? student._id : teacher._id}`}
                   className="mt-4 w-full block text-center bg-[#FFF8F2] text-[#FF8B5E] font-medium py-2 px-4 rounded-md hover:bg-[#FFE6D5] transition-all duration-300"
                 >
                   Mesaj Gönder
@@ -385,8 +385,8 @@ export default function DersDetayPage({ params }: PageProps) {
                     </div>
                   )}
                   
-                  {/* Tamamlama butonu (yalnızca öğretmen) */}
-                  {user?.role === 'teacher' && (
+                  {/* Tamamlama butonu (yalnızca eğitmen) */}
+                  {user?.role === 'instructor' && (
                     !confirmingComplete ? (
                       <button
                         onClick={() => setConfirmingComplete(true)}

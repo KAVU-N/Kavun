@@ -74,11 +74,14 @@ export async function GET(request: Request) {
       );
     }
     
-    // Önce belirtilen üniversitedeki öğretmenleri bul - case insensitive arama yap
+    // Önce belirtilen üniversitedeki eğitmenleri bul - case insensitive arama yap
+    // Hem 'teacher' hem de 'instructor' rolüne sahip kullanıcıları getir
     const teachers = await User.find({
       university: { $regex: new RegExp('^' + university + '$', 'i') },
-      role: 'teacher'
+      role: { $in: ['teacher', 'instructor'] }
     }).select('_id');
+    
+    console.log('University API - Found teachers/instructors:', teachers.length);
     
     const teacherIds = teachers.map(teacher => teacher._id.toString());
     
@@ -98,6 +101,8 @@ export async function GET(request: Request) {
     
     // İlanları bul
     const ilanlar = await Ilan.find(query).sort({ createdAt: -1 });
+    
+    console.log('University API - Found listings:', ilanlar.length);
     
     // Her ilan için öğretmen bilgilerini ekle
     const ilanlarWithTeachers = await Promise.all(

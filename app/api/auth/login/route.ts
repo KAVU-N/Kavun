@@ -143,6 +143,8 @@ export async function POST(req: Request) {
       email: user.email,
       role: user.role,
       university: user.university,
+      expertise: user.expertise,
+      grade: user.grade,
       isVerified: user.isVerified
     });
 
@@ -153,6 +155,8 @@ export async function POST(req: Request) {
       email: user.email,
       role: user.role,
       university: user.university,
+      expertise: user.expertise,
+      grade: user.grade,
       isVerified: user.isVerified
     };
 

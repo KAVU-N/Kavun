@@ -27,10 +27,11 @@ export default function IlanlarimPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Sadece eğitmen (instructor) rolüne sahip kullanıcıların erişimine izin ver
   useEffect(() => {
     if (!loading && !user) {
       router.push('/auth/login');
-    } else if (!loading && user && user.role !== 'teacher') {
+    } else if (!loading && user && user.role !== 'instructor') {
       router.push('/');
     }
   }, [user, loading, router]);
@@ -55,7 +56,23 @@ export default function IlanlarimPage() {
         // Token al
         const token = localStorage.getItem('token');
         
+        // Token'ı kontrol et
+        try {
+          const tokenData = JSON.parse(atob(token.split('.')[1]));
+          console.log('Token içeriği:', tokenData);
+        } catch (e) {
+          console.error('Token çözümlenirken hata:', e);
+        }
+        
+        // Kullanıcı bilgilerini kontrol et
+        console.log('Kullanıcı bilgileri:', {
+          id: user.id,
+          email: user.email,
+          role: user.role
+        });
+        
         // API endpoint'e istek at
+        console.log('API isteği yapılıyor - userId:', user.id);
         const response = await fetch(`/api/ilanlar?userId=${user.id}`, {
           headers: {
             'Content-Type': 'application/json',
@@ -69,6 +86,14 @@ export default function IlanlarimPage() {
         }
         
         const data = await response.json();
+        console.log('API yanıtı - alınan ilanlar:', data.length);
+        
+        if (data.length === 0) {
+          console.log('Dikkat: Hiç ilan bulunamadı');
+        } else {
+          console.log('Alınan ilk ilan örneği:', data[0]);
+        }
+        
         setIlanlar(data);
         setError('');
       } catch (err) {
@@ -79,7 +104,7 @@ export default function IlanlarimPage() {
       }
     };
 
-    if (user && user.role === 'teacher') {
+    if (user && user.role === 'instructor') {
       fetchIlanlar();
     }
   }, [user, router]);
@@ -112,7 +137,7 @@ export default function IlanlarimPage() {
     }
   };
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-white pt-20">
         <div className="container mx-auto px-4">
@@ -123,9 +148,25 @@ export default function IlanlarimPage() {
       </div>
     );
   }
-
-  if (user && user.role !== 'teacher') {
-    return null; // Yönlendirme yapıldığı için render etmeye gerek yok
+  
+  // Kullanıcı giriş yapmamış veya eğitmen değilse içeriği gösterme
+  if (!user || user.role !== 'instructor') {
+    return (
+      <div className="min-h-screen bg-white pt-24 pb-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <h1 className="text-3xl font-bold text-[#6B3416] mb-4">Erişim Engellendi</h1>
+            <p className="text-[#994D1C] mb-6">Bu sayfaya erişmek için eğitmen hesabıyla giriş yapmanız gerekmektedir.</p>
+            <button
+              onClick={() => router.push('/')}
+              className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-lg"
+            >
+              Ana Sayfaya Dön
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
