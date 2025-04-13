@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
   "/_not-found": "app/_not-found.js",
   "/api/auth/me/route": "app/api/auth/me/route.js",
   "/api/auth/reset-password/route": "app/api/auth/reset-password/route.js",
@@ -47,4 +48,17 @@
   "/auth/register/page": "app/auth/register/page.js",
   "/auth/verify/page": "app/auth/verify/page.js",
   "/auth/reset-password/page": "app/auth/reset-password/page.js"
+=======
+  "/page": "app/page.js",
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+  "/ilanlar/page": "app/ilanlar/page.js",
+  "/egitmenler/page": "app/egitmenler/page.js",
+  "/api/instructors/route": "app/api/instructors/route.js",
+  "/mesajlarim/page": "app/mesajlarim/page.js",
+  "/api/users/[id]/route": "app/api/users/[id]/route.js",
+  "/api/conversations/route": "app/api/conversations/route.js",
+  "/ilan-ver/page": "app/ilan-ver/page.js",
+  "/api/messages/route": "app/api/messages/route.js",
+  "/auth/register/page": "app/auth/register/page.js"
+>>>>>>> Stashed changes
 }

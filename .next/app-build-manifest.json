@@ -90,6 +90,7 @@
       "static/chunks/8e1d74a4-26f11b7bf3565f9c.js",
       "static/chunks/app/ilanlarim/page-449d711f0c7dd228.js"
     ],
+<<<<<<< Updated upstream
     "/ilan/[id]/page": [
       "static/chunks/webpack-13ef4b9331ab590c.js",
       "static/chunks/fd9d1056-02d6826fcca2c53d.js",
@@ -202,6 +203,32 @@
       "static/chunks/main-app-55e1d970310db88b.js",
       "static/chunks/792-93032466eb6338ab.js",
       "static/chunks/app/auth/reset-password/page-f65c8678d66354b3.js"
+=======
+    "/auth/register/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/register/page.js"
+    ],
+    "/auth/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/layout.js"
+    ],
+    "/egitmenler/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/egitmenler/page.js"
+    ],
+    "/mesajlarim/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/mesajlarim/page.js"
+    ],
+    "/ilan-ver/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilan-ver/page.js"
+>>>>>>> Stashed changes
     ]
   }
 }

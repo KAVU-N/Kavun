@@ -1,5 +1,15 @@
+<<<<<<< Updated upstream
+<<<<<<<< Updated upstream:.next/types/app/auth/layout.ts
 // File: C:\Users\eren\Kavun, organization\app\auth\layout.tsx
 import * as entry from '../../../../app/auth/layout.js'
+========
+// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\layout.tsx
+import * as entry from '../../../app/layout.js'
+>>>>>>>> Stashed changes:.next/types/app/layout.ts
+=======
+// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\auth\layout.tsx
+import * as entry from '../../../../app/auth/layout.js'
+>>>>>>> Stashed changes
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
 type TEntry = typeof import('../../../../app/auth/layout.js')
