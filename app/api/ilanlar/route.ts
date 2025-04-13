@@ -37,6 +37,11 @@ const ilanSchema = new mongoose.Schema({
     enum: ['active', 'inactive'],
     default: 'active',
   },
+  instructorFrom: {
+    type: String,
+    trim: true,
+    required: [true, 'Dersi aldığınız eğitmen bilgisi zorunludur'],
+  },
   userId: {
     type: String,
     required: true,
@@ -54,12 +59,33 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
     
+    console.log('API GET ilanlar - Requested userId:', userId);
+    
     let query = {};
     if (userId) {
-      query = { userId };
+      // userId'yi string olarak kullan ve MongoDB ObjectId formatında olabileceğini dikkate al
+      // Hem direkt eşleşme hem de string içerme durumlarını kontrol et
+      query = { 
+        $or: [
+          { userId: userId.toString() },
+          { userId: { $regex: userId, $options: 'i' } }
+        ]
+      };
+      
+      console.log('GET ilanlar - Sorgu:', JSON.stringify(query));
     }
     
+    // Hata ayıklama için tüm ilanları kontrol et
+    const allIlanlar = await Ilan.find({}).sort({ createdAt: -1 });
+    console.log('API GET ilanlar - Tüm ilanlar:', allIlanlar.map(ilan => ({
+      id: ilan._id,
+      title: ilan.title,
+      userId: ilan.userId
+    })));
+    
+    // Kullanıcının ilanlarını getir
     const ilanlar = await Ilan.find(query).sort({ createdAt: -1 });
+    console.log('API GET ilanlar - Bulunan ilanlar:', ilanlar.length);
     
     return NextResponse.json(ilanlar);
   } catch (error: any) {
@@ -77,7 +103,10 @@ export async function POST(req: Request) {
     await connectDB();
     
     const body = await req.json();
-    const { title, description, price, method, duration, frequency } = body;
+    const { title, description, price, method, duration, frequency, instructorFrom } = body;
+    
+    // Debug için tüm body'i kontrol et
+    console.log('API received body:', body);
     
     // Token'dan kullanıcı bilgisini al
     const authHeader = req.headers.get('authorization');
@@ -101,6 +130,16 @@ export async function POST(req: Request) {
       );
     }
     
+    // Token'dan kullanıcı bilgilerini çıkar
+    try {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      console.log('POST ilan - Token içeriği:', decodedToken);
+    } catch (e) {
+      console.error('POST ilan - Token çözümlenirken hata:', e);
+    }
+    
+    console.log('POST ilan - Kullanıcı ID:', userId);
+    
     // Yeni ilan oluştur
     const yeniIlan = await Ilan.create({
       title,
@@ -109,8 +148,15 @@ export async function POST(req: Request) {
       method,
       duration: Number(duration),
       frequency,
+      instructorFrom,
       status: 'active',
       userId: userId.toString(), // Convert to string to avoid ObjectId issues
+    });
+    
+    console.log('POST ilan - Oluşturulan ilan:', {
+      id: yeniIlan._id,
+      title: yeniIlan.title,
+      userId: yeniIlan.userId
     });
     
     return NextResponse.json(yeniIlan, { status: 201 });

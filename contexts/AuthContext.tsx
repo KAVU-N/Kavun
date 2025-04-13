@@ -7,10 +7,11 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'teacher';
+  role: 'student' | 'teacher' | 'instructor';
   university: string;
   isVerified: boolean;
-  expertise?: string; // Uzmanlık alanı/verdiği ders
+  expertise?: string; // Okuduğu bölüm
+  grade?: number; // Kaçıncı sınıf
 }
 
 interface LoginData {
@@ -22,8 +23,10 @@ interface RegisterData {
   name: string;
   email: string;
   password: string;
-  role: 'student' | 'teacher';
+  role: 'student' | 'teacher' | 'instructor';
   university: string;
+  expertise?: string; // Okuduğu bölüm
+  grade?: number; // Kaçıncı sınıf
 }
 
 interface AuthContextType {

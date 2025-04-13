@@ -150,7 +150,7 @@ export default function IlanlarPage() {
             </div>
             <h1 className="text-4xl font-bold text-[#6B3416] mb-3">Üniversitenizdeki İlanlar</h1>
             <p className="text-[#994D1C] max-w-2xl md:mx-0 mx-auto">
-              Üniversitenizdeki öğretmenlerin verdiği dersleri keşfedin ve ihtiyacınıza en uygun olanı seçin.
+              Üniversitenizdeki eğitmenlerin verdiği dersleri keşfedin ve ihtiyacınıza en uygun olanı seçin.
             </p>
           </div>
 
@@ -308,7 +308,7 @@ export default function IlanlarPage() {
               <p className="text-[#994D1C] mb-6 max-w-md mx-auto">
                 {searchTerm 
                   ? `"${searchTerm}" araması için sonuç bulunamadı.` 
-                  : 'Üniversitenizdeki öğretmenler ilan verdikçe burada görüntülenecektir.'}
+                  : 'Üniversitenizdeki eğitmenler ilan verdikçe burada görüntülenecektir.'}
               </p>
               {(searchTerm || filters.method || filters.priceMin || filters.priceMax) && (
                 <button 
@@ -342,7 +342,7 @@ export default function IlanlarPage() {
                   {/* Çizgi */}
                   <div className="border-t border-gray-100 my-4"></div>
                   
-                  {/* Öğretmen Bilgisi */}
+                  {/* Eğitmen Bilgisi */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3 shadow-sm group-hover:shadow-md transition-all duration-300">
@@ -350,11 +350,11 @@ export default function IlanlarPage() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-800">{ilan.teacher?.name}</p>
-                        <p className="text-xs text-gray-500">{ilan.teacher?.expertise || 'Öğretmen'}</p>
+                        <p className="text-xs text-gray-500">{ilan.teacher?.expertise || 'Eğitmen'}</p>
                       </div>
                     </div>
                     <Link 
-                      href={`/ogretmen-ilanlari/${ilan.teacher._id}`}
+                      href={`/egitmen-ilanlari/${ilan.teacher._id}`}
                       className="text-sm text-[#FF8B5E] hover:text-[#FF6B1A] hover:underline transition-colors flex items-center"
                     >
                       <span>Tüm İlanları</span>
@@ -393,7 +393,7 @@ export default function IlanlarPage() {
                       Detayları Gör
                     </Link>
                     <Link 
-                      href={`/ogretmen-ilanlari/${ilan.teacher._id}`}
+                      href={`/egitmen-ilanlari/${ilan.teacher._id}`}
                       className="block py-3 px-3 bg-[#FFF5F0] text-[#FF8B5E] rounded-lg font-medium hover:bg-[#FFE5D9] transition-all duration-300 transform group-hover:translate-y-[-2px]"
                     >
                       <FaChalkboardTeacher size={18} />

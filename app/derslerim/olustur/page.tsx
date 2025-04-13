@@ -39,10 +39,10 @@ export default function CreateLessonPage() {
   });
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  // Öğretmen bilgilerini getir
+  // Eğitmen bilgilerini getir
   useEffect(() => {
     if (!instructorId) {
-      setError('Öğretmen bilgisi bulunamadı');
+      setError('Eğitmen bilgisi bulunamadı');
       setLoading(false);
       return;
     }
@@ -62,13 +62,13 @@ export default function CreateLessonPage() {
         });
 
         if (!response.ok) {
-          throw new Error('Öğretmen bilgileri alınamadı');
+          throw new Error('Eğitmen bilgileri alınamadı');
         }
 
         const data = await response.json();
         setInstructor(data);
       } catch (err) {
-        setError('Öğretmen bilgileri yüklenirken bir hata oluştu');
+        setError('Eğitmen bilgileri yüklenirken bir hata oluştu');
         console.error(err);
       } finally {
         setLoading(false);
@@ -207,10 +207,10 @@ export default function CreateLessonPage() {
               </div>
             </div>
             
-            {/* Öğretmen Bilgileri */}
+            {/* Eğitmen Bilgileri */}
             {instructor && (
               <div className="p-6 border-b border-[#FFE5D9]">
-                <h2 className="text-xl font-semibold text-[#994D1C] mb-4">Öğretmen Bilgileri</h2>
+                <h2 className="text-xl font-semibold text-[#994D1C] mb-4">Eğitmen Bilgileri</h2>
                 <div className="flex items-center">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center mr-4">
                     <span className="text-white font-bold">{instructor.name.charAt(0)}</span>
@@ -293,7 +293,7 @@ export default function CreateLessonPage() {
                     onChange={handleChange}
                     rows={4}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF8B5E] focus:border-transparent"
-                    placeholder="Öğretmene iletmek istediğiniz notlar..."
+                    placeholder="Eğitmene iletmek istediğiniz notlar..."
                   ></textarea>
                 </div>
                 
@@ -325,7 +325,7 @@ export default function CreateLessonPage() {
                     <div className="text-gray-600">Süre:</div>
                     <div className="font-medium">{formData.duration} dakika</div>
                     
-                    <div className="text-gray-600">Öğretmen:</div>
+                    <div className="text-gray-600">Eğitmen:</div>
                     <div className="font-medium">{instructor?.name}</div>
                     
                     <div className="text-gray-600 mt-4">Toplam Tutar:</div>

@@ -13,6 +13,7 @@ interface Teacher {
   email: string;
   university: string;
   expertise: string;
+  grade?: number; // Kaçıncı sınıf olduğu bilgisi
 }
 
 interface Ilan {
@@ -28,6 +29,7 @@ interface Ilan {
   updatedAt: string;
   userId: string;
   teacher: Teacher;
+  instructorFrom: string;
 }
 
 export default function IlanDetayPage({ params }: { params: { id: string } }) {
@@ -150,14 +152,14 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
             <div className="bg-white p-8 rounded-xl shadow-lg">
               <h1 className="text-3xl font-bold text-[#6B3416] mb-4">{ilan.title}</h1>
               
-              {/* Öğretmen Bilgisi */}
+              {/* Eğitmen Bilgisi */}
               <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white text-xl font-bold mr-4">
                   {ilan.teacher?.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold text-[#6B3416]">{ilan.teacher?.name}</h2>
-                  <p className="text-[#994D1C]">{ilan.teacher?.expertise || 'Öğretmen'}</p>
+                  <p className="text-[#994D1C]">{ilan.teacher?.grade ? `${ilan.teacher.grade}. Sınıf` : ''} {ilan.teacher?.expertise || 'Belirtilmemiş'}</p>
                   <p className="text-gray-600 flex items-center mt-1">
                     <FaUniversity className="mr-1 text-sm" />
                     {ilan.teacher?.university}
@@ -208,6 +210,17 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                 </div>
               </div>
               
+              {/* Ek Bilgiler */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-[#6B3416] mb-4">Ek Bilgiler</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-[#FFF9F5] rounded-lg">
+                    <p className="text-sm font-medium text-[#994D1C] mb-1">Eğitim Aldığı Öğretmen:</p>
+                    <p className="font-semibold text-gray-800">{ilan.instructorFrom || 'Belirtilmemiş'}</p>
+                  </div>
+                </div>
+              </div>
+              
               {/* İlan Tarihi */}
               <div className="text-sm text-gray-500 mb-8">
                 İlan Tarihi: {formatDate(ilan.createdAt)}
@@ -220,7 +233,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                   className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-xl font-medium hover:shadow-md transition-all duration-300 flex items-center"
                 >
                   <FaUser className="mr-2" />
-                  Öğretmen ile İletişime Geç
+                  Eğitmen ile İletişime Geç
                 </Link>
               </div>
             </div>

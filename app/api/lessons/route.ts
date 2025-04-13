@@ -7,7 +7,7 @@ import { verifyToken } from '@/lib/jwt';
 // Veritabanı bağlantısı
 connectDB();
 
-// Ders oluşturma (öğretmen)
+// Ders oluşturma (eğitmen)
 export async function POST(request: NextRequest) {
   try {
     // JWT doğrulama
@@ -27,8 +27,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
     }
 
-    if (user.role !== 'teacher') {
-      return NextResponse.json({ error: 'Bu işlem için öğretmen yetkisine sahip olmanız gerekiyor' }, { status: 403 });
+    if (user.role !== 'instructor') {
+      return NextResponse.json({ error: 'Bu işlem için eğitmen yetkisine sahip olmanız gerekiyor' }, { status: 403 });
     }
 
     // İstek gövdesinden veri al

@@ -112,10 +112,10 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
           
           <div className="flex items-center justify-between">
             <span className="text-gray-600 font-medium">
-              {userRole === 'teacher' ? 'Öğrenci:' : 'Öğretmen:'}
+              {userRole === 'instructor' ? 'Öğrenci:' : 'Eğitmen:'}
             </span>
             <span className="font-medium">
-              {userRole === 'teacher' ? event.studentName : event.teacherName}
+              {userRole === 'instructor' ? event.studentName : event.teacherName}
             </span>
           </div>
           
