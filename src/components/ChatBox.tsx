@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import io, { Socket } from 'socket.io-client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 type Message = {
   _id?: string;
@@ -21,6 +22,7 @@ type Instructor = {
   email: string;
   university: string;
   role: string;
+  price?: number;
 };
 
 interface ChatBoxProps {
@@ -32,6 +34,7 @@ interface ChatBoxProps {
 
 const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: ChatBoxProps) => {
   const { user } = useAuth();
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -44,6 +47,9 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
   const [chatBoxHeight, setChatBoxHeight] = useState(400); // Tam açık yükseklik
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [isMinimized, setIsMinimized] = useState(false);
+  
+  // Ders oluşturma ile ilgili state'ler
+  const [showLessonModal, setShowLessonModal] = useState(false);
 
   // Mesajları yükleme
   useEffect(() => {
@@ -485,6 +491,20 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
             }}
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Ders Al butonu - Sadece öğrenci için göster ve öğretmen rolüne sahip kişilerle konuşurken */}
+            {user?.role === 'student' && instructor.role === 'teacher' && (
+              <div className="mb-3">
+                <button 
+                  onClick={() => router.push(`/derslerim/olustur?instructorId=${instructor._id}`)}
+                  className="w-full py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg hover:opacity-90 transition-opacity font-medium text-sm flex items-center justify-center"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Ders Al
+                </button>
+              </div>
+            )}
             <form onSubmit={sendMessage} className="w-full h-full">
               <div className="flex items-center w-full h-full space-x-2">
                 <input
