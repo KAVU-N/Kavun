@@ -6,7 +6,6 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-<<<<<<< Updated upstream
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -62,22 +61,36 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/ilan-duzenle/[id]/page.js"
-=======
-    "/ilanlar/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/ilanlar/page.js"
     ],
     "/ilan/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/ilan/[id]/page.js"
     ],
+    "/egitmen-ilanlari/[teacherId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/egitmen-ilanlari/[teacherId]/page.js"
+    ],
     "/randevu-al/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/randevu-al/page.js"
->>>>>>> Stashed changes
+    ],
+    "/ilanlarim/basvurular/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilanlarim/basvurular/[id]/page.js"
+    ],
+    "/profil/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/profil/page.js"
+    ],
+    "/mesajlarim/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/mesajlarim/page.js"
     ]
   }
 }

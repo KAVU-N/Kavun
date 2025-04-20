@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { universities } from '@/data/universities';
+import { departments } from './departments';
 
 type Role = 'student' | 'instructor';
 
@@ -23,6 +24,8 @@ export default function RegisterPage() {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [selectedUniversity, setSelectedUniversity] = useState('');
   const [selectedRole, setSelectedRole] = useState<Role>(defaultRole);
+  const [expertise, setExpertise] = useState('');
+  const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,21 +39,20 @@ export default function RegisterPage() {
     const password = formData.get('password') as string;
     const passwordConfirm = formData.get('passwordConfirm') as string;
     const university = formData.get('university') as string;
-    const expertise = formData.get('expertise') as string;
     const gradeValue = formData.get('grade') as string;
     const grade = gradeValue ? parseInt(gradeValue) : undefined;
-    
+    let finalExpertise = expertise;
+    if (expertise === 'Diğer') {
+      finalExpertise = otherExpertise;
+    }
     console.log("Formdan seçilen rol:", selectedRole);
-    
     if (password !== passwordConfirm) {
       setError('Şifreler eşleşmiyor');
       setLoading(false);
       return;
     }
-    
     try {
-      // URL parametresindeki rol yerine state'te tutulan rolü kullan
-      await register({ name, email, password, role: selectedRole, university, expertise, grade });
+      await register({ name, email, password, role: selectedRole, university, expertise: finalExpertise, grade });
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       setError(err.message || 'Kayıt olurken bir hata oluştu');
@@ -58,6 +60,7 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     // Veritabanından üniversiteleri getiren kod
@@ -234,20 +237,60 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="expertise" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Okuduğu Bölüm
+              Bölümünüz
             </label>
-            <input
-              id="expertise"
-              name="expertise"
-              type="text"
-              placeholder="Örn: Bilgisayar Mühendisliği, Psikoloji, Tıp..."
-              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
-            />
+            <div className="relative">
+              <input
+                id="expertise"
+                name="expertise"
+                type="text"
+                autoComplete="off"
+                placeholder="Bölümünüzü yazınız..."
+                value={expertise}
+                onChange={e => {
+                  setExpertise(e.target.value);
+                  setShowDepartmentDropdown(true);
+                }}
+                onFocus={() => setShowDepartmentDropdown(true)}
+                onBlur={() => {
+                  setTimeout(() => setShowDepartmentDropdown(false), 200);
+                }}
+                className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
+              />
+              {showDepartmentDropdown && (
+                <div
+                  className="absolute w-full mt-1 bg-white border border-[#FFE5D9] rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto"
+                >
+                  {/*
+  Büyük/küçük harf duyarsız autocomplete için filtreleme ve seçim işlemleri:
+  - Kullanıcı input'u ile departmanlar küçük harfe çevrilerek eşleştirilir.
+  - Kullanıcı küçük harfle yazsa bile doğru departman önerisi çıkar.
+  - Seçim yapıldığında input'a orijinal (büyük harfli) departman adı yazılır.
+*/}
+                  {departments.filter(dep =>
+                    dep.toLocaleLowerCase('tr').includes(expertise.toLocaleLowerCase('tr'))
+                  ).slice(0, 10).map((dep, idx) => (
+                    <div
+                      key={idx}
+                      className="group px-4 py-3 hover:bg-gradient-to-r hover:from-[#FFE5D9] hover:to-[#FFF5F0] cursor-pointer transition-all duration-200"
+                      onClick={() => {
+                        setExpertise(dep); // Orijinal haliyle input'a yazılır
+                        setShowDepartmentDropdown(false);
+                      }}
+                    >
+                      <div className="transition-colors duration-200 text-[#994D1C] group-hover:text-[#6B3416]">
+                        {dep}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div>
             <label htmlFor="grade" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Kaçıncı Sınıf
+              Sınıfınız
             </label>
             <select
               id="grade"
@@ -255,6 +298,7 @@ export default function RegisterPage() {
               className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
             >
               <option value="">Seçiniz</option>
+              <option value="hazirlik">Hazırlık</option>
               <option value="1">1. Sınıf</option>
               <option value="2">2. Sınıf</option>
               <option value="3">3. Sınıf</option>

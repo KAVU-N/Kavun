@@ -1,10 +1,5 @@
-<<<<<<< Updated upstream:.next/types/app/derslerim/page.ts
-// File: C:\Users\eren\Kavun, organization\app\derslerim\page.tsx
-import * as entry from '../../../../app/derslerim/page.js'
-=======
-// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\ilan\[id]\page.tsx
+// File: C:\Users\eren\Kavun, organization\app\ilan\[id]\page.tsx
 import * as entry from '../../../../../app/ilan/[id]/page.js'
->>>>>>> Stashed changes:.next/types/app/ilan/[id]/page.ts
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
 type TEntry = typeof import('../../../../../app/ilan/[id]/page.js')

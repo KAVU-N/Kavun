@@ -261,7 +261,10 @@ export default function IlanlarimPage() {
                     }`}>
                       {ilan.status === 'active' ? 'Aktif' : 'Pasif'}
                     </div>
-                    <button className="px-4 py-1.5 bg-[#FFE5D9] text-[#994D1C] rounded-lg text-sm hover:bg-[#FFB996] hover:text-white transition-colors duration-300">
+                    <button
+                      className="px-4 py-1.5 bg-[#FFE5D9] text-[#994D1C] rounded-lg text-sm hover:bg-[#FFB996] hover:text-white transition-colors duration-300"
+                      onClick={() => router.push(`/ilanlarim/basvurular/${ilan._id}`)}
+                    >
                       Başvuruları Görüntüle
                     </button>
                   </div>
