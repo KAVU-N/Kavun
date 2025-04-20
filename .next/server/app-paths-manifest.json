@@ -1,7 +1,16 @@
 {
   "/mesajlarim/page": "app/mesajlarim/page.js",
-  "/ilanlarim/basvurular/[id]/page": "app/ilanlarim/basvurular/[id]/page.js",
+  "/ilanlarim/page": "app/ilanlarim/page.js",
+  "/api/auth/login/route": "app/api/auth/login/route.js",
   "/page": "app/page.js",
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+  "/profil/page": "app/profil/page.js",
+  "/api/conversations/route": "app/api/conversations/route.js",
+  "/api/users/[id]/route": "app/api/users/[id]/route.js",
+  "/api/messages/route": "app/api/messages/route.js",
+  "/derslerim/page": "app/derslerim/page.js",
+  "/api/lessons/route": "app/api/lessons/route.js",
+  "/api/lessons/stats/route": "app/api/lessons/stats/route.js",
   "/auth/login/page": "app/auth/login/page.js",
   "/auth/register/page": "app/auth/register/page.js"
 }

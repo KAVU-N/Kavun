@@ -4,9 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import { universities } from '@/data/universities';
 import Navbar from '@/src/components/Navbar';
 import Link from 'next/link';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 export default function Home() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -115,8 +117,7 @@ export default function Home() {
           <div className="flex flex-col items-center">
             <div className="w-full max-w-3xl text-center mb-12">
               <h1 className="text-5xl font-bold text-[#FFE8D8] mb-8 leading-tight drop-shadow-lg">
-                İhtiyacına en uygun öğrencileri bul,
-                hemen öğrenmeye başla!
+                {t('home.mainTitle')}
               </h1>
               <div className="w-full max-w-xl mx-auto mb-8 relative">
                 <div className="w-full relative">
@@ -143,7 +144,7 @@ export default function Home() {
                   </div>
                   <input
                     type="text"
-                    placeholder="Üniversitenizi seçin..."
+                    placeholder={t('home.selectUniversity')}
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -194,13 +195,13 @@ export default function Home() {
                     {loading ? (
                       <div className="px-4 py-3 text-[#994D1C] text-center" role="status">
                         <div className="inline-block animate-spin rounded-full h-4 w-4 border-[2.5px] border-[#FFB996]/30 border-t-[#FF8B5E] shadow-sm mr-2" aria-hidden="true"></div>
-                        <span className="animate-pulse">Üniversiteler yükleniyor...</span>
+                        <span className="animate-pulse">{t('home.loadingUniversities')}</span>
                       </div>
                     ) : filteredUniversities.length > 0 ? (
                       <>
                         {!searchTerm && (
                           <div className="px-4 py-2 text-sm text-[#994D1C] bg-[#FFE5D9]/30">
-                            Tüm Üniversiteler
+                            {t('home.allUniversities')}
                           </div>
                         )}
                         {filteredUniversities.map((uni, index) => (
@@ -222,15 +223,14 @@ export default function Home() {
                       </>
                     ) : (
                       <div className="px-4 py-3 text-[#994D1C] text-center" role="status">
-                        Sonuç bulunamadı
+                        {t('general.noResults')}
                       </div>
                     )}
                   </div>
                 )}
               </div>
               <p className="text-xl text-[#FFD6B2] mb-8 drop-shadow">
-                Kavun, öğrencileri ve eğitmenleri bir araya getiren yeni nesil bir eğitim platformudur.
-                İhtiyacınıza uygun öğrencileri bulun veya öğrenciler olarak platformumuza katılın.
+                {t('home.description')}
               </p>
               
             </div>
@@ -256,22 +256,22 @@ export default function Home() {
               id="role-dialog-title" 
               className="text-2xl font-bold text-[#6B3416] mb-4 text-center"
             >
-              Nasıl devam etmek istersiniz?
+              {t('home.howToContinue')}
             </h2>
             <div className="flex flex-col gap-4">
               <button
                 onClick={() => handleRoleSelect('student')}
                 className="w-full px-8 py-3 bg-[#FFB996] text-[#994D1C] font-semibold rounded-full hover:bg-[#FF8B5E] hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                aria-label="Öğrenci olarak devam et"
+                aria-label={t('home.continueAsStudent')}
               >
-                Öğrenci Olarak Devam Et
+                {t('home.continueAsStudent')}
               </button>
               <button
                 onClick={() => handleRoleSelect('instructor')}
                 className="w-full px-8 py-3 bg-[#FFE5D9] text-[#994D1C] font-semibold rounded-full hover:bg-[#FFB996] hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                aria-label="Eğitmen olarak devam et"
+                aria-label={t('home.continueAsInstructor')}
               >
-                Eğitmen Olarak Devam Et
+                {t('home.continueAsInstructor')}
               </button>
             </div>
           </div>

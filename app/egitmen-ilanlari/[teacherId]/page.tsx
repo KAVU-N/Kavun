@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher, FaArrowLeft } from 'react-icons/fa';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 interface Teacher {
   _id: string;
@@ -32,6 +33,7 @@ interface Ilan {
 export default function EgitmenIlanlariPage({ params }: { params: { teacherId: string } }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { t } = useLanguage();
   const [ilanlar, setIlanlar] = useState<Ilan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -57,7 +59,7 @@ export default function EgitmenIlanlariPage({ params }: { params: { teacherId: s
         });
 
         if (!response.ok) {
-          throw new Error('İlanlar yüklenirken bir hata oluştu');
+          throw new Error(t('general.errorLoadingListings'));
         }
 
         const data = await response.json();
@@ -68,8 +70,8 @@ export default function EgitmenIlanlariPage({ params }: { params: { teacherId: s
           setTeacher(data[0].teacher);
         }
       } catch (err) {
-        console.error('Eğitmen ilanları yüklenirken hata oluştu:', err);
-        setError('İlanlar yüklenirken bir hata oluştu');
+        console.error(t('general.errorLoadingTeacherListings'), err);
+        setError(t('general.errorLoadingListings'));
       } finally {
         setIsLoading(false);
       }
@@ -93,7 +95,7 @@ export default function EgitmenIlanlariPage({ params }: { params: { teacherId: s
       <div className="mb-6">
         <Link href="/ilanlar" className="text-[#994D1C] hover:underline inline-flex items-center">
           <FaArrowLeft className="mr-2" />
-          İlanlara Dön
+          {t('general.backToListings')}
         </Link>
       </div>
       
@@ -115,13 +117,13 @@ export default function EgitmenIlanlariPage({ params }: { params: { teacherId: s
           </div>
           
           <div className="p-6">
-            <h2 className="text-xl font-bold text-[#994D1C] mb-4">Uzmanlık Alanı</h2>
-            <p className="text-gray-700">{teacher.expertise || 'Belirtilmemiş'}</p>
+            <h2 className="text-xl font-bold text-[#994D1C] mb-4">{t('general.expertise')}</h2>
+            <p className="text-gray-700">{teacher.expertise || t('general.notSpecified')}</p>
           </div>
         </div>
       )}
       
-      <h2 className="text-2xl font-bold text-[#994D1C] mb-6">Açık İlanlar</h2>
+      <h2 className="text-2xl font-bold text-[#994D1C] mb-6">{t('general.openListings')}</h2>
       
       {error ? (
         <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6">
@@ -132,12 +134,12 @@ export default function EgitmenIlanlariPage({ params }: { params: { teacherId: s
           <div className="w-20 h-20 mx-auto mb-4 bg-[#FFF5F0] rounded-full flex items-center justify-center">
             <FaChalkboardTeacher className="text-[#FF8B5E] text-3xl" />
           </div>
-          <h3 className="text-[#994D1C] mb-4">Bu eğitmene ait aktif ilan bulunamadı.</h3>
+          <h3 className="text-[#994D1C] mb-4">{t('general.noActiveListingsForTeacher')}</h3>
           <Link 
             href="/ilanlar" 
             className="inline-block px-6 py-3 bg-[#FFE5D9] text-[#994D1C] rounded-lg hover:bg-[#FFDAC1] transition-colors duration-200"
           >
-            Tüm İlanları Görüntüle
+            {t('general.viewAllListings')}
           </Link>
         </div>
       ) : (
@@ -151,11 +153,11 @@ export default function EgitmenIlanlariPage({ params }: { params: { teacherId: s
                 <div className="flex flex-wrap gap-2 mb-4">
                   <div className="bg-[#FFF5F0] px-3 py-1 rounded-full text-[#FF8B5E] text-sm flex items-center">
                     <FaMoneyBillWave className="mr-1" />
-                    {ilan.price} ₺
+                    {ilan.price} {t('general.currency')}
                   </div>
                   <div className="bg-[#FFF5F0] px-3 py-1 rounded-full text-[#FF8B5E] text-sm flex items-center">
                     <FaClock className="mr-1" />
-                    {ilan.duration} dk
+                    {ilan.duration} {t('general.minutes')}
                   </div>
                 </div>
                 
@@ -163,7 +165,7 @@ export default function EgitmenIlanlariPage({ params }: { params: { teacherId: s
                   href={`/ilan/${ilan._id}`}
                   className="block w-full text-center py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg hover:from-[#FF8B5E] hover:to-[#FF6B1A] transition-all duration-300"
                 >
-                  Detayları Görüntüle
+                  {t('general.viewDetails')}
                 </Link>
               </div>
             </div>

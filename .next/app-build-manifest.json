@@ -1,25 +1,30 @@
 {
   "pages": {
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+    ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/page": [
+    "/ilan-ver/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/ilan-ver/page.js"
+    ],
+    "/derslerim/olustur/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/derslerim/olustur/page.js"
     ],
     "/ilanlar/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/ilanlar/page.js"
-    ],
-    "/egitmenler/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/egitmenler/page.js"
     ],
     "/derslerim/page": [
       "static/chunks/webpack.js",
@@ -27,10 +32,25 @@
       "static/css/app/derslerim/page.css",
       "static/chunks/app/derslerim/page.js"
     ],
-    "/ilan-ver/page": [
+    "/mesajlarim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/ilan-ver/page.js"
+      "static/chunks/app/mesajlarim/page.js"
+    ],
+    "/egitmen-ilanlari/[teacherId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/egitmen-ilanlari/[teacherId]/page.js"
+    ],
+    "/profil/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/profil/page.js"
+    ],
+    "/ilanlarim/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilanlarim/page.js"
     ],
     "/auth/layout": [
       "static/chunks/webpack.js",
@@ -46,51 +66,6 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/auth/register/page.js"
-    ],
-    "/auth/verify/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/auth/verify/page.js"
-    ],
-    "/ilanlarim/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/ilanlarim/page.js"
-    ],
-    "/ilan-duzenle/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/ilan-duzenle/[id]/page.js"
-    ],
-    "/ilan/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/ilan/[id]/page.js"
-    ],
-    "/egitmen-ilanlari/[teacherId]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/egitmen-ilanlari/[teacherId]/page.js"
-    ],
-    "/randevu-al/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/randevu-al/page.js"
-    ],
-    "/ilanlarim/basvurular/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/ilanlarim/basvurular/[id]/page.js"
-    ],
-    "/profil/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/profil/page.js"
-    ],
-    "/mesajlarim/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/mesajlarim/page.js"
     ]
   }
 }

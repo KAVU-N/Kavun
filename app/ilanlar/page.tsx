@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -32,6 +33,7 @@ interface Ilan {
 
 export default function IlanlarPage() {
   const { user, loading } = useAuth();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const [ilanlar, setIlanlar] = useState<Ilan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -161,9 +163,9 @@ export default function IlanlarPage() {
               <FaUniversity className="inline-block mr-2" />
               {user.university}
             </div>
-            <h1 className="text-4xl font-bold text-[#6B3416] mb-3">Üniversitenizdeki İlanlar</h1>
+            <h1 className="text-4xl font-bold text-[#6B3416] mb-3">{t('listings.universityListings')}</h1>
             <p className="text-[#994D1C] max-w-2xl md:mx-0 mx-auto">
-              Üniversitenizdeki eğitmenlerin verdiği dersleri keşfedin ve ihtiyacınıza en uygun olanı seçin.
+              {t('listings.exploreTeacherLessons')}
             </p>
           </div>
 
@@ -177,7 +179,7 @@ export default function IlanlarPage() {
                   </div>
                   <input
                     type="text"
-                    placeholder="İlan ara..."
+                    placeholder={t('general.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full px-4 py-4 pl-12 rounded-xl border border-gray-200 bg-[#FAFAFA] focus:outline-none focus:ring-2 focus:ring-[#FFB996] focus:bg-white transition-all duration-200"
@@ -189,13 +191,13 @@ export default function IlanlarPage() {
                   className={`px-5 py-4 rounded-xl flex items-center justify-center md:w-auto transition-all duration-200 ${showFilters ? 'bg-[#FFB996] text-white' : 'bg-[#FFE5D9] text-[#6B3416] hover:bg-[#FFDAC1]'}`}
                 >
                   <FaFilter className="mr-2" />
-                  Filtreler {showFilters ? '(Açık)' : ''}
+                  {t('general.filters')} {showFilters ? `(${t('general.open')})` : ''}
                 </button>
                 <button
                   type="submit"
                   className="px-6 py-4 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-xl font-medium hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-200"
                 >
-                  Ara
+                  {t('general.search')}
                 </button>
               </form>
             </div>
@@ -204,56 +206,56 @@ export default function IlanlarPage() {
               <div className="mt-4 bg-[#FFF9F5] p-6 rounded-xl border border-[#FFE5D9] mb-6">
                 <h3 className="text-[#6B3416] font-medium mb-4 flex items-center">
                   <FaFilter className="mr-2" />
-                  Filtreleme Seçenekleri
+                  {t('general.filterOptions')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-[#994D1C] mb-2">Sıralama</label>
+                    <label className="block text-sm font-medium text-[#994D1C] mb-2">{t('general.sort')}</label>
                     <select
                       name="sortBy"
                       value={filters.sortBy}
                       onChange={handleFilterChange}
                       className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#FFB996] transition-all duration-200"
                     >
-                      <option value="en-yeni">En Yeni</option>
-                      <option value="en-eski">En Eski</option>
-                      <option value="fiyat-artan">Fiyat (Artan)</option>
-                      <option value="fiyat-azalan">Fiyat (Azalan)</option>
+                      <option value="en-yeni">{t('general.newest')}</option>
+                      <option value="en-eski">{t('general.oldest')}</option>
+                      <option value="fiyat-artan">{t('general.priceAsc')}</option>
+                      <option value="fiyat-azalan">{t('general.priceDesc')}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#994D1C] mb-2">Ders Yöntemi</label>
+                    <label className="block text-sm font-medium text-[#994D1C] mb-2">{t('general.lessonMethod')}</label>
                     <select
                       name="method"
                       value={filters.method}
                       onChange={handleFilterChange}
                       className="w-full px-4 py-3 rounded-lg bg-white border border-[#FFE5D9] focus:outline-none focus:ring-2 focus:ring-[#FFB996] focus:border-[#FFB996] transition-all duration-200"
                     >
-                      <option value="">Tüm yöntemler</option>
-                      <option value="online">Online</option>
-                      <option value="yüzyüze">Yüz yüze</option>
-                      <option value="hibrit">Hibrit</option>
+                      <option value="">{t('general.allMethods')}</option>
+                      <option value="online">{t('general.online')}</option>
+                      <option value="yüzyüze">{t('general.faceToFace')}</option>
+                      <option value="hibrit">{t('general.hybrid')}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#994D1C] mb-2">Minimum Ücret (₺)</label>
+                    <label className="block text-sm font-medium text-[#994D1C] mb-2">{t('general.minPrice')}</label>
                     <input
                       type="number"
                       name="priceMin"
                       value={filters.priceMin}
                       onChange={handleFilterChange}
-                      placeholder="Minimum fiyat"
+                      placeholder={t('general.minPricePlaceholder')}
                       className="w-full px-4 py-3 rounded-lg bg-white border border-[#FFE5D9] focus:outline-none focus:ring-2 focus:ring-[#FFB996] focus:border-[#FFB996] transition-all duration-200"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#994D1C] mb-2">Maksimum Ücret (₺)</label>
+                    <label className="block text-sm font-medium text-[#994D1C] mb-2">{t('general.maxPrice')}</label>
                     <input
                       type="number"
                       name="priceMax"
                       value={filters.priceMax}
                       onChange={handleFilterChange}
-                      placeholder="Maksimum fiyat"
+                      placeholder={t('general.maxPricePlaceholder')}
                       className="w-full px-4 py-3 rounded-lg bg-white border border-[#FFE5D9] focus:outline-none focus:ring-2 focus:ring-[#FFB996] focus:border-[#FFB996] transition-all duration-200"
                     />
                   </div>
@@ -266,40 +268,26 @@ export default function IlanlarPage() {
                     }}
                     className="px-4 py-2 text-[#994D1C] hover:text-[#6B3416] font-medium transition-colors duration-200"
                   >
-                    Filtreleri Temizle
+                    {t('general.clearFilters')}
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Sonuç Bilgisi */}
+          {/* {t('general.resultsInfo')} */}
           {!isLoading && !error && filteredIlanlar.length > 0 && (
             <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between">
               <p className="text-[#6B3416] font-medium mb-2 md:mb-0">
-                <span className="text-[#FF8B5E] font-bold">{filteredIlanlar.length}</span> ilan bulundu
-                {searchTerm && <span> "{searchTerm}" araması için</span>}
-                {filters.method && <span>, {filters.method} yöntemi ile</span>}
-                {(filters.priceMin || filters.priceMax) && <span>, fiyat aralığı: {filters.priceMin || '0'} - {filters.priceMax || '∞'} ₺</span>}
+                <span className="text-[#FF8B5E] font-bold">{filteredIlanlar.length}</span> {t('general.resultsFound')}
+                {searchTerm && <span> "{searchTerm}" {t('general.noResultsForSearch')}</span>}
+                {filters.method && <span>, {filters.method} {t('general.method')}</span>}
+                {(filters.priceMin || filters.priceMax) && <span>, {t('general.price')}: {filters.priceMin || '0'} - {filters.priceMax || '∞'} {t('general.currency')}</span>}
               </p>
-              <div className="text-sm text-gray-500">
-                <span className="mr-2">Sıralama:</span>
-                <select 
-                  className="px-2 py-1 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#FFB996]"
-                  onChange={(e) => {
-                    // Burada sıralama işlemi yapılabilir
-                    console.log(e.target.value);
-                  }}
-                >
-                  <option value="newest">En Yeni</option>
-                  <option value="priceAsc">Fiyat (Artan)</option>
-                  <option value="priceDesc">Fiyat (Azalan)</option>
-                </select>
-              </div>
             </div>
           )}
           
-          {/* İçerik */}
+          {/* {t('general.content')} */}
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
               <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
@@ -311,13 +299,13 @@ export default function IlanlarPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <p className="text-red-500 font-medium text-lg mb-2">Bir Hata Oluştu</p>
+              <p className="text-red-500 font-medium text-lg mb-2">{t('general.errorOccurred')}</p>
               <p className="text-gray-600 mb-4">{error}</p>
               <button 
                 onClick={() => window.location.reload()} 
                 className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
               >
-                Yeniden Dene
+                {t('general.tryAgain')}
               </button>
             </div>
           ) : filteredIlanlar.length === 0 ? (
@@ -329,13 +317,13 @@ export default function IlanlarPage() {
               </div>
               <h3 className="text-[#6B3416] text-xl font-bold mb-2">
                 {searchTerm || filters.method || filters.priceMin || filters.priceMax
-                  ? 'Arama Sonuçları Bulunamadı'
-                  : 'Henüz İlan Bulunmuyor'}
+                  ? t('general.noSearchResults')
+                  : t('general.noListingsYet')}
               </h3>
               <p className="text-[#994D1C] mb-6 max-w-md mx-auto">
                 {searchTerm 
-                  ? `"${searchTerm}" araması için sonuç bulunamadı.` 
-                  : 'Üniversitenizdeki eğitmenler ilan verdikçe burada görüntülenecektir.'}
+                  ? `"${searchTerm}" ${t('general.noResultsForSearch')}` 
+                  : t('general.listingsWillAppearHere')}
               </p>
               {(searchTerm || filters.method || filters.priceMin || filters.priceMax) && (
                 <button 
@@ -345,7 +333,7 @@ export default function IlanlarPage() {
                   }}
                   className="px-6 py-3 bg-[#FFE5D9] text-[#6B3416] rounded-xl hover:bg-[#FFDAC1] transition-colors duration-200"
                 >
-                  Tüm İlanları Göster
+                  {t('general.showAllListings')}
                 </button>
               )}
             </div>
@@ -359,17 +347,17 @@ export default function IlanlarPage() {
                       {ilan.title}
                     </h2>
                     <div className="bg-[#FFF5F0] px-3 py-1 rounded-full text-[#FF8B5E] font-bold text-sm">
-                      {ilan.price} ₺
+                      {ilan.price} {t('general.currency')}
                     </div>
                   </div>
                   
-                  {/* Açıklama */}
+                  {/* {t('general.description')} */}
                   <p className="text-gray-600 mb-4 line-clamp-2 text-sm">{ilan.description}</p>
                   
-                  {/* Çizgi */}
+                  {/* {t('general.divider')} */}
                   <div className="border-t border-gray-100 my-4"></div>
                   
-                  {/* Eğitmen Bilgisi */}
+                  {/* {t('general.teacherInfo')} */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3 shadow-sm group-hover:shadow-md transition-all duration-300">
@@ -377,29 +365,29 @@ export default function IlanlarPage() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-800">{ilan.teacher?.name}</p>
-                        <p className="text-xs text-gray-500">{ilan.teacher?.expertise || 'Eğitmen'}</p>
+                        <p className="text-xs text-gray-500">{ilan.teacher?.expertise || t('general.teacher')}</p>
                       </div>
                     </div>
                     <Link 
                       href={`/egitmen-ilanlari/${ilan.teacher._id}`}
                       className="text-sm text-[#FF8B5E] hover:text-[#FF6B1A] hover:underline transition-colors flex items-center"
                     >
-                      <span>Tüm İlanları</span>
+                      <span>{t('general.allListings')}</span>
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
                   </div>
                   
-                  {/* Özellikler */}
+                  {/* {t('general.features')} */}
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="flex items-center bg-gray-50 p-2 rounded-lg">
                       <FaMoneyBillWave className="text-green-600 mr-2" />
-                      <span className="text-gray-800 text-sm">{ilan.price} ₺/Saat</span>
+                      <span className="text-gray-800 text-sm">{ilan.price} {t('general.currency')}/{t('general.hour')}</span>
                     </div>
                     <div className="flex items-center bg-gray-50 p-2 rounded-lg">
                       <FaClock className="text-blue-600 mr-2" />
-                      <span className="text-gray-800 text-sm">{ilan.duration} Saat</span>
+                      <span className="text-gray-800 text-sm">{ilan.duration} {t('general.hours')}</span>
                     </div>
                     <div className="flex items-center bg-gray-50 p-2 rounded-lg">
                       <FaChalkboardTeacher className="text-purple-600 mr-2" />
@@ -411,13 +399,13 @@ export default function IlanlarPage() {
                     </div>
                   </div>
                   
-                  {/* Buton */}
+                  {/* {t('general.button')} */}
                   <div className="flex gap-2">
                     <Link 
                       href={`/ilan/${ilan._id}`}
                       className="block flex-1 text-center py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg font-medium hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 transform group-hover:translate-y-[-2px]"
                     >
-                      Detayları Gör
+                      {t('general.viewDetails')}
                     </Link>
                     <Link 
                       href={`/egitmen-ilanlari/${ilan.teacher._id}`}

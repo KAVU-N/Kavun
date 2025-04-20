@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import Image from 'next/image';
 
 // Custom hook for media query
@@ -33,6 +34,7 @@ export default function Navbar() {
   const profileRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
 
   // İstemci tarafında olduğumuzu işaretleyen effect
   useEffect(() => {
@@ -110,12 +112,12 @@ export default function Navbar() {
 
   // Navigasyon linkleri
   const navLinks = [
-    { href: '/ilanlar', label: 'İlanlar', icon: (
+    { href: '/ilanlar', label: t('nav.listings'), icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
       </svg>
     )},
-    { href: '/derslerim', label: 'Derslerim', icon: (
+    { href: '/derslerim', label: t('nav.myLessons'), icon: (
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
@@ -205,7 +207,7 @@ export default function Navbar() {
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
-                      <span>İlan Ver</span>
+                      <span>{t('nav.createListing')}</span>
                     </Link>
                     <Link
                       href="/derslerim/olustur"
@@ -218,7 +220,7 @@ export default function Navbar() {
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
-                      <span>Ders Oluştur</span>
+                      <span>{t('nav.createLesson')}</span>
                     </Link>
                   </>
                 )}
@@ -227,20 +229,37 @@ export default function Navbar() {
 
             {/* Profile/Auth Section - RIGHT */}
             <div className="hidden md:flex items-center justify-end space-x-4">
+              {/* Dil Değiştirme Butonu */}
+              <div className="flex items-center space-x-1 mr-2">
+                <button
+                  onClick={() => setLanguage('tr')}
+                  className={`px-2 py-1 rounded-md text-sm font-medium transition-all duration-300 ${language === 'tr' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
+                >
+                  TR
+                </button>
+                <span className="text-gray-400">|</span>
+                <button
+                  onClick={() => setLanguage('en')}
+                  className={`px-2 py-1 rounded-md text-sm font-medium transition-all duration-300 ${language === 'en' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
+                >
+                  EN
+                </button>
+              </div>
+              
               {!user && (
                 <div className="flex items-center space-x-4">
                   <Link
                     href="/auth/login"
                     className="px-6 py-2 rounded-xl text-[#FFD6B2] hover:text-[#FFE8D8] font-semibold transition-all duration-300 hover:bg-[#994D1C]/80 hover:scale-105"
                   >
-                    Giriş Yap
+                    {t('nav.login')}
                   </Link>
                   <Link
                     href="/auth/register"
                     className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
                       transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
                   >
-                    Kayıt Ol
+                    {t('nav.register')}
                   </Link>
                 </div>
               )}
@@ -283,7 +302,7 @@ export default function Navbar() {
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
-                          <span>Profilim</span>
+                          <span>{t('nav.profile')}</span>
                         </div>
                       </Link>
                       <Link
@@ -299,7 +318,7 @@ export default function Navbar() {
                               <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
                             )}
                           </div>
-                          <span>Mesajlarım</span>
+                          <span>{t('nav.messages')}</span>
                         </div>
                       </Link>
                       <Link
@@ -310,7 +329,7 @@ export default function Navbar() {
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          <span>Derslerim</span>
+                          <span>{t('nav.myLessons')}</span>
                         </div>
                       </Link>
                       {(user.role === 'instructor' || user.role === 'teacher') && (
@@ -323,7 +342,7 @@ export default function Navbar() {
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
-                              <span>İlanlarım</span>
+                              <span>{t('nav.myListings')}</span>
                             </div>
                           </Link>
                           <Link
@@ -334,7 +353,7 @@ export default function Navbar() {
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                               </svg>
-                              <span>Ders Oluştur</span>
+                              <span>{t('nav.createLesson')}</span>
                             </div>
                           </Link>
                         </>
@@ -347,7 +366,7 @@ export default function Navbar() {
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                           </svg>
-                          <span>Çıkış Yap</span>
+                          <span>{t('nav.logout')}</span>
                         </div>
                       </button>
                     </div>
@@ -410,7 +429,7 @@ export default function Navbar() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    <span>İlan Ver</span>
+                    <span>{t('nav.createListing')}</span>
                   </Link>
                   <Link
                     href="/derslerim/olustur"
@@ -424,7 +443,7 @@ export default function Navbar() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    <span>Ders Oluştur</span>
+                    <span>{t('nav.createLesson')}</span>
                   </Link>
                 </>
               )}
@@ -436,7 +455,7 @@ export default function Navbar() {
                     className="px-6 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] font-medium transition-all duration-300 hover:bg-[#FFF5F0] text-center"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Giriş Yap
+                    {t('nav.login')}
                   </Link>
                   <Link
                     href="/auth/register"
@@ -444,7 +463,7 @@ export default function Navbar() {
                       transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 text-center"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Kayıt Ol
+                    {t('nav.register')}
                   </Link>
                 </div>
               ) : (

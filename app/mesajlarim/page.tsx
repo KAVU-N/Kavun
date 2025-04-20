@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import ChatBox from '@/src/components/ChatBox';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 interface Conversation {
   _id: string;
@@ -31,6 +32,7 @@ export default function MessagesPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null);
   const [mounted, setMounted] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     setMounted(true);
@@ -49,13 +51,13 @@ export default function MessagesPage() {
       setLoading(true);
       const token = localStorage.getItem('token');
       if (!token) {
-        console.error('Token bulunamadı');
-        setError('Oturumunuz sonlanmış görünüyor. Lütfen tekrar giriş yapın.');
+        console.error(t('errors.tokenNotFound') || 'Token bulunamadı');
+        setError(t('errors.sessionExpired') || 'Oturumunuz sonlanmış görünüyor. Lütfen tekrar giriş yapın.');
         setLoading(false);
         return;
       }
 
-      console.log('Konuşmalar getiriliyor, token mevcut:', !!token);
+      console.log(t('logs.fetchingConversations') || 'Konuşmalar getiriliyor, token mevcut:', !!token);
       
       // API isteği
       const response = await fetch('/api/conversations', {
@@ -74,11 +76,11 @@ export default function MessagesPage() {
         try {
           errorData = JSON.parse(errorText);
         } catch (e) {
-          errorData = { error: errorText || 'Bilinmeyen hata' };
+          errorData = { error: errorText || t('errors.unknownError') || 'Bilinmeyen hata' };
         }
         
         console.error('API Hatası:', errorData);
-        throw new Error(errorData.error || `HTTP hata: ${response.status}`);
+        throw new Error(errorData.error || t('errors.httpError', { status: response.status }) || `HTTP hata: ${response.status}`);
       }
 
       const data = await response.json();
@@ -93,8 +95,8 @@ export default function MessagesPage() {
       
       setLoading(false);
     } catch (err: any) {
-      console.error('Konuşmalar yüklenirken hata oluştu:', err);
-      setError(`Konuşmalar yüklenirken bir hata oluştu: ${err.message || 'Bilinmeyen hata'}`);
+      console.error(t('errors.loadingConversations') || 'Konuşmalar yüklenirken hata oluştu:', err);
+      setError(`${t('errors.loadingConversationsDetail') || 'Konuşmalar yüklenirken bir hata oluştu:'} ${err.message || t('errors.unknownError') || 'Bilinmeyen hata'}`);
       setLoading(false);
     }
   };
@@ -116,7 +118,7 @@ export default function MessagesPage() {
           name: userName,
           email: '',
           profilePicture,
-          university: 'Bilinmiyor',
+          university: t('general.unknown') || 'Bilinmiyor',
           role: 'user'
         });
         return;
@@ -132,7 +134,7 @@ export default function MessagesPage() {
         role: userData.role || 'user'
       });
     } catch (err) {
-      console.error('Kullanıcı detayları alınırken hata oluştu:', err);
+      console.error(t('errors.fetchingUserDetails') || 'Kullanıcı detayları alınırken hata oluştu:', err);
       setSelectedUser({
         _id: userId,
         name: userName,
@@ -153,9 +155,9 @@ export default function MessagesPage() {
     return (
       <div className="min-h-screen pt-24 px-4 flex flex-col items-center justify-center bg-[#FFF9F5]">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-[#994D1C] mb-4">Mesajlarınızı görmek için giriş yapmalısınız</h1>
+          <h1 className="text-2xl font-bold text-[#994D1C] mb-4">{t('messages.loginRequired') || 'Mesajlarınızı görmek için giriş yapmalısınız'}</h1>
           <Link href="/auth/login" className="inline-block px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105">
-            Giriş Yap
+            {t('auth.login')}
           </Link>
         </div>
       </div>
@@ -165,7 +167,7 @@ export default function MessagesPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="container mx-auto px-4 py-8 pt-24 flex-shrink-0">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">Mesajlarım</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">{t('messages.myMessages')}</h1>
         
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -179,7 +181,7 @@ export default function MessagesPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
             {/* Konuşmalar Listesi */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden lg:col-span-1 h-full flex flex-col">
-              <div className="p-4 bg-[#FFE5D9] font-medium">Konuşmalarım</div>
+              <div className="p-4 bg-[#FFE5D9] font-medium">{t('messages.conversations')}</div>
               
               {conversations.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full p-6 text-center">
@@ -188,10 +190,10 @@ export default function MessagesPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Henüz mesajınız yok</h3>
-                  <p className="text-gray-600 mb-4">Eğitmenlerle mesajlaşmaya başlamak için profillerini ziyaret edebilirsiniz.</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">{t('messages.noMessages') || 'Henüz mesajınız yok'}</h3>
+                  <p className="text-gray-600 mb-4">{t('messages.visitInstructors') || 'Eğitmenlerle mesajlaşmaya başlamak için profillerini ziyaret edebilirsiniz.'}</p>
                   <Link href="/egitmenler" className="bg-[#FF8B5E] text-white px-4 py-2 rounded hover:bg-[#FF7F50] transition-colors">
-                    Eğitmenleri Keşfet
+                    {t('messages.exploreInstructors') || 'Eğitmenleri Keşfet'}
                   </Link>
                 </div>
               ) : (
@@ -262,12 +264,12 @@ export default function MessagesPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>
-                  <h2 className="text-xl font-medium text-gray-900 mb-2">Mesajlaşmaya Başlayın</h2>
+                  <h2 className="text-xl font-medium text-gray-900 mb-2">{t('messages.startMessaging')}</h2>
                   <p className="text-gray-600 max-w-md mb-6">
-                    Sol taraftan bir konuşma seçin veya eğitmen profillerini ziyaret ederek yeni bir mesajlaşma başlatın.
+                    {t('messages.selectConversation')}
                   </p>
                   <Link href="/egitmenler" className="bg-[#FF8B5E] text-white px-6 py-2 rounded-lg hover:bg-[#FF7F50] transition-colors">
-                    Eğitmenleri Keşfet
+                    {t('messages.exploreInstructors') || 'Eğitmenleri Keşfet'}
                   </Link>
                 </div>
               )}

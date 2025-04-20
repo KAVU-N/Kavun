@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { FaPaperPlane } from 'react-icons/fa';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 export default function IlanVerPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -39,22 +41,22 @@ export default function IlanVerPage() {
     e.preventDefault();
     
     if (!formData.title.trim()) {
-      setError('Lütfen bir başlık girin');
+      setError(t('errors.titleRequired') || 'Lütfen bir başlık girin');
       return;
     }
     
     if (!formData.description.trim()) {
-      setError('Lütfen bir açıklama girin');
+      setError(t('errors.descriptionRequired') || 'Lütfen bir açıklama girin');
       return;
     }
     
     if (!formData.price.trim()) {
-      setError('Lütfen ücret bilgisi girin');
+      setError(t('errors.priceRequired') || 'Lütfen ücret bilgisi girin');
       return;
     }
     
     if (!formData.duration.trim()) {
-      setError('Lütfen süre bilgisi girin');
+      setError(t('errors.durationRequired') || 'Lütfen süre bilgisi girin');
       return;
     }
     
@@ -64,7 +66,7 @@ export default function IlanVerPage() {
       
       // Kullanıcı bilgisini kontrol et
       if (!user || !user.id) {
-        setError('Kullanıcı kimliği bulunamadı. Lütfen tekrar giriş yapın.');
+        setError(t('errors.userIdNotFound') || 'Kullanıcı kimliği bulunamadı. Lütfen tekrar giriş yapın.');
         setIsSubmitting(false);
         return;
       }
@@ -72,7 +74,7 @@ export default function IlanVerPage() {
       // Token al
       const token = localStorage.getItem('token');
       if (!token) {
-        setError('Oturum bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
+        setError(t('errors.sessionNotFound') || 'Oturum bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
         setIsSubmitting(false);
         return;
       }
@@ -96,12 +98,12 @@ export default function IlanVerPage() {
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'İlan oluşturulurken bir hata oluştu');
+        throw new Error(errorData.error || t('errors.listingCreationError') || 'İlan oluşturulurken bir hata oluştu');
       }
       
       const data = await response.json();
       
-      setSuccess('İlanınız başarıyla oluşturuldu!');
+      setSuccess(t('general.listingCreated') || 'İlanınız başarıyla oluşturuldu!');
       setFormData({
         title: '',
         description: '',
@@ -118,9 +120,9 @@ export default function IlanVerPage() {
       }, 1500);
       
     } catch (err: any) {
-      console.error('İlan oluşturulurken hata:', err);
+      console.error(t('logs.listingCreationError') || 'İlan oluşturulurken hata:', err);
       // Daha detaylı hata mesajı göster
-      setError(err.message || 'İlan oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      setError(err.message || t('errors.listingCreationErrorTryAgain') || 'İlan oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
       
       // Hata detaylarını konsola yazdır
       if (err.response) {
@@ -142,6 +144,7 @@ export default function IlanVerPage() {
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center py-12">
             <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+            <p className="mt-4 text-[#6B3416]">{t('general.loading')}</p>
           </div>
         </div>
       </div>
@@ -154,13 +157,13 @@ export default function IlanVerPage() {
       <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
-            <h1 className="text-3xl font-bold text-[#6B3416] mb-4">Erişim Engellendi</h1>
-            <p className="text-[#994D1C] mb-6">Bu sayfaya erişmek için eğitmen hesabıyla giriş yapmanız gerekmektedir.</p>
+            <h1 className="text-3xl font-bold text-[#6B3416] mb-4">{t('general.accessDenied')}</h1>
+            <p className="text-[#994D1C] mb-6">{t('general.accessDeniedMessage')}</p>
             <button
               onClick={() => router.push('/')}
               className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-lg"
             >
-              Ana Sayfaya Dön
+              {t('general.goToHomepage')}
             </button>
           </div>
         </div>
@@ -172,7 +175,7 @@ export default function IlanVerPage() {
     <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold text-[#6B3416] mb-8">Yeni İlan Oluştur</h1>
+          <h1 className="text-3xl font-bold text-[#6B3416] mb-8">{t('general.createListingTitle')}</h1>
           
           {success ? (
             <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6">
@@ -190,7 +193,7 @@ export default function IlanVerPage() {
             <div className="space-y-6">
               <div>
                 <label htmlFor="title" className="block text-[#6B3416] font-medium mb-2">
-                  İlan Başlığı
+                  {t('general.listingTitle')}
                 </label>
                 <input
                   type="text"
@@ -198,21 +201,21 @@ export default function IlanVerPage() {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  placeholder="Örn: Python Programlama Dersi"
+                  placeholder={t('general.listingTitlePlaceholder')}
                   className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
                 />
               </div>
               
               <div>
                 <label htmlFor="description" className="block text-[#6B3416] font-medium mb-2">
-                  Detaylı Açıklama
+                  {t('general.listingDescription')}
                 </label>
                 <textarea
                   id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Ders içeriği ve kendiniz hakkında bilgi verin..."
+                  placeholder={t('general.listingDescriptionPlaceholder')}
                   className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996] min-h-[150px]"
                 />
               </div>
@@ -220,7 +223,7 @@ export default function IlanVerPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="price" className="block text-[#6B3416] font-medium mb-2">
-                    Ders Ücreti (₺/Saat)
+                    {t('general.hourlyPrice')}
                   </label>
                   <input
                     type="text"
@@ -228,14 +231,14 @@ export default function IlanVerPage() {
                     name="price"
                     value={formData.price}
                     onChange={handleChange}
-                    placeholder="Örn: 150"
+                    placeholder={t('general.hourlyPricePlaceholder')}
                     className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="method" className="block text-[#6B3416] font-medium mb-2">
-                    Ders Yöntemi
+                    {t('general.lessonMethod')}
                   </label>
                   <select
                     id="method"
@@ -244,15 +247,15 @@ export default function IlanVerPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
                   >
-                    <option value="online">Online</option>
-                    <option value="yüzyüze">Yüz Yüze</option>
-                    <option value="hibrit">Hibrit (Online + Yüz Yüze)</option>
+                    <option value="online">{t('general.online')}</option>
+                    <option value="yüzyüze">{t('general.faceToFace')}</option>
+                    <option value="hibrit">{t('general.hybrid')}</option>
                   </select>
                 </div>
                 
                 <div>
                   <label htmlFor="duration" className="block text-[#6B3416] font-medium mb-2">
-                    Ders Süresi (Saat)
+                    {t('general.lessonDurationHours')}
                   </label>
                   <input
                     type="text"
@@ -260,14 +263,14 @@ export default function IlanVerPage() {
                     name="duration"
                     value={formData.duration}
                     onChange={handleChange}
-                    placeholder="Örn: 1.5"
+                    placeholder={t('general.lessonDurationPlaceholder')}
                     className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
                   />
                 </div>
                 
                 <div>
                   <label htmlFor="frequency" className="block text-[#6B3416] font-medium mb-2">
-                    Ders Sıklığı
+                    {t('general.lessonFrequency')}
                   </label>
                   <select
                     id="frequency"
@@ -276,16 +279,16 @@ export default function IlanVerPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
                   >
-                    <option value="daily">Günlük</option>
-                    <option value="weekly">Haftalık</option>
-                    <option value="monthly">Aylık</option>
-                    <option value="flexible">Esnek</option>
+                    <option value="daily">{t('frequency.daily')}</option>
+                    <option value="weekly">{t('frequency.weekly')}</option>
+                    <option value="monthly">{t('frequency.monthly')}</option>
+                    <option value="flexible">{t('frequency.flexible')}</option>
                   </select>
                 </div>
                 
                 <div className="md:col-span-2">
                   <label htmlFor="instructorFrom" className="block text-[#6B3416] font-medium mb-2">
-                    Dersi Aldığınız Eğitmen
+                    {t('general.instructorFrom')}
                   </label>
                   <input
                     type="text"
@@ -293,7 +296,7 @@ export default function IlanVerPage() {
                     name="instructorFrom"
                     value={formData.instructorFrom}
                     onChange={handleChange}
-                    placeholder="Örn: Ankara Üniversitesi, Prof. Dr. Ahmet Yılmaz"
+                    placeholder={t('general.instructorFromPlaceholder')}
                     className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
                   />
                 </div>
@@ -309,12 +312,12 @@ export default function IlanVerPage() {
                   {isSubmitting ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-[#FF8B5E] rounded-full animate-spin"></div>
-                      <span>İşleniyor...</span>
+                      <span>{t('general.processing')}</span>
                     </>
                   ) : (
                     <>
                       <FaPaperPlane />
-                      <span>İlanı Yayınla</span>
+                      <span>{t('general.publishListing')}</span>
                     </>
                   )}
                 </button>

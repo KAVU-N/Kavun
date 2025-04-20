@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { user } = useAuth();
+  const { t } = useLanguage();
   
   return (
     <footer className="bg-gradient-to-r from-[#FFCDB2] to-[#FFCDB2] border-t border-[#FFCDB2] mt-0">
@@ -27,7 +29,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-[#994D1C] max-w-xs">
-              Kavun, öğrencileri eğitmenlerle buluşturan ve eğitimin geleceğini şekillendiren platform.
+              {t('footer.platformDescription')}
             </p>
             <div className="flex space-x-4 pt-2">
               {/* Social Media Icons */}
@@ -60,33 +62,33 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold text-[#6B3416] mb-4">Hızlı Bağlantılar</h3>
+            <h3 className="text-lg font-semibold text-[#6B3416] mb-4">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                  Ana Sayfa
+                  {t('nav.home')}
                 </Link>
               </li>
               {user && (
                 <li>
                   <Link href="/egitmenler" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                    Eğitmenler
+                    {t('nav.instructors')}
                   </Link>
                 </li>
               )}
               <li>
                 <Link href="/iletisim" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                  İletişim
+                  {t('nav.contact')}
                 </Link>
               </li>
               <li>
                 <Link href="/hakkimizda" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                  Hakkımızda
+                  {t('nav.about')}
                 </Link>
               </li>
               <li>
                 <Link href="/sss" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                  Sıkça Sorulan Sorular
+                  {t('nav.faq')}
                 </Link>
               </li>
               <li>
@@ -99,26 +101,26 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="text-lg font-semibold text-[#6B3416] mb-4">Yasal</h3>
+            <h3 className="text-lg font-semibold text-[#6B3416] mb-4">{t('footer.legal')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/kullanim-kosullari" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                  Kullanım Koşulları
+                  {t('footer.termsOfUse')}
                 </Link>
               </li>
               <li>
                 <Link href="/gizlilik-politikasi" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                  Gizlilik Politikası
+                  {t('footer.privacyPolicy')}
                 </Link>
               </li>
               <li>
                 <Link href="/cerez-politikasi" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                  Çerez Politikası
+                  {t('footer.cookiePolicy')}
                 </Link>
               </li>
               <li>
                 <Link href="/kvkk" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                  KVKK
+                  {t('footer.pdpl')}
                 </Link>
               </li>
             </ul>
@@ -126,7 +128,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-lg font-semibold text-[#6B3416] mb-4">İletişim</h3>
+            <h3 className="text-lg font-semibold text-[#6B3416] mb-4">{t('footer.contact')}</h3>
             <ul className="space-y-2">
               <li className="flex items-start space-x-2">
                 <svg className="w-5 h-5 text-[#FF8B5E] mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,18 +163,18 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-[#FFCDB2]">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <p className="text-[#994D1C] text-sm">
-              &copy; {currentYear} Kavun. Tüm hakları saklıdır.
+              &copy; {currentYear} Kavun. {t('footer.allRightsReserved')}
             </p>
             <div className="mt-4 md:mt-0">
               <div className="flex items-center gap-16">
                 <a href="#" className="text-sm text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300 px-4">
-                  Destek
+                  {t('footer.support')}
                 </a>
                 <a href="#" className="text-sm text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300 px-4">
-                  Güvenlik
+                  {t('footer.security')}
                 </a>
                 <a href="#" className="text-sm text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300 px-4">
-                  Bildirim
+                  {t('footer.notification')}
                 </a>
               </div>
             </div>
