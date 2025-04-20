@@ -58,6 +58,9 @@ type Resource = {
   fileSize: string;
   tags: string[];
   url: string;
+  fileData?: string; // Base64 formatında dosya verisi
+  fileName?: string; // Dosya adı
+  fileType?: string; // Dosya tipi (MIME type)
 };
 
 export default function KaynaklarPage() {
@@ -66,6 +69,7 @@ export default function KaynaklarPage() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [universitySearchTerm, setUniversitySearchTerm] = useState('');
   const [showUniversityDropdown, setShowUniversityDropdown] = useState(false);
@@ -95,25 +99,47 @@ export default function KaynaklarPage() {
   // Kaynakları getir
   useEffect(() => {
     const fetchResources = async () => {
-      setLoading(true);
       try {
-        // Normalde burada API'den kaynakları çekerdik
-        // Şimdilik localStorage'dan okuyoruz
-        const storedResources = localStorage.getItem('sharedResources');
-        if (storedResources) {
-          const parsedResources = JSON.parse(storedResources) as Resource[];
-          setResources(parsedResources);
+        // Önce API'ye istek gönder (bu, ileride veritabanı bağlantısı kurulduğunda çalışacak)
+        const response = await fetch('/api/resources');
+        const data = await response.json();
+        
+        // API yanıtı localStorage kullanmamızı söylüyorsa
+        if (data.message === 'localStorage') {
+          // localStorage'dan kaynakları al
+          const storedResources = localStorage.getItem('sharedResources');
+          if (storedResources) {
+            const parsedResources = JSON.parse(storedResources) as Resource[];
+            setResources(parsedResources);
+          } else {
+            setResources([]);
+          }
         } else {
-          setResources([]);
+          // Eğer API veritabanından veri döndüyse, doğrudan kullan
+          setResources(data);
         }
       } catch (error) {
-        console.error('Kaynaklar yüklenirken hata oluştu:', error);
-        setResources([]);
+        console.error('Kaynaklar yüklenirken hata:', error);
+        setError('Kaynaklar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+        
+        // Hata durumunda localStorage'dan okumayı dene
+        try {
+          const storedResources = localStorage.getItem('sharedResources');
+          if (storedResources) {
+            const parsedResources = JSON.parse(storedResources) as Resource[];
+            setResources(parsedResources);
+          } else {
+            setResources([]);
+          }
+        } catch (localError) {
+          console.error('localStorage\'dan okuma hatası:', localError);
+          setResources([]);
+        }
       } finally {
         setLoading(false);
       }
     };
-
+    
     fetchResources();
   }, []);
 
@@ -469,32 +495,73 @@ export default function KaynaklarPage() {
                     {t('general.resourceView')}
                   </Link>
                   <button
-                    onClick={() => {
-                      // İndirme sayısını artır
-                      const storedResources = localStorage.getItem('sharedResources');
-                      if (storedResources) {
-                        const parsedResources = JSON.parse(storedResources) as Resource[];
-                        const updatedResources = parsedResources.map((r: Resource) => {
-                          if (r.id === resource.id) {
-                            return { ...r, downloadCount: r.downloadCount + 1 };
-                          }
-                          return r;
+                    onClick={async () => {
+                      try {
+                        // API'ye istek gönder
+                        const response = await fetch(`/api/resources/${resource.id}`, {
+                          method: 'PATCH',
+                          headers: {
+                            'Content-Type': 'application/json'
+                          },
+                          body: JSON.stringify({ action: 'download' })
                         });
+                        const data = await response.json();
                         
-                        localStorage.setItem('sharedResources', JSON.stringify(updatedResources));
-                      }
-                      
-                      // Eğer gerçek bir URL varsa, indirme işlemi yap
-                      if (resource.url && resource.url !== '#') {
-                        window.open(resource.url, '_blank');
-                      } else {
-                        // Örnek bir dosya indirme simülasyonu
-                        const link = document.createElement('a');
-                        link.href = '/sample-files/sample.pdf'; // Örnek bir dosya yolu
-                        link.download = `${resource.title}.${resource.format.toLowerCase()}`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
+                        // API yanıtı localStorage kullanmamızı söylüyorsa
+                        if (data.message === 'localStorage') {
+                          // localStorage'dan kaynakları al ve indirme sayısını artır
+                          const storedResources = localStorage.getItem('sharedResources');
+                          if (storedResources) {
+                            const parsedResources = JSON.parse(storedResources) as Resource[];
+                            const resourceIndex = parsedResources.findIndex(r => r.id === resource.id);
+                            
+                            if (resourceIndex !== -1) {
+                              // İndirme sayısını artır
+                              parsedResources[resourceIndex].downloadCount = (parsedResources[resourceIndex].downloadCount || 0) + 1;
+                              localStorage.setItem('sharedResources', JSON.stringify(parsedResources));
+                              
+                              // Sayfayı yenilemeden görüntülenen kaynakları güncelle
+                              setFilteredResources(prevResources => 
+                                prevResources.map(r => 
+                                  r.id === resource.id 
+                                    ? {...r, downloadCount: r.downloadCount + 1} 
+                                    : r
+                                )
+                              );
+                            }
+                          }
+                        }
+                        
+                        // Kaynak URL'sini kontrol et
+                        if (resource.url && resource.url !== '#') {
+                          // Eğer bu bir harici bağlantıysa, yeni sekmede aç
+                          window.open(resource.url, '_blank');
+                        } else if (resource.fileData) {
+                          // Eğer dosya verisi varsa (Base64 formatında)
+                          try {
+                            // Base64 verisini kullanarak dosyayı indir
+                            const link = document.createElement('a');
+                            link.href = resource.fileData; // Base64 veri URL'si
+                            
+                            // Dosya adını belirle
+                            const fileName = resource.fileName || `${resource.title}.${resource.format.toLowerCase()}`;
+                            link.download = fileName;
+                            
+                            // Dosyayı indir
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                          } catch (error) {
+                            console.error('Dosya indirme hatası:', error);
+                            alert(t('general.downloadError'));
+                          }
+                        } else {
+                          // Dosya verisi yoksa hata mesajı göster
+                          alert(t('general.fileNotFound'));
+                        }
+                      } catch (error) {
+                        console.error('Dosya indirme hatası:', error);
+                        alert(t('general.downloadError'));
                       }
                     }}
                     className="flex-1 px-4 py-2 bg-[#FF8B5E] text-white text-center rounded-lg hover:bg-[#FF7A45] transition-colors duration-300 text-sm cursor-pointer"
