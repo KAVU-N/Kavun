@@ -1,7 +1,7 @@
 {
-  "/ilanlarim/page": "app/ilanlarim/page.js",
   "/mesajlarim/page": "app/mesajlarim/page.js",
   "/ilanlarim/basvurular/[id]/page": "app/ilanlarim/basvurular/[id]/page.js",
+  "/page": "app/page.js",
   "/auth/login/page": "app/auth/login/page.js",
   "/auth/register/page": "app/auth/register/page.js"
 }

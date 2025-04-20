@@ -98,11 +98,23 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FFF5F0]">
       <Navbar />
-      <main className="py-20 pt-40 bg-[#FFE8D8] flex-grow mb-0 pb-16">
+      <main className="relative py-20 pt-40 flex-grow mb-0 pb-16 overflow-hidden" style={{ minHeight: '100vh' }}>
+  {/* Background görsel ve overlay */}
+  <div className="absolute inset-0 w-full h-full z-0">
+    <img 
+      src="/images/homepage-students.jpg" 
+      alt="Kütüphanede ders çalışan öğrenciler arka plan" 
+      className="w-full h-full object-cover" 
+      style={{ objectPosition: 'center 40%', filter: 'brightness(0.55)' }}
+    />
+    <div className="absolute inset-0 bg-[#6B3416]/60" />
+  </div>
+  {/* İçerik */}
+  <div className="relative z-10">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center">
             <div className="w-full max-w-3xl text-center mb-12">
-              <h1 className="text-5xl font-bold text-[#6B3416] mb-8 leading-tight">
+              <h1 className="text-5xl font-bold text-[#FFE8D8] mb-8 leading-tight drop-shadow-lg">
                 İhtiyacına en uygun öğrencileri bul,
                 hemen öğrenmeye başla!
               </h1>
@@ -216,21 +228,15 @@ export default function Home() {
                   </div>
                 )}
               </div>
-              <p className="text-xl text-[#994D1C] mb-8">
+              <p className="text-xl text-[#FFD6B2] mb-8 drop-shadow">
                 Kavun, öğrencileri ve eğitmenleri bir araya getiren yeni nesil bir eğitim platformudur.
                 İhtiyacınıza uygun öğrencileri bulun veya öğrenciler olarak platformumuza katılın.
               </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <a
-                  href="/courses"
-                  className="px-8 py-3 bg-[#FFE5D9] text-[#994D1C] font-semibold rounded-full hover:bg-[#FFB996] hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                >
-                  Kursları Keşfet
-                </a>
-              </div>
+              
             </div>
           </div>
         </div>
+      </div>
       </main>
 
       {showRoleDialog && (
