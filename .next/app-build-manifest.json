@@ -11,46 +11,31 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/ilan-ver/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/ilan-ver/page.js"
-    ],
     "/derslerim/olustur/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/derslerim/olustur/page.js"
     ],
-    "/ilanlar/page": [
+    "/kaynaklar/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/ilanlar/page.js"
+      "static/chunks/app/kaynaklar/page.js"
+    ],
+    "/kaynaklar/paylas/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/kaynaklar/paylas/page.js"
+    ],
+    "/kaynaklar/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/kaynaklar/[id]/page.js"
     ],
     "/derslerim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/derslerim/page.css",
       "static/chunks/app/derslerim/page.js"
-    ],
-    "/mesajlarim/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/mesajlarim/page.js"
-    ],
-    "/egitmen-ilanlari/[teacherId]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/egitmen-ilanlari/[teacherId]/page.js"
-    ],
-    "/profil/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/profil/page.js"
-    ],
-    "/ilanlarim/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/ilanlarim/page.js"
     ],
     "/auth/layout": [
       "static/chunks/webpack.js",
@@ -62,10 +47,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/auth/login/page.js"
     ],
-    "/auth/register/page": [
+    "/egitmenler/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/register/page.js"
+      "static/chunks/app/egitmenler/page.js"
     ]
   }
 }
