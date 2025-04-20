@@ -1,20 +1,25 @@
 {
   "pages": {
-    "/profil/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/profil/page.js"
-    ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/profil/duzenle/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/profil/duzenle/page.js"
+      "static/chunks/app/page.js"
+    ],
+    "/ilanlar/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilanlar/page.js"
+    ],
+    "/egitmenler/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/egitmenler/page.js"
     ],
     "/derslerim/page": [
       "static/chunks/webpack.js",
@@ -22,10 +27,40 @@
       "static/css/app/derslerim/page.css",
       "static/chunks/app/derslerim/page.js"
     ],
-    "/ilanlar/page": [
+    "/ilan-ver/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/ilanlar/page.js"
+      "static/chunks/app/ilan-ver/page.js"
+    ],
+    "/auth/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/layout.js"
+    ],
+    "/auth/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/login/page.js"
+    ],
+    "/auth/register/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/register/page.js"
+    ],
+    "/auth/verify/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/verify/page.js"
+    ],
+    "/ilanlarim/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilanlarim/page.js"
+    ],
+    "/ilan-duzenle/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilan-duzenle/[id]/page.js"
     ]
   }
 }

@@ -109,33 +109,34 @@ export default function IlanlarimPage() {
     }
   }, [user, router]);
 
-  // İlan silme işlemi
+  // Modal için state
+  const [deleteModalIlanId, setDeleteModalIlanId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  // İlan silme işlemi (modal üzerinden)
   const handleDelete = async (ilanId: string) => {
-    if (!confirm('Bu ilanı silmek istediğinizden emin misiniz?')) {
-      return;
-    }
-    
+    setDeleting(true);
     try {
       const token = localStorage.getItem('token');
-      
-      const response = await fetch(`/api/ilanlar/${ilanId}`, {
+      const response = await fetch(`/api/ilanlar/${ilanId}?userId=${user.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      
       if (!response.ok) {
         throw new Error('İlan silinirken bir hata oluştu');
       }
-      
-      // Başarılı silme işleminden sonra listeyi güncelle
       setIlanlar(prev => prev.filter(ilan => ilan._id !== ilanId));
+      setDeleteModalIlanId(null);
     } catch (err) {
       console.error('İlan silme hatası:', err);
       alert('İlan silinirken bir hata oluştu');
+    } finally {
+      setDeleting(false);
     }
   };
+
 
   if (loading) {
     return (
@@ -210,7 +211,7 @@ export default function IlanlarimPage() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h2 className="text-xl font-bold text-[#6B3416] mb-2">{ilan.title}</h2>
-                      <p className="text-[#994D1C] mb-4">{ilan.description}</p>
+                      <p className="text-[#994D1C] mb-4 block break-all whitespace-pre-line">{ilan.description}</p>
                       
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
@@ -245,7 +246,7 @@ export default function IlanlarimPage() {
                         <FaEdit />
                       </button>
                       <button 
-                        onClick={() => handleDelete(ilan._id)}
+                        onClick={() => setDeleteModalIlanId(ilan._id)}
                         className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors duration-300"
                       >
                         <FaTrash />
@@ -270,6 +271,31 @@ export default function IlanlarimPage() {
           )}
         </div>
       </div>
-    </div>
+    {/* Silme Onay Modalı */}
+    {deleteModalIlanId && (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full">
+          <h2 className="text-xl font-bold mb-4 text-[#6B3416]">İlanı Silmek İstiyor musunuz?</h2>
+          <p className="mb-6 text-[#994D1C]">Bu işlem geri alınamaz. Emin misiniz?</p>
+          <div className="flex justify-end gap-3">
+            <button
+              className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-60"
+              onClick={() => handleDelete(deleteModalIlanId)}
+              disabled={deleting}
+            >
+              {deleting ? 'Siliniyor...' : 'Evet, Sil'}
+            </button>
+            <button
+              className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+              onClick={() => setDeleteModalIlanId(null)}
+              disabled={deleting}
+            >
+              Hayır
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
   );
 } 

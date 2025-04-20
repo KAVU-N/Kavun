@@ -1,11 +1,10 @@
 {
-  "/profil/page": "app/profil/page.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/profil/duzenle/page": "app/profil/duzenle/page.js",
-  "/api/auth/update-profile/route": "app/api/auth/update-profile/route.js",
-  "/derslerim/page": "app/derslerim/page.js",
-  "/api/lessons/route": "app/api/lessons/route.js",
-  "/api/lessons/stats/route": "app/api/lessons/stats/route.js",
-  "/ilanlar/page": "app/ilanlar/page.js",
-  "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js"
+  "/page": "app/page.js",
+  "/ilan-ver/page": "app/ilan-ver/page.js",
+  "/ilanlarim/page": "app/ilanlarim/page.js",
+  "/ilan-duzenle/[id]/page": "app/ilan-duzenle/[id]/page.js",
+  "/api/ilanlar/[id]/route": "app/api/ilanlar/[id]/route.js",
+  "/api/ilanlar/route": "app/api/ilanlar/route.js",
+  "/auth/verify/page": "app/auth/verify/page.js"
 }
