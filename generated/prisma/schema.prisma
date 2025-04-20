@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Resource {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String   @db.Text
+  author        String
+  category      String
+  format        String
+  level         String?
+  university    String?
+  department    String?
+  fileSize      String?
+  tags          String[] @default([])
+  url           String?
+  fileData      String?  @db.Text // Base64 formatında dosya verisi
+  fileName      String?
+  fileType      String?
+  downloadCount Int      @default(0)
+  viewCount     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([category])
+  @@index([university])
+  @@index([format])
+}

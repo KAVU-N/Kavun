@@ -6,6 +6,7 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
+<<<<<<< Updated upstream
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -41,10 +42,13 @@
       "static/chunks/main-app.js",
       "static/chunks/app/kaynaklar/paylas/page.js"
     ],
+=======
+>>>>>>> Stashed changes
     "/kaynaklar/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/kaynaklar/[id]/page.js"
+<<<<<<< Updated upstream
     ],
     "/ilanlar/page": [
       "static/chunks/webpack.js",
@@ -96,6 +100,8 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
+=======
+>>>>>>> Stashed changes
     ]
   }
 }

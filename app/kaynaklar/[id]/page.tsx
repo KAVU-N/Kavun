@@ -23,6 +23,9 @@ type Resource = {
   fileSize: string;
   tags: string[];
   url: string;
+  fileData?: string; // Base64 formatında dosya verisi
+  fileName?: string; // Dosya adı
+  fileType?: string; // Dosya tipi (MIME type)
 };
 
 export default function KaynakDetayPage() {
@@ -42,35 +45,64 @@ export default function KaynakDetayPage() {
     const fetchResource = async () => {
       setLoading(true);
       try {
-        // Normalde burada API'den kaynağı çekerdik
-        // Şimdilik localStorage'dan okuyoruz
-        const storedResources = localStorage.getItem('sharedResources');
-        if (storedResources) {
-          const parsedResources = JSON.parse(storedResources) as Resource[];
-          const foundResource = parsedResources.find(r => r.id.toString() === resourceId);
+        // API'den kaynağı çek
+        const response = await fetch(`/api/resources/${resourceId}`);
+        const data = await response.json();
+        
+        // API yanıtı localStorage kullanmamızı söylüyorsa
+        if (data.message === 'localStorage') {
+          // localStorage'dan kaynakları al
+          const storedResources = localStorage.getItem('sharedResources');
+          if (storedResources) {
+            const parsedResources = JSON.parse(storedResources) as Resource[];
+            const foundResource = parsedResources.find(r => r.id.toString() === resourceId);
+            
+            if (foundResource) {
+              // Görüntülenme sayısını artır
+              foundResource.viewCount = (foundResource.viewCount || 0) + 1;
+              localStorage.setItem('sharedResources', JSON.stringify(parsedResources));
+              setResource(foundResource);
+              
+              // İlgili kaynakları bul
+              const related = parsedResources
+                .filter(r => r.id !== foundResource.id)
+                .filter(r => 
+                  r.category === foundResource.category || 
+                  (r.tags && foundResource.tags && r.tags.some(tag => foundResource.tags.includes(tag)))
+                )
+                .slice(0, 3);
+              
+              setRelatedResources(related);
+            } else {
+              throw new Error('Kaynak bulunamadı');
+            }
+          } else {
+            throw new Error('Kaynak bulunamadı');
+          }
+        } else {
+          // Eğer API veritabanından veri döndüyse, doğrudan kullan
+          setResource(data);
           
-          if (foundResource) {
-            setResource(foundResource);
+          // İlgili kaynakları getir
+          const relatedResponse = await fetch('/api/resources');
+          if (relatedResponse.ok) {
+            const allResources = await relatedResponse.json();
             
             // İlgili kaynakları bul (aynı kategori veya etiketlere sahip)
-            const related = parsedResources
-              .filter(r => r.id !== foundResource.id)
-              .filter(r => 
-                r.category === foundResource.category || 
-                r.tags.some(tag => foundResource.tags.includes(tag))
+            const related = allResources
+              .filter((r: Resource) => r.id !== data.id)
+              .filter((r: Resource) => 
+                r.category === data.category || 
+                (r.tags && data.tags && r.tags.some((tag: string) => data.tags.includes(tag)))
               )
               .slice(0, 3);
             
             setRelatedResources(related);
-          } else {
-            setError('Kaynak bulunamadı');
           }
-        } else {
-          setError('Kaynak bulunamadı');
         }
       } catch (error) {
         console.error('Kaynak yüklenirken hata oluştu:', error);
-        setError('Kaynak yüklenirken bir hata oluştu');
+        setError(error instanceof Error ? error.message : 'Kaynak yüklenirken bir hata oluştu');
       } finally {
         setLoading(false);
       }
@@ -81,60 +113,73 @@ export default function KaynakDetayPage() {
     }
   }, [resourceId]);
   
-  // Görüntülenme sayısını artır - Ayrı bir useEffect ile bir kere çalışacak
-  useEffect(() => {
-    if (resource && !loading) {
-      // Görüntülenme sayısını artır - sadece bir kere çalışacak
-      const updateViewCount = () => {
+  // Görüntülenme sayısı otomatik olarak API tarafında artırılıyor
+  // Kaynağı getirdiğimizde görüntülenme sayısı zaten artırılmış oluyor
+  
+  // İndirme işlemi
+  const handleDownload = async () => {
+    if (!resource) return;
+    
+    try {
+      // API'ye istek gönder
+      const response = await fetch(`/api/resources/${resourceId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action: 'download' })
+      });
+      const data = await response.json();
+      
+      // API yanıtı localStorage kullanmamızı söylüyorsa
+      if (data.message === 'localStorage') {
+        // localStorage'dan kaynakları al ve indirme sayısını artır
         const storedResources = localStorage.getItem('sharedResources');
         if (storedResources) {
           const parsedResources = JSON.parse(storedResources) as Resource[];
-          const updatedResources = parsedResources.map(r => {
-            if (r.id.toString() === resourceId) {
-              return { ...r, viewCount: r.viewCount + 1 };
-            }
-            return r;
-          });
+          const resourceIndex = parsedResources.findIndex(r => r.id.toString() === resourceId);
           
-          localStorage.setItem('sharedResources', JSON.stringify(updatedResources));
+          if (resourceIndex !== -1) {
+            // İndirme sayısını artır
+            parsedResources[resourceIndex].downloadCount = (parsedResources[resourceIndex].downloadCount || 0) + 1;
+            localStorage.setItem('sharedResources', JSON.stringify(parsedResources));
+            
+            // Güncellenmiş kaynağı state'e kaydet
+            setResource(parsedResources[resourceIndex]);
+          }
         }
-      };
+      }
       
-      // Sayfa tamamen yüklendikten sonra görüntülenme sayısını artır
-      const timeoutId = setTimeout(updateViewCount, 1000);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [resource, loading, resourceId]);
-  
-  // İndirme işlemi
-  const handleDownload = () => {
-    if (!resource) return;
-    
-    // İndirme sayısını artır
-    const storedResources = localStorage.getItem('sharedResources');
-    if (storedResources) {
-      const parsedResources = JSON.parse(storedResources) as Resource[];
-      const updatedResources = parsedResources.map(r => {
-        if (r.id.toString() === resourceId) {
-          return { ...r, downloadCount: r.downloadCount + 1 };
+      // Kaynak URL'sini kontrol et
+      if (resource.url && resource.url !== '#') {
+        // Eğer bu bir harici bağlantıysa, yeni sekmede aç
+        window.open(resource.url, '_blank');
+      } else if (resource.fileData) {
+        // Eğer dosya verisi varsa (Base64 formatında)
+        try {
+          // Base64 verisini kullanarak dosyayı indir
+          const link = document.createElement('a');
+          link.href = resource.fileData; // Base64 veri URL'si
+          
+          // Dosya adını belirle
+          const fileName = resource.fileName || `${resource.title}.${resource.format.toLowerCase()}`;
+          link.download = fileName;
+          
+          // Dosyayı indir
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (error) {
+          console.error('Dosya indirme hatası:', error);
+          alert(t('general.downloadError'));
         }
-        return r;
-      });
-      
-      localStorage.setItem('sharedResources', JSON.stringify(updatedResources));
-    }
-    
-    // Eğer gerçek bir URL varsa, indirme işlemi yap
-    if (resource.url && resource.url !== '#') {
-      window.open(resource.url, '_blank');
-    } else {
-      // Örnek bir dosya indirme simülasyonu
-      const link = document.createElement('a');
-      link.href = '/sample-files/sample.pdf'; // Örnek bir dosya yolu
-      link.download = `${resource.title}.${resource.format.toLowerCase()}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      } else {
+        // Dosya verisi yoksa hata mesajı göster
+        alert(t('general.fileNotFound'));
+      }
+    } catch (error) {
+      console.error('Dosya indirme hatası:', error);
+      alert(t('general.downloadError'));
     }
   };
   

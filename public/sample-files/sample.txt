@@ -1,0 +1,5 @@
+Bu bir Kavun Eğitim Platformu örnek metin dosyasıdır.
+
+Kavun Eğitim Platformu, öğrencilerin ve eğitmenlerin eğitim kaynaklarını paylaşabildiği bir platformdur.
+
+Bu dosya, metin formatında paylaşılan kaynaklar için bir örnektir.

@@ -653,9 +653,12 @@ video {
 .top-3 {
   top: 0.75rem;
 }
+<<<<<<< Updated upstream
 .right-2 {
   right: 0.5rem;
 }
+=======
+>>>>>>> Stashed changes
 .z-0 {
   z-index: 0;
 }
@@ -769,9 +772,12 @@ video {
 .mt-auto {
   margin-top: auto;
 }
+<<<<<<< Updated upstream
 .ml-4 {
   margin-left: 1rem;
 }
+=======
+>>>>>>> Stashed changes
 .line-clamp-1 {
   overflow: hidden;
   display: -webkit-box;
@@ -862,9 +868,12 @@ video {
 .h-full {
   height: 100%;
 }
+<<<<<<< Updated upstream
 .h-2 {
   height: 0.5rem;
 }
+=======
+>>>>>>> Stashed changes
 .max-h-60 {
   max-height: 15rem;
 }
@@ -2149,10 +2158,13 @@ body {
 .hover\:bg-white\/20:hover {
   background-color: rgb(255 255 255 / 0.2);
 }
+<<<<<<< Updated upstream
 .hover\:bg-\[\#FFF9F5\]:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(255 249 245 / var(--tw-bg-opacity, 1));
 }
+=======
+>>>>>>> Stashed changes
 .hover\:bg-gradient-to-r:hover {
   background-image: linear-gradient(to right, var(--tw-gradient-stops));
 }

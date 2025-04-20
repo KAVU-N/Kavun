@@ -155,9 +155,6 @@ export default function Navbar() {
 
   // İstemci tarafında render edilecek içerik
   const renderClientContent = () => {
-    // Eğer kullanıcı eğitmen rolüne sahipse ve rol tanımlıysa "İlan Ver" butonunu göster
-    // mounted kontrolüne gerek yok, çünkü bu fonksiyon zaten sadece mounted true olduğunda çağrılıyor
-    const showTeacherButton = user && typeof user.role === 'string' && (user.role === 'instructor' || user.role === 'teacher');
     
     return (
       <nav className={`w-full transition-all duration-500 ${
@@ -207,23 +204,22 @@ export default function Navbar() {
             {/* Desktop Navigation - CENTER */}
             <div className="hidden md:flex items-center justify-center flex-1">
               <div className="flex items-center space-x-1">
-                {navLinks
-                  .map((link) => (
+                {navLinks.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                      className={`group flex items-center space-x-2 px-4 py-2 rounded-xl transform transition-all duration-500 ${
                         pathname === link.href
                           ? 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md'
-                          : 'text-[#FFD6B2] hover:text-[#FFE8D8] hover:bg-[#994D1C]/70 hover:scale-105'
+                          : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
                       }`}
                     >
-                      {link.icon}
-                      <span>{link.label}</span>
+                      <div className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
+                        {link.icon}
+                      </div>
+                      <span className="relative transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all after:duration-500 group-hover:after:w-full">{link.label}</span>
                     </Link>
                   ))}
-                
-
               </div>
             </div>
 

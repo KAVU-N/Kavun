@@ -157,11 +157,28 @@ export default function KaynakPaylasPage() {
       }
       
       if (formData.resourceType === 'link' && !formData.link.trim()) {
-        throw new Error('Lütfen bir bağlantı girin');
+        throw new Error('Lütfen bir bağlantıyı girin');
       }
       
-      // Normalde burada API'ye form verilerini gönderirdik
-      // Şimdilik localStorage'a kaydediyoruz
+      // API'ye form verilerini gönderelim
+      let fileDataUrl = '';
+      
+      // Eğer dosya yüklendiyse, dosyayı Base64 formatında sakla
+      if (file && formData.resourceType === 'file') {
+        try {
+          // Dosyayı Base64 formatına dönüştür
+          fileDataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        } catch (error) {
+          console.error('Dosya okuma hatası:', error);
+          throw new Error('Dosya okunamadı. Lütfen tekrar deneyin.');
+        }
+      }
+      
       const newResource = {
         id: Date.now(),
         title: formData.title,
@@ -177,21 +194,50 @@ export default function KaynakPaylasPage() {
         viewCount: 0,
         fileSize: file ? `${(file.size / (1024 * 1024)).toFixed(2)} MB` : 'N/A',
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
-        url: formData.resourceType === 'link' ? formData.link : '#'
+        url: formData.resourceType === 'link' ? formData.link : '#',
+        fileData: fileDataUrl, // Dosya içeriği Base64 formatında
+        fileName: file ? file.name : '',
+        fileType: file ? file.type : ''
       };
       
-      // Mevcut kaynakları al
-      const existingResourcesJson = localStorage.getItem('sharedResources');
-      const existingResources = existingResourcesJson ? JSON.parse(existingResourcesJson) : [];
-      
-      // Yeni kaynağı ekle
-      const updatedResources = [newResource, ...existingResources];
-      
-      // localStorage'a kaydet
-      localStorage.setItem('sharedResources', JSON.stringify(updatedResources));
-      
-      // Simüle edilmiş gecikme
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      try {
+        // API'ye yeni kaynak eklemek için istek gönder
+        const response = await fetch('/api/resources', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newResource)
+        });
+        
+        const data = await response.json();
+        
+        // API yanıtı localStorage kullanmamızı söylüyorsa
+        if (data.message === 'localStorage') {
+          // Mevcut kaynakları al
+          const existingResourcesJson = localStorage.getItem('sharedResources');
+          const existingResources = existingResourcesJson ? JSON.parse(existingResourcesJson) : [];
+          
+          // Yeni kaynağı ekle (API'den dönen ID'yi kullan)
+          newResource.id = data.id || Date.now();
+          const updatedResources = [newResource, ...existingResources];
+          
+          // localStorage'a kaydet
+          localStorage.setItem('sharedResources', JSON.stringify(updatedResources));
+        }
+        // Eğer API veritabanına kaydetmişse, başka bir şey yapmamıza gerek yok
+      } catch (apiError) {
+        console.error('API hatası:', apiError);
+        // API hata verirse, doğrudan localStorage'a kaydet
+        const existingResourcesJson = localStorage.getItem('sharedResources');
+        const existingResources = existingResourcesJson ? JSON.parse(existingResourcesJson) : [];
+        
+        // Yeni kaynağı ekle
+        const updatedResources = [newResource, ...existingResources];
+        
+        // localStorage'a kaydet
+        localStorage.setItem('sharedResources', JSON.stringify(updatedResources));
+      }
       
       // Başarılı
       setSuccess(true);
