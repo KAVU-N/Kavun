@@ -183,8 +183,8 @@ export default function Navbar() {
                       href={link.href}
                       className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
                         pathname === link.href
-                          ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
-                          : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0] hover:scale-105'
+                          ? 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md'
+                          : 'text-[#FFD6B2] hover:text-[#FFE8D8] hover:bg-[#994D1C]/70 hover:scale-105'
                       }`}
                     >
                       {link.icon}
@@ -231,7 +231,7 @@ export default function Navbar() {
                 <div className="flex items-center space-x-4">
                   <Link
                     href="/auth/login"
-                    className="px-6 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] font-medium transition-all duration-300 hover:bg-[#FFF5F0] hover:scale-105"
+                    className="px-6 py-2 rounded-xl text-[#FFD6B2] hover:text-[#FFE8D8] font-semibold transition-all duration-300 hover:bg-[#994D1C]/80 hover:scale-105"
                   >
                     Giriş Yap
                   </Link>
