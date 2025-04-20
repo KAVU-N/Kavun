@@ -16,7 +16,6 @@ export default function IlanVerPage() {
     price: '',
     method: 'online', // 'online', 'yüzyüze' veya 'hibrit'
     duration: '',
-    frequency: 'weekly', // 'daily', 'weekly', 'monthly', 'flexible'
     instructorFrom: '', // Dersi aldığı eğitmen bilgisi
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -110,7 +109,6 @@ export default function IlanVerPage() {
         price: '',
         method: 'online',
         duration: '',
-        frequency: 'weekly',
         instructorFrom: '',
       });
       
@@ -269,24 +267,6 @@ export default function IlanVerPage() {
                 </div>
                 
                 <div>
-                  <label htmlFor="frequency" className="block text-[#6B3416] font-medium mb-2">
-                    {t('general.lessonFrequency')}
-                  </label>
-                  <select
-                    id="frequency"
-                    name="frequency"
-                    value={formData.frequency}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
-                  >
-                    <option value="daily">{t('frequency.daily')}</option>
-                    <option value="weekly">{t('frequency.weekly')}</option>
-                    <option value="monthly">{t('frequency.monthly')}</option>
-                    <option value="flexible">{t('frequency.flexible')}</option>
-                  </select>
-                </div>
-                
-                <div className="md:col-span-2">
                   <label htmlFor="instructorFrom" className="block text-[#6B3416] font-medium mb-2">
                     {t('general.instructorFrom')}
                   </label>

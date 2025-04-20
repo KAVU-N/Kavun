@@ -230,7 +230,7 @@ export default function Home() {
                 )}
               </div>
               <p className="text-xl text-[#FFD6B2] mb-8 drop-shadow">
-                {t('home.description')}
+                Kavun, aynı üniversite öğrencilerini bir araya getiren yeni nesil bir eğitim platformudur.
               </p>
               
             </div>

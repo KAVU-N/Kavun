@@ -31,6 +31,7 @@ export default function Navbar() {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [mounted, setMounted] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const profileRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { user, logout } = useAuth();
@@ -59,14 +60,16 @@ export default function Navbar() {
   useEffect(() => {
     if (!mounted) return;
     
-    // Okunmamış mesajları sadece client tarafında kontrol et
+    // Okunmamış mesajları ve bildirimleri sadece client tarafında kontrol et
     if (user) {
       checkUnreadMessages();
+      checkUnreadNotifications();
     }
     
     const interval = setInterval(() => {
       if (user) {
         checkUnreadMessages();
+        checkUnreadNotifications();
       }
     }, 60000); // Her dakika kontrol et
     
@@ -107,6 +110,32 @@ export default function Navbar() {
       }
     } catch (error) {
       console.error('Okunmamış mesajlar kontrol edilirken hata oluştu:', error);
+    }
+  };
+
+  // Okunmamış bildirimleri kontrol et
+  const checkUnreadNotifications = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      // Gerçek uygulamada API'den bildirimleri çekeceksiniz
+      // Burada örnek olarak rastgele bir sayı atıyoruz
+      // const response = await fetch('/api/notifications/unread', {
+      //   headers: {
+      //     'Authorization': `Bearer ${token}`
+      //   }
+      // });
+      //
+      // if (response.ok) {
+      //   const data = await response.json();
+      //   setUnreadNotifications(data.count || 0);
+      // }
+
+      // Örnek veri
+      setUnreadNotifications(Math.floor(Math.random() * 5)); // 0-4 arası rastgele bir sayı
+    } catch (error) {
+      console.error('Okunmamış bildirimler kontrol edilirken hata oluştu:', error);
     }
   };
 
@@ -274,6 +303,27 @@ export default function Navbar() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                           <span>{t('nav.profile')}</span>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/bildirimler"
+                        className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <div className="relative">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            {unreadNotifications > 0 && (
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                            )}
+                          </div>
+                          <span>Bildirimler</span>
+                          {unreadNotifications > 0 && (
+                            <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                              {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                            </span>
+                          )}
                         </div>
                       </Link>
                       <Link
