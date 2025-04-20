@@ -1,5 +1,15 @@
+<<<<<<< Updated upstream
 // File: C:\Users\eren\Kavun, organization\app\api\ilanlar\[id]\route.ts
 import * as entry from '../../../../../../app/api/ilanlar/[id]/route.js'
+=======
+<<<<<<<< Updated upstream:.next/types/app/api/lessons/route.ts
+// File: C:\Users\eren\Kavun, organization\app\api\lessons\route.ts
+import * as entry from '../../../../../app/api/lessons/route.js'
+========
+// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\api\ilanlar\[id]\route.ts
+import * as entry from '../../../../../../app/api/ilanlar/[id]/route.js'
+>>>>>>>> Stashed changes:.next/types/app/api/ilanlar/[id]/route.ts
+>>>>>>> Stashed changes
 import type { NextRequest } from 'next/server.js'
 
 type TEntry = typeof import('../../../../../../app/api/ilanlar/[id]/route.js')

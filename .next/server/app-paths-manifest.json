@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
   "/page": "app/page.js",
   "/ilan-ver/page": "app/ilan-ver/page.js",
@@ -7,4 +8,12 @@
   "/api/ilanlar/[id]/route": "app/api/ilanlar/[id]/route.js",
   "/api/ilanlar/route": "app/api/ilanlar/route.js",
   "/auth/verify/page": "app/auth/verify/page.js"
+=======
+  "/ilanlar/page": "app/ilanlar/page.js",
+  "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js",
+  "/api/ilanlar/[id]/route": "app/api/ilanlar/[id]/route.js",
+  "/ilan/[id]/page": "app/ilan/[id]/page.js",
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+  "/randevu-al/page": "app/randevu-al/page.js"
+>>>>>>> Stashed changes
 }

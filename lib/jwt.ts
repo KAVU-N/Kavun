@@ -5,6 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'kavun-secret-key-for-jwt-authentic
 
 export interface DecodedToken {
   id: string;
+  userId?: string;
   email: string;
   role: string;
   name?: string;

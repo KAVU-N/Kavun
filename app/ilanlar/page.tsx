@@ -41,6 +41,7 @@ export default function IlanlarPage() {
     method: '',
     priceMin: '',
     priceMax: '',
+    sortBy: 'en-yeni',
   });
   const [showFilters, setShowFilters] = useState(false);
 
@@ -125,6 +126,18 @@ export default function IlanlarPage() {
     }
     
     return true;
+  }).sort((a, b) => {
+    // Sıralama filtresi
+    if (filters.sortBy === 'en-yeni') {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    } else if (filters.sortBy === 'en-eski') {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    } else if (filters.sortBy === 'fiyat-artan') {
+      return a.price - b.price;
+    } else if (filters.sortBy === 'fiyat-azalan') {
+      return b.price - a.price;
+    }
+    return 0;
   });
 
   if (loading || !user) {
@@ -193,7 +206,21 @@ export default function IlanlarPage() {
                   <FaFilter className="mr-2" />
                   Filtreleme Seçenekleri
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-[#994D1C] mb-2">Sıralama</label>
+                    <select
+                      name="sortBy"
+                      value={filters.sortBy}
+                      onChange={handleFilterChange}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#FFB996] transition-all duration-200"
+                    >
+                      <option value="en-yeni">En Yeni</option>
+                      <option value="en-eski">En Eski</option>
+                      <option value="fiyat-artan">Fiyat (Artan)</option>
+                      <option value="fiyat-azalan">Fiyat (Azalan)</option>
+                    </select>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-[#994D1C] mb-2">Ders Yöntemi</label>
                     <select

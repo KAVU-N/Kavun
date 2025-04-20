@@ -1,8 +1,16 @@
+<<<<<<<< Updated upstream:.next/types/app/page.ts
 // File: C:\Users\eren\Kavun, organization\app\page.tsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
 type TEntry = typeof import('../../../app/page.js')
+========
+// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\randevu-al\page.tsx
+import * as entry from '../../../../app/randevu-al/page.js'
+import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
+
+type TEntry = typeof import('../../../../app/randevu-al/page.js')
+>>>>>>>> Stashed changes:.next/types/app/randevu-al/page.ts
 
 // Check that the entry is a valid entry
 checkFields<Diff<{
