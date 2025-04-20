@@ -77,16 +77,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
     }
   }, [params.id]);
 
-  // Frekans bilgisini Türkçe'ye çevir
-  const getFrequencyText = (frequency: string) => {
-    const frequencyMap: Record<string, string> = {
-      'daily': 'Günlük',
-      'weekly': 'Haftalık',
-      'monthly': 'Aylık',
-      'flexible': 'Esnek'
-    };
-    return frequencyMap[frequency] || frequency;
-  };
+
 
   if (loading || !user) {
     return (
@@ -199,10 +190,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                       <p className="text-sm font-medium text-[#994D1C] mb-1">Eğitim Aldığı Öğretmen:</p>
                       <p className="text-gray-700 font-medium">{ilan.instructorFrom || 'Belirtilmemiş'}</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">Ders Sıklığı</p>
-                      <p className="font-medium text-[#6B3416]">{getFrequencyText(ilan.frequency)}</p>
-                    </div>
+
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-sm text-gray-600 mb-1">Uzmanlık Alanı</p>
                       <p className="font-medium text-[#6B3416]">{ilan.teacher?.expertise || 'Belirtilmemiş'}</p>

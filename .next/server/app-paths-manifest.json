@@ -2,12 +2,15 @@
   "/page": "app/page.js",
   "/kaynaklar/page": "app/kaynaklar/page.js",
   "/kaynaklar/[id]/page": "app/kaynaklar/[id]/page.js",
-  "/kaynaklar/paylas/page": "app/kaynaklar/paylas/page.js",
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/derslerim/page": "app/derslerim/page.js",
-  "/egitmenler/page": "app/egitmenler/page.js",
+  "/ilanlar/page": "app/ilanlar/page.js",
   "/api/auth/login/route": "app/api/auth/login/route.js",
-  "/api/lessons/route": "app/api/lessons/route.js",
-  "/api/lessons/stats/route": "app/api/lessons/stats/route.js",
-  "/auth/login/page": "app/auth/login/page.js"
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+  "/bildirimler/page": "app/bildirimler/page.js",
+  "/api/notifications/route": "app/api/notifications/route.js",
+  "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js",
+  "/ilan/[id]/page": "app/ilan/[id]/page.js",
+  "/api/ilanlar/[id]/route": "app/api/ilanlar/[id]/route.js",
+  "/randevu-al/page": "app/randevu-al/page.js",
+  "/auth/login/page": "app/auth/login/page.js",
+  "/auth/register/page": "app/auth/register/page.js"
 }

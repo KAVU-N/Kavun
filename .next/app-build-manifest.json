@@ -1,25 +1,40 @@
 {
   "pages": {
-    "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
-    ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/derslerim/olustur/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/derslerim/olustur/page.js"
+      "static/chunks/app/page.js"
     ],
     "/kaynaklar/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/kaynaklar/page.js"
+    ],
+    "/auth/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/layout.js"
+    ],
+    "/auth/register/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/register/page.js"
+    ],
+    "/auth/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/login/page.js"
+    ],
+    "/egitmenler/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/egitmenler/page.js"
     ],
     "/kaynaklar/paylas/page": [
       "static/chunks/webpack.js",
@@ -31,26 +46,56 @@
       "static/chunks/main-app.js",
       "static/chunks/app/kaynaklar/[id]/page.js"
     ],
+    "/ilanlar/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilanlar/page.js"
+    ],
+    "/ilan/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilan/[id]/page.js"
+    ],
+    "/randevu-al/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/randevu-al/page.js"
+    ],
     "/derslerim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/derslerim/page.css",
       "static/chunks/app/derslerim/page.js"
     ],
-    "/auth/layout": [
+    "/ilanlarim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/layout.js"
+      "static/chunks/app/ilanlarim/page.js"
     ],
-    "/auth/login/page": [
+    "/ilan-ver/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/login/page.js"
+      "static/chunks/app/ilan-ver/page.js"
     ],
-    "/egitmenler/page": [
+    "/mesajlarim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/egitmenler/page.js"
+      "static/chunks/app/mesajlarim/page.js"
+    ],
+    "/profil/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/profil/page.js"
+    ],
+    "/bildirimler/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/bildirimler/page.js"
+    ],
+    "/not-found": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/not-found.js"
     ]
   }
 }

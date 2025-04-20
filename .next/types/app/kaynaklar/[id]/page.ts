@@ -1,4 +1,4 @@
-// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\kaynaklar\[id]\page.tsx
+// File: C:\Users\eren\Kavun, organization\app\kaynaklar\[id]\page.tsx
 import * as entry from '../../../../../app/kaynaklar/[id]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -46,6 +46,8 @@ export default function RandevuAlPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
+  const [lessonType, setLessonType] = useState<'individual' | 'group'>('individual');
+  const [groupSize, setGroupSize] = useState<number>(2);
   const [step, setStep] = useState(1); // 1: Tarih seçimi, 2: Saat seçimi, 3: Ödeme
   
   // Ödeme bilgileri
@@ -157,9 +159,70 @@ export default function RandevuAlPage() {
         price: ilan.price,
         duration: ilan.duration,
         method: ilan.method,
+        lessonType: lessonType,
+        groupSize: lessonType === 'group' ? groupSize : 1,
         status: 'confirmed',
         paymentStatus: 'completed'
       };
+
+      // Oluşturulacak bildirimler
+      const notifications = [
+        {
+          title: 'Yeni Ders Rezervasyonu',
+          message: `${user?.name} adlı öğrenci ${ilan.title} dersiniz için rezervasyon yaptı.`,
+          type: 'lesson_booking',
+          userId: ilan.teacher._id,
+          relatedId: appointmentData._id,
+          read: false,
+          createdAt: new Date().toISOString(),
+          actionUrl: `/derslerim/${appointmentData._id}`
+        },
+        {
+          title: 'Rezervasyon Onaylandı',
+          message: `${ilan.title} dersi için rezervasyonunuz onaylandı.`,
+          type: 'lesson_booking',
+          userId: user?.id,
+          relatedId: appointmentData._id,
+          read: false,
+          createdAt: new Date().toISOString(),
+          actionUrl: `/derslerim/${appointmentData._id}`
+        }
+      ];
+
+      try {
+        // Randevu oluştur
+        const appointmentResponse = await fetch('/api/appointments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(appointmentData)
+        });
+
+        if (!appointmentResponse.ok) {
+          throw new Error('Randevu oluşturulurken bir hata oluştu');
+        }
+
+        // Bildirimleri oluştur
+        const notificationResponse = await fetch('/api/notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ notifications })
+        });
+
+        if (!notificationResponse.ok) {
+          throw new Error('Bildirimler oluşturulurken bir hata oluştu');
+        }
+
+        setPaymentSuccess(true);
+      } catch (err: any) {
+        console.error('Randevu ve bildirim oluşturma hatası:', err);
+        setPaymentError('Randevu oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      }
       
       // Gerçek uygulamada API'ye istek atılır
       // const response = await fetch('/api/appointments', {
@@ -397,6 +460,92 @@ export default function RandevuAlPage() {
                         </button>
                       ))}
                     </div>
+
+                    {/* Ders Tipi Seçimi */}
+                    <div className="mb-6">
+                      <h3 className="font-medium text-[#6B3416] mb-3">Ders Tipi</h3>
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <button
+                          type="button"
+                          onClick={() => setLessonType('individual')}
+                          className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center ${
+                            lessonType === 'individual'
+                              ? 'border-[#FF8B5E] bg-[#FFF5F0]'
+                              : 'border-gray-200 hover:border-[#FFE5D9] hover:bg-[#FFF9F5]'
+                          }`}
+                        >
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+                            lessonType === 'individual'
+                              ? 'bg-[#FF8B5E] text-white'
+                              : 'bg-gray-200 text-gray-500'
+                          }`}>
+                            <FaChalkboardTeacher size={18} />
+                          </div>
+                          <p className="font-medium">Bireysel Ders</p>
+                          <p className="text-sm text-gray-500">Sadece sizin için</p>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setLessonType('group')}
+                          className={`p-4 rounded-lg border-2 transition-all flex flex-col items-center ${
+                            lessonType === 'group'
+                              ? 'border-[#FF8B5E] bg-[#FFF5F0]'
+                              : 'border-gray-200 hover:border-[#FFE5D9] hover:bg-[#FFF9F5]'
+                          }`}
+                        >
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+                            lessonType === 'group'
+                              ? 'bg-[#FF8B5E] text-white'
+                              : 'bg-gray-200 text-gray-500'
+                          }`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                            </svg>
+                          </div>
+                          <p className="font-medium">Grup Dersi</p>
+                          <p className="text-sm text-gray-500">Arkadaşlarınızla birlikte</p>
+                        </button>
+                      </div>
+                      
+                      {/* Grup dersi seçildiğinde kişi sayısı seçimi */}
+                      {lessonType === 'group' && (
+                        <div className="bg-[#FFF9F5] p-4 rounded-lg">
+                          <label htmlFor="groupSize" className="block text-[#6B3416] font-medium mb-2">
+                            Grup Büyüklüğü (kişi sayısı)
+                          </label>
+                          <div className="flex items-center">
+                            <button
+                              type="button"
+                              onClick={() => setGroupSize(prev => Math.max(2, prev - 1))}
+                              className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200"
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              id="groupSize"
+                              min="2"
+                              max="10"
+                              value={groupSize}
+                              onChange={(e) => setGroupSize(Math.max(2, Math.min(10, parseInt(e.target.value) || 2)))}
+                              className="w-16 mx-3 px-3 py-2 text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setGroupSize(prev => Math.min(10, prev + 1))}
+                              className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200"
+                            >
+                              +
+                            </button>
+                            <p className="ml-4 text-gray-600">kişi</p>
+                          </div>
+                          <p className="text-sm text-gray-500 mt-2">
+                            Not: Grup derslerinde kişi başı ücret, bireysel derse göre daha uygun olabilir.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="flex justify-between">
                       <button
                         onClick={handlePrevStep}
@@ -442,6 +591,8 @@ export default function RandevuAlPage() {
                             <p className="font-medium">{ilan.teacher.name}</p>
                             <p className="text-gray-500">Ders:</p>
                             <p className="font-medium">{ilan.title}</p>
+                            <p className="text-gray-500">Ders Tipi:</p>
+                            <p className="font-medium">{lessonType === 'individual' ? 'Bireysel' : `Grup (${groupSize} kişi)`}</p>
                             <p className="text-gray-500">Ücret:</p>
                             <p className="font-medium">{ilan.price} ₺</p>
                           </div>
@@ -475,6 +626,8 @@ export default function RandevuAlPage() {
                             <p className="font-medium">{ilan.teacher.name}</p>
                             <p className="text-gray-500">Ders:</p>
                             <p className="font-medium">{ilan.title}</p>
+                            <p className="text-gray-500">Ders Tipi:</p>
+                            <p className="font-medium">{lessonType === 'individual' ? 'Bireysel' : `Grup (${groupSize} kişi)`}</p>
                             <p className="text-gray-500">Toplam Tutar:</p>
                             <p className="font-bold text-[#FF8B5E]">{ilan.price} ₺</p>
                           </div>
