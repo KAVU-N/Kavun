@@ -5,12 +5,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ export default function LoginPage() {
     try {
       await login({ email, password });
     } catch (err: any) {
-      setError(err.message || 'Giriş yaparken bir hata oluştu');
+      setError(err.message || t('errors.loginError') || 'Giriş yaparken bir hata oluştu');
     } finally {
       setLoading(false);
     }
@@ -49,12 +51,12 @@ export default function LoginPage() {
       <div className="flex-1">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-[#994D1C]">
-            Giriş Yap
+            {t('auth.login')}
           </h2>
           <p className="mt-2 text-sm text-[#6B3416]">
-            Hesabınız yok mu?{' '}
+            {t('auth.noAccount')}{' '}
             <Link href="/auth/register" className="font-medium text-[#FF8B5E] hover:text-[#994D1C] transition-colors">
-              Kayıt Ol
+              {t('auth.register')}
             </Link>
           </p>
         </div>
@@ -62,7 +64,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Email
+              {t('auth.email')}
             </label>
             <input
               id="email"
@@ -75,7 +77,7 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Şifre
+              {t('auth.password')}
             </label>
             <input
               id="password"
@@ -95,7 +97,7 @@ export default function LoginPage() {
                 className="h-4 w-4 rounded border-[#FFB996] text-[#FF8B5E] focus:ring-[#FF8B5E]"
               />
               <label htmlFor="remember" className="ml-2 block text-sm text-[#6B3416]">
-                Beni Hatırla
+                {t('auth.rememberMe')}
               </label>
             </div>
 
@@ -103,7 +105,7 @@ export default function LoginPage() {
               href="/auth/forgot-password"
               className="text-sm font-medium text-[#FF8B5E] hover:text-[#994D1C] transition-colors"
             >
-              Şifremi Unuttum
+              {t('auth.forgotPassword')}
             </Link>
           </div>
 
@@ -122,7 +124,7 @@ export default function LoginPage() {
               <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
               <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
             </svg>
-            {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
+            {loading ? t('auth.loggingIn') || 'Giriş Yapılıyor...' : t('auth.login')}
           </button>
           
           <div className="mt-6">
@@ -131,7 +133,7 @@ export default function LoginPage() {
                 <div className="w-full border-t border-[#FFB996]"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-[#6B3416]">Other sign in options</span>
+                <span className="px-2 bg-white text-[#6B3416]">{t('auth.otherSignInOptions') || 'Other sign in options'}</span>
               </div>
             </div>
 

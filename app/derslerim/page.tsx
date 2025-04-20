@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
 import LessonCalendar from '@/components/calendar/LessonCalendar';
 import Link from 'next/link';
@@ -22,8 +23,9 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
   onCancelLesson,
   userRole
 }) => {
+  const { t, language } = useLanguage();
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleString('tr-TR', {
+    return new Date(date).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -34,10 +36,10 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'open': return 'Açık';
-      case 'scheduled': return 'Planlandı';
-      case 'completed': return 'Tamamlandı';
-      case 'cancelled': return 'İptal Edildi';
+      case 'open': return t('lessons.statusOpen');
+      case 'scheduled': return t('lessons.statusScheduled');
+      case 'completed': return t('lessons.statusCompleted');
+      case 'cancelled': return t('lessons.statusCancelled');
       default: return status;
     }
   };
@@ -62,14 +64,14 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
               onClick={onCompleteLesson}
               className="flex-1 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
             >
-              Dersi Tamamla
+              {t('lessons.completeLesson')}
             </button>
           )}
           <button
             onClick={onCancelLesson}
             className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
           >
-            Dersi İptal Et
+            {t('lessons.cancelLesson')}
           </button>
         </div>
       );
@@ -94,25 +96,25 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
         
         <div className="mt-4 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-gray-600 font-medium">Durum:</span>
+            <span className="text-gray-600 font-medium">{t('lessons.status')}:</span>
             <span className={`px-3 py-1 rounded-full text-sm ${getStatusClass(event.status)}`}>
               {getStatusText(event.status)}
             </span>
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-gray-600 font-medium">Başlangıç:</span>
+            <span className="text-gray-600 font-medium">{t('lessons.start')}:</span>
             <span>{formatDate(event.start)}</span>
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-gray-600 font-medium">Bitiş:</span>
+            <span className="text-gray-600 font-medium">{t('lessons.end')}:</span>
             <span>{formatDate(event.end)}</span>
           </div>
           
           <div className="flex items-center justify-between">
             <span className="text-gray-600 font-medium">
-              {userRole === 'instructor' ? 'Öğrenci:' : 'Eğitmen:'}
+              {userRole === 'instructor' ? `${t('lessons.student')}:` : `${t('lessons.instructor')}:`}
             </span>
             <span className="font-medium">
               {userRole === 'instructor' ? event.studentName : event.teacherName}
@@ -120,7 +122,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-gray-600 font-medium">Ücret:</span>
+            <span className="text-gray-600 font-medium">{t('lessons.price')}:</span>
             <span className="font-medium text-[#FF8B5E]">{event.price} TL</span>
           </div>
         </div>
@@ -132,7 +134,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
             href={`/derslerim/${event.id}`}
             className="w-full block text-center bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-medium py-2 px-4 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300"
           >
-            Ders Detaylarını Görüntüle
+            {t('lessons.viewLessonDetails')}
           </Link>
         </div>
       </div>
@@ -142,6 +144,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
 
 export default function DerslerimPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
@@ -166,7 +169,7 @@ export default function DerslerimPage() {
       
       // Kullanıcı giriş yapmamışsa yönlendir
       if (!user || !user.id) {
-        console.log('Kullanıcı girişi yapılmamış, yönlendiriliyor...');
+        console.log(t('logs.userNotLoggedIn'));
         router.push('/auth/login');
         return;
       }
@@ -174,12 +177,12 @@ export default function DerslerimPage() {
       // Token kontrolü - sadece ek güvenlik için
       const token = localStorage.getItem('token');
       if (!token) {
-        console.log('Token bulunamadı, yönlendiriliyor...');
+        console.log(t('logs.userNotLoggedIn'));
         router.push('/auth/login');
         return;
       }
       
-      console.log('Kullanıcı girişi yapılmış, ders istatistikleri getiriliyor...');
+      console.log(t('logs.fetchingLessonStats'));
       await fetchLessonStats();
     };
     
@@ -190,7 +193,7 @@ export default function DerslerimPage() {
     try {
       // Kullanıcı yoksa veya token yoksa işlem yapma
       if (!user || !user.id) {
-        console.error('Kullanıcı bilgisi bulunamadı');
+        console.error(t('errors.userInfoNotFound'));
         return;
       }
       
@@ -199,7 +202,7 @@ export default function DerslerimPage() {
       if (typeof window !== 'undefined') {
         token = localStorage.getItem('token') || '';
         if (!token) {
-          console.error('Token bulunamadı');
+          console.error(t('errors.userInfoNotFound'));
           return;
         }
       }
@@ -208,8 +211,8 @@ export default function DerslerimPage() {
         ? `/api/lessons/stats?teacherId=${user.id}` 
         : `/api/lessons/stats?studentId=${user.id}`;
       
-      console.log('API isteği gönderiliyor:', endpoint);
-      console.log('Token mevcut:', !!token);
+      console.log(t('logs.sendingApiRequest'), endpoint);
+      console.log(t('logs.tokenAvailable'), !!token);
       
       setLoading(true);
       setError(null);
@@ -224,17 +227,17 @@ export default function DerslerimPage() {
       if (response.ok) {
         const stats = await response.json();
         setLessonStats(stats);
-        console.log('Ders istatistikleri alındı:', stats);
+        console.log(t('logs.lessonStatsReceived'), stats);
       } else {
-        console.error('API hatası:', response.status, response.statusText);
+        console.error(t('errors.apiError'), response.status, response.statusText);
         const errorText = await response.text();
-        console.error('Hata detayı:', errorText);
-        setError('Ders istatistikleri alınırken bir hata oluştu');
+        console.error(t('errors.errorDetails'), errorText);
+        setError(t('errors.fetchingLessonStats'));
       }
       
       setLoading(false);
     } catch (err) {
-      console.error('Ders istatistikleri getirme hatası:', err);
+      console.error(t('errors.fetchingLessonStatsError'), err);
     }
   };
 
@@ -307,11 +310,11 @@ export default function DerslerimPage() {
   return (
     <div className="container mx-auto px-4 py-8 mt-16">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#994D1C]">Derslerim</h1>
+        <h1 className="text-3xl font-bold text-[#994D1C]">{t('lessons.myLessons')}</h1>
         <p className="text-gray-600 mt-2">
           {user.role === 'teacher'
-            ? 'Tüm derslerinizi bu sayfadan yönetebilirsiniz.'
-            : 'Kayıtlı olduğunuz tüm dersleri bu sayfadan görüntüleyebilirsiniz.'}
+            ? t('lessons.teacherManageLessons')
+            : t('lessons.studentViewLessons')}
         </p>
       </div>
       
@@ -324,26 +327,26 @@ export default function DerslerimPage() {
       {/* İstatistik Kartları */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="text-sm font-medium text-gray-500 mb-1">Toplam Ders</div>
+          <div className="text-sm font-medium text-gray-500 mb-1">{t('lessons.totalLessons')}</div>
           <div className="text-2xl font-bold text-[#994D1C]">{lessonStats.total || 0}</div>
         </div>
         <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="text-sm font-medium text-gray-500 mb-1">Planlanan Dersler</div>
+          <div className="text-sm font-medium text-gray-500 mb-1">{t('lessons.plannedLessons')}</div>
           <div className="text-2xl font-bold text-blue-600">{lessonStats.upcoming || 0}</div>
         </div>
         <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="text-sm font-medium text-gray-500 mb-1">Tamamlanan Dersler</div>
+          <div className="text-sm font-medium text-gray-500 mb-1">{t('lessons.completedLessons')}</div>
           <div className="text-2xl font-bold text-green-600">{lessonStats.completed || 0}</div>
         </div>
         <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="text-sm font-medium text-gray-500 mb-1">İptal Edilen Dersler</div>
+          <div className="text-sm font-medium text-gray-500 mb-1">{t('lessons.cancelledLessons')}</div>
           <div className="text-2xl font-bold text-red-600">{lessonStats.cancelled || 0}</div>
         </div>
       </div>
       
       {/* Takvim Görünümü */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-bold text-[#994D1C] mb-4">Ders Takvimi</h2>
+        <h2 className="text-xl font-bold text-[#994D1C] mb-4">{t('lessons.lessonCalendar')}</h2>
         <LessonCalendar onSelectEvent={handleEventSelect} />
       </div>
       

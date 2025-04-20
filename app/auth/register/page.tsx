@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { universities } from '@/data/universities';
 import { departments } from './departments';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 type Role = 'student' | 'instructor';
 
@@ -25,8 +26,10 @@ export default function RegisterPage() {
   const [selectedUniversity, setSelectedUniversity] = useState('');
   const [selectedRole, setSelectedRole] = useState<Role>(defaultRole);
   const [expertise, setExpertise] = useState('');
+  const [otherExpertise, setOtherExpertise] = useState('');
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,7 +50,7 @@ export default function RegisterPage() {
     }
     console.log("Formdan seçilen rol:", selectedRole);
     if (password !== passwordConfirm) {
-      setError('Şifreler eşleşmiyor');
+      setError(t('errors.passwordsDoNotMatch') || 'Şifreler eşleşmiyor');
       setLoading(false);
       return;
     }
@@ -55,7 +58,7 @@ export default function RegisterPage() {
       await register({ name, email, password, role: selectedRole, university, expertise: finalExpertise, grade });
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
-      setError(err.message || 'Kayıt olurken bir hata oluştu');
+      setError(err.message || t('errors.registrationError') || 'Kayıt olurken bir hata oluştu');
     } finally {
       setLoading(false);
     }
@@ -74,7 +77,7 @@ export default function RegisterPage() {
           setSelectedUniversity(universityFromParam);
         }
       } catch (error) {
-        console.error('Üniversiteler yüklenirken hata oluştu:', error);
+        console.error(t('errors.loadingUniversities') || 'Üniversiteler yüklenirken hata oluştu:', error);
       }
     };
 
@@ -100,12 +103,12 @@ export default function RegisterPage() {
       <div className="flex-1">
         <div className="mb-2">
           <h2 className="text-2xl font-bold text-[#994D1C]">
-            Kayıt Ol
+            {t('auth.register')}
           </h2>
           <p className="mt-1 text-xs text-[#6B3416]">
-            Zaten hesabınız var mı?{' '}
+            {t('auth.haveAccount')}{' '}
             <Link href="/auth/login" className="font-medium text-[#FF8B5E] hover:text-[#994D1C] transition-colors">
-              Giriş Yap
+              {t('auth.login')}
             </Link>
           </p>
         </div>
@@ -113,7 +116,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-2.5">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Ad Soyad
+              {t('auth.fullName')}
             </label>
             <input
               id="name"
@@ -126,7 +129,7 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Email
+              {t('auth.email')}
             </label>
             <input
               id="email"
@@ -139,7 +142,7 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Şifre
+              {t('auth.password')}
             </label>
             <input
               id="password"
@@ -149,12 +152,12 @@ export default function RegisterPage() {
               minLength={8}
               className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
             />
-            <p className="mt-1 text-xs text-[#6B3416]">En az 8 karakter olmalıdır</p>
+            <p className="mt-1 text-xs text-[#6B3416]">{t('auth.passwordRequirement')}</p>
           </div>
 
           <div>
             <label htmlFor="passwordConfirm" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Şifre Tekrar
+              {t('auth.confirmPassword')}
             </label>
             <input
               id="passwordConfirm"
@@ -168,7 +171,7 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="role" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Rol
+              {t('auth.role')}
             </label>
             <select
               id="role"
@@ -178,14 +181,14 @@ export default function RegisterPage() {
               onChange={(e) => setSelectedRole(e.target.value as Role)}
               className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
             >
-              <option value="student">Öğrenci</option>
-              <option value="instructor">Eğitmen</option>
+              <option value="student">{t('auth.student')}</option>
+              <option value="instructor">{t('auth.instructor')}</option>
             </select>
           </div>
 
           <div>
             <label htmlFor="university" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Üniversite
+              {t('auth.university')}
             </label>
             <div className="relative">
               <input
@@ -193,7 +196,7 @@ export default function RegisterPage() {
                 name="university"
                 type="text"
                 required
-                placeholder="Üniversitenizi seçin..."
+                placeholder={t('auth.selectUniversity')}
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -237,7 +240,7 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="expertise" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Bölümünüz
+              {t('auth.department')}
             </label>
             <div className="relative">
               <input
@@ -245,7 +248,7 @@ export default function RegisterPage() {
                 name="expertise"
                 type="text"
                 autoComplete="off"
-                placeholder="Bölümünüzü yazınız..."
+                placeholder={t('auth.departmentPlaceholder')}
                 value={expertise}
                 onChange={e => {
                   setExpertise(e.target.value);
@@ -261,12 +264,6 @@ export default function RegisterPage() {
                 <div
                   className="absolute w-full mt-1 bg-white border border-[#FFE5D9] rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto"
                 >
-                  {/*
-  Büyük/küçük harf duyarsız autocomplete için filtreleme ve seçim işlemleri:
-  - Kullanıcı input'u ile departmanlar küçük harfe çevrilerek eşleştirilir.
-  - Kullanıcı küçük harfle yazsa bile doğru departman önerisi çıkar.
-  - Seçim yapıldığında input'a orijinal (büyük harfli) departman adı yazılır.
-*/}
                   {departments.filter(dep =>
                     dep.toLocaleLowerCase('tr').includes(expertise.toLocaleLowerCase('tr'))
                   ).slice(0, 10).map((dep, idx) => (
@@ -290,22 +287,22 @@ export default function RegisterPage() {
 
           <div>
             <label htmlFor="grade" className="block text-sm font-medium text-[#6B3416] mb-1">
-              Sınıfınız
+              {t('auth.class')}
             </label>
             <select
               id="grade"
               name="grade"
               className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
             >
-              <option value="">Seçiniz</option>
-              <option value="hazirlik">Hazırlık</option>
-              <option value="1">1. Sınıf</option>
-              <option value="2">2. Sınıf</option>
-              <option value="3">3. Sınıf</option>
-              <option value="4">4. Sınıf</option>
-              <option value="5">5. Sınıf</option>
-              <option value="6">6. Sınıf</option>
-              <option value="0">Mezun</option>
+              <option value="">{t('auth.selectClass')}</option>
+              <option value="hazirlik">{t('profile.preparatory') || 'Hazırlık'}</option>
+              <option value="1">{t('profile.firstYear')}</option>
+              <option value="2">{t('profile.secondYear')}</option>
+              <option value="3">{t('profile.thirdYear')}</option>
+              <option value="4">{t('profile.fourthYear')}</option>
+              <option value="5">{t('profile.fifthYear')}</option>
+              <option value="6">{t('profile.sixthYear')}</option>
+              <option value="0">{t('profile.graduate')}</option>
             </select>
           </div>
 
@@ -320,11 +317,11 @@ export default function RegisterPage() {
             disabled={loading}
             className="w-full bg-[#FF9B6A] text-white font-semibold py-1.5 px-4 rounded-md hover:bg-[#FF8B5E] transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 mt-1"
           >
-            {loading ? 'Kayıt Yapılıyor...' : 'Kayıt Ol'}
+            {loading ? t('auth.registering') || 'Kayıt Yapılıyor...' : t('auth.register')}
           </button>
           
           <p className="mt-2 text-xs text-center text-[#6B3416]">
-            By signing up, you agree to our <a href="#" className="text-[#FF8B5E] hover:text-[#994D1C]">Terms of Use</a> and <a href="#" className="text-[#FF8B5E] hover:text-[#994D1C]">Privacy Policy</a>.
+            {t('auth.termsAgreement') || 'By signing up, you agree to our'} <a href="#" className="text-[#FF8B5E] hover:text-[#994D1C]">{t('auth.termsOfUse') || 'Terms of Use'}</a> {t('auth.and') || 'and'} <a href="#" className="text-[#FF8B5E] hover:text-[#994D1C]">{t('auth.privacyPolicy') || 'Privacy Policy'}</a>.
           </p>
         </form>
       </div>

@@ -2,6 +2,7 @@ import { Inter } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { LanguageProvider } from '@/src/contexts/LanguageContext'
 import Navbar from '@/src/components/Navbar'
 import Footer from '@/src/components/Footer'
 import Link from 'next/link'
@@ -50,38 +51,40 @@ export default function RootLayout({
       </head>
       <body className={inter.className} style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
         <AuthProvider>
-          <div className="flex flex-col min-h-screen" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
-            <Navbar />
-            <div className="flex-grow" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
-              <Toaster 
-                position="top-right"
-                toastOptions={{
-                  duration: 3000,
-                  style: {
-                    background: '#ffffff',
-                    color: '#6B3416',
-                    border: '1px solid #FFE5D9',
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: '#6B3416',
-                      secondary: '#FFF5F0',
+          <LanguageProvider>
+            <div className="flex flex-col min-h-screen" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
+              <Navbar />
+              <div className="flex-grow" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
+                <Toaster 
+                  position="top-right"
+                  toastOptions={{
+                    duration: 3000,
+                    style: {
+                      background: '#ffffff',
+                      color: '#6B3416',
+                      border: '1px solid #FFE5D9',
                     },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: '#FF8B5E',
-                      secondary: '#FFF5F0',
+                    success: {
+                      iconTheme: {
+                        primary: '#6B3416',
+                        secondary: '#FFF5F0',
+                      },
                     },
-                  },
-                }}
-              />
-              {children}
+                    error: {
+                      iconTheme: {
+                        primary: '#FF8B5E',
+                        secondary: '#FFF5F0',
+                      },
+                    },
+                  }}
+                />
+                {children}
+              </div>
+              
+              {/* Kullandığımız Footer bileşeni zaten 'use client' direktifine sahip */}
+              <Footer />
             </div>
-            
-            {/* Kullandığımız Footer bileşeni zaten 'use client' direktifine sahip */}
-            <Footer />
-          </div>
+          </LanguageProvider>
         </AuthProvider>
       </body>
     </html>
