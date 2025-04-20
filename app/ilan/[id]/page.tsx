@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher, FaCalendarAlt, FaArrowLeft } from 'react-icons/fa';
+import { FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher, FaCalendarAlt, FaArrowLeft, FaEnvelope, FaCalendarCheck } from 'react-icons/fa';
+import ChatBox from '@/src/components/ChatBox';
 
 interface Teacher {
   _id: string;
@@ -12,6 +13,7 @@ interface Teacher {
   email: string;
   university: string;
   expertise: string;
+  role: string;
 }
 
 interface Ilan {
@@ -36,6 +38,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   const [ilan, setIlan] = useState<Ilan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeChat, setActiveChat] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -230,28 +233,47 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                   </div>
                 </div>
                 
-                <div className="flex justify-center">
+                <div className="flex flex-wrap justify-center gap-3">
                   <Link 
                     href="/ilanlar"
-                    className="px-6 py-3 bg-[#FFE5D9] text-[#6B3416] rounded-lg hover:bg-[#FFDAC1] transition-colors duration-200 mr-4"
+                    className="px-6 py-3 bg-[#FFE5D9] text-[#6B3416] rounded-lg hover:bg-[#FFDAC1] transition-colors duration-200"
                   >
                     Tüm İlanlara Dön
                   </Link>
                   <button 
-                    onClick={() => {
-                      // Burada mesaj gönderme işlemi yapılabilir
-                      alert('Bu özellik henüz aktif değil. Yakında eklenecektir.');
-                    }}
-                    className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg hover:shadow-md transition-all duration-300"
+                    onClick={() => setActiveChat(true)}
+                    className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg hover:shadow-md transition-all duration-300 flex items-center"
                   >
+                    <FaEnvelope className="mr-2" />
                     Eğitmene Mesaj Gönder
                   </button>
+                  <Link 
+                    href={`/randevu-al?ilanId=${ilan?._id}&teacherId=${ilan?.teacher?._id}`}
+                    className="px-6 py-3 bg-gradient-to-r from-[#4CAF50] to-[#2E7D32] text-white rounded-lg hover:shadow-md transition-all duration-300 flex items-center"
+                  >
+                    <FaCalendarCheck className="mr-2" />
+                    Randevu Al
+                  </Link>
                 </div>
               </div>
             </div>
           )}
         </div>
       </div>
+      
+    {/* Sohbet kutusu */}
+    {activeChat && ilan?.teacher && (
+      <ChatBox 
+        instructor={{
+          _id: ilan.teacher._id,
+          name: ilan.teacher.name,
+          email: ilan.teacher.email,
+          university: ilan.teacher.university,
+          role: 'instructor'
+        }} 
+        onClose={() => setActiveChat(false)} 
+      />
+    )}
     </div>
   );
 }
