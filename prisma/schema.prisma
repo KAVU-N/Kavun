@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -13,25 +14,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      String   @default("student")
-  university String?
-  grade     Int?
-  isVerified Boolean @default(false)
-  expertise  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Resource {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  url         String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String   @db.Text
+  author        String
+  category      String
+  format        String
+  level         String?
+  university    String?
+  department    String?
+  fileSize      String?
+  tags          String[] @default([])
+  url           String?
+  fileData      String?  @db.Text // Base64 formatında dosya verisi
+  fileName      String?
+  fileType      String?
+  downloadCount Int      @default(0)
+  viewCount     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([category])
+  @@index([university])
+  @@index([format])
 }
