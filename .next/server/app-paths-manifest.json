@@ -1,6 +1,8 @@
 {
-  "/api/resources/route": "app/api/resources/route.js",
+  "/not-found": "app/not-found.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/kaynaklar/page": "app/kaynaklar/page.js",
-  "/kaynaklar/paylas/page": "app/kaynaklar/paylas/page.js"
+  "/bildirimler/page": "app/bildirimler/page.js",
+  "/profil/page": "app/profil/page.js",
+  "/api/notifications/route": "app/api/notifications/route.js",
+  "/auth/login/page": "app/auth/login/page.js"
 }

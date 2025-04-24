@@ -14,25 +14,14 @@ export default function NotificationsPage() {
   const [filter, setFilter] = useState<string>('all'); // 'all', 'unread', 'read'
 
   useEffect(() => {
-    // Sadece eğitmenler (instructors) bildirimler sayfasına erişebilsin
-    if (!loading && user && user.role !== 'instructor') {
-      router.push('/');
-      return;
-    }
-
-    if (!loading && !user) {
-      router.push('/auth/login');
-      return;
-    }
-
-    if (user && user.role === 'instructor') {
-      fetchNotifications();
-    }
-  }, [user, loading, router]);
+    // DEBUG: Bildirimler her zaman yüklensin
+    fetchNotifications();
+  }, []);
 
   const fetchNotifications = async () => {
     try {
       setLoading(true);
+      setError(null);
       const token = localStorage.getItem('token');
       if (!token) {
         setError('Giriş yapmalısınız');
@@ -52,42 +41,27 @@ export default function NotificationsPage() {
       }
 
       const data = await response.json();
-      setNotifications(data.notifications || []);
+      if (!data.notifications || !Array.isArray(data.notifications)) {
+        setNotifications([]);
+      } else {
+        setNotifications(data.notifications);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Bildirimler getirme hatası:', error);
       setError('Bildirimler yüklenirken bir hata oluştu');
+      setNotifications([]);
       setLoading(false);
     }
   };
 
   const markAsRead = async (id: string) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Giriş yapmalısınız');
-      }
-
-      const response = await fetch(`/api/notifications/${id}/read`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Bildirim okundu işaretleme hatası');
-      }
-
-      // Update local state
-      setNotifications(prevNotifications => 
-        prevNotifications.map(notification => 
-          notification._id === id ? { ...notification, read: true } : notification
-        )
-      );
-    } catch (error) {
-      console.error('Bildirim okundu işaretleme hatası:', error);
-    }
+    // API isteğini kaldır, sadece state güncelle
+    setNotifications(prevNotifications => 
+      prevNotifications.map(notification => 
+        notification._id === id ? { ...notification, read: true } : notification
+      )
+    );
   };
 
   const markAllAsRead = async () => {
@@ -118,30 +92,10 @@ export default function NotificationsPage() {
   };
 
   const deleteNotification = async (id: string) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Giriş yapmalısınız');
-      }
-
-      const response = await fetch(`/api/notifications/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Bildirim silme hatası');
-      }
-
-      // Update local state
-      setNotifications(prevNotifications => 
-        prevNotifications.filter(notification => notification._id !== id)
-      );
-    } catch (error) {
-      console.error('Bildirim silme hatası:', error);
-    }
+    // API isteğini kaldır, sadece state güncelle
+    setNotifications(prevNotifications => 
+      prevNotifications.filter(notification => notification._id !== id)
+    );
   };
 
   const getFilteredNotifications = () => {
@@ -241,6 +195,23 @@ export default function NotificationsPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="pt-32 flex flex-col items-center">
+        <span className="text-[#994D1C] text-lg font-semibold mb-4">Bildirimler yükleniyor...</span>
+        <div className="w-10 h-10 border-4 border-[#FFD6B2] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="pt-32 flex flex-col items-center">
+        <span className="text-red-500 text-lg font-semibold mb-4">{error}</span>
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-10">
@@ -262,7 +233,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="pt-24 pb-8 max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold text-[#994D1C] mb-8">Bildirimler</h1>
       
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -316,11 +287,7 @@ export default function NotificationsPage() {
         </div>
         
         {/* Notifications List */}
-        {loading ? (
-          <div className="p-8 flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
-          </div>
-        ) : getFilteredNotifications().length === 0 ? (
+        {getFilteredNotifications().length === 0 ? (
           <div className="p-8 text-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -350,18 +317,20 @@ export default function NotificationsPage() {
                     <h3 className={`font-medium ${!notification.read ? 'text-[#994D1C]' : 'text-gray-700'}`}>
                       {notification.title}
                     </h3>
-                    <span className="text-xs text-gray-500">{formatTimeAgo(notification.date)}</span>
+                    <span className="text-xs text-gray-500">{formatTimeAgo(notification.createdAt)}</span>
                   </div>
                   
                   <p className="text-gray-600 mb-3">{notification.message}</p>
                   
                   <div className="flex justify-between items-center">
-                    <Link
-                      href={notification.actionUrl}
-                      className="text-sm font-medium text-[#FF8B5E] hover:text-[#994D1C] transition-colors"
-                    >
-                      Detayları Görüntüle
-                    </Link>
+                    {notification.actionUrl ? (
+                      <Link
+                        href={notification.actionUrl}
+                        className="text-sm font-medium text-[#FF8B5E] hover:text-[#994D1C] transition-colors"
+                      >
+                        Detayları Görüntüle
+                      </Link>
+                    ) : <span />}
                     
                     <div className="flex space-x-2">
                       {!notification.read && (

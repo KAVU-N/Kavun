@@ -211,7 +211,9 @@ export default function Navbar() {
                       className={`group flex items-center space-x-2 px-4 py-2 rounded-xl transform transition-all duration-500 ${
                         pathname === link.href
                           ? 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md'
-                          : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
+                          : (link.href === '/ilanlar' || link.href === '/kaynaklar')
+                            ? 'text-[#994D1C] font-semibold hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
+                            : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
                       }`}
                     >
                       <div className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
@@ -355,12 +357,10 @@ export default function Navbar() {
                             href="/ilanlarim"
                             className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                           >
-                            <div className="flex items-center space-x-2">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                              <span>{t('nav.myListings')}</span>
-                            </div>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            <span>{t('nav.myListings')}</span>
                           </Link>
 
                         </>
@@ -454,7 +454,7 @@ export default function Navbar() {
                   <Link
                     href="/auth/register"
                     className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
-                      transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 text-center"
+                      transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {t('nav.register')}

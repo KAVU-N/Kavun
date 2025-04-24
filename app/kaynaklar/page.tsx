@@ -43,6 +43,7 @@ const academicLevels = [
 
 // Kaynak tipi tanımlama
 type Resource = {
+  _id?: string;
   id: number;
   title: string;
   description: string;
@@ -53,6 +54,7 @@ type Resource = {
   department: string;
   academicLevel: string;
   uploadDate: string;
+  createdAt: string;
   downloadCount: number;
   viewCount: number;
   fileSize: string;
@@ -192,13 +194,16 @@ export default function KaynaklarPage() {
   // Tarihi formatla
   const formatDate = (dateString: string): string => {
     if (!dateString) return '-';
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return '-';
-    return new Intl.DateTimeFormat(language === 'tr' ? 'tr-TR' : 'en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date);
+    // Eğer dateString yoksa veya boşsa, createdAt kullan
+    const date = dateString !== '-' ? new Date(dateString) : null;
+    if (date && !isNaN(date.getTime())) {
+      return new Intl.DateTimeFormat(language === 'tr' ? 'tr-TR' : 'en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(date);
+    }
+    return '-';
   };
   
   // Türkçe karakterler için özel dönüşüm fonksiyonu
@@ -417,7 +422,7 @@ export default function KaynaklarPage() {
       ) : filteredResources.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredResources.map((resource) => (
-            <div key={resource.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+            <div key={resource._id || resource.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-lg font-semibold text-[#994D1C] line-clamp-2">{resource.title}</h3>
@@ -443,7 +448,11 @@ export default function KaynaklarPage() {
                 
                 <div className="flex justify-between items-center text-xs text-[#6B3416] mb-3">
                   <div>{resource.author}</div>
-                  <div>{formatDate(resource.uploadDate)}</div>
+                  <div>
+                    <span className="text-xs text-gray-500">
+                      {formatDate(resource.uploadDate || resource.createdAt)}
+                    </span>
+                  </div>
                 </div>
                 
                 <div className="flex justify-between items-center text-xs text-[#6B3416] mb-4">
@@ -464,11 +473,10 @@ export default function KaynaklarPage() {
                 </div>
                 
                 <div className="flex justify-between gap-2">
-                  <Link
-                    href={`/kaynaklar/${resource.id}`}
-                    className="flex-1 px-4 py-2 bg-[#FFF5F0] text-[#994D1C] text-center rounded-lg border border-[#FFB996] hover:bg-[#FFE5D9] transition-colors duration-300 text-sm"
-                  >
-                    {t('general.resourceView')}
+                  <Link key={resource._id || resource.id} href={`/kaynaklar/${resource._id || resource.id}`}>
+                    <div className="flex-1 px-4 py-2 bg-[#FFF5F0] text-[#994D1C] text-center rounded-lg border border-[#FFB996] hover:bg-[#FFE5D9] transition-colors duration-300 text-sm">
+                      {t('general.resourceView')}
+                    </div>
                   </Link>
                   <button
                     onClick={async () => {
