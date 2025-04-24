@@ -128,9 +128,10 @@ export async function POST(req: Request) {
     // JWT token oluştur
     const token = jwt.sign(
       { 
-        userId: user._id ? user._id.toString() : '',
+        id: user._id ? user._id.toString() : '', 
         email: user.email,
-        role: user.role
+        role: user.role,
+        name: user.name 
       },
       process.env.JWT_SECRET || 'default-secret',
       { expiresIn: '7d' }
