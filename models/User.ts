@@ -16,6 +16,7 @@ export interface IUser extends Document {
   resetPasswordExpires?: Date;
   expertise?: string; // Okuduğu bölüm
   createdAt: Date;
+  welcomeNotificationDeleted: boolean;
 }
 
 // Şema tanımı
@@ -80,6 +81,10 @@ const userSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  welcomeNotificationDeleted: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true,

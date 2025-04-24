@@ -56,12 +56,27 @@ export default function NotificationsPage() {
   };
 
   const markAsRead = async (id: string) => {
-    // API isteğini kaldır, sadece state güncelle
-    setNotifications(prevNotifications => 
-      prevNotifications.map(notification => 
-        notification._id === id ? { ...notification, read: true } : notification
-      )
-    );
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      // API'ye PUT isteği gönder
+      await fetch('/api/notifications', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ id })
+      });
+      // State'i güncelle
+      setNotifications(prevNotifications => 
+        prevNotifications.map(notification => 
+          notification._id === id ? { ...notification, read: true } : notification
+        )
+      );
+    } catch (error) {
+      console.error('Okundu işaretleme hatası:', error);
+    }
   };
 
   const markAllAsRead = async () => {
@@ -92,10 +107,23 @@ export default function NotificationsPage() {
   };
 
   const deleteNotification = async (id: string) => {
-    // API isteğini kaldır, sadece state güncelle
-    setNotifications(prevNotifications => 
-      prevNotifications.filter(notification => notification._id !== id)
-    );
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      await fetch('/api/notifications', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ id })
+      });
+      setNotifications(prevNotifications => 
+        prevNotifications.filter(notification => notification._id !== id)
+      );
+    } catch (error) {
+      console.error('Bildirim silme hatası:', error);
+    }
   };
 
   const getFilteredNotifications = () => {
