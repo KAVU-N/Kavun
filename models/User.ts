@@ -15,6 +15,7 @@ export interface IUser extends Document {
   resetPasswordCode?: string;
   resetPasswordExpires?: Date;
   expertise?: string; // Okuduğu bölüm
+  profilePhotoUrl?: string; // Profil fotoğrafı URL'si
   createdAt: Date;
   welcomeNotificationDeleted: boolean;
 }
@@ -82,9 +83,15 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now
   },
+<<<<<<< Updated upstream
   welcomeNotificationDeleted: {
     type: Boolean,
     default: false
+=======
+  profilePhotoUrl: {
+    type: String,
+    default: ''
+>>>>>>> Stashed changes
   }
 }, {
   timestamps: true,

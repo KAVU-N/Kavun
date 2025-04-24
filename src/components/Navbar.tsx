@@ -265,33 +265,32 @@ export default function Navbar() {
               {user && (
                 <div className="relative" ref={profileRef}>
                   <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                      isProfileOpen ? 'bg-[#FFF5F0] text-[#6B3416] shadow-sm' : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0] hover:scale-105'
-                    }`}
-                  >
-                    <div className="relative w-8 h-8 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center transform transition-all duration-300 hover:rotate-6">
-                      <span className="text-white font-medium">{user.name.charAt(0).toUpperCase()}</span>
-                      {unreadMessages > 0 && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
-                          {unreadMessages > 9 ? '9+' : unreadMessages}
-                        </div>
-                      )}
-                    </div>
-                    <span className="font-medium">{user.name}</span>
-                    <svg
-                      className={`w-4 h-4 transition-transform duration-300 ${isProfileOpen ? 'transform rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
+  onClick={() => setIsProfileOpen(!isProfileOpen)}
+  className={
+    `flex items-center p-0 rounded-full transition-all duration-300 border-2 border-[#e4e2f5] shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#FFB996]`
+  }
+  style={{ width: 48, height: 48 }}
+>
+  <div className={`relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden ${user.profilePhotoUrl ? '' : 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E]'}`}>
+    {user.profilePhotoUrl ? (
+      <img
+        src={user.profilePhotoUrl}
+        alt={user.name}
+        className="w-full h-full object-cover aspect-square rounded-full"
+        style={{objectFit:'cover'}}
+      />
+    ) : (
+      <span className="text-white font-semibold text-lg select-none">
+        {user.name.charAt(0).toUpperCase()}
+      </span>
+    )}
+
+  </div>
+</button>
                   
                   {/* Profile Dropdown */}
                   {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9]">
+                    <div className="absolute right-32 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9]">
                       <Link
                         href="/profil"
                         className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"

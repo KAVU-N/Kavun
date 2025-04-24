@@ -64,7 +64,7 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         user: {
-          id: user._id.toString(),
+          id: (user._id as any).toString(),
           name: user.name,
           email: user.email,
           role: user.role,

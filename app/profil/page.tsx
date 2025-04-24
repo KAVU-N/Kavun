@@ -49,15 +49,46 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#FFF5F0] pt-20">
       <div className="max-w-4xl mx-auto px-6">
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#FFE5D9]">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-[#6B3416]">{t('profile.profileInfo')}</h1>
-            <Link 
-              href="/profil/duzenle" 
-              className="px-4 py-2 bg-[#FF9B6A] text-white rounded-lg hover:bg-[#FF8B5E] transition-colors font-medium"
-            >
-              {t('profile.editProfile')}
-            </Link>
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#EEE8FC]">
+          {/* Modern üst blok */}
+          <div className="flex flex-col md:flex-row items-center justify-between mb-8">
+            <div className="mb-6 md:mb-0">
+              <div className="text-xs tracking-widest text-[#6B3416] font-semibold uppercase mb-1">{user.role === 'student' ? t('auth.student') : t('auth.instructor')}</div>
+              <div className="text-2xl md:text-3xl font-bold text-[#6B3416]">{user.name}</div>
+            </div>
+            <div className="flex flex-col items-center bg-white rounded-2xl shadow-md p-8 border border-[#EEE8FC]">
+              {/* Profil fotoğrafı yükleme alanı */}
+              <div className="relative flex flex-col items-center mb-4">
+                <label htmlFor="profile-photo-upload" className="cursor-pointer group">
+                  <div className="w-24 h-24 rounded-full bg-[#191921] flex items-center justify-center text-white text-4xl font-bold border-4 border-[#FF9B6A] group-hover:opacity-80 transition-all duration-200" style={{letterSpacing: '2px'}}>
+                    {(user as any).profilePhotoUrl ? (
+                      <img src={(user as any).profilePhotoUrl} alt="Profil Fotoğrafı" className="w-full h-full object-cover rounded-full" />
+                    ) : (
+                      user.name?.[0]?.toUpperCase() || 'U'
+                    )}
+                  </div>
+                  <input id="profile-photo-upload" type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function(loadEvt) {
+                      // Sadece önizleme için local state'e base64 olarak ekle
+                      setProfileUser((prev: any) => ({ ...prev, profilePhotoUrl: loadEvt.target?.result }));
+                    };
+                    reader.readAsDataURL(file);
+                  }} />
+                  <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-[#FF9B6A] text-white w-7 h-7 flex items-center justify-center rounded-full shadow-sm opacity-90 cursor-pointer text-xl font-bold">
+                    +
+                  </div>
+                </label>
+              </div>
+              <Link 
+                href="/profil/duzenle" 
+                className="px-4 py-2 border border-[#FF9B6A] text-[#FF9B6A] rounded-lg hover:bg-[#FF9B6A] hover:text-white transition-colors font-medium text-sm mt-4"
+              >
+                ✏ Edit profile
+              </Link>
+            </div>
           </div>
           
           <div className="space-y-6">

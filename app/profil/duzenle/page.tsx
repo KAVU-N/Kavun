@@ -1,16 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Cropper from 'react-easy-crop';
+import Modal from 'react-modal';
+import getCroppedImg from './utils/cropImage'; // Kırpma yardımcı fonksiyonu (aşağıda eklenecek)
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ProfileEditPage() {
+  // --- Crop modal state ---
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
   const { user, loading, setUser } = useAuth();
   const router = useRouter();
   
   const [expertise, setExpertise] = useState('');
   const [grade, setGrade] = useState<number | undefined>(undefined);
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -25,6 +34,7 @@ export default function ProfileEditPage() {
       // Mevcut kullanıcı bilgilerini form alanlarına doldur
       setExpertise(user.expertise || '');
       setGrade(user.grade);
+      setProfilePhoto((user as any).profilePhotoUrl || null);
     }
   }, [user, loading, router]);
 
@@ -47,6 +57,25 @@ export default function ProfileEditPage() {
         return;
       }
       
+      let uploadedPhotoUrl = profilePhoto;
+      // Eğer yeni bir fotoğraf seçildiyse ve base64 ise upload et
+      if (profilePhoto && profilePhoto.startsWith('data:')) {
+        const uploadRes = await fetch('/api/upload/profile-photo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            image: profilePhoto,
+            userId: user.id
+          })
+        });
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) throw new Error(uploadData.error || 'Fotoğraf yüklenemedi');
+        uploadedPhotoUrl = uploadData.url;
+      }
+
       const response = await fetch('/api/auth/update-profile', {
         method: 'PUT',
         headers: {
@@ -56,7 +85,8 @@ export default function ProfileEditPage() {
         body: JSON.stringify({
           userId: user.id,
           expertise,
-          grade: grade === undefined ? undefined : Number(grade)
+          grade: grade === undefined ? undefined : Number(grade),
+          profilePhotoUrl: uploadedPhotoUrl
         })
       });
       
@@ -133,6 +163,98 @@ export default function ProfileEditPage() {
           )}
           
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="mb-8">
+  <h2 className="text-xl font-semibold text-[#6B3416] mb-1">Photo</h2>
+  <p className="text-sm text-gray-500 mb-4">Add a nice photo of yourself for your profile.</p>
+  <div className="flex flex-col items-center">
+    <div className="border-2 border-[#E4E2F5] rounded-xl bg-[#FFF5F0] p-4 mb-4 w-[340px] h-[340px] flex items-center justify-center">
+      {profilePhoto ? (
+        <img src={profilePhoto} alt="Image preview" className="w-full h-full object-cover rounded-xl" />
+      ) : (
+        <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+          <span className="text-7xl mb-4">📷</span>
+          <span className="text-base">Image preview</span>
+        </div>
+      )}
+    </div>
+    <label htmlFor="profile-photo-upload" className="mb-2">
+      <span className="text-sm text-[#6B3416] font-medium cursor-pointer underline">Add / Change Image</span>
+      <input
+        id="profile-photo-upload"
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function(loadEvt) {
+            setProfilePhoto(loadEvt.target?.result as string);
+          };
+          reader.readAsDataURL(file);
+        }}
+      />
+    </label>
+    <button
+      type="button"
+      className="mb-4 px-4 py-1.5 border border-[#A259FF] text-[#A259FF] rounded-md hover:bg-[#F5F0FF] transition-all text-sm font-medium"
+      onClick={() => setShowCropModal(true)}
+      disabled={!profilePhoto}
+    >
+      Crop image
+    </button>
+
+    {/* Crop Modal */}
+    <Modal
+      isOpen={showCropModal}
+      onRequestClose={() => setShowCropModal(false)}
+      contentLabel="Crop Image"
+      ariaHideApp={false}
+      style={{
+        overlay: { backgroundColor: 'rgba(0,0,0,0.5)' },
+        content: { maxWidth: 400, margin: 'auto', borderRadius: 16, padding: 0 }
+      }}
+    >
+      <div className="p-4">
+        <h2 className="text-lg font-bold mb-4">Crop Image</h2>
+        <div className="relative w-[320px] h-[320px] bg-gray-100 rounded-lg overflow-hidden">
+          {profilePhoto && (
+            <Cropper
+              image={profilePhoto}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              cropShape="rect"
+              showGrid={true}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={(_, croppedAreaPixels) => setCroppedAreaPixels(croppedAreaPixels)}
+            />
+          )}
+        </div>
+        <div className="flex justify-end gap-2 mt-4">
+          <button
+            className="px-4 py-1.5 rounded-md bg-gray-100 text-[#6B3416] hover:bg-gray-200"
+            onClick={() => setShowCropModal(false)}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-1.5 rounded-md bg-[#A259FF] text-white hover:bg-[#7B32B1]"
+            onClick={async () => {
+              if (!profilePhoto || !croppedAreaPixels) return;
+              const cropped = await getCroppedImg(profilePhoto, croppedAreaPixels, zoom, 1);
+              setProfilePhoto(cropped);
+              setShowCropModal(false);
+            }}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </Modal>
+  </div>
+</div>
             <div>
               <label htmlFor="expertise" className="block text-sm font-medium text-[#6B3416] mb-1">
                 Okuduğu Bölüm

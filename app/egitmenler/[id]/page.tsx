@@ -172,8 +172,12 @@ export default function EgitmenProfilPage({ params }: PageProps) {
         <div className="md:col-span-1">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="p-6 text-center">
-              <div className="w-24 h-24 rounded-full bg-[#FFB996] flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
-                {teacher.name?.charAt(0) || '?'}
+              <div className="w-24 h-24 rounded-full bg-[#FFB996] flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 overflow-hidden">
+                {teacher.profilePhotoUrl ? (
+                  <img src={teacher.profilePhotoUrl} alt={teacher.name || 'Eğitmen'} className="w-full h-full object-cover rounded-full" />
+                ) : (
+                  teacher.name?.charAt(0) || '?'
+                )}
               </div>
               <h1 className="text-2xl font-bold text-[#994D1C] mb-2">{teacher.name || 'İsimsiz Öğretmen'}</h1>
               
