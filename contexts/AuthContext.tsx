@@ -118,7 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (result.user.role === 'student') {
         router.push('/egitmenler');
       } else {
-        router.push('/');
+      router.push('/');
       }
     } catch (err: any) {
       setError(err.message);

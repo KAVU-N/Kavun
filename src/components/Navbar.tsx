@@ -45,7 +45,7 @@ export default function Navbar() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     
     // Okunmamış mesajları kontrol et
@@ -156,29 +156,29 @@ export default function Navbar() {
   // İstemci tarafında render edilecek içerik
   const renderClientContent = () => {
     
-    return (
-      <nav className={`w-full transition-all duration-500 ${
-        isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'
-      }`}>
-        <div className="mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo - LEFT */}
-            <div className="flex-shrink-0">
-              <Link href="/" className="flex items-center space-x-2 group">
-                <Image
-                  src="/logo.png"
-                  alt="Kavun Logo"
-                  width={40}
-                  height={40}
-                  className="mr-2"
-                />
-                <span className={`text-2xl font-bold transition-all duration-300 ${
-                  isScrolled ? 'text-[#6B3416]' : 'text-[#994D1C]'
-                } group-hover:text-[#FF8B5E]`}>
-                  KAVUN
-                </span>
-              </Link>
-            </div>
+  return (
+        <nav className={`w-full transition-all duration-500 ${
+          isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'
+        }`}>
+          <div className="mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              {/* Logo - LEFT */}
+              <div className="flex-shrink-0">
+                <Link href="/" className="flex items-center space-x-2 group">
+                  <Image
+                    src="/logo.png"
+                    alt="Kavun Logo"
+                    width={40}
+                    height={40}
+                    className="mr-2"
+                  />
+                  <span className={`text-2xl font-bold transition-all duration-300 ${
+                    isScrolled ? 'text-[#6B3416]' : 'text-[#994D1C]'
+                  } group-hover:text-[#FF8B5E]`}>
+                    KAVUN
+                  </span>
+                </Link>
+              </div>
 
             {/* Mobile Menu Button - Only visible when menu is closed */}
             {!isMenuOpen && (
@@ -201,30 +201,30 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Desktop Navigation - CENTER */}
-            <div className="hidden md:flex items-center justify-center flex-1">
-              <div className="flex items-center space-x-1">
+              {/* Desktop Navigation - CENTER */}
+              <div className="hidden md:flex items-center justify-center flex-1">
+                <div className="flex items-center space-x-1">
                 {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
+                      <Link
+                        key={link.href}
+                        href={link.href}
                       className={`group flex items-center space-x-2 px-4 py-2 rounded-xl transform transition-all duration-500 ${
-                        pathname === link.href
+                          pathname === link.href
                           ? 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md'
                           : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
-                      }`}
-                    >
+                        }`}
+                      >
                       <div className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
                         {link.icon}
                       </div>
                       <span className="relative transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all after:duration-500 group-hover:after:w-full">{link.label}</span>
-                    </Link>
-                  ))}
+                      </Link>
+                    ))}
+                </div>
               </div>
-            </div>
 
-            {/* Profile/Auth Section - RIGHT */}
-            <div className="hidden md:flex items-center justify-end space-x-4">
+              {/* Profile/Auth Section - RIGHT */}
+              <div className="hidden md:flex items-center justify-end space-x-4">
               {/* Dil Değiştirme Butonu */}
               <div className="flex items-center space-x-1 mr-2">
                 <button
@@ -242,62 +242,62 @@ export default function Navbar() {
                 </button>
               </div>
               
-              {!user && (
-                <div className="flex items-center space-x-4">
-                  <Link
-                    href="/auth/login"
+                {!user && (
+                  <div className="flex items-center space-x-4">
+                    <Link
+                      href="/auth/login"
                     className="px-6 py-2 rounded-xl text-[#FFD6B2] hover:text-[#FFE8D8] font-semibold transition-all duration-300 hover:bg-[#994D1C]/80 hover:scale-105"
-                  >
-                    {t('nav.login')}
-                  </Link>
-                  <Link
-                    href="/auth/register"
-                    className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
-                      transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
-                  >
-                    {t('nav.register')}
-                  </Link>
-                </div>
-              )}
-              
-              {user && (
-                <div className="relative" ref={profileRef}>
-                  <button
-                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                      isProfileOpen ? 'bg-[#FFF5F0] text-[#6B3416] shadow-sm' : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0] hover:scale-105'
-                    }`}
-                  >
-                    <div className="relative w-8 h-8 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center transform transition-all duration-300 hover:rotate-6">
-                      <span className="text-white font-medium">{user.name.charAt(0).toUpperCase()}</span>
-                      {unreadMessages > 0 && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
-                          {unreadMessages > 9 ? '9+' : unreadMessages}
-                        </div>
-                      )}
-                    </div>
-                    <span className="font-medium">{user.name}</span>
-                    <svg
-                      className={`w-4 h-4 transition-transform duration-300 ${isProfileOpen ? 'transform rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  
-                  {/* Profile Dropdown */}
-                  {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9]">
-                      <Link
-                        href="/profil"
-                        className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                    {t('nav.login')}
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
+                        transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
+                    >
+                    {t('nav.register')}
+                    </Link>
+                  </div>
+                )}
+                
+                {user && (
+                  <div className="relative" ref={profileRef}>
+                    <button
+                      onClick={() => setIsProfileOpen(!isProfileOpen)}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                        isProfileOpen ? 'bg-[#FFF5F0] text-[#6B3416] shadow-sm' : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0] hover:scale-105'
+                      }`}
+                    >
+                      <div className="relative w-8 h-8 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center transform transition-all duration-300 hover:rotate-6">
+                        <span className="text-white font-medium">{user.name.charAt(0).toUpperCase()}</span>
+                        {unreadMessages > 0 && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
+                            {unreadMessages > 9 ? '9+' : unreadMessages}
+                          </div>
+                        )}
+                      </div>
+                      <span className="font-medium">{user.name}</span>
+                      <svg
+                        className={`w-4 h-4 transition-transform duration-300 ${isProfileOpen ? 'transform rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <div className="flex items-center space-x-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {/* Profile Dropdown */}
+                    {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9]">
+                        <Link
+                          href="/profil"
+                          className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
                           <span>{t('nav.profile')}</span>
                         </div>
                       </Link>
@@ -320,21 +320,21 @@ export default function Navbar() {
                               {unreadNotifications > 9 ? '9+' : unreadNotifications}
                             </span>
                           )}
-                        </div>
-                      </Link>
-                      <Link
-                        href="/mesajlarim"
-                        className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <div className="relative">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                            </svg>
-                            {unreadMessages > 0 && (
-                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-                            )}
                           </div>
+                        </Link>
+                        <Link
+                          href="/mesajlarim"
+                          className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <div className="relative">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                              </svg>
+                              {unreadMessages > 0 && (
+                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                              )}
+                            </div>
                           <span>{t('nav.messages')}</span>
                         </div>
                       </Link>
@@ -360,27 +360,27 @@ export default function Navbar() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
                               <span>{t('nav.myListings')}</span>
-                            </div>
-                          </Link>
+                          </div>
+                        </Link>
 
                         </>
                       )}
-                      <button
-                        onClick={logout}
-                        className="w-full text-left px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                          </svg>
+                        <button
+                          onClick={logout}
+                          className="w-full text-left px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
                           <span>{t('nav.logout')}</span>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                          </div>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
             {/* Eski hamburger menü düğmesi kaldırıldı */}
           </div>
@@ -390,38 +390,38 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden bg-white shadow-lg rounded-b-xl overflow-hidden">
             <div className="flex justify-end px-4 pt-2">
-              <button
+                <button
                 onClick={() => setIsMenuOpen(false)}
-                className="p-2 rounded-xl transition-all duration-300"
-              >
-                <svg className="w-6 h-6 text-[#994D1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  className="p-2 rounded-xl transition-all duration-300"
+                >
+                  <svg className="w-6 h-6 text-[#994D1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                  </svg>
+                </button>
             </div>
-            <div className="px-4 py-3 space-y-1">
-              {navLinks
-                .map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                      pathname === link.href
-                        ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
-                        : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0]'
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.icon}
-                    <span>{link.label}</span>
-                  </Link>
-                ))}
-              
+              <div className="px-4 py-3 space-y-1">
+                {navLinks
+                  .map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                        pathname === link.href
+                          ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
+                          : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0]'
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {link.icon}
+                      <span>{link.label}</span>
+                    </Link>
+                  ))}
+                
               {mounted && user && (user.role === 'instructor' || user.role === 'teacher') && (
                 <>
                   <Link
@@ -442,51 +442,51 @@ export default function Navbar() {
                 </>
               )}
               
-              {!user ? (
-                <div className="flex flex-col space-y-2 mt-4">
-                  <Link
-                    href="/auth/login"
-                    className="px-6 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] font-medium transition-all duration-300 hover:bg-[#FFF5F0] text-center"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
+                {!user ? (
+                  <div className="flex flex-col space-y-2 mt-4">
+                    <Link
+                      href="/auth/login"
+                      className="px-6 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] font-medium transition-all duration-300 hover:bg-[#FFF5F0] text-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
                     {t('nav.login')}
-                  </Link>
-                  <Link
-                    href="/auth/register"
-                    className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
-                      transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 text-center"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
+                        transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 text-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
                     {t('nav.register')}
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-2 mt-4 border-t border-[#FFE5D9] pt-4">
-                  <Link
-                    href="/profil"
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span>Profilim</span>
-                  </Link>
-                  <Link
-                    href="/mesajlarim"
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <div className="relative">
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2 mt-4 border-t border-[#FFE5D9] pt-4">
+                    <Link
+                      href="/profil"
+                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      {unreadMessages > 0 && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-                      )}
-                    </div>
-                    <span>Mesajlarım</span>
-                  </Link>
+                      <span>Profilim</span>
+                    </Link>
+                    <Link
+                      href="/mesajlarim"
+                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <div className="relative">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                        {unreadMessages > 0 && (
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                        )}
+                      </div>
+                      <span>Mesajlarım</span>
+                    </Link>
                   <Link
                     href="/derslerim"
                     className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
@@ -521,24 +521,24 @@ export default function Navbar() {
                       </Link>
                     </>
                   )}
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0] text-left"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Çıkış Yap</span>
-                  </button>
-                </div>
-              )}
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0] text-left"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      <span>Çıkış Yap</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-      </nav>
+          )}
+        </nav>
     );
   };
 

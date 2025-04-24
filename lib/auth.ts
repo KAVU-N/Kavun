@@ -101,3 +101,4 @@ export async function verifyUser(token: string): Promise<any> {
     throw error;
   }
 }
+ 
