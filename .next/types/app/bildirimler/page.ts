@@ -1,16 +1,8 @@
-<<<<<<<< Updated upstream:.next/types/app/bildirimler/page.ts
-// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\bildirimler\page.tsx
+// File: C:\Users\eren\Kavun, organization\app\bildirimler\page.tsx
 import * as entry from '../../../../app/bildirimler/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
 type TEntry = typeof import('../../../../app/bildirimler/page.js')
-========
-// File: C:\Users\eren\Kavun, organization\app\profil\duzenle\page.tsx
-import * as entry from '../../../../../app/profil/duzenle/page.js'
-import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
-
-type TEntry = typeof import('../../../../../app/profil/duzenle/page.js')
->>>>>>>> Stashed changes:.next/types/app/profil/duzenle/page.ts
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

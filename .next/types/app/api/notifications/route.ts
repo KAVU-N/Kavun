@@ -1,16 +1,8 @@
-<<<<<<<< Updated upstream:.next/types/app/api/notifications/route.ts
-// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\api\notifications\route.ts
+// File: C:\Users\eren\Kavun, organization\app\api\notifications\route.ts
 import * as entry from '../../../../../app/api/notifications/route.js'
 import type { NextRequest } from 'next/server.js'
 
 type TEntry = typeof import('../../../../../app/api/notifications/route.js')
-========
-// File: C:\Users\eren\Kavun, organization\app\api\auth\update-profile\route.ts
-import * as entry from '../../../../../../app/api/auth/update-profile/route.js'
-import type { NextRequest } from 'next/server.js'
-
-type TEntry = typeof import('../../../../../../app/api/auth/update-profile/route.js')
->>>>>>>> Stashed changes:.next/types/app/api/auth/update-profile/route.ts
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

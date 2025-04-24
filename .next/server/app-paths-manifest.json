@@ -1,6 +1,12 @@
 {
-  "/bildirimler/page": "app/bildirimler/page.js",
+  "/not-found": "app/not-found.js",
   "/page": "app/page.js",
+  "/bildirimler/page": "app/bildirimler/page.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/api/notifications/route": "app/api/notifications/route.js"
+  "/api/notifications/route": "app/api/notifications/route.js",
+  "/kaynaklar/page": "app/kaynaklar/page.js",
+  "/api/resources/route": "app/api/resources/route.js",
+  "/kaynaklar/paylas/page": "app/kaynaklar/paylas/page.js",
+  "/kaynaklar/[id]/page": "app/kaynaklar/[id]/page.js",
+  "/api/resources/[id]/route": "app/api/resources/[id]/route.js"
 }
