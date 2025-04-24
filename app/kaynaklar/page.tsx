@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 // Kaynak kategorileri
@@ -65,7 +66,8 @@ type Resource = {
 
 export default function KaynaklarPage() {
   const { t, language } = useLanguage();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [resources, setResources] = useState<Resource[]>([]);
   const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,6 +83,20 @@ export default function KaynaklarPage() {
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/auth/login');
+    }
+  }, [authLoading, user, router]);
+
+  if (authLoading || !user) {
+    return (
+      <div className="container mx-auto px-4 py-16 flex justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
+      </div>
+    );
+  }
 
   // Dropdown dışına tıklandığında kapat
   useEffect(() => {

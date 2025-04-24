@@ -11,7 +11,6 @@ exports.id = "vendor-chunks/ms";
 exports.ids = ["vendor-chunks/ms"];
 exports.modules = {
 
-<<<<<<< Updated upstream
 /***/ "(ssr)/./node_modules/ms/index.js":
 /*!**********************************!*\
   !*** ./node_modules/ms/index.js ***!
@@ -22,8 +21,6 @@ eval("/**\r\n * Helpers.\r\n */ \nvar s = 1000;\nvar m = s * 60;\nvar h = m * 60
 
 /***/ }),
 
-=======
->>>>>>> Stashed changes
 /***/ "(rsc)/./node_modules/ms/index.js":
 /*!**********************************!*\
   !*** ./node_modules/ms/index.js ***!
