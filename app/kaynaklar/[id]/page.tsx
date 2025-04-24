@@ -8,6 +8,7 @@ import Link from 'next/link';
 
 // Kaynak tipi tanımlama
 type Resource = {
+  _id?: string;
   id: number;
   title: string;
   description: string;
@@ -18,6 +19,7 @@ type Resource = {
   university: string;
   department: string;
   uploadDate: string;
+  createdAt: string;
   downloadCount: number;
   viewCount: number;
   fileSize: string;
@@ -42,6 +44,11 @@ export default function KaynakDetayPage() {
   
   // Kaynağı getir
   useEffect(() => {
+    if (!resourceId || resourceId === 'undefined') {
+      setError('Kaynak ID bulunamadı.');
+      setLoading(false);
+      return;
+    }
     const fetchResource = async () => {
       setLoading(true);
       try {
@@ -108,9 +115,7 @@ export default function KaynakDetayPage() {
       }
     };
 
-    if (resourceId) {
-      fetchResource();
-    }
+    fetchResource();
   }, [resourceId]);
   
   // Görüntülenme sayısı otomatik olarak API tarafında artırılıyor
@@ -185,7 +190,9 @@ export default function KaynakDetayPage() {
   
   // Tarihi formatla
   const formatDate = (dateString: string): string => {
+    if (!dateString) return '-';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-';
     return new Intl.DateTimeFormat(language === 'tr' ? 'tr-TR' : 'en-US', {
       year: 'numeric',
       month: 'long',
@@ -249,7 +256,7 @@ export default function KaynakDetayPage() {
               </div>
               
               <div className="flex flex-wrap gap-2 mb-4">
-                {resource.tags.map((tag, index) => (
+                {(resource.tags || []).map((tag, index) => (
                   <span key={index} className="bg-[#FFE5D9] text-[#994D1C] text-xs px-2 py-1 rounded-full">
                     {tag}
                   </span>
@@ -280,8 +287,8 @@ export default function KaynakDetayPage() {
                 <span className="font-medium">{t('general.resourceLevel')}:</span> {resource.level}
               </div>
               
-              <div className="text-sm text-[#6B3416]">
-                <span className="font-medium">{t('general.resourceDate')}:</span> {formatDate(resource.uploadDate)}
+              <div className="text-sm text-[#6B3416] mb-2">
+                <span className="font-medium">{t('general.resourceDate')}:</span> <span className="text-xs text-gray-500">{formatDate(resource?.uploadDate || resource?.createdAt)}</span>
               </div>
             </div>
             
@@ -361,14 +368,14 @@ export default function KaynakDetayPage() {
                   <p className="text-sm text-[#6B3416] mb-3 line-clamp-2">{related.description}</p>
                   
                   <div className="flex flex-wrap gap-1 mb-3">
-                    {related.tags.slice(0, 3).map((tag, index) => (
+                    {(related.tags || []).slice(0, 3).map((tag, index) => (
                       <span key={index} className="bg-[#FFE5D9] text-[#994D1C] text-xs px-2 py-1 rounded-full">
                         {tag}
                       </span>
                     ))}
-                    {related.tags.length > 3 && (
+                    {(related.tags || []).length > 3 && (
                       <span className="bg-[#FFE5D9] text-[#994D1C] text-xs px-2 py-1 rounded-full">
-                        +{related.tags.length - 3}
+                        +{(related.tags || []).length - 3}
                       </span>
                     )}
                   </div>
