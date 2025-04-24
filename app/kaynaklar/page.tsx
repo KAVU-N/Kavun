@@ -99,47 +99,21 @@ export default function KaynaklarPage() {
   // Kaynakları getir
   useEffect(() => {
     const fetchResources = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        // Önce API'ye istek gönder (bu, ileride veritabanı bağlantısı kurulduğunda çalışacak)
         const response = await fetch('/api/resources');
+        if (!response.ok) throw new Error('API hatası');
         const data = await response.json();
-        
-        // API yanıtı localStorage kullanmamızı söylüyorsa
-        if (data.message === 'localStorage') {
-          // localStorage'dan kaynakları al
-          const storedResources = localStorage.getItem('sharedResources');
-          if (storedResources) {
-            const parsedResources = JSON.parse(storedResources) as Resource[];
-            setResources(parsedResources);
-          } else {
-            setResources([]);
-          }
-        } else {
-          // Eğer API veritabanından veri döndüyse, doğrudan kullan
-          setResources(data);
-        }
+        setResources(data);
       } catch (error) {
         console.error('Kaynaklar yüklenirken hata:', error);
         setError('Kaynaklar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
-        
-        // Hata durumunda localStorage'dan okumayı dene
-        try {
-          const storedResources = localStorage.getItem('sharedResources');
-          if (storedResources) {
-            const parsedResources = JSON.parse(storedResources) as Resource[];
-            setResources(parsedResources);
-          } else {
-            setResources([]);
-          }
-        } catch (localError) {
-          console.error('localStorage\'dan okuma hatası:', localError);
-          setResources([]);
-        }
+        setResources([]);
       } finally {
         setLoading(false);
       }
     };
-    
     fetchResources();
   }, []);
 
@@ -217,7 +191,9 @@ export default function KaynaklarPage() {
 
   // Tarihi formatla
   const formatDate = (dateString: string): string => {
+    if (!dateString) return '-';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '-';
     return new Intl.DateTimeFormat(language === 'tr' ? 'tr-TR' : 'en-US', {
       year: 'numeric',
       month: 'long',
@@ -506,31 +482,6 @@ export default function KaynaklarPage() {
                           body: JSON.stringify({ action: 'download' })
                         });
                         const data = await response.json();
-                        
-                        // API yanıtı localStorage kullanmamızı söylüyorsa
-                        if (data.message === 'localStorage') {
-                          // localStorage'dan kaynakları al ve indirme sayısını artır
-                          const storedResources = localStorage.getItem('sharedResources');
-                          if (storedResources) {
-                            const parsedResources = JSON.parse(storedResources) as Resource[];
-                            const resourceIndex = parsedResources.findIndex(r => r.id === resource.id);
-                            
-                            if (resourceIndex !== -1) {
-                              // İndirme sayısını artır
-                              parsedResources[resourceIndex].downloadCount = (parsedResources[resourceIndex].downloadCount || 0) + 1;
-                              localStorage.setItem('sharedResources', JSON.stringify(parsedResources));
-                              
-                              // Sayfayı yenilemeden görüntülenen kaynakları güncelle
-                              setFilteredResources(prevResources => 
-                                prevResources.map(r => 
-                                  r.id === resource.id 
-                                    ? {...r, downloadCount: r.downloadCount + 1} 
-                                    : r
-                                )
-                              );
-                            }
-                          }
-                        }
                         
                         // Kaynak URL'sini kontrol et
                         if (resource.url && resource.url !== '#') {
