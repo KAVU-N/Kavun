@@ -108,7 +108,7 @@ export async function GET(request: Request) {
     const ilanlarWithTeachers = await Promise.all(
       ilanlar.map(async (ilan) => {
         const teacher = await User.findOne({ _id: ilan.userId })
-          .select('name email university expertise');
+          .select('name email university expertise profilePhotoUrl');
         
         return {
           ...ilan.toObject(),

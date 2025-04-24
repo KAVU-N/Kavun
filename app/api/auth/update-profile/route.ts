@@ -48,7 +48,7 @@ export async function PUT(req: Request) {
     }
 
     // Request body'i parse et
-    const { userId, expertise, grade } = await req.json();
+    const { userId, expertise, grade, profilePhotoUrl } = await req.json();
 
     // Kullanıcı ID kontrolü
     if (decoded.userId !== userId) {
@@ -91,6 +91,10 @@ export async function PUT(req: Request) {
       user.grade = grade;
     }
 
+    if (profilePhotoUrl !== undefined) {
+      user.profilePhotoUrl = profilePhotoUrl;
+    }
+
     // Değişiklikleri kaydet
     await user.save();
 
@@ -105,7 +109,8 @@ export async function PUT(req: Request) {
           university: user.university,
           expertise: user.expertise,
           grade: user.grade,
-          isVerified: user.isVerified
+          isVerified: user.isVerified,
+          profilePhotoUrl: user.profilePhotoUrl
         },
         message: 'Profil bilgileri başarıyla güncellendi'
       },

@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     const jwt = await import('jsonwebtoken');
     const token = jwt.default.sign(
       { 
-        userId: user._id.toString(),
+        userId: (user._id as any).toString(),
         email: user.email,
         role: user.role
       },
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
 
     // Kullanıcı bilgilerini hazırla
     const userData = {
-      id: user._id.toString(),
+      id: (user._id as any).toString(),
       name: user.name,
       email: user.email,
       role: user.role,
