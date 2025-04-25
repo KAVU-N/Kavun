@@ -93,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       const result = await response.json();
+      console.log('LOGIN API yanıtı:', result);
 
       // Kullanıcı kayıtlı ama email doğrulanmamış
       if (response.status === 403 && result.needsVerification) {
@@ -111,7 +112,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Only access localStorage on client-side
       if (typeof window !== 'undefined') {
         localStorage.setItem('user', JSON.stringify(result.user));
+        console.log('TOKEN localStorage öncesi:', result.token);
         localStorage.setItem('token', result.token);
+        console.log('TOKEN localStorage sonrası:', localStorage.getItem('token'));
       }
 
       // Redirect student users to instructors page, others to home page

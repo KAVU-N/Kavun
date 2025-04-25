@@ -14,6 +14,7 @@ interface Teacher {
   university: string;
   expertise: string;
   grade?: number; // Kaçıncı sınıf olduğu bilgisi
+  profilePhotoUrl?: string;
 }
 
 interface Ilan {
@@ -154,9 +155,19 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               
               {/* Eğitmen Bilgisi */}
               <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white text-xl font-bold mr-4">
-                  {ilan.teacher?.name.charAt(0).toUpperCase()}
-                </div>
+                {ilan.teacher?.profilePhotoUrl ? (
+                  <Image
+                    src={ilan.teacher.profilePhotoUrl}
+                    alt={ilan.teacher.name + ' profil fotoğrafı'}
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 rounded-full object-cover mr-4"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white text-xl font-bold mr-4">
+                    {ilan.teacher?.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div>
                   <h2 className="text-xl font-semibold text-[#6B3416]">{ilan.teacher?.name}</h2>
                   <p className="text-[#994D1C]">{ilan.teacher?.grade ? `${ilan.teacher.grade}. Sınıf` : ''} {ilan.teacher?.expertise || 'Belirtilmemiş'}</p>

@@ -46,14 +46,20 @@ export default function Navbar() {
       setIsScrolled(window.scrollY > 10);
     };
     
-    window.addEventListener('scroll', handleScroll);
+    if (typeof window !== "undefined") {
+      window.addEventListener('scroll', handleScroll);
+    }
     
     // Okunmamış mesajları kontrol et
-    if (mounted && user) {
+    if (typeof window !== "undefined" && mounted && user) {
       checkUnreadMessages();
     }
     
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener('scroll', handleScroll);
+      }
+    };
   }, [user]);
 
   // Scroll ve mesaj kontrolü için effect
@@ -86,9 +92,14 @@ export default function Navbar() {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    if (typeof window !== "undefined") {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      if (typeof window !== "undefined") {
+        document.removeEventListener('mousedown', handleClickOutside);
+      }
     };
   }, [mounted]);
 
@@ -159,7 +170,7 @@ export default function Navbar() {
     return (
       <nav className={`w-full transition-all duration-500 ${
         isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'
-      }`}>
+      }`} suppressHydrationWarning>
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo - LEFT */}
@@ -205,23 +216,35 @@ export default function Navbar() {
             <div className="hidden md:flex items-center justify-center flex-1">
               <div className="flex items-center space-x-1">
                 {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={`group flex items-center space-x-2 px-4 py-2 rounded-xl transform transition-all duration-500 ${
-                        pathname === link.href
-                          ? 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md'
-                          : (link.href === '/ilanlar' || link.href === '/kaynaklar')
-                            ? 'text-[#994D1C] font-semibold hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
-                            : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
-                      }`}
-                    >
-                      <div className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
-                        {link.icon}
-                      </div>
-                      <span className="relative transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all after:duration-500 group-hover:after:w-full">{link.label}</span>
-                    </Link>
-                  ))}
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`group flex items-center space-x-2 px-4 py-2 rounded-xl transform transition-all duration-500 ${
+                      pathname === link.href
+                        ? 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md'
+                        : (link.href === '/ilanlar' || link.href === '/kaynaklar')
+                          ? 'text-[#994D1C] font-semibold hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
+                          : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
+                    }`}
+                  >
+                    <div className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
+                      {link.icon}
+                    </div>
+                    <span className="relative transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all after:duration-500 group-hover:after:w-full">{link.label}</span>
+                  </Link>
+                ))}
+                {/* Eğitmen ise İlan Ver butonu */}
+                {mounted && user && (user.role === 'instructor' || user.role === 'teacher') && (
+                  <Link
+                    href="/ilan-ver"
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md ml-2 hover:scale-105 transition-transform`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>{t('nav.createListing')}</span>
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -265,32 +288,21 @@ export default function Navbar() {
               {user && (
                 <div className="relative" ref={profileRef}>
                   <button
-  onClick={() => setIsProfileOpen(!isProfileOpen)}
-  className={
-    `flex items-center p-0 rounded-full transition-all duration-300 border-2 border-[#e4e2f5] shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#FFB996]`
-  }
-  style={{ width: 48, height: 48 }}
->
-  <div className={`relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden ${user.profilePhotoUrl ? '' : 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E]'}`}>
-    {user.profilePhotoUrl ? (
-      <img
-        src={user.profilePhotoUrl}
-        alt={user.name}
-        className="w-full h-full object-cover aspect-square rounded-full"
-        style={{objectFit:'cover'}}
-      />
-    ) : (
-      <span className="text-white font-semibold text-lg select-none">
-        {user.name.charAt(0).toUpperCase()}
-      </span>
-    )}
-
-  </div>
-</button>
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className={
+                      `flex items-center p-0 rounded-full transition-all duration-300 border-2 border-[#e4e2f5] shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#FFB996]`
+                    }
+                  >
+                    <div className={`relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-r from-[#FFB996] to-[#FF8B5E]`}>
+                      <span className="text-white font-semibold text-lg select-none">
+                        {user.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  </button>
                   
                   {/* Profile Dropdown */}
                   {isProfileOpen && (
-                    <div className="absolute right-32 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9]">
+                    <div className="fixed right-2 top-20 mt-2 w-64 max-w-xs bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9]" style={{minWidth: '12rem', maxWidth: '95vw', right: 'min(0.5rem, calc(100vw - 270px))'}}>
                       <Link
                         href="/profil"
                         className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
@@ -309,7 +321,12 @@ export default function Navbar() {
                         <div className="flex items-center space-x-2">
                           <div className="relative">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                              />
                             </svg>
                             {unreadNotifications > 0 && (
                               <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>

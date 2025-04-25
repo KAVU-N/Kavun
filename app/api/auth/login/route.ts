@@ -158,7 +158,8 @@ export async function POST(req: Request) {
       university: user.university,
       expertise: user.expertise,
       grade: user.grade,
-      isVerified: user.isVerified
+      isVerified: user.isVerified,
+      profilePhotoUrl: user.profilePhotoUrl
     };
 
     // Kullanıcı bilgilerini döndür

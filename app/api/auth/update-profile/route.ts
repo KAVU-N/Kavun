@@ -34,7 +34,7 @@ export async function PUT(req: Request) {
     const token = authHeader.split(' ')[1];
     const decoded = await verifyToken(token);
     
-    if (!decoded || !decoded.userId) {
+    if (!decoded || !(decoded.userId || decoded.id)) {
       return NextResponse.json(
         { error: 'Geçersiz token' },
         { 
@@ -49,9 +49,10 @@ export async function PUT(req: Request) {
 
     // Request body'i parse et
     const { userId, expertise, grade, profilePhotoUrl } = await req.json();
+    const userIdFromToken = decoded.userId || decoded.id;
 
     // Kullanıcı ID kontrolü
-    if (decoded.userId !== userId) {
+    if (userIdFromToken !== userId) {
       return NextResponse.json(
         { error: 'Yetkilendirme hatası' },
         { 
@@ -126,7 +127,7 @@ export async function PUT(req: Request) {
   } catch (error: any) {
     console.error('Profil güncelleme hatası:', error);
     return NextResponse.json(
-      { error: 'Profil güncellenirken bir hata oluştu' },
+      { error: error?.message || 'Profil güncellenirken bir hata oluştu', stack: error?.stack },
       { 
         status: 500,
         headers: {

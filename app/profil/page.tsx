@@ -59,28 +59,13 @@ export default function ProfilePage() {
             <div className="flex flex-col items-center bg-white rounded-2xl shadow-md p-8 border border-[#EEE8FC]">
               {/* Profil fotoğrafı yükleme alanı */}
               <div className="relative flex flex-col items-center mb-4">
-                <label htmlFor="profile-photo-upload" className="cursor-pointer group">
-                  <div className="w-24 h-24 rounded-full bg-[#191921] flex items-center justify-center text-white text-4xl font-bold border-4 border-[#FF9B6A] group-hover:opacity-80 transition-all duration-200" style={{letterSpacing: '2px'}}>
-                    {(user as any).profilePhotoUrl ? (
-                      <img src={(user as any).profilePhotoUrl} alt="Profil Fotoğrafı" className="w-full h-full object-cover rounded-full" />
-                    ) : (
-                      user.name?.[0]?.toUpperCase() || 'U'
-                    )}
-                  </div>
-                  <input id="profile-photo-upload" type="file" accept="image/*" className="hidden" onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = function(loadEvt) {
-                      // Sadece önizleme için local state'e base64 olarak ekle
-                      setProfileUser((prev: any) => ({ ...prev, profilePhotoUrl: loadEvt.target?.result }));
-                    };
-                    reader.readAsDataURL(file);
-                  }} />
-                  <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-[#FF9B6A] text-white w-7 h-7 flex items-center justify-center rounded-full shadow-sm opacity-90 cursor-pointer text-xl font-bold">
-                    +
-                  </div>
-                </label>
+                <div className="w-24 h-24 rounded-full bg-[#191921] flex items-center justify-center text-white text-4xl font-bold border-4 border-[#FF9B6A]" style={{letterSpacing: '2px'}}>
+                  {(user as any).profilePhotoUrl ? (
+                    <img src={(user as any).profilePhotoUrl} alt="Profil Fotoğrafı" className="w-full h-full object-cover rounded-full" />
+                  ) : (
+                    user.name?.[0]?.toUpperCase() || 'U'
+                  )}
+                </div>
               </div>
               <Link 
                 href="/profil/duzenle" 
@@ -90,7 +75,34 @@ export default function ProfilePage() {
               </Link>
             </div>
           </div>
-          
+
+          {/* Hesap Durumu sadece burada */}
+          <div className="mb-6">
+            <h2 className="text-sm font-medium text-[#994D1C]">Hesap Durumu</h2>
+            <div className="mt-1 text-lg text-[#6B3416] flex items-center gap-4">
+              {user.isVerified ? (
+                <span className="text-green-600 font-semibold">Doğrulanmış</span>
+              ) : (
+                <>
+                  <span className="text-red-600 font-semibold">Doğrulanmamış</span>
+                  <button
+                    className="ml-2 px-3 py-1 bg-[#FF9B6A] text-white rounded-md hover:bg-[#FF8B5E] transition-all text-sm font-semibold"
+                    onClick={async () => {
+                      await fetch('/api/auth/send-verification', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: user.email })
+                      });
+                      router.push('/auth/verify');
+                    }}
+                  >
+                    Doğrula
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
           <div className="space-y-6">
             <div>
               <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.fullName')}</h2>
@@ -135,18 +147,6 @@ export default function ProfilePage() {
                    `${user.grade}. ${t('profile.class')}`) 
                   : t('general.notSpecified') || 'Belirtilmemiş'}
               </p>
-            </div>
-
-            <div>
-              <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.accountStatus')}</h2>
-              <div className={`mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                ${user.isVerified 
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-yellow-100 text-yellow-800'
-                }`}
-              >
-                {user.isVerified ? t('profile.verified') : t('profile.unverified')}
-              </div>
             </div>
           </div>
         </div>
