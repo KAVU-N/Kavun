@@ -6,7 +6,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: 'student' | 'instructor';
+  role: 'student' | 'instructor' | 'teacher';
   university: string;
   grade?: number; // Kaçıncı sınıf olduğu bilgisi
   isVerified: boolean;
@@ -52,7 +52,7 @@ const userSchema = new Schema({
     type: String,
     required: [true, 'Rol alanı zorunludur'],
     enum: {
-      values: ['student', 'instructor'],
+      values: ['student', 'instructor', 'teacher'],
       message: 'Geçerli bir rol seçiniz'
     }
   },

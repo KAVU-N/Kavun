@@ -26,7 +26,7 @@ export default function IlanVerPage() {
   useEffect(() => {
     if (!loading && !user) {
       router.push('/auth/login');
-    } else if (!loading && user && user.role !== 'instructor') {
+    } else if (!loading && user && user.role !== 'instructor' && user.role !== 'teacher') {
       router.push('/');
     }
   }, [user, loading, router]);
@@ -150,7 +150,7 @@ export default function IlanVerPage() {
   }
   
   // Kullanıcı giriş yapmamış veya eğitmen değilse içeriği gösterme
-  if (!user || user.role !== 'instructor') {
+  if (!user || user.role !== 'instructor' && user.role !== 'teacher') {
     return (
       <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
         <div className="container mx-auto px-4">

@@ -53,6 +53,8 @@ const userSchema = new mongoose.Schema({
   role: String,
   university: String,
   expertise: String,
+  profilePhotoUrl: String,
+  grade: String,
 });
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
@@ -84,7 +86,8 @@ export async function GET(
     
     // İlanı veren öğretmenin bilgilerini getir
     const teacher = await User.findOne({ _id: ilan.userId })
-      .select('name email university expertise');
+      .select('name email university expertise profilePhotoUrl grade');
+    console.log('API DEBUG - Teacher:', teacher);
     
     // İlan ve öğretmen bilgilerini birleştir
     const ilanWithTeacher = {

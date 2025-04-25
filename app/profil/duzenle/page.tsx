@@ -17,8 +17,6 @@ export default function ProfileEditPage() {
   const { user, loading, setUser } = useAuth();
   const router = useRouter();
   
-  const [expertise, setExpertise] = useState('');
-  const [grade, setGrade] = useState<number | undefined>(undefined);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -32,8 +30,6 @@ export default function ProfileEditPage() {
     
     if (user) {
       // Mevcut kullanıcı bilgilerini form alanlarına doldur
-      setExpertise(user.expertise || '');
-      setGrade(user.grade);
       setProfilePhoto((user as any).profilePhotoUrl || null);
     }
   }, [user, loading, router]);
@@ -74,6 +70,8 @@ export default function ProfileEditPage() {
         const uploadData = await uploadRes.json();
         if (!uploadRes.ok) throw new Error(uploadData.error || 'Fotoğraf yüklenemedi');
         uploadedPhotoUrl = uploadData.url;
+        // Fotoğraf yüklendikten sonra state'i sadece URL ile güncelle
+        setProfilePhoto(uploadData.url);
       }
 
       const response = await fetch('/api/auth/update-profile', {
@@ -84,9 +82,7 @@ export default function ProfileEditPage() {
         },
         body: JSON.stringify({
           userId: user.id,
-          expertise,
-          grade: grade === undefined ? undefined : Number(grade),
-          profilePhotoUrl: uploadedPhotoUrl
+          profilePhotoUrl: uploadedPhotoUrl && !uploadedPhotoUrl.startsWith('data:') ? uploadedPhotoUrl : undefined
         })
       });
       
@@ -255,40 +251,6 @@ export default function ProfileEditPage() {
     </Modal>
   </div>
 </div>
-            <div>
-              <label htmlFor="expertise" className="block text-sm font-medium text-[#6B3416] mb-1">
-                Okuduğu Bölüm
-              </label>
-              <input
-                id="expertise"
-                type="text"
-                value={expertise}
-                onChange={(e) => setExpertise(e.target.value)}
-                placeholder="Örn: Bilgisayar Mühendisliği, Psikoloji, Tıp..."
-                className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="grade" className="block text-sm font-medium text-[#6B3416] mb-1">
-                Kaçıncı Sınıf
-              </label>
-              <select
-                id="grade"
-                value={grade === undefined ? '' : grade}
-                onChange={(e) => setGrade(e.target.value ? Number(e.target.value) : undefined)}
-                className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
-              >
-                <option value="">Seçiniz</option>
-                <option value="1">1. Sınıf</option>
-                <option value="2">2. Sınıf</option>
-                <option value="3">3. Sınıf</option>
-                <option value="4">4. Sınıf</option>
-                <option value="5">5. Sınıf</option>
-                <option value="6">6. Sınıf</option>
-                <option value="0">Mezun</option>
-              </select>
-            </div>
             
             <div className="pt-4">
               <button
