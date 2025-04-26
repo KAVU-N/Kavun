@@ -209,7 +209,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.mainTitle': 'İhtiyacına en uygun öğrencileri bul, hemen öğrenmeye başla!',
     'home.showAllUniversities': 'Tüm üniversiteleri göster',
     'home.selectUniversity': 'Üniversitenizi seçin...',
-    'home.description': 'Kavun, öğrencileri eğitmenlerle buluşturan ve eğitimin geleceğini şekillendiren platform.',
+    'home.description': 'Kavun, aynı üniversite öğrencilerini bir araya getiren yeni nesil bir eğitim platformudur.',
     'home.exploreCourses': 'Kursları Keşfet',
     'home.howToContinue': 'Nasıl devam etmek istersiniz?',
     'home.continueAsStudent': 'Öğrenci Olarak Devam Et',
@@ -371,6 +371,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.language': 'Language',
     
     // General
+    'home.description': 'Kavun is a next-generation education platform that brings together students from the same university.',
     'general.search': 'Search',
     'general.filter': 'Filter',
     'general.filters': 'Filters',
@@ -543,7 +544,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.mainTitle': 'Find the students that best suit your needs, start learning now!',
     'home.showAllUniversities': 'Show all universities',
     'home.selectUniversity': 'Select your university...',
-    'home.description': 'Kavun is a next-generation education platform that brings together students and instructors. Find students that suit your needs or join our platform as students.',
+    'home.description': 'Kavun is a next-generation education platform that brings together students from the same university.',
     'home.exploreCourses': 'Explore Courses',
     'home.howToContinue': 'How would you like to continue?',
     'home.continueAsStudent': 'Continue as Student',

@@ -34,12 +34,7 @@ const formats = [
 import { universities } from '@/data/universities';
 
 // Akademik seviye seçenekleri
-const academicLevels = [
-  'Hepsi',
-  'Lisans',
-  'Yüksek Lisans',
-  'Doktora'
-];
+// academicLevels will be defined inside the component below.
 
 // Kaynak tipi tanımlama
 type Resource = {
@@ -67,6 +62,9 @@ type Resource = {
 
 export default function KaynaklarPage() {
   const { t, language } = useLanguage();
+  const academicLevels = language === 'en'
+    ? ['All', 'Bachelors', 'Masters', 'PhD']
+    : ['Hepsi', 'Lisans', 'Yüksek Lisans', 'Doktora'];
   const { user } = useAuth();
   const [resources, setResources] = useState<Resource[]>([]);
   const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
@@ -153,8 +151,11 @@ export default function KaynaklarPage() {
     }
     
     // Akademik seviyeye göre filtrele
-    if (selectedAcademicLevel !== 'Hepsi') {
-      result = result.filter(resource => resource.academicLevel === selectedAcademicLevel);
+    if (selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') {
+      result = result.filter(resource =>
+        resource.academicLevel &&
+        resource.academicLevel.trim().toLowerCase() === selectedAcademicLevel.trim().toLowerCase()
+      );
     }
     
     // Sıralama
