@@ -1,4 +1,4 @@
-// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\api\upload\profile-photo\route.ts
+// File: C:\Users\eren\Kavun, organization\app\api\upload\profile-photo\route.ts
 import * as entry from '../../../../../../app/api/upload/profile-photo/route.js'
 import type { NextRequest } from 'next/server.js'
 

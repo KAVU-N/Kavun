@@ -1,10 +1,10 @@
 {
-  "/not-found": "app/not-found.js",
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/ilanlarim/page": "app/ilanlarim/page.js",
+  "/kaynaklar/page": "app/kaynaklar/page.js",
+  "/profil/page": "app/profil/page.js",
   "/ilanlar/page": "app/ilanlar/page.js",
-  "/egitmenler/page": "app/egitmenler/page.js",
-  "/ilan/[id]/page": "app/ilan/[id]/page.js",
-  "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js",
-  "/auth/login/page": "app/auth/login/page.js"
+  "/profil/duzenle/page": "app/profil/duzenle/page.js",
+  "/kaynaklar/[id]/page": "app/kaynaklar/[id]/page.js",
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+  "/api/resources/route": "app/api/resources/route.js",
+  "/page": "app/page.js"
 }
