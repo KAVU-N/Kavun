@@ -61,6 +61,8 @@ type Resource = {
 };
 
 export default function KaynaklarPage() {
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [previewResource, setPreviewResource] = useState<Resource | null>(null);
   const { t, language } = useLanguage();
   const academicLevels = language === 'en'
     ? ['All', 'Bachelors', 'Masters', 'PhD']
@@ -95,26 +97,143 @@ export default function KaynaklarPage() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [universityDropdownRef]);
-
-  // Kaynakları getir
+  
+  // ESC tuşuna basıldığında önizleme modalini kapat
   useEffect(() => {
-    const fetchResources = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch('/api/resources');
-        if (!response.ok) throw new Error('API hatası');
-        const data = await response.json();
-        setResources(data);
-      } catch (error) {
-        console.error('Kaynaklar yüklenirken hata:', error);
-        setError('Kaynaklar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
-        setResources([]);
-      } finally {
-        setLoading(false);
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showPreviewModal) {
+        setShowPreviewModal(false);
       }
     };
+    
+    document.addEventListener('keydown', handleEscKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [showPreviewModal]);
+  
+  // Önizleme fonksiyonu - Backend'de önizleme sayısını artırır
+  const handlePreview = async (resource: Resource) => {
+    setPreviewResource(resource);
+    setShowPreviewModal(true);
+    
+    // Önizleme sayısını artırmak için API'ye istek gönder
+    try {
+      if (resource._id) {
+        const response = await fetch(`/api/resources/${resource._id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            action: 'preview',
+            userId: user?.id || null
+          })
+        });
+        
+        if (!response.ok) {
+          console.error('Önizleme sayısı güncellenirken hata oluştu');
+        }
+      }
+    } catch (error) {
+      console.error('Önizleme sayısı güncellenirken hata:', error);
+    }
+  };
+  
+  // İndirme fonksiyonu - Backend'de indirme sayısını artırır
+  const handleDownload = async (resource: Resource) => {
+    // Önce yerel olarak indirme sayısını artır (anında geri bildirim)
+    const updatedResource = { ...resource, downloadCount: resource.downloadCount + 1 };
+    
+    // Yerel state'i güncelle
+    const updatedResources = resources.map(r => {
+      if (r.id === resource.id) {
+        return updatedResource;
+      }
+      return r;
+    });
+    setResources(updatedResources);
+    
+    // İndirme sayısını artırmak için API'ye istek gönder
+    try {
+      if (resource._id) {
+        const response = await fetch(`/api/resources/${resource._id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            action: 'download',
+            userId: user?.id || null
+          })
+        });
+        
+        if (response.ok) {
+          // Güncel verileri API'den çek
+          fetchResources();
+          
+          // Kaynak URL'sini kontrol et
+          if (resource.url && resource.url !== '#') {
+            // Eğer bu bir harici bağlantıysa, yeni sekmede aç
+            window.open(resource.url, '_blank');
+          } else if (resource.fileData) {
+            // Eğer dosya verisi varsa (Base64 formatında)
+            try {
+              // Base64 verisini kullanarak dosyayı indir
+              const link = document.createElement('a');
+              link.href = resource.fileData; // Base64 veri URL'si
+              
+              // Dosya adını belirle
+              const fileName = resource.fileName || `${resource.title}.${resource.format.toLowerCase()}`;
+              link.download = fileName;
+              
+              // Dosyayı indir
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            } catch (error) {
+              console.error('Dosya indirme hatası:', error);
+              alert(t('general.downloadError'));
+            }
+          } else {
+            // Dosya verisi yoksa hata mesajı göster
+            alert(t('general.fileNotFound'));
+          }
+        }
+      }
+    } catch (error) {
+      console.error('İndirme sayısı artırılırken hata:', error);
+    }
+  };
+
+  // Kaynakları getir
+  const fetchResources = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/resources');
+      if (!response.ok) throw new Error('API hatası');
+      const data = await response.json();
+      setResources(data);
+    } catch (error) {
+      console.error('Kaynaklar yüklenirken hata:', error);
+      setError('Kaynaklar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      setResources([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Sayfa yüklenirken kaynakları getir
+  useEffect(() => {
     fetchResources();
+    
+    // Her 30 saniyede bir güncel verileri çek
+    const intervalId = setInterval(() => {
+      fetchResources();
+    }, 30000); // 30 saniye
+    
+    return () => clearInterval(intervalId);
   }, []);
 
   // Kaynakları filtrele
@@ -416,6 +535,90 @@ export default function KaynaklarPage() {
       </div>
       
       {/* Kaynaklar Listesi */}
+      {/* Kaynak Önizleme Modalı */}
+      {showPreviewModal && previewResource && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-xl shadow-lg max-w-3xl w-full max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-bold text-[#994D1C]">{previewResource.title} - Önizleme</h3>
+              <button onClick={() => setShowPreviewModal(false)} className="text-[#994D1C] hover:text-[#FF8B5E] text-2xl font-bold">&times;</button>
+            </div>
+            <div className="flex-1 overflow-auto p-4">
+              {/* PDF Önizleme */}
+              {previewResource.format === 'PDF' && (
+                <iframe
+                  src={previewResource.fileData || previewResource.url}
+                  title="PDF Preview"
+                  className="w-full h-[70vh] border rounded"
+                  frameBorder="0"
+                ></iframe>
+              )}
+              
+              {/* Resim Önizleme */}
+              {previewResource.format === 'Resim' && (
+                <img 
+                  src={previewResource.fileData || previewResource.url} 
+                  alt={previewResource.title}
+                  className="max-w-full max-h-[70vh] mx-auto border rounded"
+                />
+              )}
+              
+              {/* Video Önizleme */}
+              {previewResource.format === 'Video' && (
+                <video 
+                  src={previewResource.fileData || previewResource.url}
+                  controls
+                  className="w-full max-h-[70vh] border rounded"
+                ></video>
+              )}
+              
+              {/* Ses Önizleme */}
+              {previewResource.format === 'Ses' && (
+                <audio 
+                  src={previewResource.fileData || previewResource.url}
+                  controls
+                  className="w-full border rounded p-4"
+                ></audio>
+              )}
+              
+              {/* Diğer Dosya Türleri */}
+              {!['PDF', 'Resim', 'Video', 'Ses'].includes(previewResource.format) && (
+                <div className="text-center py-10">
+                  <div className="text-[#994D1C] text-5xl mb-4">
+                    <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-xl font-bold text-[#994D1C] mb-2">{previewResource.format} formatında dosya</h2>
+                  <p className="text-[#6B3416] mb-6">
+                    Bu dosya türü için önizleme desteklenmiyor. Lütfen dosyayı indirin.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setShowPreviewModal(false);
+                      // Dosya indirme işlemini başlat
+                      if (previewResource.fileData) {
+                        const link = document.createElement('a');
+                        link.href = previewResource.fileData;
+                        const fileName = previewResource.fileName || `${previewResource.title}.${previewResource.format.toLowerCase()}`;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      } else if (previewResource.url && previewResource.url !== '#') {
+                        window.open(previewResource.url, '_blank');
+                      }
+                    }}
+                    className="px-6 py-3 bg-[#FF8B5E] text-white font-medium rounded-xl transition-all duration-300 hover:bg-[#FF7A45]"
+                  >
+                    Dosyayı İndir
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {loading ? (
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
@@ -479,51 +682,17 @@ export default function KaynaklarPage() {
                       {t('general.resourceView')}
                     </div>
                   </Link>
+                  
+                  {/* Önizle Butonu - Tüm kaynak türleri için */}
                   <button
-                    onClick={async () => {
-                      try {
-                        // API'ye istek gönder
-                        const response = await fetch(`/api/resources/${resource.id}`, {
-                          method: 'PATCH',
-                          headers: {
-                            'Content-Type': 'application/json'
-                          },
-                          body: JSON.stringify({ action: 'download' })
-                        });
-                        const data = await response.json();
-                        
-                        // Kaynak URL'sini kontrol et
-                        if (resource.url && resource.url !== '#') {
-                          // Eğer bu bir harici bağlantıysa, yeni sekmede aç
-                          window.open(resource.url, '_blank');
-                        } else if (resource.fileData) {
-                          // Eğer dosya verisi varsa (Base64 formatında)
-                          try {
-                            // Base64 verisini kullanarak dosyayı indir
-                            const link = document.createElement('a');
-                            link.href = resource.fileData; // Base64 veri URL'si
-                            
-                            // Dosya adını belirle
-                            const fileName = resource.fileName || `${resource.title}.${resource.format.toLowerCase()}`;
-                            link.download = fileName;
-                            
-                            // Dosyayı indir
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                          } catch (error) {
-                            console.error('Dosya indirme hatası:', error);
-                            alert(t('general.downloadError'));
-                          }
-                        } else {
-                          // Dosya verisi yoksa hata mesajı göster
-                          alert(t('general.fileNotFound'));
-                        }
-                      } catch (error) {
-                        console.error('Dosya indirme hatası:', error);
-                        alert(t('general.downloadError'));
-                      }
-                    }}
+                    onClick={() => handlePreview(resource)}
+                    className="flex-1 px-4 py-2 bg-[#FFB996] text-white text-center rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300 text-sm"
+                  >
+                    Önizle
+                  </button>
+                  
+                  <button
+                    onClick={() => handleDownload(resource)}
                     className="flex-1 px-4 py-2 bg-[#FF8B5E] text-white text-center rounded-lg hover:bg-[#FF7A45] transition-colors duration-300 text-sm cursor-pointer"
                   >
                     {t('general.resourceDownload')}

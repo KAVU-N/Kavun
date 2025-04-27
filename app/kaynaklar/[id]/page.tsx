@@ -132,7 +132,10 @@ export default function KaynakDetayPage() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ action: 'download' })
+        body: JSON.stringify({ 
+          action: 'download',
+          userId: user?.id || null
+        })
       });
       const data = await response.json();
       
