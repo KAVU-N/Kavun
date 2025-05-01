@@ -13,6 +13,8 @@ export interface ILesson extends Document {
   scheduledAt?: Date;
   createdAt: Date;
   completedAt?: Date;
+  notified?: boolean; // Bildirim gönderildi mi?
+  studentConfirmed?: boolean; // Öğrenci dersi onayladı mı?
 }
 
 // Şema tanımı
@@ -68,6 +70,14 @@ const lessonSchema = new Schema({
   completedAt: {
     type: Date,
     default: null
+  },
+  studentConfirmed: {
+    type: Boolean,
+    default: false
+  },
+  notified: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: Date,

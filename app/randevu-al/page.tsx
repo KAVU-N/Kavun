@@ -29,6 +29,7 @@ interface Ilan {
   updatedAt: string;
   userId: string;
   teacher: Teacher;
+  lessonId: string;
 }
 
 export default function RandevuAlPage() {
@@ -99,16 +100,20 @@ export default function RandevuAlPage() {
   // Tarih seçildiğinde uygun saatleri getir
   useEffect(() => {
     if (selectedDate) {
-      // Gerçek uygulamada API'den uygun saatleri alabilirsiniz
-      // Burada örnek olarak 09:00 - 17:00 arası saatleri gösteriyoruz
       const times = [];
       const startHour = 9;
       const endHour = 17;
-      
-      for (let hour = startHour; hour <= endHour; hour++) {
+      const now = new Date();
+      const isToday = selectedDate.getFullYear() === now.getFullYear() &&
+        selectedDate.getMonth() === now.getMonth() &&
+        selectedDate.getDate() === now.getDate();
+      let minHour = startHour;
+      if (isToday) {
+        minHour = Math.max(startHour, now.getHours() + 1); // Şu anki saatten en az 1 saat sonrası
+      }
+      for (let hour = minHour; hour <= endHour; hour++) {
         times.push(`${hour.toString().padStart(2, '0')}:00`);
       }
-      
       setAvailableTimes(times);
     }
   }, [selectedDate]);
@@ -145,83 +150,89 @@ export default function RandevuAlPage() {
       setIsProcessing(true);
       setPaymentError('');
       
-      // Gerçek uygulamada ödeme API'sine istek atılır
-      // Burada simüle ediyoruz
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Randevu oluşturma API'sine istek at
-      const appointmentData = {
-        ilanId: ilan._id,
-        teacherId: ilan.teacher._id,
-        studentId: user?.id,
-        date: format(selectedDate, 'yyyy-MM-dd'),
-        time: selectedTime,
-        price: ilan.price,
-        duration: ilan.duration,
-        method: ilan.method,
-        lessonType: lessonType,
-        groupSize: lessonType === 'group' ? groupSize : 1,
-        status: 'confirmed',
-        paymentStatus: 'completed'
-      };
+      // 1. Rezervasyon sırasında yeni bir Lesson oluştur
+      // Açıklama ve süre validasyonunu garantiye al
+      const description = ilan.description && ilan.description.length < 10 ? (ilan.description + ' - detay') : ilan.description;
+      const duration = ilan.duration && ilan.duration < 15 ? 15 : ilan.duration;
 
-      // Oluşturulacak bildirimler
+      // Süreyi uygun birime çevir
+      let displayDuration = duration;
+      let durationText = '';
+      if (duration % 60 === 0) {
+        displayDuration = duration / 60;
+        durationText = `${displayDuration} saat`;
+      } else {
+        durationText = `${duration} dakika`;
+      }
+
+      const lessonCreateResponse = await fetch('/api/lessons', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          title: ilan.title,
+          description,
+          price: ilan.price,
+          duration,
+          teacherId: ilan.teacher._id,
+          studentId: user?.id,
+          scheduledAt: new Date(selectedDate!.setHours(Number(selectedTime!.split(':')[0]), 0, 0, 0)).toISOString(),
+          status: 'scheduled',
+          lessonType,
+          groupSize: lessonType === 'group' ? groupSize : undefined
+        })
+      });
+      if (!lessonCreateResponse.ok) {
+        throw new Error('Ders rezervasyonu sırasında bir hata oluştu');
+      }
+      const lessonData = await lessonCreateResponse.json();
+      const lessonId = lessonData.lesson._id;
+
+      // Bildirimleri oluştur
       const notifications = [
         {
           title: 'Yeni Ders Rezervasyonu',
-          message: `${user?.name} adlı öğrenci ${ilan.title} dersiniz için rezervasyon yaptı.`,
+          message: `${user?.name} adlı öğrenci ${ilan.title} dersiniz için rezervasyon yaptı.\nDers Süresi: ${durationText}`,
           type: 'lesson_booking',
           userId: ilan.teacher._id,
-          relatedId: appointmentData._id,
+          relatedId: lessonId,
           read: false,
           createdAt: new Date().toISOString(),
-          actionUrl: `/derslerim/${appointmentData._id}`
+          actionUrl: `/derslerim/${lessonId}`
         },
         {
-          title: 'Rezervasyon Onaylandı',
-          message: `${ilan.title} dersi için rezervasyonunuz onaylandı.`,
-          type: 'lesson_booking',
+          title: 'Randevu Onayı Gerekli',
+          message: `Randevunuzun başarılı geçtiğini doğrulamak için tıklayın.\nDers Süresi: ${durationText}`,
+          type: 'lesson_confirm',
           userId: user?.id,
-          relatedId: appointmentData._id,
+          relatedId: lessonId,
           read: false,
           createdAt: new Date().toISOString(),
-          actionUrl: `/derslerim/${appointmentData._id}`
+          actionUrl: `/derslerim/${lessonId}#confirm`
         }
       ];
 
       try {
-        // Randevu oluştur
-        const appointmentResponse = await fetch('/api/appointments', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify(appointmentData)
-        });
-
-        if (!appointmentResponse.ok) {
-          throw new Error('Randevu oluşturulurken bir hata oluştu');
+        // Bildirimleri tek tek oluştur
+        for (const notif of notifications) {
+          const notificationResponse = await fetch('/api/notifications', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(notif)
+          });
+          if (!notificationResponse.ok) {
+            throw new Error('Bildirimler oluşturulurken bir hata oluştu');
+          }
         }
-
-        // Bildirimleri oluştur
-        const notificationResponse = await fetch('/api/notifications', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({ notifications })
-        });
-
-        if (!notificationResponse.ok) {
-          throw new Error('Bildirimler oluşturulurken bir hata oluştu');
-        }
-
         setPaymentSuccess(true);
       } catch (err: any) {
-        console.error('Randevu ve bildirim oluşturma hatası:', err);
-        setPaymentError('Randevu oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+        console.error('Bildirim oluşturma hatası:', err);
+        setPaymentError('Bildirimler oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
       }
       
       // Gerçek uygulamada API'ye istek atılır
@@ -399,7 +410,7 @@ export default function RandevuAlPage() {
                     <h2 className="text-xl font-bold text-[#6B3416] mb-4">Tarih Seçin</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
                       {Array.from({ length: 14 }).map((_, index) => {
-                        const date = addDays(startOfDay(new Date()), index + 1);
+                        const date = addDays(startOfDay(new Date()), index);
                         const isSelected = selectedDate && 
                           selectedDate.getDate() === date.getDate() && 
                           selectedDate.getMonth() === date.getMonth() && 

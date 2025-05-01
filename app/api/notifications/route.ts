@@ -59,6 +59,27 @@ export async function GET(request: Request) {
   return NextResponse.json({ notifications });
 }
 
+// Bildirim oluştur
+export async function POST(request: Request) {
+  await connectDB();
+  const data = await request.json();
+  // Temel zorunlu alanlar kontrolü
+  if (!data.userId || !data.title || !data.message || !data.type) {
+    return NextResponse.json({ error: 'Zorunlu alanlar eksik (userId, title, message, type)' }, { status: 400 });
+  }
+  // Bildirimi oluştur
+  const notification = await Notification.create({
+    userId: data.userId,
+    title: data.title,
+    message: data.message,
+    type: data.type,
+    read: false,
+    createdAt: new Date(),
+    ...(data.actionUrl ? { actionUrl: data.actionUrl } : {})
+  });
+  return NextResponse.json({ notification, message: 'Bildirim başarıyla oluşturuldu' }, { status: 201 });
+}
+
 // Bildirimi okundu işaretle
 export async function PUT(request: Request) {
   await connectDB();

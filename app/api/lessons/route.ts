@@ -3,11 +3,12 @@ import { connectDB } from '@/lib/db';
 import Lesson from '@/models/Lesson';
 import User from '@/models/User';
 import { verifyToken } from '@/lib/jwt';
+import mongoose from 'mongoose';
 
 // Veritabanı bağlantısı
 connectDB();
 
-// Ders oluşturma (eğitmen)
+// Ders oluşturma (eğitmen ve öğrenci)
 export async function POST(request: NextRequest) {
   try {
     // JWT doğrulama
@@ -27,32 +28,59 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
     }
 
-    if (user.role !== 'instructor') {
-      return NextResponse.json({ error: 'Bu işlem için eğitmen yetkisine sahip olmanız gerekiyor' }, { status: 403 });
-    }
-
     // İstek gövdesinden veri al
     const data = await request.json();
-    
-    // Gerekli alanları doğrula
-    if (!data.title || !data.description || !data.price || !data.duration) {
-      return NextResponse.json({ error: 'Lütfen tüm gerekli alanları doldurun' }, { status: 400 });
+
+    if (user.role === 'instructor') {
+      // Eğitmen yeni ders açıyor
+      // Gerekli alanları doğrula
+      if (!data.title || !data.description || !data.price || !data.duration) {
+        return NextResponse.json({ error: 'Lütfen tüm gerekli alanları doldurun' }, { status: 400 });
+      }
+      // Yeni ders oluştur
+      const newLesson = await Lesson.create({
+        teacherId: user._id,
+        title: data.title,
+        description: data.description,
+        price: data.price,
+        duration: data.duration,
+        status: 'open'
+      });
+      return NextResponse.json({ 
+        message: 'Ders başarıyla oluşturuldu', 
+        lesson: newLesson 
+      }, { status: 201 });
+    } else if (user.role === 'student') {
+      // Öğrenci rezervasyon ile ders oluşturuyor
+      // Gerekli alanları doğrula
+      if (!data.title || !data.description || !data.price || !data.duration || !data.teacherId || !data.scheduledAt) {
+        return NextResponse.json({ error: 'Lütfen tüm gerekli alanları doldurun (öğrenci rezervasyonu)' }, { status: 400 });
+      }
+      try {
+        const teacherObjectId = new mongoose.Types.ObjectId(data.teacherId);
+        const newLesson = await Lesson.create({
+          teacherId: teacherObjectId,
+          studentId: user._id,
+          title: data.title,
+          description: data.description,
+          price: data.price,
+          duration: data.duration,
+          status: 'scheduled',
+          scheduledAt: data.scheduledAt,
+          lessonType: data.lessonType || 'individual',
+          groupSize: data.groupSize || undefined
+        });
+        return NextResponse.json({
+          message: 'Ders rezervasyonu başarıyla oluşturuldu',
+          lesson: newLesson
+        }, { status: 201 });
+      } catch (err) {
+        console.error('Öğrenci rezervasyonunda hata:', err);
+        return NextResponse.json({ error: 'Ders rezervasyonunda sunucu hatası', details: err instanceof Error ? err.message : err }, { status: 500 });
+      }
+    } else {
+      return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
     }
-
-    // Yeni ders oluştur
-    const newLesson = await Lesson.create({
-      teacherId: user._id,
-      title: data.title,
-      description: data.description,
-      price: data.price,
-      duration: data.duration,
-      status: 'open'
-    });
-
-    return NextResponse.json({ 
-      message: 'Ders başarıyla oluşturuldu', 
-      lesson: newLesson 
-    }, { status: 201 });
 
   } catch (error) {
     console.error('Ders oluşturma hatası:', error);
