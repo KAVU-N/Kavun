@@ -21,10 +21,22 @@
       "static/chunks/main-app.js",
       "static/chunks/app/kaynaklar/paylas/page.js"
     ],
+<<<<<<< Updated upstream
     "/not-found": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
+=======
+    "/auth/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/layout.js"
+    ],
+    "/auth/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/auth/login/page.js"
+>>>>>>> Stashed changes
     ]
   }
 }

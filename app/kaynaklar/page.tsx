@@ -84,6 +84,10 @@ export default function KaynaklarPage() {
   const [sortOrder, setSortOrder] = useState('desc');
   const [showFilters, setShowFilters] = useState(false);
 
+  // --- Kullanıcı önizlemeye 3. kez tıkladıysa paylaşım zorunlu premium modalı için sayaç ---
+  const [previewClickCount, setPreviewClickCount] = useState(0);
+  const [showPremiumBlock, setShowPremiumBlock] = useState(false);
+
   // Dropdown dışına tıklandığında kapat
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -114,6 +118,13 @@ export default function KaynaklarPage() {
   
   // Önizleme fonksiyonu - Backend'de önizleme sayısını artırır
   const handlePreview = async (resource: Resource) => {
+    setPreviewClickCount(prev => prev + 1);
+    if (previewClickCount + 1 >= 3) {
+      setShowPremiumBlock(true);
+      setPreviewResource(resource);
+      setShowPreviewModal(true);
+      return;
+    }
     setPreviewResource(resource);
     setShowPreviewModal(true);
     
@@ -538,49 +549,58 @@ export default function KaynaklarPage() {
       {/* Kaynak Önizleme Modalı */}
       {showPreviewModal && previewResource && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-xl shadow-lg max-w-3xl w-full max-h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-lg font-bold text-[#994D1C]">{previewResource.title} - Önizleme</h3>
-              <button onClick={() => setShowPreviewModal(false)} className="text-[#994D1C] hover:text-[#FF8B5E] text-2xl font-bold">&times;</button>
-            </div>
-            <div className="flex-1 overflow-auto p-4">
+          {/* Ana içerik: Kaynağı kaydırılabilir şekilde göster */}
+          <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full max-h-[96vh] flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-auto p-8 relative">
               {/* PDF Önizleme */}
               {previewResource.format === 'PDF' && (
-                <iframe
-                  src={previewResource.fileData || previewResource.url}
-                  title="PDF Preview"
-                  className="w-full h-[70vh] border rounded"
-                  frameBorder="0"
-                ></iframe>
+                <div className="relative w-full h-[85vh]">
+                  <iframe
+                    src={previewResource.fileData || previewResource.url}
+                    title="PDF Preview"
+                    className="w-full h-full border rounded"
+                    frameBorder="0"
+                  ></iframe>
+                  {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
+                  {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none"></div>}
+                </div>
               )}
-              
               {/* Resim Önizleme */}
               {previewResource.format === 'Resim' && (
-                <img 
-                  src={previewResource.fileData || previewResource.url} 
-                  alt={previewResource.title}
-                  className="max-w-full max-h-[70vh] mx-auto border rounded"
-                />
+                <div className="relative w-full flex justify-center">
+                  <img 
+                    src={previewResource.fileData || previewResource.url} 
+                    alt={previewResource.title}
+                    className="max-w-full max-h-[85vh] mx-auto border rounded"
+                  />
+                  {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
+                  {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none"></div>}
+                </div>
               )}
-              
               {/* Video Önizleme */}
               {previewResource.format === 'Video' && (
-                <video 
-                  src={previewResource.fileData || previewResource.url}
-                  controls
-                  className="w-full max-h-[70vh] border rounded"
-                ></video>
+                <div className="relative w-full">
+                  <video 
+                    src={previewResource.fileData || previewResource.url}
+                    controls
+                    className="w-full max-h-[85vh] border rounded"
+                  ></video>
+                  {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
+                  {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none"></div>}
+                </div>
               )}
-              
               {/* Ses Önizleme */}
               {previewResource.format === 'Ses' && (
-                <audio 
-                  src={previewResource.fileData || previewResource.url}
-                  controls
-                  className="w-full border rounded p-4"
-                ></audio>
+                <div className="relative w-full">
+                  <audio 
+                    src={previewResource.fileData || previewResource.url}
+                    controls
+                    className="w-full border rounded p-4"
+                  ></audio>
+                  {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
+                  {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none"></div>}
+                </div>
               )}
-              
               {/* Diğer Dosya Türleri */}
               {!['PDF', 'Resim', 'Video', 'Ses'].includes(previewResource.format) && (
                 <div className="text-center py-10">
@@ -613,6 +633,46 @@ export default function KaynaklarPage() {
                   >
                     {t('general.downloadFile')}
                   </button>
+                </div>
+              )}
+              {/* Premium kutusu sadece üstte ve sabit olarak gelsin */}
+              {showPremiumBlock && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+                  <div className="relative bg-[#FFF6E6] rounded-2xl shadow-xl px-10 py-6 max-w-xl w-full flex flex-col items-center text-[#A85A1A] text-center pointer-events-auto border-none" style={{boxShadow:'0 4px 16px rgba(168,90,26,0.13)'}}>
+                    {/* Kapatma butonu */}
+                    <button
+                      onClick={() => setShowPreviewModal(false)}
+                      className="absolute top-4 right-4 text-[#A85A1A] hover:text-[#FFB066] text-2xl font-bold bg-transparent border-none p-0 m-0 cursor-pointer z-10"
+                      style={{lineHeight:'1'}}
+                      aria-label="Close preview modal"
+                    >
+                      ×
+                    </button>
+                    <div className="mb-3 flex flex-col items-center">
+                      <div className="bg-[#FFF3E0] rounded-full p-2 mb-2 flex items-center justify-center">
+                        <svg className="w-8 h-8" fill="none" stroke="#A85A1A" strokeWidth="2.5" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="3" fill="#FFF3E0"/><path d="M12 9v4m0 2h.01" stroke="#A85A1A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </div>
+                      <h2 className="text-2xl font-extrabold mb-1 text-[#FFB066] drop-shadow">Upload your document and unlock access instantly!</h2>
+                    </div>
+                    <p className="mb-4 text-base font-medium text-[#A85A1A]">
+                      Upload just one document and you’ll get <span className='font-bold text-[#FFB066]'>access to 3 resources</span> as a reward. Share more, unlock more!</p>
+                    <div className="flex flex-row gap-3 w-full mb-3 justify-center">
+                      <Link href="/kaynaklar/paylas" className="w-full">
+                        <button
+                          className="w-full bg-[#FFB066] hover:bg-[#FFD7A8] text-[#A85A1A] font-bold py-3 rounded-full flex items-center justify-center gap-2 text-base shadow transition border-2 border-[#A85A1A]"
+                          onClick={() => {
+                            setShowPreviewModal(false);
+                            window.location.href = '/kaynaklar/paylas';
+                          }}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="#A85A1A" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                          Upload
+                        </button>
+                        <div className="text-xs text-[#A85A1A] mt-1">Share to unlock</div>
+                      </Link>
+                    </div>
+                    <div className="mt-1 text-base text-[#A85A1A]">Already user? <a className="underline font-bold text-[#FFB066]" href="/login">Log in</a></div>
+                  </div>
                 </div>
               )}
             </div>
