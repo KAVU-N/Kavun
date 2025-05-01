@@ -6,28 +6,30 @@ import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
 // Kaynak kategorileri
-const categories = [
-  'Ders Notları',
-  'Kitaplar',
-  'Makaleler',
-  'Videolar',
-  'Sunumlar',
-  'Sınav Soruları',
-  'Projeler',
-  'Diğer'
+// Çok dilli kategori anahtarları
+const categoryKeys = [
+  'resourceCategory.notes',
+  'resourceCategory.books',
+  'resourceCategory.articles',
+  'resourceCategory.videos',
+  'resourceCategory.presentations',
+  'resourceCategory.examQuestions',
+  'resourceCategory.projects',
+  'resourceCategory.other'
 ];
 
 // Örnek kaynak formatları
-const formats = [
-  'PDF',
-  'DOC/DOCX',
-  'PPT/PPTX',
-  'XLS/XLSX',
-  'Video',
-  'Ses',
-  'Resim',
-  'Link',
-  'Diğer'
+// Çok dilli format anahtarları
+const formatKeys = [
+  'resourceFormat.pdf',
+  'resourceFormat.doc',
+  'resourceFormat.ppt',
+  'resourceFormat.xls',
+  'resourceFormat.video',
+  'resourceFormat.audio',
+  'resourceFormat.image',
+  'resourceFormat.link',
+  'resourceFormat.other'
 ];
 
 // Üniversite listesini data klasöründen import ediyoruz
@@ -223,12 +225,12 @@ export default function KaynaklarPage() {
     
     // Kategoriye göre filtrele
     if (selectedCategory) {
-      result = result.filter(resource => resource.category === selectedCategory);
+      result = result.filter(resource => resource.category === t(selectedCategory));
     }
     
     // Formata göre filtrele
     if (selectedFormat) {
-      result = result.filter(resource => resource.format === selectedFormat);
+      result = result.filter(resource => resource.format === t(selectedFormat));
     }
     
     // Üniversiteye göre filtrele
@@ -377,9 +379,9 @@ export default function KaynaklarPage() {
                 className="w-full px-3 py-2 rounded-lg border-[#FFB996] focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
               >
                 <option value="">{t('general.allResources')}</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
+                {categoryKeys.map((key) => (
+                  <option key={key} value={key}>
+                    {t(key)}
                   </option>
                 ))}
               </select>
@@ -395,9 +397,9 @@ export default function KaynaklarPage() {
                 className="w-full px-3 py-2 rounded-lg border-[#FFB996] focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
               >
                 <option value="">{t('general.allResources')}</option>
-                {formats.map((format) => (
-                  <option key={format} value={format}>
-                    {format}
+                {formatKeys.map((key) => (
+                  <option key={key} value={key}>
+                    {t(key)}
                   </option>
                 ))}
               </select>
@@ -511,9 +513,18 @@ export default function KaynaklarPage() {
       {/* Kaynak Önizleme Modalı */}
       {showPreviewModal && previewResource && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+<<<<<<< Updated upstream
           {/* Ana içerik: Kaynağı kaydırılabilir şekilde göster */}
           <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full max-h-[96vh] flex flex-col overflow-hidden">
             <div className="flex-1 overflow-auto p-8 relative">
+=======
+          <div className="bg-white rounded-xl shadow-lg max-w-3xl w-full max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-bold text-[#994D1C]">{previewResource.title} - {t('general.preview')}</h3>
+              <button onClick={() => setShowPreviewModal(false)} className="text-[#994D1C] hover:text-[#FF8B5E] text-2xl font-bold">&times;</button>
+            </div>
+            <div className="flex-1 overflow-auto p-4">
+>>>>>>> Stashed changes
               {/* PDF Önizleme */}
               {previewResource.format === 'PDF' && (
                 <div className="relative w-full h-[85vh]">
@@ -710,7 +721,7 @@ export default function KaynaklarPage() {
                     onClick={() => handlePreview(resource)}
                     className="flex-1 px-4 py-2 bg-[#FFB996] text-white text-center rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300 text-sm"
                   >
-                    Önizle
+                    {t('general.preview')}
                   </button>
                   
                   <button

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 import Image from 'next/image';
 import { FaChalkboardTeacher, FaGraduationCap, FaStar, FaSearch, FaUniversity } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,8 +19,24 @@ interface Instructor {
   expertise: string; // Uzmanlık alanı/verdiği ders
 }
 
+const departments = [
+  'departments.computer',
+  'departments.dentistry',
+  'departments.medicine',
+  'departments.law',
+  'departments.mechanical',
+  'departments.electrical',
+  'departments.business',
+  'departments.psychology',
+  'departments.architecture',
+  'departments.industrial',
+  'departments.civil',
+  'departments.software',
+];
+
 export default function InstructorsPage() {
   const [searchTerm, setSearchTerm] = useState('');
+  const { t } = useLanguage();
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -93,10 +110,12 @@ export default function InstructorsPage() {
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-[#6B3416] mb-2">Eğitmenlerimiz</h1>
+            <h1 className="text-3xl font-bold text-[#6B3416] mb-2">{t('instructors.title')}</h1>
             <p className="text-[#994D1C]">
               <FaUniversity className="inline-block mr-2" />
-              {user?.university ? `${user.university} üniversitesindeki eğitmenlerimizle tanışın ve ihtiyacınıza en uygun eğitmeni seçin.` : 'Alanında uzman eğitmenlerimizle tanışın ve ihtiyacınıza en uygun eğitmeni seçin.'}
+              {user?.university
+                ? t('instructors.universityDesc', { university: user.university })
+                : t('instructors.generalDesc')}
             </p>
           </div>
 
@@ -106,7 +125,7 @@ export default function InstructorsPage() {
               <div className="flex-1 relative">
                 <input
                   type="text"
-                  placeholder="Eğitmen ara..."
+                  placeholder={t('instructors.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-4 py-3 pl-10 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
@@ -117,39 +136,26 @@ export default function InstructorsPage() {
                 onClick={() => setSelectedDepartment(null)}
                 className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-xl font-medium"
               >
-                Ara
+                {t('general.search')}
               </button>
             </div>
           </div>
 
           {/* Ders Filtreleri */}
           <div className="bg-white p-6 rounded-xl shadow-md mb-6">
-            <h3 className="text-lg font-medium text-[#6B3416] mb-3">Uzmanlık Alanları</h3>
+            <h3 className="text-lg font-medium text-[#6B3416] mb-3">{t('instructors.departmentsTitle')}</h3>
             <div className="flex flex-wrap gap-2">
-              {[
-                'Bilgisayar Mühendisliği',
-                'Diş Hekimliği',
-                'Tıp',
-                'Hukuk',
-                'Makine Mühendisliği',
-                'Elektrik-Elektronik Mühendisliği',
-                'İşletme',
-                'Psikoloji',
-                'Mimarlık',
-                'Endüstri Mühendisliği',
-                'İnşaat Mühendisliği',
-                'Yazılım Mühendisliği'
-              ].map((bolum) => (
+              {departments.map((deptKey) => (
                 <button
-                  key={bolum}
+                  key={deptKey}
                   className={`px-4 py-2 rounded-lg text-sm transition-all duration-200
-                    ${selectedDepartment === bolum 
+                    ${selectedDepartment === deptKey 
                       ? 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium' 
                       : 'bg-[#FFE5D9] text-[#6B3416] hover:bg-[#FFB996] hover:text-white'
                     }`}
-                  onClick={() => setSelectedDepartment(selectedDepartment === bolum ? null : bolum)}
+                  onClick={() => setSelectedDepartment(selectedDepartment === deptKey ? null : deptKey)}
                 >
-                  {bolum}
+                  {t(deptKey)}
                 </button>
               ))}
             </div>
@@ -168,11 +174,11 @@ export default function InstructorsPage() {
             <div className="bg-white p-8 rounded-xl shadow-md text-center">
               <p className="text-[#994D1C] mb-4">
                 {searchTerm || selectedDepartment
-                  ? `Aradığınız kriterlere uygun eğitmen bulunamadı.`
-                  : 'Henüz hiç eğitmen bulunmuyor.'}
+                  ? t('instructors.noMatch')
+                  : t('instructors.noInstructors')}
               </p>
               <p className="text-gray-600">
-                Farklı arama kriterleri deneyebilirsiniz.
+                {t('instructors.tryDifferentSearch')}
               </p>
             </div>
           ) : (
@@ -185,22 +191,22 @@ export default function InstructorsPage() {
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-800">{instructor.name}</h3>
-                      <p className="text-sm text-gray-600">{instructor.expertise || 'Eğitmen'}</p>
+                      <p className="text-sm text-gray-600">{instructor.expertise || t('instructors.role')}</p>
                     </div>
                   </div>
                     
                   <div className="grid grid-cols-2 gap-2 mb-4">
                     <div className="flex items-center">
                       <FaChalkboardTeacher className="text-purple-600 mr-2" />
-                      <span className="text-gray-800">{instructor.expertise || 'Genel Eğitmen'}</span>
+                      <span className="text-gray-800">{t('instructors.expertise')}</span>
                     </div>
                     <div className="flex items-center">
                       <FaGraduationCap className="text-blue-600 mr-2" />
-                      <span className="text-gray-800">3+ Yıl Deneyim</span>
+                      <span className="text-gray-800">{t('instructors.experience')}</span>
                     </div>
                     <div className="flex items-center">
                       <FaStar className="text-orange-600 mr-2" />
-                      <span className="text-gray-800">4.8/5 Puan</span>
+                      <span className="text-gray-800">{t('instructors.rating')}</span>
                     </div>
                     <div className="flex items-center">
                       <FaUniversity className="text-green-600 mr-2" />
@@ -213,7 +219,7 @@ export default function InstructorsPage() {
                       className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg text-sm font-medium hover:shadow-md transition-all duration-300"
                       onClick={() => setActiveChat(instructor)}
                     >
-                      Mesaj Gönder
+                      {t('general.sendMessage')}
                     </button>
                   </div>
                 </div>
