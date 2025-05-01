@@ -67,12 +67,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
               {t('lessons.completeLesson')}
             </button>
           )}
-          <button
-            onClick={onCancelLesson}
-            className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-          >
-            {t('lessons.cancelLesson')}
-          </button>
+          {/* İptal butonu tamamen kaldırıldı */}
         </div>
       );
     }
@@ -274,35 +269,6 @@ export default function DerslerimPage() {
     }
   };
 
-  const handleCancelLesson = async () => {
-    if (!selectedEvent) return;
-    
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/lessons/${selectedEvent.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ status: 'cancelled' })
-      });
-
-      if (response.ok) {
-        // Takvimi yenile
-        setSelectedEvent(null);
-        window.location.reload();
-      } else {
-        const data = await response.json();
-        setError(data.error || 'Ders iptal işlemi başarısız oldu');
-      }
-    } catch (err) {
-      setError('Sunucu hatası');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (!user) {
     return null; // Yönlendirme yapılıyor
   }
@@ -356,7 +322,6 @@ export default function DerslerimPage() {
           event={selectedEvent}
           onClose={() => setSelectedEvent(null)}
           onCompleteLesson={handleCompleteLesson}
-          onCancelLesson={handleCancelLesson}
           userRole={user.role}
         />
       )}

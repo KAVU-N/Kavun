@@ -16,27 +16,31 @@
       "static/chunks/main-app.js",
       "static/chunks/app/kaynaklar/page.js"
     ],
-    "/kaynaklar/paylas/page": [
+    "/ilanlarim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/kaynaklar/paylas/page.js"
+      "static/chunks/app/ilanlarim/page.js"
     ],
-<<<<<<< Updated upstream
-    "/not-found": [
+    "/derslerim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/not-found.js"
-=======
-    "/auth/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/auth/layout.js"
+      "static/css/app/derslerim/page.css",
+      "static/chunks/app/derslerim/page.js"
     ],
-    "/auth/login/page": [
+    "/bildirimler/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/login/page.js"
->>>>>>> Stashed changes
+      "static/chunks/app/bildirimler/page.js"
+    ],
+    "/mesajlarim/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/mesajlarim/page.js"
+    ],
+    "/derslerim/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/derslerim/[id]/page.js"
     ]
   }
 }

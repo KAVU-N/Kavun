@@ -83,6 +83,11 @@ export default function IlanVerPage() {
         userId: user.id
       });
       
+      // Kullanıcıdan alınan duration saat cinsindense dakika'ya çevir. Eğer kullanıcı dakika giriyorsa burayı güncellemek gerekebilir.
+      let durationInMinutes = Number(formData.duration);
+      if (durationInMinutes <= 12) { // 12 saatten küçükse, büyük ihtimalle saat girildi, dakikaya çevir
+        durationInMinutes = durationInMinutes * 60;
+      }
       const response = await fetch('/api/ilanlar', {
         method: 'POST',
         headers: {
@@ -91,6 +96,7 @@ export default function IlanVerPage() {
         },
         body: JSON.stringify({
           ...formData,
+          duration: durationInMinutes,
           userId: user.id
         })
       });

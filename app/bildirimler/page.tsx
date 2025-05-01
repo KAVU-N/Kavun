@@ -354,7 +354,13 @@ export default function NotificationsPage() {
                     {notification.actionUrl ? (
                       <Link
                         href={notification.actionUrl}
-                        className="text-sm font-medium text-[#FF8B5E] hover:text-[#994D1C] transition-colors"
+                        className="text-sm font-medium text-[#FF8B5E] hover:text-[#994D1C] transition-colors cursor-pointer"
+                        onClick={e => {
+                          // Okundu işaretle
+                          markAsRead(notification._id);
+                        }}
+                        scroll={true}
+                        shallow={false}
                       >
                         Detayları Görüntüle
                       </Link>
