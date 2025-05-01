@@ -1,9 +1,5 @@
 {
-  "/page": "app/page.js",
-  "/kaynaklar/page": "app/kaynaklar/page.js",
-  "/api/resources/route": "app/api/resources/route.js",
+  "/not-found": "app/not-found.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/kaynaklar/paylas/page": "app/kaynaklar/paylas/page.js",
-  "/api/resources/[id]/route": "app/api/resources/[id]/route.js",
-  "/kaynaklar/[id]/page": "app/kaynaklar/[id]/page.js"
+  "/kaynaklar/paylas/page": "app/kaynaklar/paylas/page.js"
 }

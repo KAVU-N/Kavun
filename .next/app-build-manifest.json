@@ -16,15 +16,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/kaynaklar/page.js"
     ],
-    "/kaynaklar/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/kaynaklar/[id]/page.js"
-    ],
     "/kaynaklar/paylas/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/kaynaklar/paylas/page.js"
+    ],
+    "/not-found": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/not-found.js"
     ]
   }
 }

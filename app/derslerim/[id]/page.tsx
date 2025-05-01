@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ReviewForm from '@/components/reviews/ReviewForm';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 interface PageProps {
   params: { id: string };
@@ -14,6 +15,7 @@ export default function DersDetayPage({ params }: PageProps) {
   const { id } = params;
   const { user } = useAuth();
   const router = useRouter();
+  const { t, language } = useLanguage();
   
   const [lesson, setLesson] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -164,7 +166,7 @@ export default function DersDetayPage({ params }: PageProps) {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('tr-TR', {
+    return date.toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -175,10 +177,10 @@ export default function DersDetayPage({ params }: PageProps) {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'open': return 'Açık';
-      case 'scheduled': return 'Planlandı';
-      case 'completed': return 'Tamamlandı';
-      case 'cancelled': return 'İptal Edildi';
+      case 'open': return t('lessons.statusOpen');
+      case 'scheduled': return t('lessons.statusScheduled');
+      case 'completed': return t('lessons.statusCompleted');
+      case 'cancelled': return t('lessons.statusCancelled');
       default: return status;
     }
   };
@@ -205,13 +207,13 @@ export default function DersDetayPage({ params }: PageProps) {
     return (
       <div className="container mx-auto px-4 py-10">
         <div className="bg-red-100 text-red-600 p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold mb-2">Hata</h2>
+          <h2 className="text-xl font-bold mb-2">{t('general.error')}</h2>
           <p className="mb-4">{error}</p>
           <button
             onClick={fetchLessonDetails}
             className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
           >
-            Yeniden Dene
+            {t('general.retry')}
           </button>
         </div>
       </div>
@@ -222,13 +224,13 @@ export default function DersDetayPage({ params }: PageProps) {
     return (
       <div className="container mx-auto px-4 py-10">
         <div className="bg-yellow-100 text-yellow-800 p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold mb-2">Ders Bulunamadı</h2>
-          <p className="mb-4">Görüntülemeye çalıştığınız ders bulunamadı veya erişim izniniz yok.</p>
+          <h2 className="text-xl font-bold mb-2">{t('lessons.notFound')}</h2>
+          <p className="mb-4">{t('lessons.notFoundDesc')}</p>
           <Link 
             href="/derslerim"
             className="bg-[#FF8B5E] text-white px-4 py-2 rounded-md hover:bg-[#994D1C] transition-colors inline-block"
           >
-            Derslerime Dön
+            {t('nav.myLessons')}
           </Link>
         </div>
       </div>
@@ -241,7 +243,7 @@ export default function DersDetayPage({ params }: PageProps) {
   
   // Kullanıcı rolüne göre karşı tarafın bilgilerini gösterme
   const otherUserName = user?.role === 'instructor' ? student.name : teacher.name;
-  const otherUserRole = user?.role === 'instructor' ? 'Öğrenci' : 'Eğitmen';
+  const otherUserRole = user?.role === 'instructor' ? t('lessons.student') : t('lessons.teacher');
   const otherUserEmail = user?.role === 'instructor' ? student.email : teacher.email;
 
   return (
@@ -251,7 +253,7 @@ export default function DersDetayPage({ params }: PageProps) {
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
           </svg>
-          Derslerime Dön
+          {t('nav.myLessons')}
         </Link>
       </div>
       
@@ -261,8 +263,8 @@ export default function DersDetayPage({ params }: PageProps) {
           <div className="container mx-auto flex justify-between items-center">
             <span className="font-medium">{getStatusText(lesson.status)}</span>
             <span className="text-sm">
-              {lesson.status === 'completed' && lesson.completedAt ? `Tamamlandı: ${formatDate(lesson.completedAt)}` : ''}
-              {lesson.status === 'cancelled' ? 'İptal Edildi' : ''}
+              {lesson.status === 'completed' && lesson.completedAt ? `${t('lessons.completedAt')}: ${formatDate(lesson.completedAt)}` : ''}
+              {lesson.status === 'cancelled' ? t('lessons.statusCancelled') : ''}
             </span>
           </div>
         </div>
@@ -274,14 +276,14 @@ export default function DersDetayPage({ params }: PageProps) {
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span>{lesson.duration} dakika</span>
+            <span>{lesson.duration} {t('lessons.minute')}</span>
             
             <span className="mx-3">•</span>
             
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
-            <span>{lesson.scheduledAt ? formatDate(lesson.scheduledAt) : 'Tarih belirtilmemiş'}</span>
+            <span>{lesson.scheduledAt ? formatDate(lesson.scheduledAt) : t('lessons.noDate')}</span>
           </div>
         </div>
         
@@ -289,7 +291,7 @@ export default function DersDetayPage({ params }: PageProps) {
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h2 className="text-lg font-bold text-[#994D1C] mb-4">Ders Detayları</h2>
+              <h2 className="text-lg font-bold text-[#994D1C] mb-4">{t('lessons.details')}</h2>
               
               <div className="bg-[#FFF8F2] p-4 rounded-lg mb-6">
                 <p className="text-gray-700 whitespace-pre-line">{lesson.description}</p>
@@ -297,19 +299,19 @@ export default function DersDetayPage({ params }: PageProps) {
               
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Ücret</h3>
+                  <h3 className="text-sm font-medium text-gray-500">{t('general.price')}</h3>
                   <p className="text-xl font-bold text-[#FF8B5E]">{lesson.price} TL</p>
                 </div>
                 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Oluşturulma Tarihi</h3>
+                  <h3 className="text-sm font-medium text-gray-500">{t('lessons.createdAt')}</h3>
                   <p>{formatDate(lesson.createdAt)}</p>
                 </div>
               </div>
             </div>
             
             <div>
-              <h2 className="text-lg font-bold text-[#994D1C] mb-4">{otherUserRole} Bilgileri</h2>
+              <h2 className="text-lg font-bold text-[#994D1C] mb-4">{user?.role === 'instructor' ? t('lessons.studentInfo') : t('lessons.teacherInfo')}</h2>
               
               <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
                 <div className="flex items-center space-x-4">
@@ -317,8 +319,8 @@ export default function DersDetayPage({ params }: PageProps) {
                     {otherUserName ? otherUserName.charAt(0).toUpperCase() : '?'}
                   </div>
                   <div>
-                    <h3 className="font-medium">{otherUserName || 'İsim belirtilmemiş'}</h3>
-                    <p className="text-sm text-gray-500">{otherUserEmail || 'E-posta belirtilmemiş'}</p>
+                    <h3 className="font-medium">{otherUserName || t('general.noName')}</h3>
+                    <p className="text-sm text-gray-500">{otherUserEmail || t('general.noEmail')}</p>
                   </div>
                 </div>
                 
@@ -327,27 +329,27 @@ export default function DersDetayPage({ params }: PageProps) {
                   href={`/mesajlarim?recipient=${user?.role === 'instructor' ? student._id : teacher._id}`}
                   className="mt-4 w-full block text-center bg-[#FFF8F2] text-[#FF8B5E] font-medium py-2 px-4 rounded-md hover:bg-[#FFE6D5] transition-all duration-300"
                 >
-                  Mesaj Gönder
+                  {t('messages.sendMessage')}
                 </Link>
               </div>
               
               {/* Ödeme bilgisi (yalnızca öğrenci ise) */}
               {user?.role === 'student' && (
                 <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Ödeme Durumu</h3>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">{t('lessons.paymentStatus')}</h3>
                   
                   {showPayment ? (
                     <div>
-                      <p className="text-yellow-600 mb-2">Bu ders için henüz ödeme yapılmamış.</p>
+                      <p className="text-yellow-600 mb-2">{t('lessons.notPaid')}</p>
                       <Link
                         href={`/payment?lessonId=${lesson._id}`}
                         className="w-full block text-center bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-medium py-2 px-4 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300"
                       >
-                        Ödeme Yap
+                        {t('lessons.payNow')}
                       </Link>
                     </div>
                   ) : (
-                    <p className="text-green-600">Ödeme tamamlandı</p>
+                    <p className="text-green-600">{t('lessons.paid')}</p>
                   )}
                 </div>
               )}

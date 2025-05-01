@@ -6,36 +6,36 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
-// Kaynak kategorileri
-const categories = [
-  'Ders Notları',
-  'Kitaplar',
-  'Makaleler',
-  'Videolar',
-  'Sunumlar',
-  'Sınav Soruları',
-  'Projeler',
-  'Diğer'
+// Kaynak kategorileri (multilingual keys)
+const categoryKeys: string[] = [
+  'resourceCategory.notes',
+  'resourceCategory.books',
+  'resourceCategory.articles',
+  'resourceCategory.videos',
+  'resourceCategory.presentations',
+  'resourceCategory.examQuestions',
+  'resourceCategory.projects',
+  'resourceCategory.other',
 ];
 
 // Kaynak formatları
-const formats = [
-  'PDF',
-  'DOC/DOCX',
-  'PPT/PPTX',
-  'XLS/XLSX',
-  'Video',
-  'Ses',
-  'Resim',
-  'Link',
-  'Diğer'
+const formatKeys: string[] = [
+  'resourceFormat.pdf',
+  'resourceFormat.doc',
+  'resourceFormat.ppt',
+  'resourceFormat.xls',
+  'resourceFormat.video',
+  'resourceFormat.audio',
+  'resourceFormat.image',
+  'resourceFormat.link',
+  'resourceFormat.other',
 ];
 
-// Akademik seviyeler
-const academicLevels = [
-  'Lisans',
-  'Yüksek Lisans',
-  'Doktora'
+// Akademik seviyeler (multilingual keys)
+const academicLevelKeys: string[] = [
+  'academicLevel.bachelor',
+  'academicLevel.master',
+  'academicLevel.phd',
 ];
 
 export default function KaynakPaylasPage() {
@@ -107,24 +107,24 @@ export default function KaynakPaylasPage() {
       const selectedFile = e.target.files[0];
       setFile(selectedFile);
       
-      // Dosya formatını otomatik olarak belirle
+      // Dosya formatını otomatik olarak belirle (çeviri anahtarlarıyla)
       const fileName = selectedFile.name.toLowerCase();
       if (fileName.endsWith('.pdf')) {
-        setFormData(prev => ({ ...prev, format: 'PDF' }));
+        setFormData(prev => ({ ...prev, format: 'resourceFormat.pdf' }));
       } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
-        setFormData(prev => ({ ...prev, format: 'DOC/DOCX' }));
+        setFormData(prev => ({ ...prev, format: 'resourceFormat.doc' }));
       } else if (fileName.endsWith('.ppt') || fileName.endsWith('.pptx')) {
-        setFormData(prev => ({ ...prev, format: 'PPT/PPTX' }));
+        setFormData(prev => ({ ...prev, format: 'resourceFormat.ppt' }));
       } else if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) {
-        setFormData(prev => ({ ...prev, format: 'XLS/XLSX' }));
+        setFormData(prev => ({ ...prev, format: 'resourceFormat.xls' }));
       } else if (fileName.endsWith('.mp4') || fileName.endsWith('.avi') || fileName.endsWith('.mov')) {
-        setFormData(prev => ({ ...prev, format: 'Video' }));
+        setFormData(prev => ({ ...prev, format: 'resourceFormat.video' }));
       } else if (fileName.endsWith('.mp3') || fileName.endsWith('.wav')) {
-        setFormData(prev => ({ ...prev, format: 'Ses' }));
+        setFormData(prev => ({ ...prev, format: 'resourceFormat.audio' }));
       } else if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png')) {
-        setFormData(prev => ({ ...prev, format: 'Resim' }));
+        setFormData(prev => ({ ...prev, format: 'resourceFormat.image' }));
       } else {
-        setFormData(prev => ({ ...prev, format: 'Diğer' }));
+        setFormData(prev => ({ ...prev, format: 'resourceFormat.other' }));
       }
     }
   };
@@ -267,10 +267,10 @@ export default function KaynakPaylasPage() {
                 required
                 className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
               >
-                <option value="">Seçiniz</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
+                <option value="">{t('general.selectOption')}</option>
+                {categoryKeys.map((key) => (
+                  <option key={key} value={key}>
+                    {t(key)}
                   </option>
                 ))}
               </select>
@@ -278,7 +278,7 @@ export default function KaynakPaylasPage() {
             
             <div>
               <label htmlFor="level" className="block text-sm font-medium text-[#6B3416] mb-1">
-                Akademik Seviyesi *
+                {t('general.academicLevel')} *
               </label>
               <select
                 id="level"
@@ -288,9 +288,9 @@ export default function KaynakPaylasPage() {
                 required
                 className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
               >
-                <option value="">Seçiniz</option>
-                {academicLevels.map((level) => (
-                  <option key={level} value={level}>{level}</option>
+                <option value="">{t('general.selectOption')}</option>
+                {academicLevelKeys.map((key) => (
+                  <option key={key} value={key}>{t(key)}</option>
                 ))}
               </select>
             </div>
@@ -435,10 +435,10 @@ export default function KaynakPaylasPage() {
                       required
                       className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
                     >
-                      <option value="">Seçiniz</option>
-                      {formats.map((format) => (
-                        <option key={format} value={format}>
-                          {format}
+                      <option value="">{t('general.selectOption')}</option>
+                      {formatKeys.map((key) => (
+                        <option key={key} value={key}>
+                          {t(key)}
                         </option>
                       ))}
                     </select>
@@ -472,10 +472,10 @@ export default function KaynakPaylasPage() {
                       required
                       className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
                     >
-                      <option value="">Seçiniz</option>
-                      {formats.map((format) => (
-                        <option key={format} value={format}>
-                          {format}
+                      <option value="">{t('general.selectOption')}</option>
+                      {formatKeys.map((key) => (
+                        <option key={key} value={key}>
+                          {t(key)}
                         </option>
                       ))}
                     </select>
