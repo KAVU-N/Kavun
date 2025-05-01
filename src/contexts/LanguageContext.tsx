@@ -313,7 +313,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Eğitmenler sayfası
     'instructors.title': 'Eğitmenlerimiz',
-    'instructors.universityDesc': '{{university}} üniversitesindeki eğitmenlerimizle tanışın ve ihtiyacınıza en uygun eğitmeni seçin.',
+    'instructors.universityDesc': '{university} üniversitesindeki eğitmenlerimizle tanışın ve ihtiyacınıza en uygun eğitmeni seçin.',
     'instructors.generalDesc': 'Alanında uzman eğitmenlerimizle tanışın ve ihtiyacınıza en uygun eğitmeni seçin.',
     'instructors.searchPlaceholder': 'Eğitmen ara...',
     'instructors.departmentsTitle': 'Uzmanlık Alanları',
@@ -339,6 +339,8 @@ const translations: Record<Language, Record<string, string>> = {
     'departments.industrial': 'Endüstri Mühendisliği',
     'departments.civil': 'İnşaat Mühendisliği',
     'departments.software': 'Yazılım Mühendisliği',
+    'general.allDepartments': 'Tüm Bölümler',
+    'general.allRatings': 'Tüm Puanlar',
     'auth.selectUniversity': 'Üniversitenizi seçin...',
     'auth.department': 'Bölümünüz',
     'auth.departmentPlaceholder': 'Bölümünüzü yazınız...',
@@ -443,7 +445,7 @@ const translations: Record<Language, Record<string, string>> = {
   en: {
     // Instructors page
     'instructors.title': 'Our Instructors',
-    'instructors.universityDesc': 'Meet the instructors at {{university}} University and choose the one that best suits your needs.',
+    'instructors.universityDesc': 'Meet the instructors at {university} University and choose the one that best suits your needs.',
     'instructors.generalDesc': 'Meet our expert instructors and choose the one that best suits your needs.',
     'instructors.searchPlaceholder': 'Search instructor...',
     'instructors.departmentsTitle': 'Expertise Areas',
@@ -469,6 +471,8 @@ const translations: Record<Language, Record<string, string>> = {
     'departments.industrial': 'Industrial Engineering',
     'departments.civil': 'Civil Engineering',
     'departments.software': 'Software Engineering',
+    'general.allDepartments': 'All Departments',
+    'general.allRatings': 'All Ratings',
     // Calendar
     'calendar.today': 'Today',
     'calendar.previous': 'Previous',

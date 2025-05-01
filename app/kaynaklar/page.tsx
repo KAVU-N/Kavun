@@ -198,13 +198,6 @@ export default function KaynaklarPage() {
   // Sayfa yüklenirken kaynakları getir
   useEffect(() => {
     fetchResources();
-    
-    // Her 30 saniyede bir güncel verileri çek
-    const intervalId = setInterval(() => {
-      fetchResources();
-    }, 30000); // 30 saniye
-    
-    return () => clearInterval(intervalId);
   }, []);
 
   // Kaynakları filtrele
