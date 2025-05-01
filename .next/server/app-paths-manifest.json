@@ -1,11 +1,6 @@
 {
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/ilanlarim/page": "app/ilanlarim/page.js",
-  "/ilan-duzenle/[id]/page": "app/ilan-duzenle/[id]/page.js",
-  "/ilan-ver/page": "app/ilan-ver/page.js",
   "/kaynaklar/page": "app/kaynaklar/page.js",
-  "/kaynaklar/paylas/page": "app/kaynaklar/paylas/page.js",
   "/api/resources/route": "app/api/resources/route.js",
-  "/ilanlar/page": "app/ilanlar/page.js",
-  "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js"
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+  "/api/resources/[id]/route": "app/api/resources/[id]/route.js"
 }

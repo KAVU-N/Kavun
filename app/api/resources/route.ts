@@ -7,26 +7,7 @@ import User from '@/models/User';
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    // Sadece gerekli alanları getirerek optimize et
-    const resources = await Resource.find({}, {
-      title: 1,
-      description: 1,
-      author: 1,
-      category: 1,
-      format: 1,
-      university: 1,
-      department: 1,
-      academicLevel: 1,
-      uploadDate: 1,
-      createdAt: 1,
-      downloadCount: 1,
-      viewCount: 1,
-      fileSize: 1,
-      tags: 1,
-      url: 1,
-      fileName: 1,
-      fileType: 1,
-    }).sort({ createdAt: -1 });
+    const resources = await Resource.find({}).sort({ createdAt: -1 });
     return NextResponse.json(resources);
   } catch (error) {
     console.error('Kaynaklar getirilirken hata oluştu:', error);
