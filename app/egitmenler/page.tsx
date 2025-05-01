@@ -41,7 +41,8 @@ export default function InstructorsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeChat, setActiveChat] = useState<Instructor | null>(null);
-  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
+  const [selectedRating, setSelectedRating] = useState<string>('all');
   const { user } = useAuth();
   const router = useRouter();
 
@@ -51,6 +52,20 @@ export default function InstructorsPage() {
       router.push('/auth/login');
     }
   }, [user, router]);
+
+  // Filtrelenmiş eğitmenler
+  const filteredInstructors = instructors.filter((instructor) => {
+    // Bölüm filtresi
+    const departmentMatch = !selectedDepartment || (instructor.expertise && departments.includes(selectedDepartment) && selectedDepartment === instructor.expertise);
+    // Puan filtresi (örnek: instructor.rating olmalı, yoksa varsayılan 0)
+    let rating = (instructor as any).rating || 0;
+    let ratingMatch = true;
+    if (selectedRating !== 'all') {
+      const min = parseInt(selectedRating, 10);
+      ratingMatch = rating >= min;
+    }
+    return departmentMatch && ratingMatch;
+  });
 
   // Eğitmenleri getir
   useEffect(() => {
@@ -114,12 +129,12 @@ export default function InstructorsPage() {
             <p className="text-[#994D1C]">
               <FaUniversity className="inline-block mr-2" />
               {user?.university
-                ? t('instructors.universityDesc', { university: user.university })
+                ? t('instructors.universityDesc', { university: String(user.university).replace(/\s*Üniversitesi$|\s*University$/i, '') })
                 : t('instructors.generalDesc')}
             </p>
           </div>
 
-          {/* Arama ve Filtre */}
+          {/* Arama ve Gelişmiş Filtreler */}
           <div className="mb-8">
             <div className="flex flex-col md:flex-row gap-4 mb-4">
               <div className="flex-1 relative">
@@ -133,33 +148,51 @@ export default function InstructorsPage() {
                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
               <button
-                onClick={() => setSelectedDepartment(null)}
+                onClick={() => {
+                  setSelectedDepartment('');
+                  setSelectedRating('all');
+                }}
                 className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-xl font-medium"
               >
-                {t('general.search')}
+                {t('general.clearFilters')}
               </button>
+            </div>
+            {/* Yeni filtre barı */}
+            <div className="flex flex-wrap gap-4 mt-2">
+              {/* Bölüm filtresi */}
+              <div>
+                <label className="block text-sm font-medium text-[#6B3416] mb-1">{t('instructors.departmentsTitle')}</label>
+                <select
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
+                  className="min-w-[160px] px-3 py-2 rounded-lg border-[#FFB996] focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+                >
+                  <option value="">{t('general.allDepartments')}</option>
+                  {departments.map((deptKey) => (
+                    <option key={deptKey} value={deptKey}>{t(deptKey)}</option>
+                  ))}
+                </select>
+              </div>
+              {/* Puan filtresi */}
+              <div>
+                <label className="block text-sm font-medium text-[#6B3416] mb-1">Puan</label>
+                <select
+                  value={selectedRating}
+                  onChange={(e) => setSelectedRating(e.target.value)}
+                  className="min-w-[120px] px-3 py-2 rounded-lg border-[#FFB996] focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+                >
+                  <option value="all">{t('general.allRatings')}</option>
+                  <option value="5">5</option>
+                  <option value="4">4+</option>
+                  <option value="3">3+</option>
+                  <option value="2">2+</option>
+                  <option value="1">1+</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          {/* Ders Filtreleri */}
-          <div className="bg-white p-6 rounded-xl shadow-md mb-6">
-            <h3 className="text-lg font-medium text-[#6B3416] mb-3">{t('instructors.departmentsTitle')}</h3>
-            <div className="flex flex-wrap gap-2">
-              {departments.map((deptKey) => (
-                <button
-                  key={deptKey}
-                  className={`px-4 py-2 rounded-lg text-sm transition-all duration-200
-                    ${selectedDepartment === deptKey 
-                      ? 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium' 
-                      : 'bg-[#FFE5D9] text-[#6B3416] hover:bg-[#FFB996] hover:text-white'
-                    }`}
-                  onClick={() => setSelectedDepartment(selectedDepartment === deptKey ? null : deptKey)}
-                >
-                  {t(deptKey)}
-                </button>
-              ))}
-            </div>
-          </div>
+
 
           {/* Eğitmenler Listesi */}
           {loading ? (
@@ -170,10 +203,10 @@ export default function InstructorsPage() {
             <div className="bg-white p-6 rounded-xl shadow-md">
               <p className="text-red-500 text-center">{error}</p>
             </div>
-          ) : instructors.length === 0 ? (
+          ) : filteredInstructors.length === 0 ? (
             <div className="bg-white p-8 rounded-xl shadow-md text-center">
               <p className="text-[#994D1C] mb-4">
-                {searchTerm || selectedDepartment
+                {searchTerm || selectedDepartment || selectedRating !== 'all'
                   ? t('instructors.noMatch')
                   : t('instructors.noInstructors')}
               </p>
@@ -183,7 +216,7 @@ export default function InstructorsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {instructors.map((instructor, index) => (
+              {filteredInstructors.map((instructor, index) => (
                 <div key={instructor._id || index} className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center mb-4">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3">
@@ -191,7 +224,7 @@ export default function InstructorsPage() {
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-800">{instructor.name}</h3>
-                      <p className="text-sm text-gray-600">{instructor.expertise || t('instructors.role')}</p>
+                      <p className="text-sm text-gray-600">{instructor.expertise ? t(instructor.expertise) : t('instructors.role')}</p>
                     </div>
                   </div>
                     

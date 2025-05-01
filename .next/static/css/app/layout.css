@@ -892,9 +892,6 @@ video {
 .max-h-\[85vh\] {
   max-height: 85vh;
 }
-.max-h-\[90vh\] {
-  max-height: 90vh;
-}
 .max-h-\[96vh\] {
   max-height: 96vh;
 }
@@ -966,6 +963,12 @@ video {
 }
 .min-w-full {
   min-width: 100%;
+}
+.min-w-\[120px\] {
+  min-width: 120px;
+}
+.min-w-\[160px\] {
+  min-width: 160px;
 }
 .max-w-2xl {
   max-width: 42rem;

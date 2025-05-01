@@ -1,8 +1,9 @@
 {
-  "/not-found": "app/not-found.js",
+  "/egitmenler/page": "app/egitmenler/page.js",
   "/page": "app/page.js",
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
   "/kaynaklar/page": "app/kaynaklar/page.js",
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+  "/profil/page": "app/profil/page.js",
   "/api/resources/route": "app/api/resources/route.js",
-  "/api/resources/[id]/route": "app/api/resources/[id]/route.js"
+  "/auth/login/page": "app/auth/login/page.js"
 }
