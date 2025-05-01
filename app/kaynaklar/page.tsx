@@ -513,18 +513,9 @@ export default function KaynaklarPage() {
       {/* Kaynak Önizleme Modalı */}
       {showPreviewModal && previewResource && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-<<<<<<< Updated upstream
           {/* Ana içerik: Kaynağı kaydırılabilir şekilde göster */}
           <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full max-h-[96vh] flex flex-col overflow-hidden">
             <div className="flex-1 overflow-auto p-8 relative">
-=======
-          <div className="bg-white rounded-xl shadow-lg max-w-3xl w-full max-h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-lg font-bold text-[#994D1C]">{previewResource.title} - {t('general.preview')}</h3>
-              <button onClick={() => setShowPreviewModal(false)} className="text-[#994D1C] hover:text-[#FF8B5E] text-2xl font-bold">&times;</button>
-            </div>
-            <div className="flex-1 overflow-auto p-4">
->>>>>>> Stashed changes
               {/* PDF Önizleme */}
               {previewResource.format === 'PDF' && (
                 <div className="relative w-full h-[85vh]">

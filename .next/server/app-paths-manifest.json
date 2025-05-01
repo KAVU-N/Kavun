@@ -1,18 +1,8 @@
 {
-<<<<<<< Updated upstream
+  "/not-found": "app/not-found.js",
+  "/page": "app/page.js",
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
   "/kaynaklar/page": "app/kaynaklar/page.js",
   "/api/resources/route": "app/api/resources/route.js",
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
   "/api/resources/[id]/route": "app/api/resources/[id]/route.js"
-=======
-  "/not-found": "app/not-found.js",
-  "/kaynaklar/page": "app/kaynaklar/page.js",
-  "/egitmenler/page": "app/egitmenler/page.js",
-  "/page": "app/page.js",
-  "/ilanlar/page": "app/ilanlar/page.js",
-  "/api/instructors/route": "app/api/instructors/route.js",
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/ilan-ver/page": "app/ilan-ver/page.js",
-  "/auth/login/page": "app/auth/login/page.js"
->>>>>>> Stashed changes
 }
