@@ -6,6 +6,7 @@ import { LanguageProvider } from '@/src/contexts/LanguageContext'
 import Navbar from '@/src/components/Navbar'
 import Footer from '@/src/components/Footer'
 import Link from 'next/link'
+import ClientOnly from '@/src/components/ClientOnly'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -53,7 +54,9 @@ export default function RootLayout({
         <AuthProvider>
           <LanguageProvider>
             <div className="flex flex-col min-h-screen" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
-              <Navbar />
+              <ClientOnly hideOnAdmin>
+                <Navbar />
+              </ClientOnly>
               <div className="flex-grow" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
                 <Toaster 
                   position="top-right"
@@ -80,9 +83,9 @@ export default function RootLayout({
                 />
                 {children}
               </div>
-              
-              {/* Kullandığımız Footer bileşeni zaten 'use client' direktifine sahip */}
-              <Footer />
+              <ClientOnly hideOnAdmin>
+                <Footer />
+              </ClientOnly>
             </div>
           </LanguageProvider>
         </AuthProvider>

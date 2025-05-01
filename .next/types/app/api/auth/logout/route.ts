@@ -1,8 +1,23 @@
+<<<<<<< Updated upstream
 // File: C:\Users\musta\OneDrive\Belgeler\GitHub\Kavun\app\api\auth\logout\route.ts
+=======
+<<<<<<<< Updated upstream:.next/types/app/api/auth/login/route.ts
+// File: C:\Users\musta\OneDrive\Belgeler\GitHub\Kavun\app\api\auth\login\route.ts
+import * as entry from '../../../../../../app/api/auth/login/route.js'
+import type { NextRequest } from 'next/server.js'
+
+type TEntry = typeof import('../../../../../../app/api/auth/login/route.js')
+========
+// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\api\auth\logout\route.ts
+>>>>>>> Stashed changes
 import * as entry from '../../../../../../app/api/auth/logout/route.js'
 import type { NextRequest } from 'next/server.js'
 
 type TEntry = typeof import('../../../../../../app/api/auth/logout/route.js')
+<<<<<<< Updated upstream
+=======
+>>>>>>>> Stashed changes:.next/types/app/api/auth/logout/route.ts
+>>>>>>> Stashed changes
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

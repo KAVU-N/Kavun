@@ -24,7 +24,16 @@ export async function GET(request: Request) {
   const userDoc = await User.findById(userId);
   if (userDoc && userDoc.welcomeNotificationDeleted) {
     // Hoş geldin bildirimi silinmişse, asla yeni hoş geldin bildirimi oluşturma!
-    const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
+    let filter: any = {};
+    if (user.role === 'student') {
+      filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'student' } ] };
+    } else if (user.role === 'teacher') {
+      filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'teacher' } ] };
+    } else {
+      // admin ve diğer roller sadece kendi userId'si ile görebilir
+      filter = { userId: userId };
+    }
+    const notifications = await Notification.find(filter).sort({ createdAt: -1 });
     return NextResponse.json({ notifications });
   }
 
@@ -42,20 +51,17 @@ export async function GET(request: Request) {
     });
   }
 
-  // Kullanıcıya ait tüm bildirimleri getir, sadece en yeni hoş geldin bildirimi göster
-  let notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
-  let welcomeFound = false;
-  notifications = notifications.filter(n => {
-    if (n.type === 'info' && /^Merhaba .*! Kavun Eğitim Platformu Hakkında$/i.test(n.title)) {
-      if (!welcomeFound) {
-        welcomeFound = true;
-        return true;
-      }
-      return false;
-    }
-    return true;
-  });
-
+  // Bildirimleri getirirken sadece hedef kitleye uygun olanları göster
+  let filter: any = {};
+  if (user.role === 'student') {
+    filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'student' } ] };
+  } else if (user.role === 'teacher') {
+    filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'teacher' } ] };
+  } else {
+    // admin ve diğer roller sadece kendi userId'si ile görebilir
+    filter = { userId: userId };
+  }
+  const notifications = await Notification.find(filter).sort({ createdAt: -1 });
   return NextResponse.json({ notifications });
 }
 

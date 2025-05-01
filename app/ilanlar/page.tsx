@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaSearch, FaFilter, FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher } from 'react-icons/fa';
+import Duyurular from './Duyurular';
 
 interface Teacher {
   _id: string;
@@ -159,6 +160,8 @@ export default function IlanlarPage() {
     <div className="min-h-screen bg-white pt-24 pb-16">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
+          {/* Duyurular */}
+          <Duyurular userRole={user.role === 'teacher' ? 'teacher' : 'student'} />
           <div className="mb-8 text-center md:text-left">
             <div className="inline-block mb-3 px-4 py-1 bg-[#FFF5F0] rounded-full text-[#994D1C] text-sm font-medium">
               <FaUniversity className="inline-block mr-2" />

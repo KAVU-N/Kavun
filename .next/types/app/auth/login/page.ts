@@ -1,8 +1,23 @@
+<<<<<<< Updated upstream
+<<<<<<<< Updated upstream:.next/types/app/auth/login/page.ts
 // File: C:\Users\musta\OneDrive\Belgeler\GitHub\Kavun\app\auth\login\page.tsx
+=======
+// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\auth\login\page.tsx
+>>>>>>> Stashed changes
 import * as entry from '../../../../../app/auth/login/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
 type TEntry = typeof import('../../../../../app/auth/login/page.js')
+<<<<<<< Updated upstream
+========
+// File: C:\Users\Ogem\Documents\GitHub\kavu_n\Kavun\app\admin\payments\page.tsx
+import * as entry from '../../../../../app/admin/payments/page.js'
+import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
+
+type TEntry = typeof import('../../../../../app/admin/payments/page.js')
+>>>>>>>> Stashed changes:.next/types/app/admin/payments/page.ts
+=======
+>>>>>>> Stashed changes
 
 // Check that the entry is a valid entry
 checkFields<Diff<{
