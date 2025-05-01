@@ -2,8 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaRocket, FaGraduationCap, FaCode, FaUsers, FaCertificate, FaLaptop } from "react-icons/fa";
 import { useEffect } from "react";
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Home() {
+  const { t } = useLanguage();
+
   useEffect(() => {
     // Sayfanın arka plan rengini ve metin rengini doğrudan JavaScript ile ayarla
     document.body.style.backgroundColor = "white";
@@ -16,7 +19,7 @@ export default function Home() {
         footer.style.backgroundColor = "white";
         footer.style.borderTopColor = "#FFE5D9";
         footer.style.color = "#6B3416";
-        footer.style.display = "block";
+        footer.style.display = "";
         footer.style.position = "relative";
         footer.style.zIndex = "999";
         footer.style.opacity = "1";
@@ -41,12 +44,10 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 lg:pr-12 mb-10 lg:mb-0">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#6B3416]" style={{color: '#6B3416 !important'}}>
-                İhtiyacına en uygun öğrencileri bul,<br />
-                hemen öğrenmeye başla!
+                {t('home.mainTitle')}
               </h1>
               <p className="text-xl text-[#994D1C] mb-8 max-w-xl" style={{color: '#994D1C !important'}}>
-                Kavun, öğrencileri ve eğitmenleri bir araya getiren yeni nesil bir eğitim platformudur.
-                İhtiyacınıza uygun öğrencileri bulun veya öğrenciler olarak platformumuza katılın.
+                {t('home.description')}
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
@@ -55,7 +56,7 @@ export default function Home() {
                     transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
                   style={{backgroundColor: '#FFB996 !important', color: 'white !important'}}
                 >
-                  Eğitmenleri Keşfet
+                  {t('home.exploreInstructors')}
                 </Link>
                 <Link
                   href="/auth/register"
@@ -63,7 +64,7 @@ export default function Home() {
                     transition-all duration-300 hover:bg-[#FFB996] hover:scale-105 active:scale-[0.98]"
                   style={{backgroundColor: '#FFE5D9 !important', color: '#994D1C !important'}}
                 >
-                  Hemen Kaydol
+                  {t('home.registerNow')}
                 </Link>
               </div>
             </div>
@@ -82,9 +83,9 @@ export default function Home() {
       <section className="py-16 bg-white" style={{backgroundColor: 'white !important'}}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#6B3416] mb-4" style={{color: '#6B3416 !important'}}>Neden Kavun?</h2>
+            <h2 className="text-3xl font-bold text-[#6B3416] mb-4" style={{color: '#6B3416 !important'}}>{t('home.whyKavun')}</h2>
             <p className="text-[#994D1C] max-w-2xl mx-auto" style={{color: '#994D1C !important'}}>
-              Eğitim yolculuğunuzda size eşlik edecek benzersiz özelliklerimiz
+              {t('home.featuresDescription')}
             </p>
           </div>
           
@@ -92,33 +93,33 @@ export default function Home() {
             {[
               {
                 icon: FaUsers,
-                title: "Uzman Eğitmenler",
-                description: "Alanında uzman eğitmenlerle bire bir eğitim imkanı"
+                title: t('home.featureExpertInstructors'),
+                description: t('home.featureOneOnOne')
               },
               {
                 icon: FaCertificate,
-                title: "Sertifikalı Eğitimler",
-                description: "Kariyerinize değer katacak sertifika programları"
+                title: t('home.featureCertified'),
+                description: t('home.featureCertificatePrograms')
               },
               {
                 icon: FaLaptop,
-                title: "Esnek Öğrenme",
-                description: "İstediğiniz zaman, istediğiniz yerden eğitim alma özgürlüğü"
+                title: t('home.featureFlexibleLearning'),
+                description: t('home.featureFlexibleLearningDescription')
               },
               {
                 icon: FaGraduationCap,
-                title: "Kişiselleştirilmiş",
-                description: "Öğrenme stilinize özel uyarlanmış eğitim içerikleri"
+                title: t('home.featurePersonalized'),
+                description: t('home.featurePersonalizedDescription')
               },
               {
                 icon: FaRocket,
-                title: "Kariyer Fırsatları",
-                description: "Mezunlarımıza özel iş ve staj fırsatları"
+                title: t('home.featureCareerOpportunities'),
+                description: t('home.featureCareerOpportunitiesDescription')
               },
               {
                 icon: FaCode,
-                title: "Güncel İçerik",
-                description: "Sürekli güncellenen ve sektör ihtiyaçlarına uygun müfredat"
+                title: t('home.featureUpToDateContent'),
+                description: t('home.featureUpToDateContentDescription')
               }
             ].map((feature, index) => (
               <div
@@ -144,10 +145,10 @@ export default function Home() {
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0 md:mr-8">
                 <h2 className="text-2xl md:text-3xl font-bold text-[#6B3416] mb-3" style={{color: '#6B3416 !important'}}>
-                  Öğrenme Yolculuğuna Hemen Başla
+                  {t('home.startLearning')}
                 </h2>
                 <p className="text-[#994D1C] max-w-lg" style={{color: '#994D1C !important'}}>
-                  Binlerce öğrenci ve eğitmen arasındaki topluluğumuza katıl, geleceğini şekillendir.
+                  {t('home.startLearningDescription')}
                 </p>
               </div>
               <Link
@@ -156,7 +157,7 @@ export default function Home() {
                   transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-[0.98]"
                 style={{backgroundColor: '#FFB996 !important', color: 'white !important'}}
               >
-                Ücretsiz Kaydol
+                {t('home.registerFree')}
               </Link>
             </div>
           </div>
@@ -186,13 +187,13 @@ export default function Home() {
               </div>
             </div>
             <div className="flex flex-wrap justify-center gap-x-8 gap-y-2">
-              <Link href="/" className="text-[#994D1C] hover:text-[#FF8B5E]" style={{color: '#994D1C !important'}}>Ana Sayfa</Link>
-              <Link href="/egitmenler" className="text-[#994D1C] hover:text-[#FF8B5E]" style={{color: '#994D1C !important'}}>Eğitmenler</Link>
-              <Link href="/hakkimizda" className="text-[#994D1C] hover:text-[#FF8B5E]" style={{color: '#994D1C !important'}}>Hakkımızda</Link>
-              <Link href="/iletisim" className="text-[#994D1C] hover:text-[#FF8B5E]" style={{color: '#994D1C !important'}}>İletişim</Link>
+              <Link href="/" className="text-[#994D1C] hover:text-[#FF8B5E]" style={{color: '#994D1C !important'}}>{t('nav.home')}</Link>
+              <Link href="/egitmenler" className="text-[#994D1C] hover:text-[#FF8B5E]" style={{color: '#994D1C !important'}}>{t('nav.instructors')}</Link>
+              <Link href="/hakkimizda" className="text-[#994D1C] hover:text-[#FF8B5E]" style={{color: '#994D1C !important'}}>{t('nav.about')}</Link>
+              <Link href="/iletisim" className="text-[#994D1C] hover:text-[#FF8B5E]" style={{color: '#994D1C !important'}}>{t('nav.contact')}</Link>
             </div>
             <p className="text-[#994D1C] text-sm mt-4 md:mt-0" style={{color: '#994D1C !important'}}>
-              &copy; {new Date().getFullYear()} Kavun. Tüm hakları saklıdır.
+              &copy; {new Date().getFullYear()} Kavun. {t('footer.allRightsReserved')}
             </p>
           </div>
         </div>

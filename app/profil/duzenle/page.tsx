@@ -7,8 +7,10 @@ import getCroppedImg from './utils/cropImage'; // Kırpma yardımcı fonksiyonu 
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 export default function ProfileEditPage() {
+  const { t } = useLanguage();
   // --- Crop modal state ---
   const [showCropModal, setShowCropModal] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -38,7 +40,7 @@ export default function ProfileEditPage() {
     e.preventDefault();
     
     if (!user) {
-      setError('Kullanıcı bilgisi bulunamadı');
+      setError(t('profile.userNotFound'));
       return;
     }
     
@@ -49,7 +51,7 @@ export default function ProfileEditPage() {
       
       const token = localStorage.getItem('token');
       if (!token) {
-        setError('Oturum bilgisi bulunamadı');
+        setError(t('profile.sessionNotFound'));
         return;
       }
       
@@ -98,7 +100,7 @@ export default function ProfileEditPage() {
       // LocalStorage'daki kullanıcı bilgilerini güncelle
       localStorage.setItem('user', JSON.stringify(data.user));
       
-      setSuccess('Profil bilgileriniz başarıyla güncellendi');
+      setSuccess(t('profile.updateSuccess'));
       
       // 2 saniye sonra profil sayfasına yönlendir
       setTimeout(() => {
@@ -107,7 +109,7 @@ export default function ProfileEditPage() {
       
     } catch (err: any) {
       console.error('Profil güncelleme hatası:', err);
-      setError(err.message || 'Profil güncellenirken bir hata oluştu');
+      setError(err.message || t('profile.updateError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -120,7 +122,7 @@ export default function ProfileEditPage() {
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#FFE5D9]">
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFB996]"></div>
-              <span className="ml-3 text-[#994D1C]">Yükleniyor...</span>
+              <span className="ml-3 text-[#994D1C]">{t('general.loading')}</span>
             </div>
           </div>
         </div>
@@ -137,24 +139,24 @@ export default function ProfileEditPage() {
       <div className="max-w-4xl mx-auto px-6">
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#FFE5D9]">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-[#6B3416]">Profil Düzenle</h1>
+            <h1 className="text-3xl font-bold text-[#6B3416]">{t('profile.editProfile')}</h1>
             <Link 
               href="/profil" 
               className="px-4 py-2 bg-gray-100 text-[#6B3416] rounded-lg hover:bg-gray-200 transition-colors"
             >
-              Vazgeç
+              {t('general.cancel')}
             </Link>
           </div>
           
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg">
-              {error}
+              {t(error)}
             </div>
           )}
           
           {success && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-600 rounded-lg">
-              {success}
+              {t(success)}
             </div>
           )}
           

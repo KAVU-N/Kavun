@@ -71,20 +71,20 @@ export default function ProfilePage() {
                 href="/profil/duzenle" 
                 className="px-4 py-2 border border-[#FF9B6A] text-[#FF9B6A] rounded-lg hover:bg-[#FF9B6A] hover:text-white transition-colors font-medium text-sm mt-4"
               >
-                ✏ Edit profile
+                ✏ {t('profile.editProfile')}
               </Link>
             </div>
           </div>
 
           {/* Hesap Durumu sadece burada */}
           <div className="mb-6">
-            <h2 className="text-sm font-medium text-[#994D1C]">Hesap Durumu</h2>
+            <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.accountStatus')}</h2>
             <div className="mt-1 text-lg text-[#6B3416] flex items-center gap-4">
               {user.isVerified ? (
-                <span className="text-green-600 font-semibold">Doğrulanmış</span>
+                <span className="text-green-600 font-semibold">{t('profile.verified')}</span>
               ) : (
                 <>
-                  <span className="text-red-600 font-semibold">Doğrulanmamış</span>
+                  <span className="text-red-600 font-semibold">{t('profile.unverified')}</span>
                   <button
                     className="ml-2 px-3 py-1 bg-[#FF9B6A] text-white rounded-md hover:bg-[#FF8B5E] transition-all text-sm font-semibold"
                     onClick={async () => {
@@ -96,7 +96,7 @@ export default function ProfilePage() {
                       router.push('/auth/verify');
                     }}
                   >
-                    Doğrula
+                    {t('profile.verify')}
                   </button>
                 </>
               )}

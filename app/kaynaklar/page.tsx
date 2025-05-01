@@ -132,11 +132,11 @@ export default function KaynaklarPage() {
         });
         
         if (!response.ok) {
-          console.error('Önizleme sayısı güncellenirken hata oluştu');
+          console.error(t('logs.previewUpdateError'));
         }
       }
     } catch (error) {
-      console.error('Önizleme sayısı güncellenirken hata:', error);
+      console.error(t('logs.previewUpdateError'), error);
     }
   };
   
@@ -611,7 +611,7 @@ export default function KaynaklarPage() {
                     }}
                     className="px-6 py-3 bg-[#FF8B5E] text-white font-medium rounded-xl transition-all duration-300 hover:bg-[#FF7A45]"
                   >
-                    Dosyayı İndir
+                    {t('general.downloadFile')}
                   </button>
                 </div>
               )}
@@ -688,7 +688,7 @@ export default function KaynaklarPage() {
                     onClick={() => handlePreview(resource)}
                     className="flex-1 px-4 py-2 bg-[#FFB996] text-white text-center rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300 text-sm"
                   >
-                    Önizle
+                    {t('general.preview')}
                   </button>
                   
                   <button

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/tr';
@@ -9,8 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 // Moment yerelleştirmesi
-moment.locale('tr');
-const localizer = momentLocalizer(moment);
+// useLanguage ve localizer'ı fonksiyonun içine taşıyoruz.
 
 // Takvim etkinlik tipi
 interface CalendarEvent {
@@ -32,6 +32,9 @@ interface LessonCalendarProps {
 }
 
 const LessonCalendar: React.FC<LessonCalendarProps> = ({ onSelectEvent }) => {
+  const { language, t } = useLanguage();
+  moment.locale(language === 'tr' ? 'tr' : 'en');
+  const localizer = momentLocalizer(moment);
   const { user } = useAuth();
   const router = useRouter();
   
@@ -201,25 +204,25 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({ onSelectEvent }) => {
         eventPropGetter={eventStyleGetter}
         popup
         messages={{
-          today: 'Bugün',
-          previous: 'Önceki',
-          next: 'Sonraki',
-          month: 'Ay',
-          week: 'Hafta',
-          day: 'Gün',
-          agenda: 'Ajanda',
-          date: 'Tarih',
-          time: 'Saat',
-          event: 'Etkinlik',
-          showMore: (total: number) => `+${total} daha...`,
-          noEventsInRange: 'Bu aralıkta ders bulunmuyor'
+          today: t('calendar.today'),
+          previous: t('calendar.previous'),
+          next: t('calendar.next'),
+          month: t('calendar.month'),
+          week: t('calendar.week'),
+          day: t('calendar.day'),
+          agenda: t('calendar.agenda'),
+          date: t('calendar.date'),
+          time: t('calendar.time'),
+          event: t('calendar.event'),
+          showMore: (total: number) => `${total > 0 ? '+' + total : ''} ${t('calendar.more')}`,
+          noEventsInRange: t('calendar.noEventsInRange'),
         }}
         formats={{
-          monthHeaderFormat: 'MMMM YYYY',
-          dayHeaderFormat: 'DD MMMM YYYY, dddd',
+          monthHeaderFormat: language === 'tr' ? 'MMMM YYYY' : 'MMMM YYYY',
+          dayHeaderFormat: language === 'tr' ? 'DD MMMM YYYY, dddd' : 'dddd, MMMM DD, YYYY',
           dayRangeHeaderFormat: ({ start, end }: { start: Date, end: Date }) => 
-            `${moment(start).format('DD MMMM')} - ${moment(end).format('DD MMMM YYYY')}`,
-          agendaDateFormat: 'DD MMMM (ddd)',
+            `${moment(start).format(language === 'tr' ? 'DD MMMM' : 'MMM DD')} - ${moment(end).format(language === 'tr' ? 'DD MMMM YYYY' : 'MMM DD, YYYY')}`,
+          agendaDateFormat: language === 'tr' ? 'DD MMMM (ddd)' : 'ddd, MMM DD',
           agendaTimeFormat: 'HH:mm',
           agendaTimeRangeFormat: ({ start, end }: { start: Date, end: Date }) => 
             `${moment(start).format('HH:mm')} - ${moment(end).format('HH:mm')}`,

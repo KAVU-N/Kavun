@@ -332,7 +332,7 @@ export default function Navbar() {
                               <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
                             )}
                           </div>
-                          <span>Bildirimler</span>
+                          <span>{t('nav.notifications')}</span>
                           {unreadNotifications > 0 && (
                             <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                               {unreadNotifications > 9 ? '9+' : unreadNotifications}
