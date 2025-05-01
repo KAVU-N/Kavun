@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Notification from './Notification';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -174,9 +175,7 @@ export default function MessagesPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF8B5E]"></div>
           </div>
         ) : error ? (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            <p>{error}</p>
-          </div>
+          <Notification type="error" message={error || ''} onClose={() => setError(null)} />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
             {/* Konuşmalar Listesi */}
