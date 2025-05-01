@@ -12,6 +12,7 @@ interface User {
   isVerified: boolean;
   expertise?: string; // Okuduğu bölüm
   grade?: number; // Kaçıncı sınıf
+  viewQuota?: number; // Kullanıcının kaynak görme hakkı
 }
 
 interface LoginData {
