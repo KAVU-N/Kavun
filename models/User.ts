@@ -16,6 +16,7 @@ export interface IUser extends Document {
   resetPasswordExpires?: Date;
   expertise?: string; // Okuduğu bölüm
   profilePhotoUrl?: string; // Profil fotoğrafı URL'si
+  viewQuota?: number; // Kullanıcının kaynak görme hakkı
   createdAt: Date;
   welcomeNotificationDeleted: boolean;
 }
@@ -78,6 +79,11 @@ const userSchema = new Schema({
     type: String,
     default: '',
     trim: true
+  },
+  viewQuota: {
+    type: Number,
+    default: 2,
+    min: 0
   },
   createdAt: {
     type: Date,

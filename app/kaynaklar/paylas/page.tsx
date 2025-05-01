@@ -163,6 +163,7 @@ export default function KaynakPaylasPage() {
         title: formData.title,
         description: formData.description,
         author: user?.name || 'Anonim',
+        authorId: user?.id, // Eksik olan alan eklendi
         category: formData.category,
         format: formData.format,
         level: formData.level,

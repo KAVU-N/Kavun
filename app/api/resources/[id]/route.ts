@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Resource from '@/models/Resource';
 import ResourceActivity from '@/models/ResourceActivity';
+import User from '@/models/User';
 import mongoose from 'mongoose';
 
 // Belirli bir kaynağı getir
@@ -44,6 +45,17 @@ export async function PATCH(
     
     // Kullanıcı kimliği (varsa)
     const userId = data.userId || null;
+
+    // --- İZLEME/İNDİRME HAK KONTROLÜ ---
+    if (['download', 'view', 'preview'].includes(data.action) && userId) {
+      const user = await User.findById(userId);
+      if (!user) {
+        return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
+      }
+      if ((user.viewQuota ?? 0) <= 0) {
+        return NextResponse.json({ error: 'Yeterli izleme hakkınız yok', code: 'NO_QUOTA' }, { status: 403 });
+      }
+    }
     
     // İşlem türüne göre güncelleme yap
     if (data.action === 'download') {
@@ -52,6 +64,10 @@ export async function PATCH(
       session.startTransaction();
       
       try {
+        // Kullanıcının hakkını 1 azalt
+        if (userId) {
+          await User.findByIdAndUpdate(userId, { $inc: { viewQuota: -1 } }, { session });
+        }
         // İndirme sayısını artır
         const resource = await Resource.findByIdAndUpdate(
           id,
@@ -92,6 +108,10 @@ export async function PATCH(
       session.startTransaction();
       
       try {
+        // Kullanıcının hakkını 1 azalt
+        if (userId) {
+          await User.findByIdAndUpdate(userId, { $inc: { viewQuota: -1 } }, { session });
+        }
         // Görüntülenme sayısını artır
         const resource = await Resource.findByIdAndUpdate(
           id,

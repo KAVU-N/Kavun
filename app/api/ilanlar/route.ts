@@ -83,8 +83,21 @@ export async function GET(req: Request) {
       userId: ilan.userId
     })));
     
-    // Kullanıcının ilanlarını getir
-    const ilanlar = await Ilan.find(query).sort({ createdAt: -1 });
+    // Sadece gerekli alanları getirerek optimize et
+    const ilanlar = await Ilan.find(query, {
+      title: 1,
+      description: 1,
+      price: 1,
+      method: 1,
+      duration: 1,
+      frequency: 1,
+      status: 1,
+      instructorFrom: 1,
+      userId: 1,
+      createdAt: 1,
+      updatedAt: 1,
+      // Büyük, gereksiz alanlar hariç
+    }).sort({ createdAt: -1 });
     console.log('API GET ilanlar - Bulunan ilanlar:', ilanlar.length);
     
     return NextResponse.json(ilanlar);
