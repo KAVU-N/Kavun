@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -71,7 +71,6 @@ export default function KaynaklarPage() {
     : ['Hepsi', 'Lisans', 'Yüksek Lisans', 'Doktora'];
   const { user } = useAuth();
   const [resources, setResources] = useState<Resource[]>([]);
-  const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -89,8 +88,43 @@ export default function KaynaklarPage() {
   // --- 9'lu sayfalama için kaynakları böl ---
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 9;
+
+  // Filtreleme ve sıralama işlemlerini useMemo ile optimize et
+  const filteredResources = useMemo(() => {
+    let filtered = [...resources];
+    if (searchTerm) {
+      filtered = filtered.filter(r => r.title.toLowerCase().includes(searchTerm.toLowerCase()) || r.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
+    if (selectedCategory) {
+      filtered = filtered.filter(r => r.category === selectedCategory);
+    }
+    if (selectedFormat) {
+      filtered = filtered.filter(r => r.format === selectedFormat);
+    }
+    if (selectedUniversity && selectedUniversity !== 'all') {
+      filtered = filtered.filter(r => r.university === selectedUniversity);
+    }
+    if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') {
+      filtered = filtered.filter(r => r.academicLevel === selectedAcademicLevel);
+    }
+    // Sıralama
+    filtered.sort((a, b) => {
+      if (sortBy === 'date') {
+        return sortOrder === 'asc'
+          ? new Date(a.uploadDate).getTime() - new Date(b.uploadDate).getTime()
+          : new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime();
+      } else if (sortBy === 'download') {
+        return sortOrder === 'asc' ? a.downloadCount - b.downloadCount : b.downloadCount - a.downloadCount;
+      } else if (sortBy === 'view') {
+        return sortOrder === 'asc' ? a.viewCount - b.viewCount : b.viewCount - a.viewCount;
+      }
+      return 0;
+    });
+    return filtered;
+  }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, sortBy, sortOrder]);
+
   const pageCount = Math.ceil(filteredResources.length / pageSize);
-  const paginatedResources = filteredResources.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedResources = useMemo(() => filteredResources.slice((currentPage - 1) * pageSize, currentPage * pageSize), [filteredResources, currentPage, pageSize]);
 
   // --- Kullanıcı önizlemeye 3. kez tıkladıysa paylaşım zorunlu premium modalı için sayaç ---
   const [previewClickCount, setPreviewClickCount] = useState(0);
@@ -263,7 +297,7 @@ export default function KaynaklarPage() {
       return 0;
     });
     
-    setFilteredResources(result);
+    // setFilteredResources KULLANILMIYOR, kaldırıldı. result);
   }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, sortBy, sortOrder]);
 
   // Formatı insan tarafından okunabilir hale getir
@@ -642,7 +676,7 @@ export default function KaynaklarPage() {
         </div>
       ) : paginatedResources.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {paginatedResources.map((resource) => (
+          {paginatedResources.map((resource: Resource) => (
             <div key={resource._id || resource.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
@@ -651,11 +685,9 @@ export default function KaynaklarPage() {
                     {resource.format}
                   </div>
                 </div>
-                
                 <p className="text-sm text-[#6B3416] mb-3 line-clamp-2">{resource.description}</p>
-                
                 <div className="flex flex-wrap gap-1 mb-3">
-                  {resource.tags.slice(0, 3).map((tag, index) => (
+                  {resource.tags.slice(0, 3).map((tag: string, index: number) => (
                     <span key={index} className="bg-[#FFE5D9] text-[#994D1C] text-xs px-2 py-1 rounded-full">
                       {tag}
                     </span>
@@ -666,7 +698,6 @@ export default function KaynaklarPage() {
                     </span>
                   )}
                 </div>
-                
                 <div className="flex justify-between items-center text-xs text-[#6B3416] mb-3">
                   <div>{resource.author}</div>
                   <div>
@@ -675,7 +706,6 @@ export default function KaynaklarPage() {
                     </span>
                   </div>
                 </div>
-                
                 <div className="flex justify-between items-center text-xs text-[#6B3416] mb-4">
                   <div className="flex items-center">
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -692,22 +722,18 @@ export default function KaynaklarPage() {
                   </div>
                   <div>{formatFileSize(resource.fileSize)}</div>
                 </div>
-                
                 <div className="flex justify-between gap-2">
                   <Link key={resource._id || resource.id} href={`/kaynaklar/${resource._id || resource.id}`}>
                     <div className="flex-1 px-4 py-2 bg-[#FFF5F0] text-[#994D1C] text-center rounded-lg border border-[#FFB996] hover:bg-[#FFE5D9] transition-colors duration-300 text-sm">
                       {t('general.resourceView')}
                     </div>
                   </Link>
-                  
-                  {/* Önizle Butonu - Tüm kaynak türleri için */}
                   <button
                     onClick={() => handlePreview(resource)}
                     className="flex-1 px-4 py-2 bg-[#FFB996] text-white text-center rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300 text-sm"
                   >
                     {t('general.preview')}
                   </button>
-                  
                   <button
                     onClick={() => handleDownload(resource)}
                     className="flex-1 px-4 py-2 bg-[#FF8B5E] text-white text-center rounded-lg hover:bg-[#FF7A45] transition-colors duration-300 text-sm cursor-pointer"

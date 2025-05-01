@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Notification from './Notification';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -190,9 +191,7 @@ export default function IlanlarimPage() {
               <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
             </div>
           ) : error ? (
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <p className="text-red-500 text-center">{error}</p>
-            </div>
+            <Notification type="error" message={error || ''} onClose={() => setError('')} />
           ) : ilanlar.length === 0 ? (
             <div className="bg-white p-8 rounded-xl shadow-md text-center">
               <p className="text-[#994D1C] mb-4">Henüz hiç ilan oluşturmadınız.</p>

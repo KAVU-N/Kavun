@@ -6,28 +6,19 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 
+import { useMemo } from 'react';
+
 export default function ProfilePage() {
   const { user: authUser, loading: authLoading, setUser } = useAuth();
-  const [user, setProfileUser] = useState(authUser);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const router = useRouter();
   const { t } = useLanguage();
 
-  useEffect(() => {
+  // Kullanıcı yoksa login'e yönlendir veya yükleniyor ise loading göster
+  if (!authUser || authLoading) {
     if (!authLoading && !authUser) {
       router.push('/auth/login');
-      return;
+      return null;
     }
-    
-    if (authUser) {
-      // AuthContext'ten gelen kullanıcı bilgilerini kullan
-      setProfileUser(authUser);
-      setLoading(false);
-    }
-  }, [authUser, authLoading, router]);
-
-  if (loading) {
     return (
       <div className="min-h-screen bg-[#FFF5F0] pt-20">
         <div className="max-w-4xl mx-auto px-6">
@@ -42,8 +33,53 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) {
-    return null;
+  // useMemo ile rol etiketi ve baş harf
+  const roleLabel = useMemo(() => authUser.role === 'student' ? t('auth.student') : t('auth.instructor'), [authUser.role, t]);
+  const userInitial = useMemo(() => authUser.name?.[0]?.toUpperCase() || 'U', [authUser.name]);
+
+  // Profil fotoğrafı componenti
+  function ProfilePhoto() {
+    return (
+      <div className="w-24 h-24 rounded-full bg-[#191921] flex items-center justify-center text-white text-4xl font-bold border-4 border-[#FF9B6A]" style={{letterSpacing: '2px'}}>
+        {(authUser as any).profilePhotoUrl ? (
+          <img src={(authUser as any).profilePhotoUrl} alt="Profil Fotoğrafı" className="w-full h-full object-cover rounded-full" />
+        ) : (
+          userInitial
+        )}
+      </div>
+    );
+  }
+
+  // Hesap durumu componenti
+  type AccountStatusProps = { authUser: NonNullable<ReturnType<typeof useAuth>['user']> };
+  function AccountStatus({ authUser }: AccountStatusProps) {
+    return (
+      <div className="mb-6">
+        <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.accountStatus')}</h2>
+        <div className="mt-1 text-lg text-[#6B3416] flex items-center gap-4">
+          {authUser.isVerified ? (
+            <span className="text-green-600 font-semibold">{t('profile.verified')}</span>
+          ) : (
+            <>
+              <span className="text-red-600 font-semibold">{t('profile.unverified')}</span>
+              <button
+                className="ml-2 px-3 py-1 bg-[#FF9B6A] text-white rounded-md hover:bg-[#FF8B5E] transition-all text-sm font-semibold"
+                onClick={async () => {
+                  await fetch('/api/auth/send-verification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: authUser.email })
+                  });
+                  router.push('/auth/verify');
+                }}
+              >
+                {t('profile.verify')}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -53,19 +89,13 @@ export default function ProfilePage() {
           {/* Modern üst blok */}
           <div className="flex flex-col md:flex-row items-center justify-between mb-8">
             <div className="mb-6 md:mb-0">
-              <div className="text-xs tracking-widest text-[#6B3416] font-semibold uppercase mb-1">{user.role === 'student' ? t('auth.student') : t('auth.instructor')}</div>
-              <div className="text-2xl md:text-3xl font-bold text-[#6B3416]">{user.name}</div>
+              <div className="text-xs tracking-widest text-[#6B3416] font-semibold uppercase mb-1">{roleLabel}</div>
+              <div className="text-2xl md:text-3xl font-bold text-[#6B3416]">{authUser.name}</div>
             </div>
             <div className="flex flex-col items-center bg-white rounded-2xl shadow-md p-8 border border-[#EEE8FC]">
               {/* Profil fotoğrafı yükleme alanı */}
               <div className="relative flex flex-col items-center mb-4">
-                <div className="w-24 h-24 rounded-full bg-[#191921] flex items-center justify-center text-white text-4xl font-bold border-4 border-[#FF9B6A]" style={{letterSpacing: '2px'}}>
-                  {(user as any).profilePhotoUrl ? (
-                    <img src={(user as any).profilePhotoUrl} alt="Profil Fotoğrafı" className="w-full h-full object-cover rounded-full" />
-                  ) : (
-                    user.name?.[0]?.toUpperCase() || 'U'
-                  )}
-                </div>
+                <ProfilePhoto />
               </div>
               <Link 
                 href="/profil/duzenle" 
@@ -77,74 +107,50 @@ export default function ProfilePage() {
           </div>
 
           {/* Hesap Durumu sadece burada */}
-          <div className="mb-6">
-            <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.accountStatus')}</h2>
-            <div className="mt-1 text-lg text-[#6B3416] flex items-center gap-4">
-              {user.isVerified ? (
-                <span className="text-green-600 font-semibold">{t('profile.verified')}</span>
-              ) : (
-                <>
-                  <span className="text-red-600 font-semibold">{t('profile.unverified')}</span>
-                  <button
-                    className="ml-2 px-3 py-1 bg-[#FF9B6A] text-white rounded-md hover:bg-[#FF8B5E] transition-all text-sm font-semibold"
-                    onClick={async () => {
-                      await fetch('/api/auth/send-verification', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: user.email })
-                      });
-                      router.push('/auth/verify');
-                    }}
-                  >
-                    {t('profile.verify')}
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
+          <AccountStatus authUser={authUser} />
 
           <div className="space-y-6">
             <div>
               <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.fullName')}</h2>
-              <p className="mt-1 text-lg text-[#6B3416]">{user.name}</p>
+              <p className="mt-1 text-lg text-[#6B3416]">{authUser.name}</p>
             </div>
 
             <div>
               <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.email')}</h2>
-              <p className="mt-1 text-lg text-[#6B3416]">{user.email}</p>
+              <p className="mt-1 text-lg text-[#6B3416]">{authUser.email}</p>
             </div>
 
             <div>
               <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.university')}</h2>
-              <p className="mt-1 text-lg text-[#6B3416]">{user.university}</p>
+              <p className="mt-1 text-lg text-[#6B3416]">{authUser.university}</p>
             </div>
 
             <div>
               <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.role')}</h2>
               <p className="mt-1 text-lg text-[#6B3416] capitalize">
-                {user.role === 'student' ? t('auth.student') : t('auth.instructor')}
+                {authUser.role === 'student' ? t('auth.student') : t('auth.instructor')}
               </p>
             </div>
 
             <div>
               <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.department')}</h2>
               <p className="mt-1 text-lg text-[#6B3416]">
-                {user.expertise || t('general.notSpecified') || 'Belirtilmemiş'}
+                {authUser.expertise || t('general.notSpecified') || 'Belirtilmemiş'}
               </p>
             </div>
 
             <div>
               <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.class')}</h2>
               <p className="mt-1 text-lg text-[#6B3416]">
-                {user.grade !== undefined ? 
-                  (user.grade === 0 ? t('profile.graduate') : 
-                   user.grade === 1 ? t('profile.firstYear') :
-                   user.grade === 2 ? t('profile.secondYear') :
-                   user.grade === 3 ? t('profile.thirdYear') :
-                   user.grade === 4 ? t('profile.fourthYear') :
-                   user.grade === 5 ? t('profile.fifthYear') :
-                   user.grade === 6 ? t('profile.sixthYear') :
-                   `${user.grade}. ${t('profile.class')}`) 
+                {authUser.grade !== undefined ? 
+                  (authUser.grade === 0 ? t('profile.graduate') : 
+                   authUser.grade === 1 ? t('profile.firstYear') :
+                   authUser.grade === 2 ? t('profile.secondYear') :
+                   authUser.grade === 3 ? t('profile.thirdYear') :
+                   authUser.grade === 4 ? t('profile.fourthYear') :
+                   authUser.grade === 5 ? t('profile.fifthYear') :
+                   authUser.grade === 6 ? t('profile.sixthYear') :
+                   `${authUser.grade}. ${t('profile.class')}`) 
                   : t('general.notSpecified') || 'Belirtilmemiş'}
               </p>
             </div>

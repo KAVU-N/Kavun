@@ -958,17 +958,17 @@ video {
 .min-w-0 {
   min-width: 0px;
 }
-.min-w-\[200px\] {
-  min-width: 200px;
-}
-.min-w-full {
-  min-width: 100%;
-}
 .min-w-\[120px\] {
   min-width: 120px;
 }
 .min-w-\[160px\] {
   min-width: 160px;
+}
+.min-w-\[200px\] {
+  min-width: 200px;
+}
+.min-w-full {
+  min-width: 100%;
 }
 .max-w-2xl {
   max-width: 42rem;
@@ -2380,6 +2380,10 @@ body {
 .hover\:text-white:hover {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+.hover\:text-black:hover {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity, 1));
 }
 .hover\:underline:hover {
   text-decoration-line: underline;

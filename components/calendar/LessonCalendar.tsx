@@ -56,7 +56,8 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({ onSelectEvent }) => {
   const fetchLessons = async () => {
     setLoading(true);
     try {
-      const endpoint = user?.role === 'teacher' 
+      if (!user) return; // Guard: user is possibly null
+      const endpoint = user.role === 'teacher' 
         ? `/api/lessons?teacherId=${user.id}` 
         : `/api/lessons?studentId=${user.id}`;
       

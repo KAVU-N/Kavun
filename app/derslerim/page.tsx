@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Notification from './Notification';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
@@ -284,11 +285,7 @@ export default function DerslerimPage() {
         </p>
       </div>
       
-      {error && (
-        <div className="bg-red-100 text-red-600 p-4 rounded-md mb-6">
-          {error}
-        </div>
-      )}
+      <Notification type="error" message={error || ''} onClose={() => setError(null)} />
       
       {/* İstatistik Kartları */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

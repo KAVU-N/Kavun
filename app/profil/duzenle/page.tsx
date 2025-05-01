@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Notification from './Notification';
 import Cropper from 'react-easy-crop';
 import Modal from 'react-modal';
 import getCroppedImg from './utils/cropImage'; // Kırpma yardımcı fonksiyonu (aşağıda eklenecek)
@@ -148,17 +149,8 @@ export default function ProfileEditPage() {
             </Link>
           </div>
           
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg">
-              {t(error)}
-            </div>
-          )}
-          
-          {success && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-600 rounded-lg">
-              {t(success)}
-            </div>
-          )}
+          <Notification type="error" message={error ? t(error) : ''} onClose={() => setError('')} />
+          <Notification type="success" message={success ? t(success) : ''} onClose={() => setSuccess('')} />
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="mb-8">
