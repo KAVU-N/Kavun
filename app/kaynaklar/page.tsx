@@ -71,6 +71,7 @@ export default function KaynaklarPage() {
     : ['Hepsi', 'Lisans', 'Yüksek Lisans', 'Doktora'];
   const { user } = useAuth();
   const [resources, setResources] = useState<Resource[]>([]);
+  const [total, setTotal] = useState(0); // total resource count for pagination
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -85,50 +86,47 @@ export default function KaynaklarPage() {
   const [sortOrder, setSortOrder] = useState('desc');
   const [showFilters, setShowFilters] = useState(false);
 
-  // --- 9'lu sayfalama için kaynakları böl ---
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 9;
+  const pageSize = 4;
+  const pageCount = Math.ceil(total / pageSize);
 
-  // Filtreleme ve sıralama işlemlerini useMemo ile optimize et
-  const filteredResources = useMemo(() => {
-    let filtered = [...resources];
-    if (searchTerm) {
-      filtered = filtered.filter(r => r.title.toLowerCase().includes(searchTerm.toLowerCase()) || r.description.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Fetch resources from API with filters, search, sort, pagination
+  const fetchResources = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        pageSize: pageSize.toString(),
+        searchTerm,
+        category: selectedCategory,
+        format: selectedFormat,
+        university: selectedUniversity,
+        academicLevel: selectedAcademicLevel,
+        sortBy: sortBy === 'date' ? 'createdAt' : sortBy,
+        sortOrder,
+      });
+      const response = await fetch(`/api/resources?${params.toString()}`);
+      if (!response.ok) throw new Error('API hatası');
+      const data = await response.json();
+      setResources(data.resources);
+      setTotal(data.total);
+    } catch (error) {
+      console.error('Kaynaklar yüklenirken hata:', error);
+      setError('Kaynaklar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      setResources([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
     }
-    if (selectedCategory) {
-      filtered = filtered.filter(r => r.category === selectedCategory);
-    }
-    if (selectedFormat) {
-      filtered = filtered.filter(r => r.format === selectedFormat);
-    }
-    if (selectedUniversity && selectedUniversity !== 'all') {
-      filtered = filtered.filter(r => r.university === selectedUniversity);
-    }
-    if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') {
-      filtered = filtered.filter(r => r.academicLevel === selectedAcademicLevel);
-    }
-    // Sıralama
-    filtered.sort((a, b) => {
-      if (sortBy === 'date') {
-        return sortOrder === 'asc'
-          ? new Date(a.uploadDate).getTime() - new Date(b.uploadDate).getTime()
-          : new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime();
-      } else if (sortBy === 'download') {
-        return sortOrder === 'asc' ? a.downloadCount - b.downloadCount : b.downloadCount - a.downloadCount;
-      } else if (sortBy === 'view') {
-        return sortOrder === 'asc' ? a.viewCount - b.viewCount : b.viewCount - a.viewCount;
-      }
-      return 0;
-    });
-    return filtered;
-  }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, sortBy, sortOrder]);
+  };
 
-  const pageCount = Math.ceil(filteredResources.length / pageSize);
-  const paginatedResources = useMemo(() => filteredResources.slice((currentPage - 1) * pageSize, currentPage * pageSize), [filteredResources, currentPage, pageSize]);
-
-  // --- Kullanıcı önizlemeye 3. kez tıkladıysa paylaşım zorunlu premium modalı için sayaç ---
-  const [previewClickCount, setPreviewClickCount] = useState(0);
-  const [showPremiumBlock, setShowPremiumBlock] = useState(false);
+  // Fetch resources on mount and whenever filters/search/page/sort changes
+  useEffect(() => {
+    fetchResources();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, sortBy, sortOrder]);
 
   // Dropdown dışına tıklandığında kapat
   useEffect(() => {
@@ -211,95 +209,6 @@ export default function KaynaklarPage() {
     }
   };
   
-  // Kaynakları getir
-  const fetchResources = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('/api/resources');
-      if (!response.ok) throw new Error('API hatası');
-      const data = await response.json();
-      setResources(data);
-    } catch (error) {
-      console.error('Kaynaklar yüklenirken hata:', error);
-      setError('Kaynaklar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
-      setResources([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  // Sayfa yüklenirken kaynakları getir
-  useEffect(() => {
-    fetchResources();
-  }, []);
-
-  // Kaynakları filtrele
-  useEffect(() => {
-    let result = resources;
-    
-    // Arama terimine göre filtrele
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(
-        resource => 
-          resource.title.toLowerCase().includes(term) || 
-          resource.description.toLowerCase().includes(term) || 
-          resource.author.toLowerCase().includes(term) ||
-          resource.tags.some(tag => tag.toLowerCase().includes(term))
-      );
-    }
-    
-    // Kategoriye göre filtrele
-    if (selectedCategory) {
-      result = result.filter(resource => resource.category === t(selectedCategory));
-    }
-    
-    // Formata göre filtrele
-    if (selectedFormat) {
-      result = result.filter(resource => resource.format === t(selectedFormat));
-    }
-    
-    // Üniversiteye göre filtrele
-    if (selectedUniversity !== 'all') {
-      result = result.filter(resource => 
-        turkishToLower(resource.university).includes(turkishToLower(selectedUniversity))
-      );
-    }
-    
-    // Akademik seviyeye göre filtrele
-    if (selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') {
-      result = result.filter(resource =>
-        resource.academicLevel &&
-        resource.academicLevel.trim().toLowerCase() === selectedAcademicLevel.trim().toLowerCase()
-      );
-    }
-    
-    // Sıralama
-    result = [...result].sort((a, b) => {
-      if (sortBy === 'date') {
-        return sortOrder === 'asc' 
-          ? new Date(a.uploadDate).getTime() - new Date(b.uploadDate).getTime()
-          : new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime();
-      } else if (sortBy === 'downloads') {
-        return sortOrder === 'asc' 
-          ? a.downloadCount - b.downloadCount
-          : b.downloadCount - a.downloadCount;
-      } else if (sortBy === 'views') {
-        return sortOrder === 'asc' 
-          ? a.viewCount - b.viewCount
-          : b.viewCount - a.viewCount;
-      } else if (sortBy === 'title') {
-        return sortOrder === 'asc'
-          ? a.title.localeCompare(b.title)
-          : b.title.localeCompare(a.title);
-      }
-      return 0;
-    });
-    
-    // setFilteredResources KULLANILMIYOR, kaldırıldı. result);
-  }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, sortBy, sortOrder]);
-
   // Formatı insan tarafından okunabilir hale getir
   const formatFileSize = (sizeInMB: string): string => {
     const size = parseFloat(sizeInMB);
@@ -334,7 +243,7 @@ export default function KaynaklarPage() {
 
   // Kullanıcının kaynak görme hakkı kadar kaynağı göster
   const userViewQuota = user?.viewQuota ?? 2;
-  const visibleResources = filteredResources.slice(0, userViewQuota);
+  const visibleResources = resources.slice(0, userViewQuota);
 
   return (
     <div className="container mx-auto px-4 py-8 mt-20">
@@ -532,7 +441,7 @@ export default function KaynaklarPage() {
       {/* Sonuç Sayısı */}
       <div className="mb-6">
         <p className="text-[#6B3416]">
-          <span className="font-medium">{filteredResources.length}</span> {t('general.resourceSearchResults')}
+          <span className="font-medium">{total}</span> {t('general.resourceSearchResults')}
         </p>
       </div>
       
@@ -674,9 +583,9 @@ export default function KaynaklarPage() {
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
         </div>
-      ) : paginatedResources.length > 0 ? (
+      ) : resources.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {paginatedResources.map((resource: Resource) => (
+          {resources.map((resource: Resource) => (
             <div key={resource._id || resource.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
