@@ -3,12 +3,50 @@ import connectDB from '@/lib/mongodb';
 import Resource from '@/models/Resource';
 import User from '@/models/User';
 
-// Tüm kaynakları getir
+// Tüm kaynakları getir (pagination, filtering, search, sort)
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    const resources = await Resource.find({}).sort({ createdAt: -1 });
-    return NextResponse.json(resources);
+    const { searchParams } = new URL(request.url);
+
+    // Pagination
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const pageSize = parseInt(searchParams.get('pageSize') || '4', 10);
+    const skip = (page - 1) * pageSize;
+
+    // Filters
+    const searchTerm = searchParams.get('searchTerm') || '';
+    const category = searchParams.get('category');
+    const format = searchParams.get('format');
+    const university = searchParams.get('university');
+    const academicLevel = searchParams.get('academicLevel');
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') === 'asc' ? 1 : -1;
+
+    // Build query
+    const query: any = {};
+    if (searchTerm) {
+      query.$or = [
+        { title: { $regex: searchTerm, $options: 'i' } },
+        { description: { $regex: searchTerm, $options: 'i' } },
+      ];
+    }
+    if (category) query.category = category;
+    if (format) query.format = format;
+    if (university && university !== 'all') query.university = university;
+    if (academicLevel && academicLevel !== 'Hepsi' && academicLevel !== 'All') query.academicLevel = academicLevel;
+
+    // Get total count for pagination
+    const total = await Resource.countDocuments(query);
+
+    // Fetch paginated resources (only necessary fields)
+    const resources = await Resource.find(query)
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(pageSize)
+      .select('title description author category format university department academicLevel uploadDate createdAt downloadCount viewCount fileSize tags url fileName fileType');
+
+    return NextResponse.json({ resources, total });
   } catch (error) {
     console.error('Kaynaklar getirilirken hata oluştu:', error);
     return NextResponse.json(
