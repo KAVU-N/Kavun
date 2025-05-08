@@ -10,7 +10,6 @@ interface Ilan {
   description: string;
   price: number;
   method: string;
-  duration: number;
   frequency: string;
   status: string;
 }
@@ -50,15 +49,26 @@ export default function IlanDuzenlePage({ params }: { params: { id: string } }) 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     if (!ilan) return;
-    setIlan({ ...ilan, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+    // Ensure number fields are stored as numbers
+    setIlan({ ...ilan, [name]: type === 'number' ? Number(value) : value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    
+    // instructorFrom validation removed
+    
     try {
       const token = localStorage.getItem("token");
+      // Remove _id from the update payload to avoid MongoDB update errors
+      if (!ilan) {
+        setError("İlan bilgileri bulunamadı");
+        return;
+      }
+      const { _id, ...updatePayload } = ilan;
       const response = await fetch(`/api/ilanlar/${params.id}?userId=${user?.id}`,
         {
           method: "PUT",
@@ -66,7 +76,7 @@ export default function IlanDuzenlePage({ params }: { params: { id: string } }) 
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(ilan),
+          body: JSON.stringify(updatePayload),
         }
       );
       if (!response.ok) {
@@ -101,10 +111,6 @@ export default function IlanDuzenlePage({ params }: { params: { id: string } }) 
             <label className="block mb-1 font-medium">Ücret (₺/Saat)</label>
             <input type="number" name="price" value={ilan.price} onChange={handleChange} className="w-full border px-3 py-2 rounded" required />
           </div>
-          <div>
-            <label className="block mb-1 font-medium">Süre (Saat)</label>
-            <input type="number" name="duration" value={ilan.duration} onChange={handleChange} className="w-full border px-3 py-2 rounded" required />
-          </div>
         </div>
         <div className="mb-4 grid grid-cols-2 gap-4">
           <div>
@@ -125,13 +131,14 @@ export default function IlanDuzenlePage({ params }: { params: { id: string } }) 
             </select>
           </div>
         </div>
-        <div className="mb-6">
+        <div className="mb-4">
           <label className="block mb-1 font-medium">Durum</label>
           <select name="status" value={ilan.status} onChange={handleChange} className="w-full border px-3 py-2 rounded">
             <option value="active">Aktif</option>
             <option value="inactive">Pasif</option>
           </select>
         </div>
+        {/* instructorFrom field removed */}
         {success && <div className="mb-4 text-green-600 text-center">{success}</div>}
         {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
         <div className="flex justify-end gap-2">

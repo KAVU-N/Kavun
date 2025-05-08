@@ -13,8 +13,8 @@ interface Ilan {
   description: string;
   price: number;
   method: string;
-  duration: number;
   frequency: string;
+  instructorFrom?: string;
   createdAt: string;
   updatedAt: string;
   status: 'active' | 'inactive';
@@ -55,12 +55,14 @@ export default function IlanlarimPage() {
         }
         
         // Token al
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token') || '';
         
         // Token'ı kontrol et
         try {
-          const tokenData = JSON.parse(atob(token.split('.')[1]));
+          if (token) {
+            const tokenData = JSON.parse(atob(token.split('.')[1]));
           console.log('Token içeriği:', tokenData);
+          }
         } catch (e) {
           console.error('Token çözümlenirken hata:', e);
         }
@@ -118,8 +120,8 @@ export default function IlanlarimPage() {
   const handleDelete = async (ilanId: string) => {
     setDeleting(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/ilanlar/${ilanId}?userId=${user.id}`, {
+      const token = localStorage.getItem('token') || '';
+      const response = await fetch(`/api/ilanlar/${ilanId}?userId=${user?.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -218,10 +220,6 @@ export default function IlanlarimPage() {
                           <p className="font-medium text-[#6B3416]">{ilan.price} ₺/Saat</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Süre</p>
-                          <p className="font-medium text-[#6B3416]">{ilan.duration} Saat</p>
-                        </div>
-                        <div>
                           <p className="text-sm text-gray-600">Yöntem</p>
                           <p className="font-medium text-[#6B3416] capitalize">{ilan.method}</p>
                         </div>
@@ -229,6 +227,12 @@ export default function IlanlarimPage() {
                           <p className="text-sm text-gray-600">Sıklık</p>
                           <p className="font-medium text-[#6B3416] capitalize">{ilan.frequency}</p>
                         </div>
+                        {ilan.instructorFrom && (
+                          <div>
+                            <p className="text-sm text-gray-600">Dersi Aldığım Eğitmen</p>
+                            <p className="font-medium text-[#6B3416]">{ilan.instructorFrom}</p>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="text-sm text-gray-500">

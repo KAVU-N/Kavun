@@ -19,13 +19,13 @@ export default function Footer() {
             <Link href="/" className="flex items-center space-x-2 group">
               <Image
                 src="/logo.png"
-                alt="Kavun Logo"
+                alt="Kavunla Logo"
                 width={40}
                 height={40}
                 className="mr-2"
               />
               <span className="text-2xl font-bold text-[#6B3416] group-hover:text-[#FF8B5E] transition-all duration-300">
-                KAVUN
+                KAVUNLA
               </span>
             </Link>
             <p className="text-[#994D1C] max-w-xs">
@@ -136,7 +136,7 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <span className="text-[#994D1C]">
-                  Kavun Headquarters<br />
+                  Kavunla Headquarters<br />
                   İstanbul, Türkiye
                 </span>
               </li>
@@ -144,7 +144,7 @@ export default function Footer() {
                 <svg className="w-5 h-5 text-[#FF8B5E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <a href="mailto:info@kavun.com" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
+                <a href="mailto:info@kavunla.com" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
                   info@kavun.com
                 </a>
               </li>
@@ -163,7 +163,7 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-[#FFCDB2]">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <p className="text-[#994D1C] text-sm">
-              &copy; {currentYear} Kavun. {t('footer.allRightsReserved')}
+              &copy; {currentYear} Kavunla. {t('footer.allRightsReserved')}
             </p>
             <div className="mt-4 md:mt-0">
               <div className="flex items-center gap-16">
