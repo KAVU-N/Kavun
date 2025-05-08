@@ -1,11 +1,9 @@
 {
-  "/not-found": "app/not-found.js",
-  "/kaynaklar/page": "app/kaynaklar/page.js",
+  "/ilan/[id]/page": "app/ilan/[id]/page.js",
+  "/ilanlar/page": "app/ilanlar/page.js",
+  "/randevu-al/page": "app/randevu-al/page.js",
   "/page": "app/page.js",
-  "/kaynaklar/paylas/page": "app/kaynaklar/paylas/page.js",
-  "/api/resources/[id]/route": "app/api/resources/[id]/route.js",
-  "/api/resources/route": "app/api/resources/route.js",
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/admin/login/page": "app/admin/login/page.js",
-  "/admin/users/page": "app/admin/users/page.js"
+  "/api/admin/announcements/route": "app/api/admin/announcements/route.js",
+  "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js",
+  "/api/ilanlar/[id]/route": "app/api/ilanlar/[id]/route.js"
 }

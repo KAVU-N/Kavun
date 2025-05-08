@@ -63,7 +63,8 @@ type Resource = {
 };
 
 export default function KaynaklarPage() {
-
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [previewResource, setPreviewResource] = useState<Resource | null>(null);
   const { t, language } = useLanguage();
   const academicLevels = language === 'en'
     ? ['All', 'Bachelors', 'Masters', 'PhD']
@@ -126,7 +127,8 @@ export default function KaynaklarPage() {
   const paginatedResources = useMemo(() => filteredResources.slice((currentPage - 1) * pageSize, currentPage * pageSize), [filteredResources, currentPage, pageSize]);
 
   // --- Kullanıcı önizlemeye 3. kez tıkladıysa paylaşım zorunlu premium modalı için sayaç ---
-
+  const [previewClickCount, setPreviewClickCount] = useState(0);
+  const [showPremiumBlock, setShowPremiumBlock] = useState(false);
 
   // Dropdown dışına tıklandığında kapat
   useEffect(() => {
@@ -143,67 +145,67 @@ export default function KaynaklarPage() {
   }, [universityDropdownRef]);
   
   // ESC tuşuna basıldığında önizleme modalini kapat
-
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showPreviewModal) {
+        setShowPreviewModal(false);
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [showPreviewModal]);
   
-
-
-  // İndirme hakkı modalı için state
-  const [showDownloadLimitModal, setShowDownloadLimitModal] = useState(false);
-
-  // Kullanıcıya ait indirme hakkı kontrolü (her yüklenen kaynak için 2 hak, maksimum 2 hak)
-  const getUserDownloadData = () => {
-    const data = localStorage.getItem(`downloadData_${user?.id}`);
-    if (data) return JSON.parse(data);
-    return { uploaded: 0, downloaded: 0 };
-  };
-
-  const setUserDownloadData = (uploaded: number, downloaded: number) => {
-    localStorage.setItem(`downloadData_${user?.id}`, JSON.stringify({ uploaded, downloaded }));
+  // Önizleme fonksiyonu - Backend'de önce hak kontrolü
+  const handlePreview = async (resource: Resource) => {
+    if (!user) return;
+    try {
+      const response = await fetch(`/api/resources/${resource._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'preview', userId: user.id })
+      });
+      if (response.status === 403) {
+        // Hak yok, premium kutusu göster
+        setShowPremiumBlock(true);
+        setPreviewResource(resource);
+        setShowPreviewModal(true);
+        return;
+      }
+      if (!response.ok) {
+        alert('Bir hata oluştu.');
+        return;
+      }
+      setPreviewResource(resource);
+      setShowPreviewModal(true);
+    } catch (error) {
+      alert('Bir hata oluştu.');
+    }
   };
 
   // İndirme fonksiyonu - Backend'de önce hak kontrolü
   const handleDownload = async (resource: Resource) => {
     if (!user) return;
-    // Hak kontrolü
-    const { uploaded, downloaded } = getUserDownloadData();
-    // downloaded: kalan hak (her yüklemede 2'ye ayarlanıyor)
-    if (downloaded <= 0) {
-      setShowDownloadLimitModal(true);
-      return;
-    }
     try {
       const response = await fetch(`/api/resources/${resource._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'download', userId: user.id })
       });
+      if (response.status === 403) {
+        setShowPremiumBlock(true);
+        setPreviewResource(resource);
+        setShowPreviewModal(true);
+        return;
+      }
       if (!response.ok) {
         alert('Bir hata oluştu.');
         return;
       }
-      // İndirme başarılıysa hakkı güncelle
-      setUserDownloadData(uploaded, downloaded - 1);
-      // PATCH isteğinden dönen resource ile dosya indirme işlemi
-      const updatedResource = await response.json();
-      if (updatedResource.url && updatedResource.url !== '#') {
-        // Normal url ile indirme
-        const link = document.createElement('a');
-        link.href = updatedResource.url;
-        link.download = updatedResource.fileName || 'dosya';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else if (updatedResource.fileData) {
-        // Base64 ile indirme
-        const link = document.createElement('a');
-        link.href = updatedResource.fileData;
-        link.download = updatedResource.fileName || 'dosya';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        alert('Dosya bağlantısı bulunamadı.');
-      }
+      // Dosya indirme işlemini burada başlat (varsa)
+      // ...
     } catch (error) {
       alert('Bir hata oluştu.');
     }
@@ -335,28 +337,7 @@ export default function KaynaklarPage() {
   const visibleResources = filteredResources.slice(0, userViewQuota);
 
   return (
-   <>
-      {showDownloadLimitModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full flex flex-col items-center">
-            <div className="text-[#994D1C] text-2xl font-bold mb-4">İndirme hakkınız bitti</div>
-            <div className="text-[#6B3416] mb-6 text-center">Hak elde etmek için kaynak yükleyin.</div>
-            <button
-              className="px-6 py-3 bg-[#FF8B5E] text-white font-medium rounded-xl transition-all duration-300 hover:bg-[#FF7A45] mb-2 w-full"
-              onClick={() => window.location.href = '/kaynaklar/paylas'}
-            >
-              Kaynak Yükle
-            </button>
-            <button
-              className="px-4 py-2 text-[#994D1C] underline mt-2"
-              onClick={() => setShowDownloadLimitModal(false)}
-            >
-              Kapat
-            </button>
-          </div>
-        </div>
-      )}
-      <div className="container mx-auto px-4 py-8 mt-20">
+    <div className="container mx-auto px-4 py-8 mt-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-[#994D1C] mb-2">{t('nav.resources')}</h1>
@@ -556,7 +537,139 @@ export default function KaynaklarPage() {
       </div>
       
       {/* Kaynaklar Listesi */}
-
+      {/* Kaynak Önizleme Modalı */}
+      {showPreviewModal && previewResource && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          {/* Ana içerik: Kaynağı kaydırılabilir şekilde göster */}
+          <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full max-h-[96vh] flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-auto p-8 relative">
+              {/* PDF Önizleme */}
+              {previewResource.format === 'PDF' && (
+                <div className="relative w-full h-[85vh]">
+                  <iframe
+                    src={previewResource.fileData || previewResource.url}
+                    title="PDF Preview"
+                    className="w-full h-full border rounded"
+                    frameBorder="0"
+                  ></iframe>
+                  {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
+                  {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none"></div>}
+                </div>
+              )}
+              {/* Resim Önizleme */}
+              {previewResource.format === 'Resim' && (
+                <div className="relative w-full flex justify-center">
+                  <img 
+                    src={previewResource.fileData || previewResource.url} 
+                    alt={previewResource.title}
+                    className="max-w-full max-h-[85vh] mx-auto border rounded"
+                  />
+                  {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
+                  {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none"></div>}
+                </div>
+              )}
+              {/* Video Önizleme */}
+              {previewResource.format === 'Video' && (
+                <div className="relative w-full">
+                  <video 
+                    src={previewResource.fileData || previewResource.url}
+                    controls
+                    className="w-full max-h-[85vh] border rounded"
+                  ></video>
+                  {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
+                  {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none"></div>}
+                </div>
+              )}
+              {/* Ses Önizleme */}
+              {previewResource.format === 'Ses' && (
+                <div className="relative w-full">
+                  <audio 
+                    src={previewResource.fileData || previewResource.url}
+                    controls
+                    className="w-full border rounded p-4"
+                  ></audio>
+                  {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
+                  {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none"></div>}
+                </div>
+              )}
+              {/* Diğer Dosya Türleri */}
+              {!['PDF', 'Resim', 'Video', 'Ses'].includes(previewResource.format) && (
+                <div className="text-center py-10">
+                  <div className="text-[#994D1C] text-5xl mb-4">
+                    <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-xl font-bold text-[#994D1C] mb-2">{previewResource.format} formatında dosya</h2>
+                  <p className="text-[#6B3416] mb-6">
+                    Bu dosya türü için önizleme desteklenmiyor. Lütfen dosyayı indirin.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setShowPreviewModal(false);
+                      // Dosya indirme işlemini başlat
+                      if (previewResource.fileData) {
+                        const link = document.createElement('a');
+                        link.href = previewResource.fileData;
+                        const fileName = previewResource.fileName || `${previewResource.title}.${previewResource.format.toLowerCase()}`;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      } else if (previewResource.url && previewResource.url !== '#') {
+                        window.open(previewResource.url, '_blank');
+                      }
+                    }}
+                    className="px-6 py-3 bg-[#FF8B5E] text-white font-medium rounded-xl transition-all duration-300 hover:bg-[#FF7A45]"
+                  >
+                    Dosyayı İndir
+                  </button>
+                </div>
+              )}
+              {/* Premium kutusu sadece üstte ve sabit olarak gelsin */}
+              {showPremiumBlock && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+                  <div className="relative bg-[#FFF6E6] rounded-2xl shadow-xl px-10 py-6 max-w-xl w-full flex flex-col items-center text-[#A85A1A] text-center pointer-events-auto border-none" style={{boxShadow:'0 4px 16px rgba(168,90,26,0.13)'}}>
+                    {/* Kapatma butonu */}
+                    <button
+                      onClick={() => setShowPreviewModal(false)}
+                      className="absolute top-4 right-4 text-[#A85A1A] hover:text-[#FFB066] text-2xl font-bold bg-transparent border-none p-0 m-0 cursor-pointer z-10"
+                      style={{lineHeight:'1'}}
+                      aria-label="Close preview modal"
+                    >
+                      ×
+                    </button>
+                    <div className="mb-3 flex flex-col items-center">
+                      <div className="bg-[#FFF3E0] rounded-full p-2 mb-2 flex items-center justify-center">
+                        <svg className="w-8 h-8" fill="none" stroke="#A85A1A" strokeWidth="2.5" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="3" fill="#FFF3E0"/><path d="M12 9v4m0 2h.01" stroke="#A85A1A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </div>
+                      <h2 className="text-2xl font-extrabold mb-1 text-[#FFB066] drop-shadow">Upload your document and unlock access instantly!</h2>
+                    </div>
+                    <p className="mb-4 text-base font-medium text-[#A85A1A]">
+                      Upload just one document and you’ll get <span className='font-bold text-[#FFB066]'>access to 3 resources</span> as a reward. Share more, unlock more!</p>
+                    <div className="flex flex-row gap-3 w-full mb-3 justify-center">
+                      <Link href="/kaynaklar/paylas" className="w-full">
+                      <button
+                          className="w-full bg-[#FFB066] hover:bg-[#FFD7A8] text-[#A85A1A] font-bold py-3 rounded-full flex items-center justify-center gap-2 text-base shadow transition border-2 border-[#A85A1A]"
+                          onClick={() => {
+                            setShowPreviewModal(false);
+                            window.location.href = '/kaynaklar/paylas';
+                          }}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="#A85A1A" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                          Upload
+                        </button>
+                        <div className="text-xs text-[#A85A1A] mt-1">Share to unlock</div>
+                      </Link>
+                    </div>
+                    <div className="mt-1 text-base text-[#A85A1A]">Already user? <a className="underline font-bold text-[#FFB066]" href="/login">Log in</a></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {loading ? (
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
@@ -615,7 +728,12 @@ export default function KaynaklarPage() {
                       {t('general.resourceView')}
                     </div>
                   </Link>
-
+                  <button
+                    onClick={() => handlePreview(resource)}
+                    className="flex-1 px-4 py-2 bg-[#FFB996] text-white text-center rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300 text-sm"
+                  >
+                    {t('general.preview')}
+                  </button>
                   <button
                     onClick={() => handleDownload(resource)}
                     className="flex-1 px-4 py-2 bg-[#FF8B5E] text-white text-center rounded-lg hover:bg-[#FF7A45] transition-colors duration-300 text-sm cursor-pointer"
@@ -662,6 +780,5 @@ export default function KaynaklarPage() {
         ))}
       </div>
     </div>
-    </>
   );
 }
