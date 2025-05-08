@@ -24,12 +24,12 @@ interface Ilan {
   description: string;
   price: number;
   method: string;
-  duration: number;
   frequency: string;
   status: string;
   createdAt: string;
   updatedAt: string;
   userId: string;
+  instructorFrom?: string;
   teacher: Teacher;
 }
 
@@ -48,6 +48,8 @@ export default function IlanlarPage() {
     sortBy: 'en-yeni',
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
   useEffect(() => {
     if (!loading && !user) {
@@ -343,7 +345,7 @@ export default function IlanlarPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredIlanlar.map((ilan) => (
+              {filteredIlanlar.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((ilan) => (
                 <div key={ilan._id} className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#FFE5D9] transition-all duration-300">
                   {/* Üst Kısım - Başlık ve Fiyat */}
                   <div className="flex justify-between items-start mb-3">
@@ -398,10 +400,6 @@ export default function IlanlarPage() {
                       <span className="text-gray-800 text-sm">{ilan.price} {t('general.currency')}/{t('general.hour')}</span>
                     </div>
                     <div className="flex items-center bg-gray-50 p-2 rounded-lg">
-                      <FaClock className="text-blue-600 mr-2" />
-                      <span className="text-gray-800 text-sm">{ilan.duration} {t('general.hours')}</span>
-                    </div>
-                    <div className="flex items-center bg-gray-50 p-2 rounded-lg">
                       <FaChalkboardTeacher className="text-purple-600 mr-2" />
                       <span className="text-gray-800 text-sm capitalize">{ilan.method}</span>
                     </div>
@@ -409,6 +407,12 @@ export default function IlanlarPage() {
                       <FaUniversity className="text-orange-600 mr-2" />
                       <span className="text-gray-800 text-sm line-clamp-1">{user.university}</span>
                     </div>
+                    {ilan.instructorFrom && (
+                      <div className="flex items-center bg-gray-50 p-2 rounded-lg">
+                        <FaChalkboardTeacher className="text-indigo-600 mr-2" />
+                        <span className="text-gray-800 text-sm line-clamp-1">Eğitmen: {ilan.instructorFrom}</span>
+                      </div>
+                    )}
                   </div>
                   
                   {/* {t('general.button')} */}
@@ -427,6 +431,25 @@ export default function IlanlarPage() {
                     </Link>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!isLoading && !error && filteredIlanlar.length > itemsPerPage && (
+            <div className="flex justify-center mt-8 space-x-2">
+              {Array.from({ length: Math.ceil(filteredIlanlar.length / itemsPerPage) }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentPage(index + 1)}
+                  className={`w-10 h-10 rounded-lg ${
+                    currentPage === index + 1
+                      ? 'bg-[#FF8B5E] text-white'
+                      : 'bg-[#FFE5D9] text-[#6B3416] hover:bg-[#FFDAC1]'
+                  } transition-colors duration-200`}
+                >
+                  {index + 1}
+                </button>
               ))}
             </div>
           )}

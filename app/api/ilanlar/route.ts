@@ -25,7 +25,15 @@ const ilanSchema = new mongoose.Schema({
   },
   duration: {
     type: Number,
-    required: [true, 'Süre zorunludur'],
+    default: 1, // Default to 1 hour
+  },
+  durationHours: {
+    type: Number,
+    default: 0,
+  },
+  durationMinutes: {
+    type: Number,
+    default: 0,
   },
   frequency: {
     type: String,
@@ -37,11 +45,7 @@ const ilanSchema = new mongoose.Schema({
     enum: ['active', 'inactive'],
     default: 'active',
   },
-  instructorFrom: {
-    type: String,
-    trim: true,
-    required: [true, 'Dersi aldığınız eğitmen bilgisi zorunludur'],
-  },
+  // instructorFrom field has been removed
   userId: {
     type: String,
     required: true,
@@ -103,7 +107,7 @@ export async function POST(req: Request) {
     await connectDB();
     
     const body = await req.json();
-    const { title, description, price, method, duration, frequency, instructorFrom } = body;
+    const { title, description, price, method, duration, durationHours, durationMinutes, frequency } = body;
     
     // Debug için tüm body'i kontrol et
     console.log('API received body:', body);
@@ -146,9 +150,10 @@ export async function POST(req: Request) {
       description,
       price: Number(price),
       method,
-      duration: Number(duration),
+      duration: 1, // Default to 1 hour since we removed this field from the UI
+      durationHours: 1,
+      durationMinutes: 0,
       frequency,
-      instructorFrom,
       status: 'active',
       userId: userId.toString(), // Convert to string to avoid ObjectId issues
     });

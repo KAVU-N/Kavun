@@ -178,7 +178,7 @@ export default function Navbar() {
               <Link href="/" className="flex items-center space-x-2 group">
                 <Image
                   src="/logo.png"
-                  alt="Kavun Logo"
+                  alt="Kavunla Logo"
                   width={40}
                   height={40}
                   className="mr-2"
@@ -186,7 +186,7 @@ export default function Navbar() {
                 <span className={`text-2xl font-bold transition-all duration-300 ${
                   isScrolled ? 'text-[#6B3416]' : 'text-[#994D1C]'
                 } group-hover:text-[#FF8B5E]`}>
-                  KAVUN
+                  KAVUNLA
                 </span>
               </Link>
             </div>
