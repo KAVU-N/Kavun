@@ -33,6 +33,26 @@ interface Ilan {
 }
 
 export default function RandevuAlPage() {
+  // Showing only "Coming Soon" message while keeping the original code
+  const showComingSoon = true; // Set to true to show only the coming soon message
+  
+  if (showComingSoon) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+        <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="p-8 text-center">
+            <h1 className="text-4xl font-bold mb-6 text-gray-800">Çok Yakında</h1>
+            <p className="text-xl text-gray-600 mb-8">Randevu alma sistemi çok yakında hizmetinizde olacak.</p>
+            <Link href="/" className="inline-block px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg font-medium hover:shadow-md transition-all">
+              Ana Sayfaya Dön
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Original code below - will not be displayed when showComingSoon is true
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
