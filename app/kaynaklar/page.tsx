@@ -63,6 +63,70 @@ type Resource = {
 };
 
 export default function KaynaklarPage() {
+  const [showPremiumBlock, setShowPremiumBlock] = useState(false);
+
+  // Kaynakları indir
+  const handleDownload = async (resource: Resource) => {
+    if (!user) return;
+    try {
+      const response = await fetch(`/api/resources/${resource._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'download', userId: user.id })
+      });
+      if (response.status === 403) {
+        setShowPreviewModal(true);
+        setPreviewResource(resource);
+        setShowPremiumBlock(true);
+        return;
+      }
+      if (!response.ok) {
+        alert('Bir hata oluştu.');
+        return;
+      }
+      // Dosya indirme işlemini başlat
+      if (resource.fileData) {
+        const link = document.createElement('a');
+        link.href = resource.fileData;
+        const fileName = resource.fileName || `${resource.title}.${resource.format.toLowerCase()}`;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else if (resource.url && resource.url !== '#') {
+        window.open(resource.url, '_blank');
+      }
+    } catch (error) {
+      alert('Bir hata oluştu.');
+    }
+  };
+
+  // Kaynakları önizle
+  const handlePreview = async (resource: Resource) => {
+    if (!user) return;
+    try {
+      const response = await fetch(`/api/resources/${resource._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'preview', userId: user.id })
+      });
+      if (response.status === 403) {
+        setShowPreviewModal(true);
+        setPreviewResource(resource);
+        setShowPremiumBlock(true);
+        return;
+      }
+      if (!response.ok) {
+        alert('Bir hata oluştu.');
+        return;
+      }
+      setPreviewResource(resource);
+      setShowPreviewModal(true);
+    } catch (error) {
+      alert('Bir hata oluştu.');
+    }
+  };
+
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [previewResource, setPreviewResource] = useState<Resource | null>(null);
   const { t, language } = useLanguage();
@@ -84,10 +148,6 @@ export default function KaynaklarPage() {
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
   const [showFilters, setShowFilters] = useState(false);
-
-  // --- 9'lu sayfalama için kaynakları böl ---
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 9;
 
   // Filtreleme ve sıralama işlemlerini useMemo ile optimize et
   const filteredResources = useMemo(() => {
@@ -120,106 +180,26 @@ export default function KaynaklarPage() {
       }
       return 0;
     });
-    return filtered;
+    return filtered.slice(0, 9);
   }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, sortBy, sortOrder]);
 
-  const pageCount = Math.ceil(filteredResources.length / pageSize);
-  const paginatedResources = useMemo(() => filteredResources.slice((currentPage - 1) * pageSize, currentPage * pageSize), [filteredResources, currentPage, pageSize]);
-
-  // --- Kullanıcı önizlemeye 3. kez tıkladıysa paylaşım zorunlu premium modalı için sayaç ---
-  const [previewClickCount, setPreviewClickCount] = useState(0);
-  const [showPremiumBlock, setShowPremiumBlock] = useState(false);
-
-  // Dropdown dışına tıklandığında kapat
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (universityDropdownRef.current && !universityDropdownRef.current.contains(event.target as Node)) {
-        setShowUniversityDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [universityDropdownRef]);
-  
-  // ESC tuşuna basıldığında önizleme modalini kapat
-  useEffect(() => {
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && showPreviewModal) {
-        setShowPreviewModal(false);
-      }
-    };
-    
-    document.addEventListener('keydown', handleEscKey);
-    return () => {
-      document.removeEventListener('keydown', handleEscKey);
-    };
-  }, [showPreviewModal]);
-  
-  // Önizleme fonksiyonu - Backend'de önce hak kontrolü
-  const handlePreview = async (resource: Resource) => {
-    if (!user) return;
-    try {
-      const response = await fetch(`/api/resources/${resource._id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'preview', userId: user.id })
-      });
-      if (response.status === 403) {
-        // Hak yok, premium kutusu göster
-        setShowPremiumBlock(true);
-        setPreviewResource(resource);
-        setShowPreviewModal(true);
-        return;
-      }
-      if (!response.ok) {
-        alert('Bir hata oluştu.');
-        return;
-      }
-      setPreviewResource(resource);
-      setShowPreviewModal(true);
-    } catch (error) {
-      alert('Bir hata oluştu.');
-    }
-  };
-
-  // İndirme fonksiyonu - Backend'de önce hak kontrolü
-  const handleDownload = async (resource: Resource) => {
-    if (!user) return;
-    try {
-      const response = await fetch(`/api/resources/${resource._id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'download', userId: user.id })
-      });
-      if (response.status === 403) {
-        setShowPremiumBlock(true);
-        setPreviewResource(resource);
-        setShowPreviewModal(true);
-        return;
-      }
-      if (!response.ok) {
-        alert('Bir hata oluştu.');
-        return;
-      }
-      // Dosya indirme işlemini burada başlat (varsa)
-      // ...
-    } catch (error) {
-      alert('Bir hata oluştu.');
-    }
-  };
-  
-  // Kaynakları getir
+  // Kaynakları getir (arama ve filtreye göre)
   const fetchResources = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/resources');
+      // Query parametrelerini oluştur
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('search', searchTerm);
+      if (selectedCategory) params.append('category', selectedCategory);
+      if (selectedFormat) params.append('format', selectedFormat);
+      if (selectedUniversity && selectedUniversity !== 'all') params.append('university', selectedUniversity);
+      if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') params.append('academicLevel', selectedAcademicLevel);
+      const query = params.toString() ? `?${params.toString()}` : '';
+      const response = await fetch(`/api/resources${query}`);
       if (!response.ok) throw new Error('API hatası');
       const data = await response.json();
-      setResources(data);
+      setResources(data.resources);
     } catch (error) {
       console.error('Kaynaklar yüklenirken hata:', error);
       setError('Kaynaklar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
@@ -228,77 +208,11 @@ export default function KaynaklarPage() {
       setLoading(false);
     }
   };
-  
-  // Sayfa yüklenirken kaynakları getir
+
+  // Sayfa yüklendiğinde ve filtre/arama değiştiğinde kaynakları getir
   useEffect(() => {
     fetchResources();
-  }, []);
-
-  // Kaynakları filtrele
-  useEffect(() => {
-    let result = resources;
-    
-    // Arama terimine göre filtrele
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(
-        resource => 
-          resource.title.toLowerCase().includes(term) || 
-          resource.description.toLowerCase().includes(term) || 
-          resource.author.toLowerCase().includes(term) ||
-          resource.tags.some(tag => tag.toLowerCase().includes(term))
-      );
-    }
-    
-    // Kategoriye göre filtrele
-    if (selectedCategory) {
-      result = result.filter(resource => resource.category === t(selectedCategory));
-    }
-    
-    // Formata göre filtrele
-    if (selectedFormat) {
-      result = result.filter(resource => resource.format === t(selectedFormat));
-    }
-    
-    // Üniversiteye göre filtrele
-    if (selectedUniversity !== 'all') {
-      result = result.filter(resource => 
-        turkishToLower(resource.university).includes(turkishToLower(selectedUniversity))
-      );
-    }
-    
-    // Akademik seviyeye göre filtrele
-    if (selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') {
-      result = result.filter(resource =>
-        resource.academicLevel &&
-        resource.academicLevel.trim().toLowerCase() === selectedAcademicLevel.trim().toLowerCase()
-      );
-    }
-    
-    // Sıralama
-    result = [...result].sort((a, b) => {
-      if (sortBy === 'date') {
-        return sortOrder === 'asc' 
-          ? new Date(a.uploadDate).getTime() - new Date(b.uploadDate).getTime()
-          : new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime();
-      } else if (sortBy === 'downloads') {
-        return sortOrder === 'asc' 
-          ? a.downloadCount - b.downloadCount
-          : b.downloadCount - a.downloadCount;
-      } else if (sortBy === 'views') {
-        return sortOrder === 'asc' 
-          ? a.viewCount - b.viewCount
-          : b.viewCount - a.viewCount;
-      } else if (sortBy === 'title') {
-        return sortOrder === 'asc'
-          ? a.title.localeCompare(b.title)
-          : b.title.localeCompare(a.title);
-      }
-      return 0;
-    });
-    
-    // setFilteredResources KULLANILMIYOR, kaldırıldı. result);
-  }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, sortBy, sortOrder]);
+  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
 
   // Formatı insan tarafından okunabilir hale getir
   const formatFileSize = (sizeInMB: string): string => {
@@ -503,32 +417,13 @@ export default function KaynaklarPage() {
                 className="w-full px-3 py-2 rounded-lg border-[#FFB996] focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
               >
                 {academicLevels.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
+                  <option key={level} value={level}>{level}</option>
                 ))}
               </select>
-            </div>
-            
-            <div className="flex items-end ml-auto">
-              <button
-                onClick={() => {
-                  setSelectedCategory('');
-                  setSelectedFormat('');
-                  setSelectedUniversity('all');
-                  setSelectedAcademicLevel('Hepsi');
-                  setSearchTerm('');
-                  setUniversitySearchTerm('');
-                }}
-                className="px-4 py-2 text-[#994D1C] hover:text-[#6B3416] transition-colors duration-300"
-              >
-                {t('general.clearFilters')}
-              </button>
             </div>
           </div>
         )}
       </div>
-      
       {/* Sonuç Sayısı */}
       <div className="mb-6">
         <p className="text-[#6B3416]">
@@ -674,9 +569,9 @@ export default function KaynaklarPage() {
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
         </div>
-      ) : paginatedResources.length > 0 ? (
+      ) : filteredResources.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {paginatedResources.map((resource: Resource) => (
+          {filteredResources.map((resource: Resource) => (
             <div key={resource._id || resource.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
@@ -767,18 +662,6 @@ export default function KaynaklarPage() {
           )}
         </div>
       )}
-      {/* Sayfalama butonları */}
-      <div className="pagination flex justify-center gap-2 mt-8">
-        {[...Array(pageCount)].map((_, idx) => (
-          <button
-            key={idx}
-            className={`px-3 py-1 rounded ${currentPage === idx + 1 ? 'bg-orange-400 text-white' : 'bg-gray-200'}`}
-            onClick={() => setCurrentPage(idx + 1)}
-          >
-            {idx + 1}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }

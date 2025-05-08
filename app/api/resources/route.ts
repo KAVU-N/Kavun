@@ -7,8 +7,38 @@ import User from '@/models/User';
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    const resources = await Resource.find({}).sort({ createdAt: -1 });
-    return NextResponse.json(resources);
+    const { searchParams } = new URL(request.url);
+
+    // Filtre parametrelerini oku
+    const search = searchParams.get('search') || '';
+    const category = searchParams.get('category') || '';
+    const format = searchParams.get('format') || '';
+    const university = searchParams.get('university') || '';
+    const academicLevel = searchParams.get('academicLevel') || '';
+
+    // Sorgu oluştur
+    let query: any = {};
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { author: { $regex: search, $options: 'i' } },
+        { tags: { $elemMatch: { $regex: search, $options: 'i' } } }
+      ];
+    }
+    if (category) query.category = category;
+    if (format) query.format = format;
+    if (university) query.university = university;
+    if (academicLevel) query.academicLevel = academicLevel;
+
+    let resources;
+    // Eğer arama veya filtreleme varsa tüm kaynakları getir, yoksa sadece ilk 9'u getir
+    if (search || category || format || university || academicLevel) {
+      resources = await Resource.find(query).sort({ createdAt: -1 });
+    } else {
+      resources = await Resource.find({}).sort({ createdAt: -1 }).limit(9);
+    }
+    return NextResponse.json({ resources });
   } catch (error) {
     console.error('Kaynaklar getirilirken hata oluştu:', error);
     return NextResponse.json(
