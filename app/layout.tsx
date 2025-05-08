@@ -11,8 +11,8 @@ import ClientOnly from '@/src/components/ClientOnly'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Kavun - Geleceğe Adım At',
-  description: 'Kavun resmi web sitesi',
+  title: 'Kavunla - Geleceğe Adım At',
+  description: 'Kavunla resmi web sitesi',
   manifest: '/manifest.json',
   icons: {
     icon: '/logo.png',
@@ -22,7 +22,7 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Kavun'
+    title: 'Kavunla'
   },
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   themeColor: '#ffffff'
@@ -41,7 +41,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Kavun" />
+        <meta name="apple-mobile-web-app-title" content="Kavunla" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <style>{`
           html, body {

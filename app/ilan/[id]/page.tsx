@@ -23,14 +23,12 @@ interface Ilan {
   description: string;
   price: number;
   method: string;
-  duration: number;
   frequency: string;
   status: string;
   createdAt: string;
   updatedAt: string;
   userId: string;
   teacher: Teacher;
-  instructorFrom: string;
 }
 
 export default function IlanDetayPage({ params }: { params: { id: string } }) {
@@ -160,16 +158,11 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               
               {/* Main Content */}
               <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <div className="bg-[#FFF9F5] p-4 rounded-lg flex flex-col items-center justify-center">
                     <FaMoneyBillWave className="text-[#FF8B5E] text-2xl mb-2" />
                     <p className="text-sm text-gray-600 mb-1">{t('general.price')}</p>
                     <p className="text-xl font-bold text-[#6B3416]">{ilan.price} ₺/{t('general.hour')}</p>
-                  </div>
-                  <div className="bg-[#FFF9F5] p-4 rounded-lg flex flex-col items-center justify-center">
-                    <FaClock className="text-[#FF8B5E] text-2xl mb-2" />
-                    <p className="text-sm text-gray-600 mb-1">{t('general.duration')}</p>
-                    <p className="text-xl font-bold text-[#6B3416]">{ilan.duration} {t('general.hour')}</p>
                   </div>
                   <div className="bg-[#FFF9F5] p-4 rounded-lg flex flex-col items-center justify-center">
                     <FaChalkboardTeacher className="text-[#FF8B5E] text-2xl mb-2" />
@@ -187,12 +180,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                 
                 <div className="mb-8">
                   <h2 className="text-xl font-bold text-[#6B3416] mb-4">{t('general.additionalInfo')}</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-[#FFF9F5] p-4 rounded-lg">
-                      <p className="text-sm font-medium text-[#994D1C] mb-1">{t('general.instructorFrom')}:</p>
-                      <p className="text-gray-700 font-medium">{ilan.instructorFrom || t('general.notSpecified')}</p>
-                    </div>
-
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-sm text-gray-600 mb-1">{t('general.expertise')}</p>
                       <p className="font-medium text-[#6B3416]">{ilan.teacher?.expertise || t('general.notSpecified')}</p>
