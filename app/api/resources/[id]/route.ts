@@ -52,9 +52,10 @@ export async function PATCH(
       if (!user) {
         return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
       }
-      if ((user.viewQuota ?? 0) <= 0) {
-        return NextResponse.json({ error: 'Yeterli izleme hakkınız yok', code: 'NO_QUOTA' }, { status: 403 });
-      }
+      // viewQuota kontrolü kaldırıldı
+      // if ((user.viewQuota ?? 0) <= 0) {
+      //   return NextResponse.json({ error: 'Yeterli izleme hakkınız yok', code: 'NO_QUOTA' }, { status: 403 });
+      // }
     }
     
     // İşlem türüne göre güncelleme yap

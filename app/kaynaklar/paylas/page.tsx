@@ -182,6 +182,22 @@ export default function KaynakPaylasPage() {
         body: JSON.stringify(newResource)
       });
       if (!response.ok) throw new Error('Kaynak eklenemedi. Lütfen tekrar deneyin.');
+      
+      // İndirme hakkını güncelle
+      try {
+        const downloadDataKey = `downloadData_${user?.id}`;
+        const data = localStorage.getItem(downloadDataKey);
+        let uploaded = 0;
+        if (data) {
+          const parsed = JSON.parse(data);
+          uploaded = (parsed.uploaded || 0) + 1;
+        } else {
+          uploaded = 1;
+        }
+        // Her yüklemede indirme hakkı 2 olarak başlatılır
+        localStorage.setItem(downloadDataKey, JSON.stringify({ uploaded, downloaded: 2 }));
+      } catch (e) { /* localStorage erişilemezse sessizce geç */ }
+      
       setSuccess(true);
       setTimeout(() => { router.push('/kaynaklar'); }, 2000);
     } catch (err: any) {
