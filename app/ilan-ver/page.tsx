@@ -15,8 +15,6 @@ export default function IlanVerPage() {
     description: '',
     price: '',
     method: 'online', // 'online', 'yüzyüze' veya 'hibrit'
-    duration: '',
-    instructorFrom: '', // Dersi aldığı eğitmen bilgisi
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -54,10 +52,8 @@ export default function IlanVerPage() {
       return;
     }
     
-    if (!formData.duration.trim()) {
-      setError(t('errors.durationRequired') || 'Lütfen süre bilgisi girin');
-      return;
-    }
+    // instructorFrom validation removed
+    
     
     try {
       setIsSubmitting(true);
@@ -83,11 +79,7 @@ export default function IlanVerPage() {
         userId: user.id
       });
       
-      // Kullanıcıdan alınan duration saat cinsindense dakika'ya çevir. Eğer kullanıcı dakika giriyorsa burayı güncellemek gerekebilir.
-      let durationInMinutes = Number(formData.duration);
-      if (durationInMinutes <= 12) { // 12 saatten küçükse, büyük ihtimalle saat girildi, dakikaya çevir
-        durationInMinutes = durationInMinutes * 60;
-      }
+
       const response = await fetch('/api/ilanlar', {
         method: 'POST',
         headers: {
@@ -96,7 +88,6 @@ export default function IlanVerPage() {
         },
         body: JSON.stringify({
           ...formData,
-          duration: durationInMinutes,
           userId: user.id
         })
       });
@@ -114,8 +105,6 @@ export default function IlanVerPage() {
         description: '',
         price: '',
         method: 'online',
-        duration: '',
-        instructorFrom: '',
       });
       
       // İlan oluşturulduktan sonra ilanlarım sayfasına yönlendir
@@ -257,35 +246,9 @@ export default function IlanVerPage() {
                   </select>
                 </div>
                 
-                <div>
-                  <label htmlFor="duration" className="block text-[#6B3416] font-medium mb-2">
-                    {t('general.lessonDurationHours')}
-                  </label>
-                  <input
-                    type="text"
-                    id="duration"
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleChange}
-                    placeholder={t('general.lessonDurationPlaceholder')}
-                    className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
-                  />
-                </div>
+
                 
-                <div>
-                  <label htmlFor="instructorFrom" className="block text-[#6B3416] font-medium mb-2">
-                    {t('general.instructorFrom')}
-                  </label>
-                  <input
-                    type="text"
-                    id="instructorFrom"
-                    name="instructorFrom"
-                    value={formData.instructorFrom}
-                    onChange={handleChange}
-                    placeholder={t('general.instructorFromPlaceholder')}
-                    className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
-                  />
-                </div>
+                {/* instructorFrom field removed */}
               </div>
               
               <div className="pt-4">

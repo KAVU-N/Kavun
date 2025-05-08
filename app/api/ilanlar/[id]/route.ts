@@ -25,7 +25,15 @@ const ilanSchema = new mongoose.Schema({
   },
   duration: {
     type: Number,
-    required: [true, 'Süre zorunludur'],
+    default: 1, // Default to 1 hour
+  },
+  durationHours: {
+    type: Number,
+    default: 0,
+  },
+  durationMinutes: {
+    type: Number,
+    default: 0,
   },
   frequency: {
     type: String,
