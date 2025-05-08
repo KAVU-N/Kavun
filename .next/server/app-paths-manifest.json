@@ -1,27 +1,9 @@
 {
-<<<<<<< Updated upstream
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/bildirimler/page": "app/bildirimler/page.js",
-  "/mesajlarim/page": "app/mesajlarim/page.js",
-  "/derslerim/page": "app/derslerim/page.js",
-  "/ilanlarim/page": "app/ilanlarim/page.js",
-  "/api/ilanlar/route": "app/api/ilanlar/route.js",
+  "/ilan/[id]/page": "app/ilan/[id]/page.js",
   "/ilanlar/page": "app/ilanlar/page.js",
+  "/randevu-al/page": "app/randevu-al/page.js",
+  "/page": "app/page.js",
+  "/api/admin/announcements/route": "app/api/admin/announcements/route.js",
   "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js",
-  "/profil/page": "app/profil/page.js",
-  "/api/notifications/route": "app/api/notifications/route.js",
-  "/api/lessons/route": "app/api/lessons/route.js",
-  "/api/lessons/stats/route": "app/api/lessons/stats/route.js",
-  "/api/conversations/route": "app/api/conversations/route.js",
-  "/kaynaklar/page": "app/kaynaklar/page.js",
-  "/api/resources/route": "app/api/resources/route.js"
-=======
-  "/bildirimler/page": "app/bildirimler/page.js",
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/api/admin/stats/route": "app/api/admin/stats/route.js",
-  "/admin/resources/page": "app/admin/resources/page.js",
-  "/admin/lessons/page": "app/admin/lessons/page.js",
-  "/admin/users/page": "app/admin/users/page.js",
-  "/admin/dashboard/page": "app/admin/dashboard/page.js"
->>>>>>> Stashed changes
+  "/api/ilanlar/[id]/route": "app/api/ilanlar/[id]/route.js"
 }
