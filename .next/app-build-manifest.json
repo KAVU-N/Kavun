@@ -11,15 +11,10 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/sss/page": [
+    "/iletisim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/sss/page.js"
-    ],
-    "/profil/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/profil/page.js"
+      "static/chunks/app/iletisim/page.js"
     ],
     "/auth/layout": [
       "static/chunks/webpack.js",
@@ -31,10 +26,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/auth/login/page.js"
     ],
-    "/auth/register/page": [
+    "/mesajlarim/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/auth/register/page.js"
+      "static/chunks/app/mesajlarim/page.js"
+    ],
+    "/ilanlar/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilanlar/page.js"
+    ],
+    "/ilan/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ilan/[id]/page.js"
     ]
   }
 }
