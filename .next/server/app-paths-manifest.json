@@ -1,12 +1,11 @@
 {
-  "/kaynaklar/page": "app/kaynaklar/page.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/api/resources/route": "app/api/resources/route.js",
-  "/api/admin/announcements/route": "app/api/admin/announcements/route.js",
-  "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js",
-  "/ilanlar/page": "app/ilanlar/page.js",
+  "/derslerim/page": "app/derslerim/page.js",
+  "/page": "app/page.js",
   "/ilan/[id]/page": "app/ilan/[id]/page.js",
-  "/api/ilanlar/[id]/route": "app/api/ilanlar/[id]/route.js",
   "/randevu-al/page": "app/randevu-al/page.js",
-  "/page": "app/page.js"
+  "/ilanlar/page": "app/ilanlar/page.js",
+  "/api/admin/announcements/route": "app/api/admin/announcements/route.js",
+  "/api/ilanlar/[id]/route": "app/api/ilanlar/[id]/route.js",
+  "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js"
 }

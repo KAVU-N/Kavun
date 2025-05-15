@@ -1,12 +1,16 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useLanguage } from '@/src/contexts/LanguageContext';
+import Link from 'next/link';
+
+// Preserved imports for future use
+/* 
 import Notification from './Notification';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
 import LessonCalendar from '@/components/calendar/LessonCalendar';
-import Link from 'next/link';
+*/
 
 // Ders detay modalı
 interface EventDetailModalProps {
@@ -25,6 +29,8 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
   userRole
 }) => {
   const { t, language } = useLanguage();
+  // This component already uses the t() function for translations
+  // All text elements are properly set up for translation
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US', {
       day: 'numeric',
@@ -139,189 +145,31 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({
 };
 
 export default function DerslerimPage() {
-  const { user } = useAuth();
-  const { t } = useLanguage();
-  const router = useRouter();
+  const { t, language } = useLanguage();
   
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lessonStats, setLessonStats] = useState({
-    total: 0,
-    upcoming: 0,
-    completed: 0,
-    cancelled: 0,
-    pending: 0
-  });
-
-  useEffect(() => {
-    // Komponent mount edildiğinde yükleme durumunu kontrol et
-    const checkAuth = async () => {
-      // Kullanıcı bilgisi henüz yüklenmediyse bekle
-      if (user === null) {
-        // Burada hiçbir şey yapma, useAuth hook'u kullanıcı bilgisini yükleyecek
-        return;
-      }
-      
-      // Kullanıcı giriş yapmamışsa yönlendir
-      if (!user || !user.id) {
-        console.log(t('logs.userNotLoggedIn'));
-        router.push('/auth/login');
-        return;
-      }
-      
-      // Token kontrolü - sadece ek güvenlik için
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.log(t('logs.userNotLoggedIn'));
-        router.push('/auth/login');
-        return;
-      }
-      
-      console.log(t('logs.fetchingLessonStats'));
-      await fetchLessonStats();
-    };
-    
-    checkAuth();
-  }, [user, router]);
-
-  const fetchLessonStats = async () => {
-    try {
-      // Kullanıcı yoksa veya token yoksa işlem yapma
-      if (!user || !user.id) {
-        console.error(t('errors.userInfoNotFound'));
-        return;
-      }
-      
-      // localStorage'dan token'i güvenli bir şekilde al
-      let token = '';
-      if (typeof window !== 'undefined') {
-        token = localStorage.getItem('token') || '';
-        if (!token) {
-          console.error(t('errors.userInfoNotFound'));
-          return;
-        }
-      }
-
-      const endpoint = user.role === 'teacher' 
-        ? `/api/lessons/stats?teacherId=${user.id}` 
-        : `/api/lessons/stats?studentId=${user.id}`;
-      
-      console.log(t('logs.sendingApiRequest'), endpoint);
-      console.log(t('logs.tokenAvailable'), !!token);
-      
-      setLoading(true);
-      setError(null);
-      
-      const response = await fetch(endpoint, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const stats = await response.json();
-        setLessonStats(stats);
-        console.log(t('logs.lessonStatsReceived'), stats);
-      } else {
-        console.error(t('errors.apiError'), response.status, response.statusText);
-        const errorText = await response.text();
-        console.error(t('errors.errorDetails'), errorText);
-        setError(t('errors.fetchingLessonStats'));
-      }
-      
-      setLoading(false);
-    } catch (err) {
-      console.error(t('errors.fetchingLessonStatsError'), err);
+  // Content based on language
+  const content = {
+    tr: {
+      title: 'Çok Yakında',
+      description: 'Bu özellik çok yakında hizmetinizde olacak. Bizi takip etmeye devam edin!'
+    },
+    en: {
+      title: 'Coming Soon',
+      description: 'This feature will be available very soon for you. Stay tuned for updates!'
     }
   };
-
-  const handleEventSelect = (event: any) => {
-    setSelectedEvent(event);
-  };
-
-  const handleCompleteLesson = async () => {
-    if (!selectedEvent) return;
-    
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/lessons/${selectedEvent.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ status: 'completed' })
-      });
-
-      if (response.ok) {
-        // Takvimi yenile
-        setSelectedEvent(null);
-        window.location.reload();
-      } else {
-        const data = await response.json();
-        setError(data.error || 'Ders tamamlama işlemi başarısız oldu');
-      }
-    } catch (err) {
-      setError('Sunucu hatası');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!user) {
-    return null; // Yönlendirme yapılıyor
-  }
-
+  
+  // Get content based on current language
+  const currentContent = language === 'en' ? content.en : content.tr;
+  
   return (
-    <div className="container mx-auto px-4 py-8 mt-16">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#994D1C]">{t('lessons.myLessons')}</h1>
-        <p className="text-gray-600 mt-2">
-          {user.role === 'teacher'
-            ? t('lessons.teacherManageLessons')
-            : t('lessons.studentViewLessons')}
+    <div className="container mx-auto px-4 py-8 mt-16 flex flex-col items-center justify-center min-h-[70vh]">
+      <div className="text-center">
+        <h1 className="text-5xl font-bold text-[#994D1C] mb-6">{currentContent.title}</h1>
+        <p className="text-xl text-gray-600 max-w-2xl">
+          {currentContent.description}
         </p>
       </div>
-      
-      <Notification type="error" message={error || ''} onClose={() => setError(null)} />
-      
-      {/* İstatistik Kartları */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="text-sm font-medium text-gray-500 mb-1">{t('lessons.totalLessons')}</div>
-          <div className="text-2xl font-bold text-[#994D1C]">{lessonStats.total || 0}</div>
-        </div>
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="text-sm font-medium text-gray-500 mb-1">{t('lessons.plannedLessons')}</div>
-          <div className="text-2xl font-bold text-blue-600">{lessonStats.upcoming || 0}</div>
-        </div>
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="text-sm font-medium text-gray-500 mb-1">{t('lessons.completedLessons')}</div>
-          <div className="text-2xl font-bold text-green-600">{lessonStats.completed || 0}</div>
-        </div>
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="text-sm font-medium text-gray-500 mb-1">{t('lessons.cancelledLessons')}</div>
-          <div className="text-2xl font-bold text-red-600">{lessonStats.cancelled || 0}</div>
-        </div>
-      </div>
-      
-      {/* Takvim Görünümü */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-bold text-[#994D1C] mb-4">{t('lessons.lessonCalendar')}</h2>
-        <LessonCalendar onSelectEvent={handleEventSelect} />
-      </div>
-      
-      {/* Ders Detay Modalı */}
-      {selectedEvent && (
-        <EventDetailModal
-          event={selectedEvent}
-          onClose={() => setSelectedEvent(null)}
-          onCompleteLesson={handleCompleteLesson}
-          userRole={user.role}
-        />
-      )}
     </div>
   );
 }
