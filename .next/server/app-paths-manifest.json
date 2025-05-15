@@ -1,16 +1,8 @@
 {
-  "/page": "app/page.js",
-  "/iletisim/page": "app/iletisim/page.js",
-  "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/not-found": "app/not-found.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/api/users/[id]/route": "app/api/users/[id]/route.js",
-  "/mesajlarim/page": "app/mesajlarim/page.js",
-  "/api/messages/route": "app/api/messages/route.js",
-  "/api/conversations/route": "app/api/conversations/route.js",
-  "/ilanlar/page": "app/ilanlar/page.js",
-  "/api/admin/announcements/route": "app/api/admin/announcements/route.js",
-  "/api/ilanlar/university/route": "app/api/ilanlar/university/route.js",
-  "/ilan/[id]/page": "app/ilan/[id]/page.js",
-  "/api/ilanlar/[id]/route": "app/api/ilanlar/[id]/route.js",
-  "/auth/login/page": "app/auth/login/page.js"
+  "/iletisim/page": "app/iletisim/page.js",
+  "/hakkimizda/page": "app/hakkimizda/page.js",
+  "/sss/page": "app/sss/page.js",
+  "/page": "app/page.js"
 }

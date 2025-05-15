@@ -145,7 +145,7 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 <a href="mailto:info@kavunla.com" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                  info@kavun.com
+                  info@kavunla.com
                 </a>
               </li>
               <li className="flex items-center space-x-2">
@@ -163,7 +163,7 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-[#FFCDB2]">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <p className="text-[#994D1C] text-sm">
-              &copy; {currentYear} Kavunla. {t('footer.allRightsReserved')}
+              &copy; {currentYear} KAVUNLA. {t('footer.allRightsReserved')}
             </p>
             <div className="mt-4 md:mt-0">
               <div className="flex items-center gap-16">
