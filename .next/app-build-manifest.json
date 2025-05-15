@@ -11,45 +11,30 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/kaynaklar/page": [
+    "/sss/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/kaynaklar/page.js"
+      "static/chunks/app/sss/page.js"
     ],
-    "/mesajlarim/page": [
+    "/profil/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/mesajlarim/page.js"
+      "static/chunks/app/profil/page.js"
     ],
-    "/bildirimler/page": [
+    "/auth/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/bildirimler/page.js"
+      "static/chunks/app/auth/layout.js"
     ],
-    "/derslerim/page": [
+    "/auth/login/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/derslerim/page.js"
+      "static/chunks/app/auth/login/page.js"
     ],
-    "/ilanlar/page": [
+    "/auth/register/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/ilanlar/page.js"
-    ],
-    "/ilan/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/ilan/[id]/page.js"
-    ],
-    "/randevu-al/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/randevu-al/page.js"
-    ],
-    "/not-found": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/not-found.js"
+      "static/chunks/app/auth/register/page.js"
     ]
   }
 }

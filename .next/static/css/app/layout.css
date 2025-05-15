@@ -904,11 +904,11 @@ video {
 .min-h-\[150px\] {
   min-height: 150px;
 }
-.min-h-screen {
-  min-height: 100vh;
-}
 .min-h-\[70vh\] {
   min-height: 70vh;
+}
+.min-h-screen {
+  min-height: 100vh;
 }
 .w-0 {
   width: 0px;
