@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { FaCalendarAlt, FaClock, FaMoneyBillWave, FaChalkboardTeacher, FaArrowLeft, FaCreditCard, FaCheckCircle } from 'react-icons/fa';
 import { format, addDays, startOfDay, addHours, isBefore, isAfter, parseISO } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 interface Teacher {
   _id: string;
@@ -33,6 +34,26 @@ interface Ilan {
 }
 
 export default function RandevuAlPage() {
+  // Get language context
+  const { language } = useLanguage();
+  
+  // Content based on language
+  const content = {
+    tr: {
+      title: 'Çok Yakında',
+      description: 'Randevu alma sistemi çok yakında hizmetinizde olacak.',
+      buttonText: 'Ana Sayfaya Dön'
+    },
+    en: {
+      title: 'Coming Soon',
+      description: 'The appointment booking system will be available very soon for you. Stay tuned for updates!',
+      buttonText: 'Return to Home Page'
+    }
+  };
+  
+  // Get content based on current language
+  const currentContent = language === 'en' ? content.en : content.tr;
+  
   // Showing only "Coming Soon" message while keeping the original code
   const showComingSoon = true; // Set to true to show only the coming soon message
   
@@ -41,10 +62,10 @@ export default function RandevuAlPage() {
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-8 text-center">
-            <h1 className="text-4xl font-bold mb-6 text-gray-800">Çok Yakında</h1>
-            <p className="text-xl text-gray-600 mb-8">Randevu alma sistemi çok yakında hizmetinizde olacak.</p>
+            <h1 className="text-4xl font-bold mb-6 text-gray-800">{currentContent.title}</h1>
+            <p className="text-xl text-gray-600 mb-8">{currentContent.description}</p>
             <Link href="/" className="inline-block px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg font-medium hover:shadow-md transition-all">
-              Ana Sayfaya Dön
+              {currentContent.buttonText}
             </Link>
           </div>
         </div>
