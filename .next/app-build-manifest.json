@@ -1,30 +1,15 @@
 {
   "pages": {
-    "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
-    ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/sss/page": [
+    "/kaynaklar/paylas/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/sss/page.js"
-    ],
-    "/iletisim/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/iletisim/page.js"
-    ],
-    "/hakkimizda/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/hakkimizda/page.js"
+      "static/chunks/app/kaynaklar/paylas/page.js"
     ],
     "/not-found": [
       "static/chunks/webpack.js",

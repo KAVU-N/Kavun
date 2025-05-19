@@ -13,28 +13,10 @@ export default function ContactPage() {
 
   const socialLinks = [
     { 
-      icon: FaFacebook, 
-      href: 'https://www.facebook.com/codesmedipol/', 
-      label: 'Facebook',
-      description: 'Etkinliklerimizi ve güncel gelişmeleri takip edin'
-    },
-    { 
-      icon: FaTwitter, 
-      href: 'https://twitter.com/codesmedipol', 
-      label: 'Twitter',
-      description: 'Profesyonel ağımıza katılın ve kariyer fırsatlarını keşfedin'
-    },
-    { 
       icon: FaInstagram, 
-      href: 'https://www.instagram.com/codesmedipol/', 
+      href: 'https://www.instagram.com/kavunlacom/', 
       label: 'Instagram',
-      description: 'Topluluğumuza katılın ve diğer üyelerle etkileşime geçin'
-    },
-    { 
-      icon: FaLinkedin, 
-      href: 'https://www.linkedin.com/company/kavun', 
-      label: 'LinkedIn',
-      description: 'Profesyonel ağımıza katılın ve kariyer fırsatlarını keşfedin'
+      description: 'Instagram hesabımızı takip edin'
     }
   ];
 

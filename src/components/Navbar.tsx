@@ -562,27 +562,31 @@ export default function Navbar() {
   // useEffect içinde mounted state'ini güncellediğimiz için, bu component ilk render edildiğinde
   // mounted false olacak ve sadece sunucu tarafında render edilebilecek içeriği göstereceğiz
   if (!mounted) {
-    // Sunucu tarafında minimal bir yapı render et
+    // Sunucu tarafında, client ile aynı ana DOM hiyerarşisini döndür (nav yapısı dahil)
     return (
       <div className="fixed w-full z-50">
-        <div className="w-full py-4">
-          <div className="mx-auto px-4 sm:px-6 lg:px-8">
+        <nav className="w-full">
+          <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between h-16">
               <div className="flex-shrink-0">
                 <div className="flex items-center space-x-2">
-                  <div className="w-10 h-10 mr-2"></div>
+                  <div className="w-10 h-10 mr-2 bg-gray-200 rounded-full"></div>
                   <span className="text-2xl font-bold text-[#994D1C]">KAVUN</span>
                 </div>
               </div>
               <div className="hidden md:flex items-center justify-center flex-1">
-                <div className="flex items-center space-x-1"></div>
+                <div className="flex items-center space-x-1">
+                  {/* SSR'da boş bırak */}
+                </div>
               </div>
               <div className="hidden md:flex items-center justify-end space-x-4">
-                <div className="flex items-center space-x-4"></div>
+                <div className="flex items-center space-x-4">
+                  {/* SSR'da boş bırak */}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </nav>
       </div>
     );
   }

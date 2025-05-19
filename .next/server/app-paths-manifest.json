@@ -1,8 +1,6 @@
 {
   "/not-found": "app/not-found.js",
+  "/kaynaklar/paylas/page": "app/kaynaklar/paylas/page.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/iletisim/page": "app/iletisim/page.js",
-  "/hakkimizda/page": "app/hakkimizda/page.js",
-  "/sss/page": "app/sss/page.js",
-  "/page": "app/page.js"
+  "/api/resources/route": "app/api/resources/route.js"
 }

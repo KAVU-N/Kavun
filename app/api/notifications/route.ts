@@ -4,11 +4,6 @@ import { NextResponse } from 'next/server';
 import { getUserFromToken } from '@/lib/auth';
 import User from '@/models/User';
 
-export const metadata = {
-  viewport: {
-    themeColor: '#FF8B5E'
-  }
-};
 
 // Bildirimleri getir
 export async function GET(request: Request) {
