@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,12 +24,9 @@ const formatKeys: string[] = [
   'resourceFormat.pdf',
   'resourceFormat.doc',
   'resourceFormat.ppt',
-  'resourceFormat.xls',
-  'resourceFormat.video',
-  'resourceFormat.audio',
-  'resourceFormat.image',
-  'resourceFormat.link',
-  'resourceFormat.other',
+  'resourceFormat.jpg',
+  'resourceFormat.jpeg',
+  'resourceFormat.png',
 ];
 
 // Akademik seviyeler (multilingual keys)
@@ -61,6 +59,15 @@ export default function KaynakPaylasPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  // Uygunsuz içerik anahtar kelimeleri
+  const forbiddenWords = ['küfür1', 'küfür2', 'spam', 'hack', 'yasaklı'];
+
+  // İçerik kontrol fonksiyonu
+  function containsForbidden(text: string) {
+    const lower = text.toLocaleLowerCase('tr');
+    return forbiddenWords.some(word => lower.includes(word));
+  }
   
   // Kullanıcı giriş yapmamışsa giriş sayfasına yönlendir
   if (!user) {
@@ -105,29 +112,44 @@ export default function KaynakPaylasPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      setFile(selectedFile);
-      
-      // Dosya formatını otomatik olarak belirle (çeviri anahtarlarıyla)
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'image/jpeg',
+        'image/png',
+      ];
+      const allowedExtensions = ['.pdf','.doc','.docx','.ppt','.pptx','.jpg','.jpeg','.png'];
       const fileName = selectedFile.name.toLowerCase();
+      const isValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+      const isValidType = allowedTypes.includes(selectedFile.type);
+      const isValidSize = selectedFile.size <= 5 * 1024 * 1024;
+      if (!isValidExtension || !isValidType) {
+        setError('Sadece PDF, DOC, PPT, JPG, PNG dosyaları yüklenebilir.');
+        setFile(null);
+        return;
+      }
+      if (!isValidSize) {
+        setError('Dosya boyutu en fazla 5MB olabilir.');
+        setFile(null);
+        return;
+      }
+      setFile(selectedFile);
+      setError('');
       if (fileName.endsWith('.pdf')) {
         setFormData(prev => ({ ...prev, format: 'resourceFormat.pdf' }));
       } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
         setFormData(prev => ({ ...prev, format: 'resourceFormat.doc' }));
       } else if (fileName.endsWith('.ppt') || fileName.endsWith('.pptx')) {
         setFormData(prev => ({ ...prev, format: 'resourceFormat.ppt' }));
-      } else if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) {
-        setFormData(prev => ({ ...prev, format: 'resourceFormat.xls' }));
-      } else if (fileName.endsWith('.mp4') || fileName.endsWith('.avi') || fileName.endsWith('.mov')) {
-        setFormData(prev => ({ ...prev, format: 'resourceFormat.video' }));
-      } else if (fileName.endsWith('.mp3') || fileName.endsWith('.wav')) {
-        setFormData(prev => ({ ...prev, format: 'resourceFormat.audio' }));
       } else if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png')) {
         setFormData(prev => ({ ...prev, format: 'resourceFormat.image' }));
-      } else {
-        setFormData(prev => ({ ...prev, format: 'resourceFormat.other' }));
       }
     }
   };
+
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,6 +163,11 @@ export default function KaynakPaylasPage() {
       if (!formData.level) throw new Error('Lütfen bir seviye seçin');
       if (formData.resourceType === 'file' && !file) throw new Error('Lütfen bir dosya yükleyin');
       if (formData.resourceType === 'link' && !formData.link.trim()) throw new Error('Lütfen bir bağlantıyı girin');
+
+      // Başlık, açıklama ve etiketlerde uygunsuz içerik kontrolü
+      if (containsForbidden(formData.title)) throw new Error('Başlıkta uygunsuz içerik tespit edildi.');
+      if (containsForbidden(formData.description)) throw new Error('Açıklamada uygunsuz içerik tespit edildi.');
+      if (containsForbidden(formData.tags)) throw new Error('Etiketlerde uygunsuz içerik tespit edildi.');
 
       // Dosya varsa base64'e çevir
       let fileDataUrl = '';
@@ -185,7 +212,14 @@ export default function KaynakPaylasPage() {
       setSuccess(true);
       setTimeout(() => { router.push('/kaynaklar'); }, 2000);
     } catch (err: any) {
-      setError(err.message || 'Bir hata oluştu');
+      if (
+        err.message?.includes('uygunsuz içerik') ||
+        err.message?.toLowerCase().includes('uygunsuz')
+      ) {
+        router.push('/kaynaklar/paylas/fail');
+      } else {
+        setError(err.message || 'Bir hata oluştu');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -383,7 +417,7 @@ export default function KaynakPaylasPage() {
                           <span className="font-semibold">Dosya yüklemek için tıklayın</span> veya sürükleyip bırakın
                         </p>
                         <p className="text-xs text-[#6B3416]">
-                          PDF, DOC, PPT, XLS, MP4, MP3, JPG, PNG (Max 50MB)
+                          PDF, DOC, DOCX, PPT, PPTX, JPG, JPEG, PNG (Max 5MB)
                         </p>
                       </div>
                       <input

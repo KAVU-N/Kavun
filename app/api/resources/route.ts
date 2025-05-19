@@ -48,10 +48,81 @@ export async function GET(request: NextRequest) {
   }
 }
 
+import pdfParse from 'pdf-parse';
+import mammoth from 'mammoth';
+
 // Yeni kaynak ekle
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
+
+    // Uygunsuz içerik anahtar kelimeleri
+    const forbiddenWords = [
+      // Türkçe küfür ve argo
+      'amk', 'aq', 'orospu', 'sik', 'piç', 'yarrak', 'ananı', 'göt', 'mal', 'salak', 'aptal', 'gerizekalı',
+      'ibne', 'ibine', 'pezevenk', 'kahpe', 'şerefsiz', 'yavşak', 'dallama', 'dingil', 'hıyar', 'kaltak',
+      'puşt', 'kancık', 'dangalak', 'oç', 'amına', 'amcık', 'sürtük', 'bok', 'boktan', 'taşak', 'taşşağı',
+      // İngilizce küfür ve argo
+      'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'motherfucker', 'cunt', 'faggot',
+      'slut', 'whore', 'cock', 'jerk', 'retard', 'nigger', 'nigga', 'wanker', 'twat', 'bollocks',
+      // Irkçılık, nefret
+      'hitler', 'nazi', 'jew', 'kike', 'israil düşmanı', 'antisemit', 'ırkçı', 'faşist', 'racist', 'hate',
+      // Cinsel, pornografi
+      'porn', 'porno', 'sex', 'seks', 'escort', 'fuhuş', 'fisting', 'anal', 'blowjob', 'handjob', 'sikiş',
+      'gay', 'lezbiyen', 'trans', 'travesti', 'fetish', 'fetishist', 'incest', 'zoofili', 'pedofili',
+      // Şiddet, tehdit
+      'öldür', 'öldüreceğim', 'katil', 'bomb', 'bomba', 'intihar', 'suicide', 'terror', 'terör', 'terorist',
+      'silah', 'gun', 'knife', 'stab', 'rape', 'tecavüz', 'saldırı', 'attack', 'lynch', 'linç',
+      // Uyuşturucu, illegal
+      'esrar', 'eroin', 'kokain', 'meth', 'methamphetamine', 'uyuşturucu', 'drug', 'drugs', 'weed', 'heroin',
+      'cocaine', 'ecstasy', 'mdma', 'lsd', 'trip', 'marihuana', 'marijuana', 'skunk', 'bonzai',
+      // Hack, scam, spam, illegal
+      'hack', 'hacker', 'phishing', 'scam', 'spam', 'malware', 'virus', 'trojan', 'keylogger', 'carding',
+      'crack', 'serial', 'warez', 'illegal', 'yasadışı', 'kaçak', 'darkweb', 'deepweb',
+      // Diğer
+      'yasaklı', 'ban', 'banlan', 'banlama', 'banlı', 'banlandın', 'banlayacağım', 'banlanacaksın',
+      'banlanacak', 'banlanıyor', 'banlanmıştır', 'banlanmış', 'banlandı', 'banlanır',
+    ];
+    const containsForbidden = (text: string) => {
+      const lower = text.toLocaleLowerCase('tr');
+      return forbiddenWords.some(word => lower.includes(word));
+    }
+
+    // Başlık, açıklama, etiketlerde uygunsuz içerik kontrolü
+    if (containsForbidden(data.title)) {
+      return NextResponse.json({ error: 'Başlıkta uygunsuz içerik tespit edildi.' }, { status: 400 });
+    }
+    if (containsForbidden(data.description)) {
+      return NextResponse.json({ error: 'Açıklamada uygunsuz içerik tespit edildi.' }, { status: 400 });
+    }
+    if (Array.isArray(data.tags) && containsForbidden(data.tags.join(','))) {
+      return NextResponse.json({ error: 'Etiketlerde uygunsuz içerik tespit edildi.' }, { status: 400 });
+    }
+
+    // Dosya içeriği kontrolü (PDF/DOCX)
+    if (data.fileData && data.fileName) {
+      const fileName = data.fileName.toLowerCase();
+      // PDF
+      if (fileName.endsWith('.pdf')) {
+        // data.fileData: "data:application/pdf;base64,..."
+        const base64 = data.fileData.split(',')[1];
+        const buffer = Buffer.from(base64, 'base64');
+        const pdfData = await pdfParse(buffer);
+        if (containsForbidden(pdfData.text)) {
+          return NextResponse.json({ error: 'PDF dosya içeriğinde uygunsuz içerik bulundu.' }, { status: 400 });
+        }
+      }
+      // DOCX
+      else if (fileName.endsWith('.docx')) {
+        const base64 = data.fileData.split(',')[1];
+        const buffer = Buffer.from(base64, 'base64');
+        const result = await mammoth.extractRawText({ buffer });
+        if (containsForbidden(result.value)) {
+          return NextResponse.json({ error: 'DOCX dosya içeriğinde uygunsuz içerik bulundu.' }, { status: 400 });
+        }
+      }
+      // Diğer dosya türleri için ek kontrol isterseniz eklenebilir.
+    }
 
     // Gerekli alanları kontrol et
     if (!data.title || !data.description || !data.category || !data.format || !data.authorId) {
