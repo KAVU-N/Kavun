@@ -35,7 +35,7 @@ export default function KaynakDetayPage() {
   const { user } = useAuth();
   const params = useParams();
   const router = useRouter();
-  const resourceId = params.id;
+  const resourceId = params?.id;
   
   const [resource, setResource] = useState<Resource | null>(null);
   const [loading, setLoading] = useState(true);

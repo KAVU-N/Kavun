@@ -25,7 +25,7 @@ export default function CreateLessonPage() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const instructorId = searchParams.get('instructorId');
+  const instructorId = searchParams?.get('instructorId');
   
   const [instructor, setInstructor] = useState<Instructor | null>(null);
   const [loading, setLoading] = useState(true);

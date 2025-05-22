@@ -91,7 +91,7 @@ export const createPayment = async (
 
     // Ödemeyi gerçekleştir
     return new Promise((resolve, reject) => {
-      iyzipay.payment.create(request, (err, result) => {
+      iyzipay.payment.create(request, (err: any, result: any) => {
         if (err) {
           reject(err);
         } else {
@@ -99,7 +99,7 @@ export const createPayment = async (
         }
       });
     });
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(`Ödeme işlemi başlatılırken bir hata oluştu: ${error.message}`);
   }
 };
@@ -186,7 +186,7 @@ export const create3DSecurePayment = async (
 
     // 3D ödemeyi başlat
     return new Promise((resolve, reject) => {
-      iyzipay.threedsInitialize.create(request, (err, result) => {
+      iyzipay.threedsInitialize.create(request, (err: any, result: any) => {
         if (err) {
           reject(err);
         } else {
@@ -194,7 +194,7 @@ export const create3DSecurePayment = async (
         }
       });
     });
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(`3D Secure ödeme işlemi başlatılırken bir hata oluştu: ${error.message}`);
   }
 };
@@ -209,7 +209,7 @@ export const complete3DSecurePayment = async (paymentId: string, conversationId:
     };
 
     return new Promise((resolve, reject) => {
-      iyzipay.threedsPayment.create(request, (err, result) => {
+      iyzipay.threedsPayment.create(request, (err: any, result: any) => {
         if (err) {
           reject(err);
         } else {
@@ -217,7 +217,7 @@ export const complete3DSecurePayment = async (paymentId: string, conversationId:
         }
       });
     });
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(`3D Secure ödeme tamamlanırken bir hata oluştu: ${error.message}`);
   }
 };
@@ -232,7 +232,7 @@ export const cancelPayment = async (paymentId: string) => {
     };
 
     return new Promise((resolve, reject) => {
-      iyzipay.cancel.create(request, (err, result) => {
+      iyzipay.cancel.create(request, (err: any, result: any) => {
         if (err) {
           reject(err);
         } else {
@@ -240,7 +240,7 @@ export const cancelPayment = async (paymentId: string) => {
         }
       });
     });
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(`Ödeme iptali sırasında bir hata oluştu: ${error.message}`);
   }
 };
@@ -258,7 +258,7 @@ export const refundPayment = async (paymentTransactionId: string, amount: number
     };
 
     return new Promise((resolve, reject) => {
-      iyzipay.refund.create(request, (err, result) => {
+      iyzipay.refund.create(request, (err: any, result: any) => {
         if (err) {
           reject(err);
         } else {
@@ -266,7 +266,7 @@ export const refundPayment = async (paymentTransactionId: string, amount: number
         }
       });
     });
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(`Ödeme iadesi sırasında bir hata oluştu: ${error.message}`);
   }
 };

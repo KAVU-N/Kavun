@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Öğretmen kontrolü (öğrenci kendi dersini rezerve edemez)
-    if (lesson.teacherId.toString() === user._id.toString()) {
+    if (lesson.teacherId.toString() === String(user._id)) {
       return NextResponse.json({ error: 'Kendi dersinizi rezerve edemezsiniz' }, { status: 400 });
     }
 

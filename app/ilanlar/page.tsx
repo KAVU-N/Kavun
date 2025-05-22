@@ -270,7 +270,7 @@ export default function IlanlarPage() {
                   <button 
                     type="button"
                     onClick={() => {
-                      setFilters({ method: '', priceMin: '', priceMax: '' });
+                      setFilters({ method: '', priceMin: '', priceMax: '', sortBy: 'en-yeni' });
                     }}
                     className="px-4 py-2 text-[#994D1C] hover:text-[#6B3416] font-medium transition-colors duration-200"
                   >
@@ -335,7 +335,7 @@ export default function IlanlarPage() {
                 <button 
                   onClick={() => {
                     setSearchTerm('');
-                    setFilters({ method: '', priceMin: '', priceMax: '' });
+                    setFilters({ method: '', priceMin: '', priceMax: '', sortBy: 'en-yeni' });
                   }}
                   className="px-6 py-3 bg-[#FFE5D9] text-[#6B3416] rounded-xl hover:bg-[#FFDAC1] transition-colors duration-200"
                 >

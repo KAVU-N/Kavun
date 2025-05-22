@@ -256,6 +256,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Anasayfa
     'home.mainTitle': 'İhtiyacına en uygun öğrencileri bul, hemen öğrenmeye başla!',
     'home.showAllUniversities': 'Tüm üniversiteleri göster',
+    'home.allUniversities': 'Tüm Üniversiteler',
     'home.selectUniversity': 'Üniversitenizi seçin...',
     'home.description': 'Kavun, aynı üniversite öğrencilerini bir araya getiren yeni nesil bir eğitim platformudur.',
     'home.exploreCourses': 'Kursları Keşfet',
@@ -719,6 +720,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Homepage
     'home.mainTitle': 'Find the students that best suit your needs, start learning now!',
     'home.showAllUniversities': 'Show all universities',
+    'home.allUniversities': 'All Universities',
     'home.selectUniversity': 'Select your university...',
     'home.description ': 'Kavun is a next-generation education platform that brings together students from the same university.',
     'home.exploreCourses': 'Explore Courses',

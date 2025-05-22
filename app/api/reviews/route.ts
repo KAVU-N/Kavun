@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Dersin öğrencisi olduğunu doğrula
-    if (!lesson.studentId || lesson.studentId.toString() !== user._id.toString()) {
+    if (!lesson.studentId || lesson.studentId.toString() !== String(user._id)) {
       return NextResponse.json({ error: 'Bu dersi değerlendirme yetkiniz yok' }, { status: 403 });
     }
 

@@ -86,7 +86,7 @@ const UsersPage = () => {
     if (!selectedUser) return
     
     try {
-      const payload = { ...selectedUser }
+      const payload: any = { ...selectedUser }
       if (newPassword.length > 0) {
         payload.newPassword = newPassword
       }

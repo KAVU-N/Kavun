@@ -4,6 +4,7 @@ import { Schema } from 'mongoose';
 // Lesson interface
 export interface ILesson extends Document {
   teacherId: mongoose.Types.ObjectId;
+  courseId?: mongoose.Types.ObjectId;
   studentId?: mongoose.Types.ObjectId;
   title: string;
   description: string;
@@ -23,6 +24,12 @@ const lessonSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'Öğretmen ID alanı zorunludur']
+  },
+  courseId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
+    required: false,
+    default: null
   },
   studentId: {
     type: mongoose.Schema.Types.ObjectId,

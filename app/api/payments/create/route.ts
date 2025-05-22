@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Öğrencinin kendisine ait ders mi kontrol et
-    if (lesson.studentId?.toString() !== user._id.toString()) {
+    if (lesson.studentId?.toString() !== String(user._id)) {
       return NextResponse.json({ error: 'Bu ders size ait değil' }, { status: 403 });
     }
 

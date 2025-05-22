@@ -1,6 +1,12 @@
 {
   "/not-found": "app/not-found.js",
-  "/kaynaklar/paylas/page": "app/kaynaklar/paylas/page.js",
+  "/page": "app/page.js",
   "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/api/resources/route": "app/api/resources/route.js"
+  "/kvkk/page": "app/kvkk/page.js",
+  "/cerez-politikasi/page": "app/cerez-politikasi/page.js",
+  "/ilanlar/page": "app/ilanlar/page.js",
+  "/api/resources/route": "app/api/resources/route.js",
+  "/kaynaklar/page": "app/kaynaklar/page.js",
+  "/iletisim/page": "app/iletisim/page.js",
+  "/auth/login/page": "app/auth/login/page.js"
 }

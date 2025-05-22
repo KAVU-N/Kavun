@@ -9,10 +9,10 @@ export default function PaymentErrorPage() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const paymentId = searchParams.get('paymentId');
-  const errorCode = searchParams.get('errorCode');
-  const errorMessage = searchParams.get('errorMessage');
-  const mdStatus = searchParams.get('mdStatus');
+  const paymentId = searchParams?.get('paymentId');
+  const errorCode = searchParams?.get('errorCode');
+  const errorMessage = searchParams?.get('errorMessage');
+  const mdStatus = searchParams?.get('mdStatus');
   
   const [payment, setPayment] = useState<any>(null);
   const [loading, setLoading] = useState(true);

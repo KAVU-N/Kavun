@@ -1,13 +1,13 @@
 'use client';
-import { FaInstagram, FaLinkedin, FaEnvelope, FaMapMarkerAlt, FaPhone, FaFacebook, FaTwitter } from 'react-icons/fa';
+import { FaInstagram, FaLinkedin, FaEnvelope, FaFacebook, FaTwitter } from 'react-icons/fa';
 
 export default function ContactPage() {
   const contactInfo = [
     {
       icon: FaEnvelope,
       title: 'E-posta',
-      value: 'tutorhub25@gmail.com',
-      href: 'mailto:tutorhub25@gmail.com'
+      value: 'info@kavunla.com',
+      href: 'mailto:info@kavunla.com'
     }
   ];
 
