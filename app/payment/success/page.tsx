@@ -9,7 +9,7 @@ export default function PaymentSuccessPage() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const paymentId = searchParams.get('paymentId');
+  const paymentId = searchParams?.get('paymentId');
   
   const [payment, setPayment] = useState<any>(null);
   const [loading, setLoading] = useState(true);

@@ -162,7 +162,7 @@ export async function DELETE(
     }
 
     // Yalnızca dersin öğretmeni silebilir
-    if (lesson.teacherId.toString() !== user._id.toString() && user.role !== 'admin') {
+    if (lesson.teacherId.toString() !== String(user._id) && user.role !== 'admin') {
       return NextResponse.json({ error: 'Bu dersi silme yetkiniz yok' }, { status: 403 });
     }
 

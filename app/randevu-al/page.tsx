@@ -77,8 +77,8 @@ export default function RandevuAlPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const ilanId = searchParams.get('ilanId');
-  const teacherId = searchParams.get('teacherId');
+  const ilanId = searchParams?.get('ilanId');
+  const teacherId = searchParams?.get('teacherId');
   
   const [ilan, setIlan] = useState<Ilan | null>(null);
   const [isLoading, setIsLoading] = useState(true);

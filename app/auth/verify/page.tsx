@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function VerifyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get('email');
+  const email = searchParams?.get('email');
   const { setUser } = useAuth();
   const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState('');

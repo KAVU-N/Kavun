@@ -1,5 +1,6 @@
 'use client';
 
+import CookieConsentBar from '../components/CookieConsentBar';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -44,6 +45,8 @@ export default function RootLayout({
           <main className="pt-24 pb-20" style={{backgroundColor: 'white !important'}}>
             {children}
           </main>
+          {/* Çerez Banner'ı */}
+          <CookieConsentBar />
           
           {/* Inline Footer - Bu sadece görünmesi için */}
           <footer className="bg-gradient-to-r from-[#FFF5F0] to-white border-t border-[#FFE5D9] py-8" style={{backgroundColor: '#FFF5F0 !important', borderTopColor: '#FFE5D9 !important', color: '#6B3416 !important'}}>

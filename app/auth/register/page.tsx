@@ -14,8 +14,8 @@ type Role = 'student' | 'instructor';
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const defaultRole = searchParams.get('role') as Role || 'student';
-  const universityFromParam = searchParams.get('university') || '';
+  const defaultRole = searchParams?.get('role') as Role || 'student';
+  const universityFromParam = searchParams?.get('university') || '';
   const { register } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,7 @@ export default function RegisterPage() {
   const [localUniversities, setLocalUniversities] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [selectedUniversity, setSelectedUniversity] = useState('');
-  const [selectedRole, setSelectedRole] = useState<Role>(defaultRole);
+  const [selectedRole, setSelectedRole] = useState<Role>(defaultRole); // searchParams null olabilir, ?. ile güvenli erişim
   const [expertise, setExpertise] = useState('');
   const [otherExpertise, setOtherExpertise] = useState('');
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);

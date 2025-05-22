@@ -6,6 +6,8 @@ export interface IPayment extends Document {
   lessonId: mongoose.Types.ObjectId;
   studentId: mongoose.Types.ObjectId;
   teacherId: mongoose.Types.ObjectId;
+  userId?: mongoose.Types.ObjectId;
+  courseId?: mongoose.Types.ObjectId;
   amount: number;
   commission: number;
   status: 'pending' | 'completed' | 'refunded' | 'disputed';
@@ -32,6 +34,18 @@ const paymentSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'Öğretmen ID alanı zorunludur']
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false,
+    default: null
+  },
+  courseId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
+    required: false,
+    default: null
   },
   amount: {
     type: Number,
