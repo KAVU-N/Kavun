@@ -149,3 +149,10 @@ function ResetPasswordContent() {
     </div>
   );
 }
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Yükleniyor...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
+  );
+}
