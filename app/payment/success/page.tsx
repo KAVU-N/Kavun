@@ -1,11 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
 export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<div>Yükleniyor...</div>}>
+      <PaymentSuccessContent />
+    </Suspense>
+  );
+}
+
+function PaymentSuccessContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
