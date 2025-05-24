@@ -133,10 +133,3 @@ function PaymentSuccessContent() {
     </div>
   );
 }
-export default function Page() {
-  return (
-    <Suspense fallback={<div>Yükleniyor...</div>}>
-      <PaymentSuccessContent />
-    </Suspense>
-  );
-}
