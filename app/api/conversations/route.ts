@@ -11,11 +11,29 @@ import mongoose from 'mongoose';
 async function getUserFromToken(req: Request) {
   // Authorization header'dan token'ı al
   const headersList = headers();
-  const authorization = headersList.get('Authorization');
-  const token = authorization?.replace('Bearer ', '');
-  
+  console.log('Tüm headerlar:', Object.fromEntries(headersList.entries()));
+  let token = headersList.get('Authorization')?.replace('Bearer ', '');
+  // Eğer header'daki token geçersiz bir placeholder ise, yok say
+  if (!token || token === '{%Authorization%}' || token.toLowerCase().includes('authoriz')) {
+    token = undefined;
+  }
+  // Vercel prod için: Cookie'den de token oku
   if (!token) {
-    console.error('Token bulunamadı');
+    try {
+      const cookieHeader = headersList.get('cookie');
+      if (cookieHeader) {
+        const match = cookieHeader.match(/token=([^;]+)/);
+        if (match) {
+          token = match[1];
+        }
+      }
+    } catch (e) {
+      console.error('Cookie token okuma hatası:', e);
+    }
+  }
+
+  if (!token) {
+    console.error('Token bulunamadı (header ve cookie)');
     return null;
   }
   
@@ -23,8 +41,10 @@ async function getUserFromToken(req: Request) {
     console.log('Token doğrulanıyor...');
     
     // JWT_SECRET değeri .env dosyasından okunmalıdır
-    const jwtSecret = process.env.JWT_SECRET || 'default_secret';
-    console.log('JWT Secret kullanılıyor (ilk 5 karakter):', jwtSecret.substring(0, 5) + '...');
+    console.log('[DEBUG] JWT_SECRET env (ilk 10 karakter):', (process.env.JWT_SECRET || '').substring(0, 10));
+console.log('[DEBUG] Gelen token (uzunluk):', token.length, 'İlk 10:', token.substring(0, 10));
+const jwtSecret = process.env.JWT_SECRET || 'default_secret';
+console.log('JWT Secret kullanılıyor (ilk 5 karakter):', jwtSecret.substring(0, 5) + '...');
     
     const decoded = jwt.verify(token, jwtSecret) as {
       id?: string;
@@ -83,6 +103,7 @@ function formatDate(date: Date): string {
 
 // Kullanıcının tüm konuşmalarını getir
 export async function GET(request: Request) {
+  console.log('[DEBUG] /api/conversations endpointi çağrıldı');
   console.log('GET /api/conversations isteği alındı');
   
   try {

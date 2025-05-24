@@ -10,11 +10,28 @@ import jwt from 'jsonwebtoken';
 async function getUserFromToken(req: Request) {
   // Authorization header'dan token'ı al
   const headersList = headers();
-  const authorization = headersList.get('Authorization');
-  const token = authorization?.replace('Bearer ', '');
-  
+  let token = headersList.get('Authorization')?.replace('Bearer ', '');
+  // Eğer header'daki token geçersiz bir placeholder ise, yok say
+  if (!token || token === '{%Authorization%}' || token.toLowerCase().includes('authoriz')) {
+    token = undefined;
+  }
+  // Vercel prod için: Cookie'den de token oku
   if (!token) {
-    console.error('Token bulunamadı');
+    try {
+      const cookieHeader = headersList.get('cookie');
+      if (cookieHeader) {
+        const match = cookieHeader.match(/token=([^;]+)/);
+        if (match) {
+          token = match[1];
+        }
+      }
+    } catch (e) {
+      console.error('Cookie token okuma hatası:', e);
+    }
+  }
+
+  if (!token) {
+    console.error('Token bulunamadı (header ve cookie)');
     return null;
   }
   

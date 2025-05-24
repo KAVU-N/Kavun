@@ -7,10 +7,6 @@ import User from '@/models/User';
 import fs from 'fs';
 
 export async function GET(request: NextRequest) {
-  // Eğer test/data/05-versions-space.pdf dosyası yoksa build'i kırma
-  if (!fs.existsSync('test/data/05-versions-space.pdf')) {
-    return NextResponse.json({ error: 'Kaynak PDF dosyası eksik' }, { status: 503 });
-  }
 
   try {
     await connectDB();

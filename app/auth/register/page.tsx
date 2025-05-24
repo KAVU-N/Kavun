@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -11,7 +12,9 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 
 type Role = 'student' | 'instructor';
 
-export default function RegisterPage() {
+import { Suspense } from 'react';
+
+function RegisterPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const defaultRole = searchParams?.get('role') as Role || 'student';
@@ -49,11 +52,15 @@ export default function RegisterPage() {
       finalExpertise = otherExpertise;
     }
     console.log("Formdan seçilen rol:", selectedRole);
+
+    let isValid = true;
     if (password !== passwordConfirm) {
       setError(t('errors.passwordsDoNotMatch') || 'Şifreler eşleşmiyor');
       setLoading(false);
-      return;
+      isValid = false;
     }
+    if (!isValid) return;
+
     try {
       await register({ name, email, password, role: selectedRole, university, expertise: finalExpertise, grade });
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
@@ -64,14 +71,10 @@ export default function RegisterPage() {
     }
   };
 
-
   useEffect(() => {
-    // Veritabanından üniversiteleri getiren kod
     const fetchUniversities = async () => {
       try {
-        // Data dosyasından üniversiteleri kullanıyoruz
         setLocalUniversities(universities);
-        
         if (universityFromParam) {
           setSearchTerm(universityFromParam);
           setSelectedUniversity(universityFromParam);
@@ -80,7 +83,6 @@ export default function RegisterPage() {
         console.error(t('errors.loadingUniversities') || 'Üniversiteler yüklenirken hata oluştu:', error);
       }
     };
-
     fetchUniversities();
   }, [universityFromParam]);
 
@@ -90,29 +92,21 @@ export default function RegisterPage() {
       <div className="hidden md:flex md:flex-1 items-center justify-center">
         <div className="relative w-full max-w-sm">
           <Image 
-            src="/images/education-illustration.svg" 
-            alt="Education" 
-            width={380} 
-            height={380} 
+            src="/register-illustration.svg"
+            alt="Register Illustration"
+            width={400}
+            height={400}
             className="object-contain"
+            priority
           />
         </div>
       </div>
-      
-      {/* Form on the right */}
       <div className="flex-1">
         <div className="mb-2">
           <h2 className="text-2xl font-bold text-[#994D1C]">
             {t('auth.register')}
           </h2>
-          <p className="mt-1 text-xs text-[#6B3416]">
-            {t('auth.haveAccount')}{' '}
-            <Link href="/auth/login" className="font-medium text-[#FF8B5E] hover:text-[#994D1C] transition-colors">
-              {t('auth.login')}
-            </Link>
-          </p>
         </div>
-        
         <form onSubmit={handleSubmit} className="space-y-2.5">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-[#6B3416] mb-1">
@@ -154,6 +148,7 @@ export default function RegisterPage() {
             />
             <p className="mt-1 text-xs text-[#6B3416]">{t('auth.passwordRequirement')}</p>
           </div>
+
 
           <div>
             <label htmlFor="passwordConfirm" className="block text-sm font-medium text-[#6B3416] mb-1">
@@ -326,5 +321,13 @@ export default function RegisterPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterPageInner />
+    </Suspense>
   );
 }

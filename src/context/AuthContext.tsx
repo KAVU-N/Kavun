@@ -51,6 +51,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       setUser(data.user);
       localStorage.setItem('user', JSON.stringify(data.user));
+      // JWT token'ı çerez olarak kaydet
+      if (data.token) {
+        const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const sameSite = isHttps && !isLocalhost ? 'None' : 'Strict';
+        const secure = isHttps && !isLocalhost ? '; Secure' : '';
+        const domain = isHttps && !isLocalhost ? '; domain=.kavunla.com' : '';
+document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${domain}`;
+        console.log('TOKEN (login sonrası, cookie):', document.cookie);
+        console.log('TOKEN (login sonrası, value):', data.token);
+      }
       router.push('/');
     } catch (error) {
       throw error;
@@ -73,11 +84,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       setUser(data.user);
       localStorage.setItem('user', JSON.stringify(data.user));
+      // JWT token'ı çerez olarak kaydet
+      if (data.token) {
+        const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const sameSite = isHttps && !isLocalhost ? 'None' : 'Strict';
+        const secure = isHttps && !isLocalhost ? '; Secure' : '';
+        const domain = isHttps && !isLocalhost ? '; domain=.kavunla.com' : '';
+document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${domain}`;
+        console.log('TOKEN (register sonrası, cookie):', document.cookie);
+        console.log('TOKEN (register sonrası, value):', data.token);
+      }
       router.push('/');
     } catch (error) {
       throw error;
     }
   };
+
 
   const logout = () => {
     setUser(null);

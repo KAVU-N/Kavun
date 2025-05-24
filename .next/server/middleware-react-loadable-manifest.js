@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST='{"..\\\\app\\\\derslerim\\\\[id]\\\\page.tsx -> ../VideoUploadAndComplete":{"id":96,"files":["static/chunks/96.7153a4311901eccd.js"]}}';
