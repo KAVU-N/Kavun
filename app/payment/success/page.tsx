@@ -127,7 +127,7 @@ function PaymentSuccessContent() {
                 Ana Sayfaya Dön
               </Link>
             </div>
-          </div>
+          </div> 
         )}
       </div>
     </div>
