@@ -1,8 +1,9 @@
+export const dynamic = "force-dynamic";
 'use client';
 import { motion } from 'framer-motion';
 import { FaCode, FaMobile, FaRobot, FaDatabase, FaCloud, FaLock, FaSpinner, FaStar } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 const IconMap = {
@@ -12,8 +13,8 @@ const IconMap = {
   4: FaDatabase,
   5: FaCloud,
   6: FaLock,
-};
-
+};   
+ 
 interface Course {
   _id: string;
   title: string;
