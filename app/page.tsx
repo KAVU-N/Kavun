@@ -19,7 +19,7 @@ export default function Home() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleRoleSelect = (role: 'student' | 'instructor') => {
-    router.push(`/auth/register?role=${role}&university=${encodeURIComponent(searchTerm)}`);
+    // router.push(`/auth/register?role=${role}&university=${encodeURIComponent(searchTerm)}`); // Yönlendirme kaldırıldı
   };
 
   const handleCloseDialog = () => {

@@ -1,12 +1,13 @@
 {
   "/not-found": "app/not-found.js",
-  "/page": "app/page.js",
-  "/api/messages/unread/route": "app/api/messages/unread/route.js",
-  "/kvkk/page": "app/kvkk/page.js",
-  "/cerez-politikasi/page": "app/cerez-politikasi/page.js",
-  "/ilanlar/page": "app/ilanlar/page.js",
-  "/api/resources/route": "app/api/resources/route.js",
+  "/api/resources/count": "app/api/resources/count.js",
   "/kaynaklar/page": "app/kaynaklar/page.js",
-  "/iletisim/page": "app/iletisim/page.js",
-  "/auth/login/page": "app/auth/login/page.js"
+  "/api/resources/route": "app/api/resources/route.js",
+  "/api/messages/unread/route": "app/api/messages/unread/route.js",
+  "/api/resources/[id]/route": "app/api/resources/[id]/route.js",
+  "/api/notifications/route": "app/api/notifications/route.js",
+  "/api/auth/verify/route": "app/api/auth/verify/route.js",
+  "/bildirimler/page": "app/bildirimler/page.js",
+  "/auth/register/page": "app/auth/register/page.js",
+  "/auth/verify/page": "app/auth/verify/page.js"
 }
