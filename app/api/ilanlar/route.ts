@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import mongoose from 'mongoose';
@@ -113,37 +114,42 @@ export async function POST(req: Request) {
     console.log('API received body:', body);
     
     // Token'dan kullanıcı bilgisini al
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    async function getUserFromToken(req: Request) {
+      const headersList = req.headers;
+      let token = headersList.get('authorization')?.replace('Bearer ', '');
+      // Eğer header'daki token geçersiz bir placeholder ise, yok say
+      if (!token || token === '{%Authorization%}' || token.toLowerCase().includes('authoriz')) {
+        token = undefined;
+      }
+      // Cookie'den de token oku
+      if (!token) {
+        const cookieHeader = headersList.get('cookie');
+        if (cookieHeader) {
+          const match = cookieHeader.match(/token=([^;]+)/);
+          if (match) {
+            token = match[1];
+          }
+        }
+      }
+      if (!token) return null;
+      try {
+        const jwt = require('jsonwebtoken');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret');
+        return decoded && (decoded.userId || decoded.id || decoded._id);
+      } catch (e) {
+        return null;
+      }
+    }
+    // ---
+    const userId = await getUserFromToken(req);
+    if (!userId) {
       return NextResponse.json(
         { error: 'Yetkilendirme başarısız' },
         { status: 401 }
       );
     }
-    
-    const token = authHeader.split(' ')[1];
-    // Normalde token doğrulaması yapılır, burada basit bir örnek
-    
-    // Kullanıcı ID'sini al (gerçek uygulamada token'dan çıkarılır)
-    const userId = body.userId; // Bu değer client tarafından gönderilmeli
-    
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Kullanıcı kimliği bulunamadı' },
-        { status: 400 }
-      );
-    }
-    
-    // Token'dan kullanıcı bilgilerini çıkar
-    try {
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      console.log('POST ilan - Token içeriği:', decodedToken);
-    } catch (e) {
-      console.error('POST ilan - Token çözümlenirken hata:', e);
-    }
-    
-    console.log('POST ilan - Kullanıcı ID:', userId);
-    
+    // Kullanıcı kimliği client'tan alınmaz, token'dan çıkarılır
+
     // Yeni ilan oluştur
     const yeniIlan = await Ilan.create({
       title,

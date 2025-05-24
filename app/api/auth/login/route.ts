@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User, { IUser } from '@/models/User';
@@ -16,6 +17,8 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
+  console.log('[DEBUG][LOGIN] Endpoint çağrıldı (console.log)');
+  console.error('[ERROR][LOGIN] Endpoint çağrıldı (console.error)');
   try {
     // Request body'i parse et
     const { email, password } = await req.json();
@@ -126,6 +129,8 @@ export async function POST(req: Request) {
     }
 
     // JWT token oluştur
+    const jwtSecret = process.env.JWT_SECRET || 'default-secret';
+    console.log('[DEBUG][LOGIN] JWT_SECRET env (ilk 10 karakter):', jwtSecret.substring(0, 10), 'uzunluk:', jwtSecret.length);
     const token = jwt.sign(
       { 
         id: user._id ? user._id.toString() : '', 
@@ -133,9 +138,11 @@ export async function POST(req: Request) {
         role: user.role,
         name: user.name 
       },
-      process.env.JWT_SECRET || 'default-secret',
+      jwtSecret,
       { expiresIn: '7d' }
     );
+    console.log('[DEBUG][LOGIN] Üretilen token (ilk 10 karakter):', token.substring(0, 10), 'uzunluk:', token.length);
+    console.error('[ERROR][LOGIN] Üretilen token (ilk 10 karakter):', token.substring(0, 10), 'uzunluk:', token.length);
 
     // Debug için
     console.log('Login successful, returning user data:', {

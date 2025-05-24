@@ -115,7 +115,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('user', JSON.stringify(result.user));
         console.log('TOKEN localStorage öncesi:', result.token);
         localStorage.setItem('token', result.token);
-        console.log('TOKEN localStorage sonrası:', localStorage.getItem('token'));
+        // Token'ı cookie olarak da kaydet (Vercel prod için)
+        const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const sameSite = isHttps && !isLocalhost ? 'None' : 'Strict';
+        const secure = isHttps && !isLocalhost ? '; Secure' : '';
+        document.cookie = `token=${result.token}; path=/; SameSite=${sameSite}${secure}`;
+        console.log('TOKEN (login sonrası, cookie):', document.cookie);
+        console.log('TOKEN (login sonrası, value):', result.token);
       }
 
       // Redirect student users to instructors page, others to home page
@@ -183,24 +190,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("Kullanıcının kayıt formunda seçtiği rol:", data.role);
       console.log("API yanıtında gelen rol (varsa):", userData.role);
 
-      // API'den gelen kullanıcı nesnesini doğrula ve gerekirse varsayılan değerler ata
+      // API yanıtında kullanıcı nesnesini doğrula ve gerekirse varsayılan değerler ata
       const validatedUser: User = {
         id: userData.id || userData._id || '',
         name: userData.name || data.name || '',
         email: userData.email || data.email || '',
-        // Öncelikle kullanıcının kayıt formunda seçtiği rolü kullan
-        role: data.role || userData.role || 'student',
+        role: userData.role || data.role || 'student',
         university: userData.university || data.university || '',
         isVerified: userData.isVerified || false,
         expertise: userData.expertise
       };
+
+      // Eğer register sonrası token dönüyorsa, çerezi ayarla
+      if (result.token) {
+        const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+        const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+        const sameSite = isHttps && !isLocalhost ? 'None' : 'Strict';
+        const secure = isHttps && !isLocalhost ? '; Secure' : '';
+        document.cookie = `token=${result.token}; path=/; SameSite=${sameSite}${secure}`;
+        console.log('TOKEN (register sonrası, cookie):', document.cookie);
+        console.log('TOKEN (register sonrası, value):', result.token);
+      }
 
       console.log("Doğrulanmış kullanıcı verisi:", validatedUser);
       
       // Kullanıcı doğrulama sayfasına yönlendir
       router.push(`/auth/verify?email=${encodeURIComponent(validatedUser.email)}`);
       
-      // Kullanıcı bilgilerini ve token'ı kaydetmiyoruz - doğrulama sonrası yapılacak
     } catch (err: any) {
       console.error("Kayıt hatası:", err);
       setError(err.message);
