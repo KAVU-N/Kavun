@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
-export default function PaymentErrorPage() {
+function PaymentErrorContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
