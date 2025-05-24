@@ -411,3 +411,10 @@ function CreateLessonContent() {
     </div>
   );
 }
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Yükleniyor...</div>}>
+      <CreateLessonContent />
+    </Suspense>
+  );
+}
