@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+// Iyzico veya ödeme entegrasyonu kullanılmıyorsa build'i kırmamak için koruma:
+const IYZICO_DISABLED = !process.env.IYZICO_API_KEY || process.env.IYZICO_API_KEY === 'dummy';
+
 import { connectDB } from '@/lib/db';
 import Lesson from '@/models/Lesson';
 import User from '@/models/User';
@@ -12,6 +16,10 @@ connectDB();
 
 // Ödeme başlatma
 export async function POST(request: NextRequest) {
+  if (IYZICO_DISABLED) {
+    return NextResponse.json({ error: 'Ödeme servisi devre dışı' }, { status: 503 });
+  }
+
   try {
     // JWT doğrulama
     const token = request.headers.get('Authorization')?.split(' ')[1];

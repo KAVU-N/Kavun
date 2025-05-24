@@ -150,6 +150,33 @@ export default function KaynaklarPage() {
   const [showFilters, setShowFilters] = useState(false);
 
   // Filtreleme ve sıralama işlemlerini useMemo ile optimize et
+  // Pagination için state
+  const [currentPage, setCurrentPage] = useState(1);
+  const resourcesPerPage = 9;
+  const [totalResourceCount, setTotalResourceCount] = useState(0);
+
+  // Filtrelenmiş kaynakları hesapla
+  const fetchTotalResourceCount = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('search', searchTerm);
+      if (selectedCategory) params.append('category', selectedCategory);
+      if (selectedFormat) params.append('format', selectedFormat);
+      if (selectedUniversity && selectedUniversity !== 'all') params.append('university', selectedUniversity);
+      if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') params.append('academicLevel', selectedAcademicLevel);
+      const query = params.toString() ? `?${params.toString()}` : '';
+      const response = await fetch(`/api/resources/count${query}`);
+      if (!response.ok) throw new Error('API hatası');
+      const data = await response.json();
+      setTotalResourceCount(data.count || 0);
+    } catch (error) {
+      setTotalResourceCount(0);
+    }
+  };
+  useEffect(() => {
+    fetchTotalResourceCount();
+  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
+
   const filteredResources = useMemo(() => {
     let filtered = [...resources];
     if (searchTerm) {
@@ -180,8 +207,29 @@ export default function KaynaklarPage() {
       }
       return 0;
     });
-    return filtered.slice(0, 9);
+    return filtered;
   }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, sortBy, sortOrder]);
+
+  // Toplam sayfa sayısı
+  const totalPages = Math.ceil(totalResourceCount / resourcesPerPage);
+
+  // Sadece aktif sayfanın kaynakları
+  const pagedResources = useMemo(() => {
+    const startIdx = (currentPage - 1) * resourcesPerPage;
+    return filteredResources.slice(startIdx, startIdx + resourcesPerPage);
+  }, [filteredResources, currentPage]);
+
+  // Sayfa veya filtre değişince otomatik olarak en başa dön
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
+
+  // Eğer mevcut sayfa, toplam sayfa sayısından büyükse düzelt
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
 
   // Kaynakları getir (arama ve filtreye göre)
   const fetchResources = async () => {
@@ -209,9 +257,11 @@ export default function KaynaklarPage() {
     }
   };
 
-  // Sayfa yüklendiğinde ve filtre/arama değiştiğinde kaynakları getir
+  // Sayfa yüklendiğinde ve sadece filtre/arama değiştiğinde kaynakları getir (currentPage bağımlılığını kaldırdım)
   useEffect(() => {
     fetchResources();
+    // currentPage burada bağımlılıkta OLMAMALI. Sadece filtre/arama değişiminde çalışmalı.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
 
   // Formatı insan tarafından okunabilir hale getir
@@ -246,9 +296,7 @@ export default function KaynaklarPage() {
       .toLowerCase();
   };
 
-  // Kullanıcının kaynak görme hakkı kadar kaynağı göster
-  const userViewQuota = user?.viewQuota ?? 2;
-  const visibleResources = filteredResources.slice(0, userViewQuota);
+  // Kullanıcının kaynak görme hakkı ile ilgili kısıtlama kaldırıldı.
 
   return (
     <div className="container mx-auto px-4 py-8 mt-20">
@@ -433,7 +481,44 @@ export default function KaynaklarPage() {
       
       {/* Kaynaklar Listesi */}
       {/* Kaynak Önizleme Modalı */}
-      {showPreviewModal && previewResource && (
+      {/* Pagination */}
+      {(totalPages > 1 || (totalResourceCount > 0 && pagedResources.length === 0)) && (
+  <div className="flex flex-col items-center mt-8">
+    {/* User-friendly message if no resources on current page but there are other pages */}
+    {pagedResources.length === 0 && totalResourceCount > 0 && (
+      <div className="mb-4 text-[#994D1C] bg-[#FFF5F0] px-4 py-2 rounded">
+        {t('general.noResourcesOnPage') || 'Bu sayfada kaynak bulunamadı. Farklı bir sayfaya geçin veya filtreleri değiştirin.'}
+      </div>
+    )}
+    <nav className="inline-flex rounded-md shadow-sm" aria-label="Pagination">
+      <button
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        disabled={currentPage <= 1 || totalPages === 0}
+        className={`px-3 py-2 rounded-l-md border border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage <= 1 || totalPages === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+      >
+        &lt;
+      </button>
+      {[...Array(totalPages)].map((_, idx) => (
+        <button
+          key={idx + 1}
+          onClick={() => setCurrentPage(idx + 1)}
+          className={`px-3 py-2 border-t border-b border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage === idx + 1 ? 'bg-[#FFB996] text-white font-bold' : ''}`}
+        >
+          {idx + 1}
+        </button>
+      ))}
+      <button
+        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        disabled={currentPage >= totalPages || totalPages === 0}
+        className={`px-3 py-2 rounded-r-md border border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage >= totalPages || totalPages === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+      >
+        &gt;
+      </button>
+    </nav>
+  </div>
+)}
+
+{showPreviewModal && previewResource && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           {/* Ana içerik: Kaynağı kaydırılabilir şekilde göster */}
           <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full max-h-[96vh] flex flex-col overflow-hidden">
@@ -571,7 +656,7 @@ export default function KaynaklarPage() {
         </div>
       ) : filteredResources.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredResources.map((resource: Resource) => (
+          {pagedResources.map((resource: Resource) => (
             <div key={resource._id || resource.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
@@ -639,27 +724,39 @@ export default function KaynaklarPage() {
               </div>
             </div>
           ))}
+          {(totalPages > 1 || (totalResourceCount > 0 && pagedResources.length === 0)) && (
+            <div className="flex justify-center mt-8">
+              <nav className="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1 || totalPages === 0}
+                  className={`px-3 py-2 rounded-l-md border border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${(currentPage === 1 || totalPages === 0) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  &lt;
+                </button>
+                {[...Array(totalPages)].map((_, idx) => (
+                  <button
+                    key={idx + 1}
+                    onClick={() => setCurrentPage(idx + 1)}
+                    className={`px-3 py-2 border-t border-b border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage === idx + 1 ? 'bg-[#FFB996] text-white font-bold' : ''}`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  className={`px-3 py-2 rounded-r-md border border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${(currentPage === totalPages || totalPages === 0) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  &gt;
+                </button>
+              </nav>
+            </div>
+          )}
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-md p-8 text-center">
-          <div className="text-[#994D1C] text-5xl mb-4">
-            <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-[#994D1C] mb-4">{t('general.resourceSearchNoResults')}</h2>
-          <p className="text-[#6B3416] mb-6">
-            {t('general.noResultsForSearch')}
-          </p>
-          {user && (
-            <Link
-              href="/kaynaklar/paylas"
-              className="px-6 py-3 bg-[#FF8B5E] text-white font-medium rounded-xl 
-                transition-all duration-300 hover:bg-[#FF7A45]"
-            >
-              {t('general.shareResource')}
-            </Link>
-          )}
+        <div className="flex justify-center items-center py-20">
+          <h2 className="text-2xl font-bold text-[#994D1C]">{t('general.noResourcesFound')}</h2>
         </div>
       )}
     </div>

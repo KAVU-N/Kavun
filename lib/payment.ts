@@ -1,7 +1,10 @@
 import Iyzipay from 'iyzipay';
 
-// İyzico yapılandırması
-export const iyzipay = new Iyzipay({
+// Build sırasında Iyzico dummy ise işlemleri devre dışı bırak
+export const IYZICO_DISABLED = !process.env.IYZICO_API_KEY || process.env.IYZICO_API_KEY === 'dummy';
+
+// İyzico yapılandırması (dummy ise oluşturma)
+export const iyzipay = IYZICO_DISABLED ? null : new Iyzipay({
   apiKey: process.env.IYZICO_API_KEY || '',
   secretKey: process.env.IYZICO_SECRET_KEY || '',
   uri: process.env.NODE_ENV === 'production' 
@@ -16,6 +19,7 @@ export const createPayment = async (
   cardData: any,
   callbackUrl: string
 ) => {
+  if (IYZICO_DISABLED) throw new Error('Ödeme servisi devre dışı');
   try {
     // Buyer bilgilerini oluştur
     const buyer = {
@@ -111,6 +115,7 @@ export const create3DSecurePayment = async (
   cardData: any,
   callbackUrl: string
 ) => {
+  if (IYZICO_DISABLED) throw new Error('Ödeme servisi devre dışı');
   try {
     // Buyer bilgilerini oluştur
     const buyer = {
@@ -201,6 +206,7 @@ export const create3DSecurePayment = async (
 
 // 3D doğrulama sonrası ödemeyi tamamla
 export const complete3DSecurePayment = async (paymentId: string, conversationId: string) => {
+  if (IYZICO_DISABLED) throw new Error('Ödeme servisi devre dışı');
   try {
     const request = {
       locale: 'tr',
@@ -224,6 +230,7 @@ export const complete3DSecurePayment = async (paymentId: string, conversationId:
 
 // Ödeme iptal işlemi
 export const cancelPayment = async (paymentId: string) => {
+  if (IYZICO_DISABLED) throw new Error('Ödeme servisi devre dışı');
   try {
     const request = {
       locale: 'tr',
@@ -247,6 +254,7 @@ export const cancelPayment = async (paymentId: string) => {
 
 // Ödeme iade işlemi
 export const refundPayment = async (paymentTransactionId: string, amount: number) => {
+  if (IYZICO_DISABLED) throw new Error('Ödeme servisi devre dışı');
   try {
     const request = {
       locale: 'tr',
