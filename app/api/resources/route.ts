@@ -40,10 +40,16 @@ export async function GET(request: NextRequest) {
       resources = await Resource.find({}).sort({ createdAt: -1 }).limit(9);
     }
     return NextResponse.json({ resources });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Kaynaklar getirilirken hata oluştu:', error);
+    let details = '';
+    if (error instanceof Error) {
+      details = error.stack || error.message;
+    } else {
+      details = String(error);
+    }
     return NextResponse.json(
-      { error: 'Kaynaklar getirilirken bir hata oluştu', details: error?.stack || error?.message || String(error) },
+      { error: 'Kaynaklar getirilirken bir hata oluştu', details },
       { status: 500 }
     );
   }
