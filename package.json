@@ -62,7 +62,7 @@
     "@types/dotenv": "^8.2.3",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/mongoose": "^5.11.97",
-    "@types/node": "^20.10.6",
+    "@types/node": "^20.17.50",
     "@types/pdf-parse": "^1.1.5",
     "@types/react": "^18.2.46",
     "@types/react-big-calendar": "^1.16.1",
