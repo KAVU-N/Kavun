@@ -56,9 +56,9 @@ import mammoth from 'mammoth';
 export async function POST(request: NextRequest) {
   if (process.env.NODE_ENV !== 'production') {
     if (!fs.existsSync('test/data/05-versions-space.pdf')) {
-        return NextResponse.json({ error: 'Kaynak PDF dosyası eksik' }, { status: 503 });
+      return NextResponse.json({ error: 'Kaynak PDF dosyası eksik' }, { status: 503 });
     }
-}
+  }
 
   try {
     const data = await request.json();
