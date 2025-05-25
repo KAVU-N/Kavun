@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Resource from '@/models/Resource';
 import User from '@/models/User';
-
-// Tüm kaynakları getir
 import fs from 'fs';
 
 export async function GET(request: NextRequest) {
