@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Kaynaklar getirilirken hata oluştu:', error);
     return NextResponse.json(
-      { error: 'Kaynaklar getirilirken bir hata oluştu' },
+      { error: 'Kaynaklar getirilirken bir hata oluştu', details: error?.stack || error?.message || String(error) },
       { status: 500 }
     );
   }
