@@ -42,4 +42,7 @@ const ResourceSchema = new Schema<IResource>({
   timestamps: true
 });
 
+// createdAt alanına index ekle
+ResourceSchema.index({ createdAt: -1 });
+
 export default models.Resource || model<IResource>('Resource', ResourceSchema);

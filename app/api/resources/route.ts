@@ -1,4 +1,3 @@
-require('../../../lib/mongooseAllowDiskUsePatch');
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Resource from '@/models/Resource';
@@ -64,12 +63,13 @@ export async function GET(request: NextRequest) {
     // Toplam kaynak sayısı (filtreye göre)
     const totalCount = await Resource.countDocuments(query);
 
-    // Sadece ilgili sayfanın kaynaklarını getir
-    const resources = await Resource.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .allowDiskUse(true);
+    // Sadece ilgili sayfanın kaynaklarını aggregate pipeline ile getir
+    const resources = await Resource.aggregate([
+      { $match: query },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit }
+    ], { allowDiskUse: true });
 
     return NextResponse.json({ resources, totalCount });
   } catch (error: unknown) {
