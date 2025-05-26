@@ -433,6 +433,8 @@ const translations: Record<Language, Record<string, string>> = {
     'errors.sessionNotFound': 'Oturum bilgisi bulunamadı. Lütfen tekrar giriş yapın.',
     'errors.listingCreationError': 'İlan oluşturulurken bir hata oluştu',
     'errors.listingCreationErrorTryAgain': 'İlan oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+    'errors.loginRequired': 'Bu kaynağı indirebilmek için giriş yapmalısınız.',
+    'errors.noDownloadPermission': 'Bu kaynağı indirmek için yetkiniz bulunmamaktadır.',
     
     // Footer
     'footer.platformDescription': 'Kavun, öğrencileri eğitmenlerle buluşturan ve eğitimin geleceğini şekillendiren platform.',
@@ -878,6 +880,8 @@ const translations: Record<Language, Record<string, string>> = {
     'errors.sessionNotFound': 'Session information not found. Please log in again.',
     'errors.listingCreationError': 'An error occurred while creating the listing',
     'errors.listingCreationErrorTryAgain': 'An error occurred while creating the listing. Please try again later.',
+    'errors.loginRequired': 'You need to log in to download this resource.',
+    'errors.noDownloadPermission': 'You do not have permission to download this resource.',
     
     // Footer
     'footer.platformDescription': 'Kavun is a platform that brings students together with instructors and shapes the future of education.',

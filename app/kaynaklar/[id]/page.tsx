@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useLanguage } from '@/src/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/context/AuthContext';
+import type { User } from '../../../src/types/User';
 import Link from 'next/link';
 
 // Kaynak tipi tanımlama
@@ -30,11 +31,10 @@ type Resource = {
   fileType?: string; // Dosya tipi (MIME type)
 };
 
-import type { User } from '@/context/AuthContext';
 
 export default function KaynakDetayPage() {
   const { t, language } = useLanguage();
-  const { user, setUser } = useAuth();
+  const { user } = useAuth() as { user: User | null };
   const params = useParams();
   const router = useRouter();
   const resourceId = params?.id;
@@ -128,8 +128,14 @@ export default function KaynakDetayPage() {
   
   // İndirme işlemi
   const handleDownload = async () => {
-    if (!resource || !user || (user.downloadRight ?? 0) < 1) {
-      alert('İndirme hakkınız yok');
+    if (!resource || !user) {
+      alert(t('errors.loginRequired'));
+      return;
+    }
+    
+    const hasDownloadRight = (user as any).downloadRight >= 1;
+    if (!hasDownloadRight) {
+      alert(t('errors.noDownloadPermission'));
       return;
     }
     
