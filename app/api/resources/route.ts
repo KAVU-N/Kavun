@@ -4,6 +4,17 @@ import Resource from '@/models/Resource';
 import User from '@/models/User';
 import fs from 'fs';
 
+// Production ortamında test dosyasına erişimi engellemek için yardımcı fonksiyon
+function readTestPdfIfDev(filePath: string) {
+  if (process.env.NODE_ENV !== 'production') {
+    return fs.readFileSync(filePath);
+  } else {
+    // Production'da dosya erişimi engelleniyor
+    return null;
+  }
+}
+
+
 export async function GET(request: NextRequest) {
 
   try {
