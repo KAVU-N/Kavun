@@ -62,12 +62,14 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json({ resources });
   } catch (error: unknown) {
-    console.error('Kaynaklar getirilirken hata oluştu:', error);
+    // Hata detaylarını daha kapsamlı logla
     let details = '';
     if (error instanceof Error) {
       details = error.stack || error.message;
+      console.error('Kaynaklar getirilirken hata oluştu:', error.message, error.stack);
     } else {
       details = String(error);
+      console.error('Kaynaklar getirilirken hata oluştu:', details);
     }
     // ENOENT gibi dosya bulunamadı hatalarını özel olarak yakala
     if (details.includes('ENOENT')) {
@@ -76,6 +78,7 @@ export async function GET(request: NextRequest) {
         { status: 404 }
       );
     }
+    // Diğer tüm beklenmeyen hatalar için
     return NextResponse.json(
       { error: 'Kaynaklar getirilirken bir hata oluştu', details },
       { status: 500 }
