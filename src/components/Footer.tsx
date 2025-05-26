@@ -59,11 +59,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/hakkimizda" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
-                  {t('nav.about')}
-                </Link>
-              </li>
-              <li>
                 <Link href="/sss" className="text-[#994D1C] hover:text-[#FF8B5E] transition-colors duration-300">
                   {t('nav.faq')}
                 </Link>
