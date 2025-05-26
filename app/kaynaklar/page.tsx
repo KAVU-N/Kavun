@@ -177,59 +177,13 @@ export default function KaynaklarPage() {
     fetchTotalResourceCount();
   }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
 
-  const filteredResources = useMemo(() => {
-    let filtered = [...resources];
-    if (searchTerm) {
-      filtered = filtered.filter(r => r.title.toLowerCase().includes(searchTerm.toLowerCase()) || r.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    }
-    if (selectedCategory) {
-      filtered = filtered.filter(r => r.category === selectedCategory);
-    }
-    if (selectedFormat) {
-      filtered = filtered.filter(r => r.format === selectedFormat);
-    }
-    if (selectedUniversity && selectedUniversity !== 'all') {
-      filtered = filtered.filter(r => r.university === selectedUniversity);
-    }
-    if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') {
-      filtered = filtered.filter(r => r.academicLevel === selectedAcademicLevel);
-    }
-    // Sıralama
-    filtered.sort((a, b) => {
-      if (sortBy === 'date') {
-        return sortOrder === 'asc'
-          ? new Date(a.uploadDate).getTime() - new Date(b.uploadDate).getTime()
-          : new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime();
-      } else if (sortBy === 'download') {
-        return sortOrder === 'asc' ? a.downloadCount - b.downloadCount : b.downloadCount - a.downloadCount;
-      } else if (sortBy === 'view') {
-        return sortOrder === 'asc' ? a.viewCount - b.viewCount : b.viewCount - a.viewCount;
-      }
-      return 0;
-    });
-    return filtered;
-  }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, sortBy, sortOrder]);
-
-  // Toplam sayfa sayısı
+  // Toplam sayfa sayısı (API'den gelen toplam sayıya göre)
   const totalPages = Math.ceil(totalResourceCount / resourcesPerPage);
-
-  // Sadece aktif sayfanın kaynakları
-  const pagedResources = useMemo(() => {
-    const startIdx = (currentPage - 1) * resourcesPerPage;
-    return filteredResources.slice(startIdx, startIdx + resourcesPerPage);
-  }, [filteredResources, currentPage]);
 
   // Sayfa veya filtre değişince otomatik olarak en başa dön
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
-
-  // Eğer mevcut sayfa, toplam sayfa sayısından büyükse düzelt
-  useEffect(() => {
-    if (currentPage > totalPages && totalPages > 0) {
-      setCurrentPage(totalPages);
-    }
-  }, [totalPages, currentPage]);
 
   // Kaynakları getir (arama, filtre ve sayfa/pagination'a göre)
   const fetchResources = async () => {
@@ -261,7 +215,6 @@ export default function KaynaklarPage() {
     }
   };
 
-
   // Sayfa yüklendiğinde ve filtre/arama veya sayfa değiştiğinde kaynakları getir
   useEffect(() => {
     fetchResources();
@@ -291,7 +244,7 @@ export default function KaynaklarPage() {
     }
     return '-';
   };
-  
+
   // Türkçe karakterler için özel dönüşüm fonksiyonu
   const turkishToLower = (text: string): string => {
     return text
@@ -311,7 +264,7 @@ export default function KaynaklarPage() {
             {t('general.allResources')}
           </p>
         </div>
-        
+
         {user && (
           <Link
             href="/kaynaklar/paylas"
@@ -325,7 +278,7 @@ export default function KaynaklarPage() {
           </Link>
         )}
       </div>
-      
+
       {/* Arama ve Filtreleme */}
       <div className="bg-white rounded-xl shadow-md p-4 mb-8">
         <div className="flex flex-col md:flex-row gap-4 mb-4">
@@ -345,7 +298,7 @@ export default function KaynaklarPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -358,7 +311,7 @@ export default function KaynaklarPage() {
             </button>
           </div>
         </div>
-        
+
         {/* Genişletilmiş Filtreler */}
         {showFilters && (
           <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-[#FFE5D9]">
@@ -379,7 +332,7 @@ export default function KaynaklarPage() {
                 ))}
               </select>
             </div>
-            
+
             <div className="flex-1 min-w-[200px]">
               <label className="block text-sm font-medium text-[#6B3416] mb-1">
                 {t('general.resourceFormat')}
@@ -397,7 +350,7 @@ export default function KaynaklarPage() {
                 ))}
               </select>
             </div>
-            
+
             <div className="flex-1 min-w-[200px]">
               <label className="block text-sm font-medium text-[#6B3416] mb-1">
                 {t('general.university')}
@@ -458,7 +411,7 @@ export default function KaynaklarPage() {
                 )}
               </div>
             </div>
-            
+
             <div className="flex-1 min-w-[200px]">
               <label className="block text-sm font-medium text-[#6B3416] mb-1">
                 {t('general.academicLevel')}
@@ -479,57 +432,30 @@ export default function KaynaklarPage() {
       {/* Sonuç Sayısı */}
       <div className="mb-6">
         <p className="text-[#6B3416]">
-          <span className="font-medium">{filteredResources.length}</span> {t('general.resourceSearchResults')}
+          <span className="font-medium">{totalResourceCount}</span> {t('general.resourceSearchResults')}
         </p>
       </div>
-      
-      {/* Kaynaklar Listesi */}
-      {/* Kaynak Önizleme Modalı */}
-      {/* Pagination */}
-      {(totalPages > 1 || (totalResourceCount > 0 && pagedResources.length === 0)) && (
-  <div className="flex flex-col items-center mt-8">
-    {/* User-friendly message if no resources on current page but there are other pages */}
-    {pagedResources.length === 0 && totalResourceCount > 0 && (
-      <div className="mb-4 text-[#994D1C] bg-[#FFF5F0] px-4 py-2 rounded">
-        {t('general.noResourcesOnPage') || 'Bu sayfada kaynak bulunamadı. Farklı bir sayfaya geçin veya filtreleri değiştirin.'}
-      </div>
-    )}
-    <nav className="inline-flex rounded-md shadow-sm" aria-label="Pagination">
-      <button
-        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-        disabled={currentPage <= 1 || totalPages === 0}
-        className={`px-3 py-2 rounded-l-md border border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage <= 1 || totalPages === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-      >
-        &lt;
-      </button>
-      {[...Array(totalPages)].map((_, idx) => (
-        <button
-          key={idx + 1}
-          onClick={() => setCurrentPage(idx + 1)}
-          className={`px-3 py-2 border-t border-b border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage === idx + 1 ? 'bg-[#FFB996] text-white font-bold' : ''}`}
-        >
-          {idx + 1}
-        </button>
-      ))}
-      <button
-        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-        disabled={currentPage >= totalPages || totalPages === 0}
-        className={`px-3 py-2 rounded-r-md border border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage >= totalPages || totalPages === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-      >
-        &gt;
-      </button>
-    </nav>
-  </div>
-)}
 
-{showPreviewModal && previewResource && (
+
+
+      {showPreviewModal && previewResource && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          {/* Modal sağ üst köşede sabit kapatma butonu */}
+          <button
+            onClick={() => setShowPreviewModal(false)}
+            className="fixed top-6 right-6 text-[#994D1C] hover:text-[#FF8B5E] text-3xl font-bold bg-white/90 rounded-full border border-[#FFB996] shadow-lg p-2 cursor-pointer z-[100]"
+            style={{ lineHeight: '1', zIndex: 100 }}
+            aria-label="Önizlemeyi kapat"
+          >
+            ×
+          </button>
           {/* Ana içerik: Kaynağı kaydırılabilir şekilde göster */}
           <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full max-h-[96vh] flex flex-col overflow-hidden">
             <div className="flex-1 overflow-auto p-8 relative">
               {/* PDF Önizleme */}
-              {previewResource.format === 'PDF' && (
+              {(previewResource.format === 'PDF' || previewResource.format === 'resourceFormat.pdf' || previewResource.format?.toLowerCase() === 'pdf') && (
                 <div className="relative w-full h-[85vh]">
+
                   <iframe
                     src={previewResource.fileData || previewResource.url}
                     title="PDF Preview"
@@ -541,7 +467,7 @@ export default function KaynaklarPage() {
                 </div>
               )}
               {/* Resim Önizleme */}
-              {previewResource.format === 'Resim' && (
+              {(previewResource.format === 'Resim' || previewResource.format === 'resourceFormat.image' || previewResource.format?.toLowerCase() === 'image' || previewResource.format?.toLowerCase() === 'png' || previewResource.format === 'resourceFormat.png' || previewResource.format === 'resourceFormat.jpeg' || previewResource.format === 'resourceFormat.jpg' || previewResource.format?.toLowerCase() === 'jpg' || previewResource.format?.toLowerCase() === 'jpeg') && (
                 <div className="relative w-full flex justify-center">
                   <img 
                     src={previewResource.fileData || previewResource.url} 
@@ -577,8 +503,32 @@ export default function KaynaklarPage() {
                 </div>
               )}
               {/* Diğer Dosya Türleri */}
-              {!['PDF', 'Resim', 'Video', 'Ses'].includes(previewResource.format) && (
-                <div className="text-center py-10">
+              {!(
+                previewResource.format === 'PDF' ||
+                previewResource.format === 'resourceFormat.pdf' ||
+                previewResource.format?.toLowerCase() === 'pdf' ||
+                previewResource.format === 'Resim' ||
+                previewResource.format === 'resourceFormat.image' ||
+                previewResource.format?.toLowerCase() === 'image' ||
+                previewResource.format?.toLowerCase() === 'png' ||
+                previewResource.format === 'resourceFormat.png' ||
+                previewResource.format === 'resourceFormat.jpeg' ||
+                previewResource.format === 'resourceFormat.jpg' ||
+                previewResource.format?.toLowerCase() === 'jpg' ||
+                previewResource.format?.toLowerCase() === 'jpeg' ||
+                ['Video', 'resourceFormat.video', 'video'].includes(previewResource.format) ||
+                ['Ses', 'resourceFormat.audio', 'audio'].includes(previewResource.format)
+              ) && (
+                <div className="relative text-center py-10">
+                  {/* Kapatma butonu */}
+                  <button
+                    onClick={() => setShowPreviewModal(false)}
+                    className="absolute top-4 right-4 text-[#994D1C] hover:text-[#FF8B5E] text-2xl font-bold bg-transparent border-none p-0 m-0 cursor-pointer z-10"
+                    style={{ lineHeight: '1' }}
+                    aria-label="Önizlemeyi kapat"
+                  >
+                    ×
+                  </button>
                   <div className="text-[#994D1C] text-5xl mb-4">
                     <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -658,9 +608,9 @@ export default function KaynaklarPage() {
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
         </div>
-      ) : filteredResources.length > 0 ? (
+      ) : resources.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pagedResources.map((resource: Resource) => (
+          {resources.map((resource: Resource) => (
             <div key={resource._id || resource.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
@@ -728,7 +678,7 @@ export default function KaynaklarPage() {
               </div>
             </div>
           ))}
-          {(totalPages > 1 || (totalResourceCount > 0 && pagedResources.length === 0)) && (
+          {(totalPages > 1 || (totalResourceCount > 0 && resources.length === 0)) && (
             <div className="flex justify-center mt-8">
               <nav className="inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                 <button
