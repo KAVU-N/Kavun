@@ -2,18 +2,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role?: string;
-  university?: string;
-  isVerified?: boolean;
-  expertise?: string;
-  grade?: string | number;
-  profilePhotoUrl?: string;
-  downloadRight?: number;
-}
+import type { User } from '../types/User';
 
 interface AuthContextType {
   user: User | null;
