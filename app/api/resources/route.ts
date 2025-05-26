@@ -5,9 +5,13 @@ import User from '@/models/User';
 import fs from 'fs';
 
 // Production ortamında test dosyasına erişimi engellemek için yardımcı fonksiyon
-function readTestPdfIfDev(filePath: string) {
+import path from 'path';
+
+function readTestPdfIfDev() {
   try {
     if (process.env.NODE_ENV !== 'production') {
+      // Proje kökünden mutlak yol oluştur
+      const filePath = path.join(process.cwd(), 'test', 'data', '05-versions-space.pdf');
       if (fs.existsSync(filePath)) {
         return fs.readFileSync(filePath);
       } else {
