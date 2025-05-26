@@ -231,7 +231,7 @@ export default function KaynaklarPage() {
     }
   }, [totalPages, currentPage]);
 
-  // Kaynakları getir (arama ve filtreye göre)
+  // Kaynakları getir (arama, filtre ve sayfa/pagination'a göre)
   const fetchResources = async () => {
     setLoading(true);
     setError(null);
@@ -243,26 +243,30 @@ export default function KaynaklarPage() {
       if (selectedFormat) params.append('format', selectedFormat);
       if (selectedUniversity && selectedUniversity !== 'all') params.append('university', selectedUniversity);
       if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') params.append('academicLevel', selectedAcademicLevel);
+      params.append('page', currentPage.toString());
+      params.append('limit', resourcesPerPage.toString());
       const query = params.toString() ? `?${params.toString()}` : '';
       const response = await fetch(`/api/resources${query}`);
       if (!response.ok) throw new Error('API hatası');
       const data = await response.json();
       setResources(data.resources);
+      setTotalResourceCount(data.totalCount || 0);
     } catch (error) {
       console.error('Kaynaklar yüklenirken hata:', error);
       setError('Kaynaklar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
       setResources([]);
+      setTotalResourceCount(0);
     } finally {
       setLoading(false);
     }
   };
 
-  // Sayfa yüklendiğinde ve sadece filtre/arama değiştiğinde kaynakları getir (currentPage bağımlılığını kaldırdım)
+
+  // Sayfa yüklendiğinde ve filtre/arama veya sayfa değiştiğinde kaynakları getir
   useEffect(() => {
     fetchResources();
-    // currentPage burada bağımlılıkta OLMAMALI. Sadece filtre/arama değişiminde çalışmalı.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
+  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, currentPage]);
 
   // Formatı insan tarafından okunabilir hale getir
   const formatFileSize = (sizeInMB: string): string => {
