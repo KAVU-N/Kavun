@@ -15,6 +15,15 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 // Türkçe ve İngilizce çeviriler
 const translations: Record<Language, Record<string, string>> = {
   tr: {
+    // Premium engel modalı
+    'premiumBlock.title': 'Belge yükle, erişim kazan!',
+    'premiumBlock.desc1': 'Sadece bir belge yükleyerek',
+    'premiumBlock.desc2': '3 farklı kaynağa erişim',
+    'premiumBlock.desc3': 'ödülü kazanabilirsin. Ne kadar çok paylaşırsan, o kadar çok kaynağa erişirsin!',
+    'premiumBlock.uploadBtn': 'Belge Yükle',
+    'premiumBlock.shareToUnlock': 'Açmak için paylaş',
+    'premiumBlock.alreadyUser': 'Zaten üye misin?',
+    'premiumBlock.login': 'Giriş yap',
     // Takvim
     'calendar.today': 'Bugün',
     'calendar.previous': 'Önceki',
@@ -453,6 +462,15 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.notification': 'Bildirim',
   },
   en: {
+    // Premium block modal
+    'premiumBlock.title': 'Upload a document, get instant access!',
+    'premiumBlock.desc1': 'Upload just one document to',
+    'premiumBlock.desc2': 'unlock access to 3 resources',
+    'premiumBlock.desc3': 'as a reward. The more you share, the more you unlock!',
+    'premiumBlock.uploadBtn': 'Upload Document',
+    'premiumBlock.shareToUnlock': 'Share to unlock',
+    'premiumBlock.alreadyUser': 'Already a user?',
+    'premiumBlock.login': 'Log in',
     // Instructors page
     'instructors.title': 'Our Instructors',
     'instructors.universityDesc': 'Meet the instructors at {university} University and choose the one that best suits your needs.',
