@@ -6,10 +6,20 @@ import fs from 'fs';
 
 // Production ortamında test dosyasına erişimi engellemek için yardımcı fonksiyon
 function readTestPdfIfDev(filePath: string) {
-  if (process.env.NODE_ENV !== 'production') {
-    return fs.readFileSync(filePath);
-  } else {
-    // Production'da dosya erişimi engelleniyor
+  try {
+    if (process.env.NODE_ENV !== 'production') {
+      if (fs.existsSync(filePath)) {
+        return fs.readFileSync(filePath);
+      } else {
+        console.warn(`Test PDF dosyası bulunamadı: ${filePath}`);
+        return null;
+      }
+    } else {
+      // Production'da dosya erişimi engelleniyor
+      return null;
+    }
+  } catch (err) {
+    console.error('Test PDF dosyası okunurken hata:', err);
     return null;
   }
 }
