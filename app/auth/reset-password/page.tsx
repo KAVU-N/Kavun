@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -8,12 +8,48 @@ function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams?.get('token');
+  const email = searchParams?.get('email');
+  const code = searchParams?.get('code');
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [isValidLink, setIsValidLink] = useState<boolean | null>(null);
+
+  // Check if the reset link is valid on component mount
+  useEffect(() => {
+    const checkResetLink = async () => {
+      if ((!token && (!email || !code)) || (token && (email || code))) {
+        setIsValidLink(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/auth/verify-reset-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            ...(token ? { token } : { email, code })
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Invalid or expired reset link');
+        }
+
+        setIsValidLink(true);
+      } catch (error) {
+        console.error('Error verifying reset link:', error);
+        setIsValidLink(false);
+      }
+    };
+
+    checkResetLink();
+  }, [token, email, code]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +74,10 @@ function ResetPasswordContent() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({ 
+          ...(token ? { token } : { email, code }),
+          password 
+        }),
       });
 
       const data = await response.json();
@@ -58,7 +97,17 @@ function ResetPasswordContent() {
     }
   };
 
-  if (!token) {
+  if (isValidLink === null) {
+    return (
+      <div className="text-center space-y-4">
+        <div className="text-[#994D1C] font-medium">
+          Şifre sıfırlama bağlantısı kontrol ediliyor...
+        </div>
+      </div>
+    );
+  }
+
+  if (!isValidLink) {
     return (
       <div className="text-center space-y-4">
         <div className="text-[#994D1C] font-medium">
