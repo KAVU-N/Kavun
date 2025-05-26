@@ -30,18 +30,7 @@ type Resource = {
   fileType?: string; // Dosya tipi (MIME type)
 };
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role?: string;
-  university?: string;
-  isVerified?: boolean;
-  expertise?: string;
-  grade?: string | number;
-  profilePhotoUrl?: string;
-  downloadRight?: number;
-}
+import type { User } from '@/context/AuthContext';
 
 export default function KaynakDetayPage() {
   const { t, language } = useLanguage();
