@@ -111,6 +111,8 @@ export const sendPasswordResetEmail = async (email: string, code: string) => {
       throw new Error('SMTP sunucusuna bağlanılamadı. Lütfen email ayarlarınızı kontrol edin.');
     }
 
+    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?email=${encodeURIComponent(email)}&code=${code}`;
+
     const mailOptions = {
       from: {
         name: 'Kavun App',
@@ -122,11 +124,13 @@ export const sendPasswordResetEmail = async (email: string, code: string) => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333; text-align: center;">Kavun App Şifre Sıfırlama</h2>
           <p style="color: #666; font-size: 16px;">Merhaba,</p>
-          <p style="color: #666; font-size: 16px;">Şifrenizi sıfırlamak için talepte bulundunuz. Lütfen aşağıdaki kodu kullanarak şifrenizi sıfırlayın:</p>
-          <div style="background-color: #f5f5f5; padding: 20px; text-align: center; margin: 20px 0;">
-            <h1 style="color: #333; letter-spacing: 5px; margin: 0;">${code}</h1>
+          <p style="color: #666; font-size: 16px;">Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:</p>
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="${resetLink}" style="background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Şifremi Sıfırla</a>
           </div>
-          <p style="color: #666; font-size: 14px;">Bu kod 10 dakika süreyle geçerlidir.</p>
+          <p style="color: #666; font-size: 14px;">Ya da bu bağlantıyı tarayıcınıza yapıştırın:</p>
+          <p style="color: #1a73e8; word-break: break-all; font-size: 14px;">${resetLink}</p>
+          <p style="color: #666; font-size: 14px;">Bu bağlantı 10 dakika süreyle geçerlidir.</p>
           <p style="color: #666; font-size: 14px;">Eğer bu işlemi siz yapmadıysanız, lütfen bu e-postayı dikkate almayın ve hesabınızın güvenliği için şifrenizi değiştirin.</p>
           <hr style="border: 1px solid #eee; margin: 20px 0;">
           <p style="color: #999; font-size: 12px; text-align: center;">Bu e-posta otomatik olarak gönderilmiştir, lütfen yanıtlamayınız.</p>
