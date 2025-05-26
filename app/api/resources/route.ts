@@ -59,6 +59,13 @@ export async function GET(request: NextRequest) {
     } else {
       details = String(error);
     }
+    // ENOENT gibi dosya bulunamadı hatalarını özel olarak yakala
+    if (details.includes('ENOENT')) {
+      return NextResponse.json(
+        { error: 'Bir veya daha fazla dosya bulunamadı. Lütfen yöneticinizle iletişime geçin.', details },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(
       { error: 'Kaynaklar getirilirken bir hata oluştu', details },
       { status: 500 }
@@ -123,20 +130,30 @@ export async function POST(request: NextRequest) {
       // PDF
       if (fileName.endsWith('.pdf')) {
         // data.fileData: "data:application/pdf;base64,..."
-        const base64 = data.fileData.split(',')[1];
-        const buffer = Buffer.from(base64, 'base64');
-        const pdfData = await pdfParse(buffer);
-        if (containsForbidden(pdfData.text)) {
-          return NextResponse.json({ error: 'PDF dosya içeriğinde uygunsuz içerik bulundu.' }, { status: 400 });
+        try {
+          const base64 = data.fileData.split(',')[1];
+          const buffer = Buffer.from(base64, 'base64');
+          const pdfData = await pdfParse(buffer);
+          if (containsForbidden(pdfData.text)) {
+            return NextResponse.json({ error: 'PDF dosya içeriğinde uygunsuz içerik bulundu.' }, { status: 400 });
+          }
+        } catch (err) {
+          console.error('PDF dosyası okunurken hata:', err);
+          return NextResponse.json({ error: 'PDF dosyası okunamadı veya bozuk. Lütfen geçerli bir PDF yükleyin.' }, { status: 400 });
         }
       }
       // DOCX
       else if (fileName.endsWith('.docx')) {
-        const base64 = data.fileData.split(',')[1];
-        const buffer = Buffer.from(base64, 'base64');
-        const result = await mammoth.extractRawText({ buffer });
-        if (containsForbidden(result.value)) {
-          return NextResponse.json({ error: 'DOCX dosya içeriğinde uygunsuz içerik bulundu.' }, { status: 400 });
+        try {
+          const base64 = data.fileData.split(',')[1];
+          const buffer = Buffer.from(base64, 'base64');
+          const result = await mammoth.extractRawText({ buffer });
+          if (containsForbidden(result.value)) {
+            return NextResponse.json({ error: 'DOCX dosya içeriğinde uygunsuz içerik bulundu.' }, { status: 400 });
+          }
+        } catch (err) {
+          console.error('DOCX dosyası okunurken hata:', err);
+          return NextResponse.json({ error: 'DOCX dosyası okunamadı veya bozuk. Lütfen geçerli bir DOCX yükleyin.' }, { status: 400 });
         }
       }
       // Diğer dosya türleri için ek kontrol isterseniz eklenebilir.
@@ -182,8 +199,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(newResource, { status: 201 });
   } catch (error) {
     console.error('Kaynak oluşturulurken hata oluştu:', error);
+    let details = '';
+    if (error instanceof Error) {
+      details = error.stack || error.message;
+    } else {
+      details = String(error);
+    }
+    if (details.includes('ENOENT')) {
+      return NextResponse.json(
+        { error: 'Yüklenen dosya bulunamadı veya işlenemedi. Lütfen geçerli bir dosya yükleyin.', details },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(
-      { error: 'Kaynak oluşturulurken bir hata oluştu' },
+      { error: 'Kaynak oluşturulurken bir hata oluştu', details },
       { status: 500 }
     );
   }
