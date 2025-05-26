@@ -30,7 +30,6 @@ function readTestPdfIfDev() {
 
 
 export async function GET(request: NextRequest) {
-
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
@@ -41,6 +40,10 @@ export async function GET(request: NextRequest) {
     const format = searchParams.get('format') || '';
     const university = searchParams.get('university') || '';
     const academicLevel = searchParams.get('academicLevel') || '';
+    // Pagination parametreleri
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '9', 10);
+    const skip = (page - 1) * limit;
 
     // Sorgu oluştur
     let query: any = {};
@@ -57,14 +60,16 @@ export async function GET(request: NextRequest) {
     if (university) query.university = university;
     if (academicLevel) query.academicLevel = academicLevel;
 
-    let resources;
-    // Eğer arama veya filtreleme varsa tüm kaynakları getir, yoksa sadece ilk 9'u getir
-    if (search || category || format || university || academicLevel) {
-      resources = await Resource.find(query).sort({ createdAt: -1 });
-    } else {
-      resources = await Resource.find({}).sort({ createdAt: -1 }).limit(9);
-    }
-    return NextResponse.json({ resources });
+    // Toplam kaynak sayısı (filtreye göre)
+    const totalCount = await Resource.countDocuments(query);
+
+    // Sadece ilgili sayfanın kaynaklarını getir
+    const resources = await Resource.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    return NextResponse.json({ resources, totalCount });
   } catch (error: unknown) {
     // Hata detaylarını daha kapsamlı logla
     let details = '';
