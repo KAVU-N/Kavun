@@ -92,7 +92,7 @@ function RegisterPageInner() {
       <div className="hidden md:flex md:flex-1 items-center justify-center">
         <div className="relative w-full max-w-sm">
           <Image 
-            src="/register-illustration.svg"
+            src="/images/education-illustration.svg"
             alt="Register Illustration"
             width={400}
             height={400}
