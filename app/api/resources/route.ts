@@ -67,7 +67,8 @@ export async function GET(request: NextRequest) {
     const resources = await Resource.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .allowDiskUse(true);
 
     return NextResponse.json({ resources, totalCount });
   } catch (error: unknown) {
