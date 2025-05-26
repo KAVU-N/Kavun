@@ -30,9 +30,22 @@ type Resource = {
   fileType?: string; // Dosya tipi (MIME type)
 };
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role?: string;
+  university?: string;
+  isVerified?: boolean;
+  expertise?: string;
+  grade?: string | number;
+  profilePhotoUrl?: string;
+  downloadRight?: number;
+}
+
 export default function KaynakDetayPage() {
   const { t, language } = useLanguage();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const params = useParams();
   const router = useRouter();
   const resourceId = params?.id;
@@ -93,8 +106,11 @@ export default function KaynakDetayPage() {
           // İlgili kaynakları getir
           const relatedResponse = await fetch('/api/resources');
           if (relatedResponse.ok) {
-            const allResources = await relatedResponse.json();
-            
+            let allResources = await relatedResponse.json();
+            // Eğer API'den obje dönerse (ör: {resources: [...]}) diziye eriş
+            if (allResources && !Array.isArray(allResources) && allResources.resources && Array.isArray(allResources.resources)) {
+              allResources = allResources.resources;
+            }
             // İlgili kaynakları bul (aynı kategori veya etiketlere sahip)
             const related = allResources
               .filter((r: Resource) => r.id !== data.id)
@@ -123,7 +139,10 @@ export default function KaynakDetayPage() {
   
   // İndirme işlemi
   const handleDownload = async () => {
-    if (!resource) return;
+    if (!resource || !user || (user.downloadRight ?? 0) < 1) {
+      alert('İndirme hakkınız yok');
+      return;
+    }
     
     try {
       // API'ye istek gönder
@@ -297,14 +316,15 @@ export default function KaynakDetayPage() {
             
             <div className="flex flex-col gap-3 w-full md:w-auto">
               <button
-                onClick={handleDownload}
-                className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-xl 
-                  transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 flex items-center justify-center"
+                onClick={(user?.downloadRight ?? 0) === 0 ? undefined : handleDownload}
+                className={`px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-xl transition-all duration-300 flex items-center justify-center ${(user?.downloadRight ?? 0) === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg hover:shadow-[#FFB996]/20'}`}
+                disabled={(user?.downloadRight ?? 0) === 0}
+                title={(user?.downloadRight ?? 0) === 0 ? 'İndirme hakkınız yok' : ''}
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                {t('general.resourceDownload')}
+                {(user?.downloadRight ?? 0) === 0 ? 'İndirme hakkınız yok' : t('general.resourceDownload')}
               </button>
               
               {resource.url && resource.url !== '#' && (

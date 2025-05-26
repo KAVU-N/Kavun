@@ -12,6 +12,7 @@ interface User {
   expertise?: string;
   grade?: string | number;
   profilePhotoUrl?: string;
+  downloadRight?: number;
 }
 
 interface AuthContextType {
