@@ -14,8 +14,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Kavun - Eğitim Platformu",
-  description: "Kavun ile öğrenciler ve eğitmenler arasında köprü kurun.",
+  title: "Kavunla - Eğitim Platformu",
+  description: "Kavunla ile öğrenciler ve eğitmenler arasında köprü kurun.",
 };
 
 export default function RootLayout({
@@ -67,7 +67,7 @@ export default function RootLayout({
                   <Link href="/iletisim" className="text-[#994D1C] hover:text-[#FF8B5E]" style={{color: '#994D1C !important'}}>İletişim</Link>
                 </div>
                 <p className="text-[#994D1C] text-sm mt-4 md:mt-0" style={{color: '#994D1C !important'}}>
-                  &copy; {currentYear} Kavun. Tüm hakları saklıdır.
+                  &copy; {currentYear} Kavunla. Tüm hakları saklıdır.
                 </p>
               </div>
             </div>

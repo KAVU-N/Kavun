@@ -14,8 +14,8 @@ const faqTopics = [
         answer: 'Kavunla, aynı üniversitede bulunan ders almak ve vermek isteyen öğrencileri bir araya getiren bir eğitim platformudur. Aynı zamanda platformumuz sayesinde öğrenciler dersleri ile alakalı kaynaklara ulaşma imkanı elde edebilecektir.'
       },
       {
-        question: 'Kavun’a kimler katılabilir?',
-        answer: 'Kavun Eğitim Platformu’na öğrenciler, eğitmenler ve öğrenmeye ilgi duyan kişiler katılabilir. Üyelik tamamen ücretsizdir.'
+        question: 'Kavunla\'ya kimler katılabilir?',
+        answer: 'Kavunla Eğitim Platformu\'na öğrenciler, eğitmenler ve öğrenmeye ilgi duyan kişiler katılabilir. Üyelik tamamen ücretsizdir.'
       },
     ]
   },

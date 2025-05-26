@@ -1,7 +1,7 @@
 {
-  "name": "Kavun",
-  "short_name": "Kavun",
-  "description": "Kavun - Eğitmen ve öğrencileri buluşturan platform",
+  "name": "Kavunla",
+  "short_name": "Kavunla",
+  "description": "Kavunla - Eğitmen ve öğrencileri buluşturan platform",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

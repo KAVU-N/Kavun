@@ -51,16 +51,16 @@ export const sendVerificationEmail = async (email: string, code: string) => {
 
     const mailOptions = {
       from: {
-        name: 'Kavun App',
+        name: 'Kavunla',
         address: process.env.EMAIL_USER!
       },
       to: email,
-      subject: 'E-posta Doğrulama Kodu - Kavun App',
+      subject: 'E-posta Doğrulama Kodu - Kavunla',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333; text-align: center;">Kavun App E-posta Doğrulama</h2>
+          <h2 style="color: #333; text-align: center;">Kavunla E-posta Doğrulama</h2>
           <p style="color: #666; font-size: 16px;">Merhaba,</p>
-          <p style="color: #666; font-size: 16px;">Kavun App'e hoş geldiniz. Lütfen aşağıdaki doğrulama kodunu kullanarak e-posta adresinizi doğrulayın:</p>
+          <p style="color: #666; font-size: 16px;">Kavunla'ya hoş geldiniz. Lütfen aşağıdaki doğrulama kodunu kullanarak e-posta adresinizi doğrulayın:</p>
           <div style="background-color: #f5f5f5; padding: 20px; text-align: center; margin: 20px 0;">
             <h1 style="color: #333; letter-spacing: 5px; margin: 0;">${code}</h1>
           </div>
@@ -115,16 +115,16 @@ export const sendPasswordResetEmail = async (email: string, code: string) => {
 
     const mailOptions = {
       from: {
-        name: 'Kavun App',
+        name: 'Kavunla',
         address: process.env.EMAIL_USER!
       },
       to: email,
-      subject: 'Şifre Sıfırlama - Kavun App',
+      subject: 'Şifre Sıfırlama - Kavunla',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333; text-align: center;">Kavun App Şifre Sıfırlama</h2>
+          <h2 style="color: #333; text-align: center;">Kavunla Şifre Sıfırlama</h2>
           <p style="color: #666; font-size: 16px;">Merhaba,</p>
-          <p style="color: #666; font-size: 16px;">Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:</p>
+          <p style="color: #666; font-size: 16px;">Kavunla şifre sıfırlama isteğiniz alındı. Aşağıdaki kodu kullanarak şifrenizi sıfırlayabilirsiniz:</p>
           <div style="text-align: center; margin: 20px 0;">
             <a href="${resetLink}" style="background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Şifremi Sıfırla</a>
           </div>

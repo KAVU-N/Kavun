@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 // Tüm projede aynı JWT_SECRET kullanılmalı
-const JWT_SECRET = process.env.JWT_SECRET || 'kavun-secret-key-for-jwt-authentication';
+const JWT_SECRET = process.env.JWT_SECRET || 'kavunla-secret-key-for-jwt-authentication';
 
 export interface DecodedToken {
   id: string;
