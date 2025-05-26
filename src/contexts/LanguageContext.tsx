@@ -258,7 +258,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.showAllUniversities': 'Tüm üniversiteleri göster',
     'home.allUniversities': 'Tüm Üniversiteler',
     'home.selectUniversity': 'Üniversitenizi seçin...',
-    'home.description': 'Kavun, aynı üniversite öğrencilerini bir araya getiren yeni nesil bir eğitim platformudur.',
+    'home.description': 'Kavunla, aynı üniversite öğrencilerini bir araya getiren yeni nesil bir eğitim platformudur.',
     'home.exploreCourses': 'Kursları Keşfet',
     'home.howToContinue': 'Nasıl devam etmek istersiniz?',
     'home.continueAsStudent': 'Öğrenci Olarak Devam Et',
@@ -435,9 +435,11 @@ const translations: Record<Language, Record<string, string>> = {
     'errors.listingCreationErrorTryAgain': 'İlan oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
     'errors.loginRequired': 'Bu kaynağı indirebilmek için giriş yapmalısınız.',
     'errors.noDownloadPermission': 'Bu kaynağı indirmek için yetkiniz bulunmamaktadır.',
+    'errors.invalidUniversity': 'Lütfen geçerli bir üniversite seçin',
+    'errors.invalidDepartment': 'Lütfen geçerli bir bölüm seçin',
     
     // Footer
-    'footer.platformDescription': 'Kavun, öğrencileri eğitmenlerle buluşturan ve eğitimin geleceğini şekillendiren platform.',
+    'footer.platformDescription': 'Kavunla, öğrencileri eğitmenlerle buluşturan ve eğitimin geleceğini şekillendiren platform.',
     'footer.quickLinks': 'Hızlı Bağlantılar',
     'footer.legal': 'Yasal',
     'footer.termsOfUse': 'Kullanım Koşulları',
@@ -544,7 +546,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.notifications': 'Notifications',
     
     // General
-    'home.description': 'Kavun is a next-generation education platform that brings together students from the same university.',
+    'home.description': 'Kavunla is a next-generation education platform that brings together students from the same university.',
     'general.search': 'Search',
     'general.filter': 'Filter',
     'general.filters': 'Filters',
@@ -724,7 +726,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.showAllUniversities': 'Show all universities',
     'home.allUniversities': 'All Universities',
     'home.selectUniversity': 'Select your university...',
-    'home.description ': 'Kavun is a next-generation education platform that brings together students from the same university.',
+    'home.description ': 'Kavunla is a next-generation education platform that brings together students from the same university.',
     'home.exploreCourses': 'Explore Courses',
     'home.howToContinue': 'How would you like to continue?',
     'home.continueAsStudent': 'Continue as Student',
@@ -882,9 +884,11 @@ const translations: Record<Language, Record<string, string>> = {
     'errors.listingCreationErrorTryAgain': 'An error occurred while creating the listing. Please try again later.',
     'errors.loginRequired': 'You need to log in to download this resource.',
     'errors.noDownloadPermission': 'You do not have permission to download this resource.',
+    'errors.invalidUniversity': 'Please select a valid university',
+    'errors.invalidDepartment': 'Please select a valid department',
     
     // Footer
-    'footer.platformDescription': 'Kavun is a platform that brings students together with instructors and shapes the future of education.',
+    'footer.platformDescription': 'Kavunla is a platform that brings students together with instructors and shapes the future of education.',
     'footer.quickLinks': 'Quick Links',
     'footer.legal': 'Legal',
     'footer.termsOfUse': 'Terms of Use',

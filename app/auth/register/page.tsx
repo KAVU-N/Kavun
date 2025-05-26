@@ -54,12 +54,35 @@ function RegisterPageInner() {
     console.log("Formdan seçilen rol:", selectedRole);
 
     let isValid = true;
+    
+    // Password match validation
     if (password !== passwordConfirm) {
       setError(t('errors.passwordsDoNotMatch') || 'Şifreler eşleşmiyor');
       setLoading(false);
-      isValid = false;
+      return;
     }
-    if (!isValid) return;
+    
+    // Email domain validation
+    const emailDomain = email.split('@')[1];
+    if (emailDomain !== 'std.ankaramedipol.edu.tr') {
+      setError('Sadece @std.ankaramedipol.edu.tr uzantılı e-posta adresleri ile kayıt olabilirsiniz');
+      setLoading(false);
+      return;
+    }
+    
+    // University validation
+    if (!universities.includes(university)) {
+      setError(t('errors.invalidUniversity') || 'Lütfen geçerli bir üniversite seçin');
+      setLoading(false);
+      return;
+    }
+    
+    // Department validation
+    if (!departments.includes(expertise)) {
+      setError(t('errors.invalidDepartment') || 'Lütfen geçerli bir bölüm seçin');
+      setLoading(false);
+      return;
+    }
 
     try {
       await register({ name, email, password, role: selectedRole, university, expertise: finalExpertise, grade });
@@ -192,7 +215,7 @@ function RegisterPageInner() {
                 type="text"
                 required
                 placeholder={t('auth.selectUniversity')}
-                value={searchTerm}
+                value={selectedUniversity}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   setShowDropdown(true);
@@ -242,6 +265,7 @@ function RegisterPageInner() {
                 id="expertise"
                 name="expertise"
                 type="text"
+                required
                 autoComplete="off"
                 placeholder={t('auth.departmentPlaceholder')}
                 value={expertise}

@@ -193,7 +193,7 @@ export default function Home() {
               <Link href="/iletisim" className="text-[#994D1C] hover:text-[#FF8B5E]" style={{color: '#994D1C !important'}}>{t('nav.contact')}</Link>
             </div>
             <p className="text-[#994D1C] text-sm mt-4 md:mt-0" style={{color: '#994D1C !important'}}>
-              &copy; {new Date().getFullYear()} Kavun. {t('footer.allRightsReserved')}
+              &copy; {new Date().getFullYear()} Kavunla. {t('footer.allRightsReserved')}
             </p>
           </div>
         </div>
