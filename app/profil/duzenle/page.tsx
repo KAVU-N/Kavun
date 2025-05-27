@@ -175,13 +175,64 @@ export default function ProfileEditPage() {
         accept="image/*"
         className="hidden"
         onChange={async (e) => {
-          const file = e.target.files?.[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = function(loadEvt) {
-            setProfilePhoto(loadEvt.target?.result as string);
-          };
-          reader.readAsDataURL(file);
+           const file = e.target.files?.[0];
+           if (!file) return;
+           // Güvenlik kontrolleri
+           const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+           const minSize = 10 * 1024; // 10KB
+           const maxSize = 5 * 1024 * 1024; // 5MB
+           if (!allowedTypes.includes(file.type)) {
+             setError('Yalnızca jpeg, png veya webp formatında fotoğraf yükleyebilirsiniz.');
+             return;
+           }
+           if (file.size < minSize) {
+             setError('Fotoğraf boyutu çok küçük. Lütfen daha kaliteli bir fotoğraf seçin.');
+             return;
+           }
+           if (file.size > maxSize) {
+             setError('Fotoğraf boyutu çok büyük. Maksimum 5MB olmalı.');
+             return;
+           }
+           // Görsel boyutunu ve oranını kontrol et
+           const img = new window.Image();
+           img.onload = async function() {
+             if (img.width < 150 || img.height < 150) {
+               setError('Fotoğrafın genişliği ve yüksekliği en az 150px olmalı.');
+               return;
+             }
+             const aspect = img.width / img.height;
+             if (aspect < 0.6 || aspect > 1.7) {
+               setError('Fotoğrafın oranı çok sıra dışı. Lütfen kareye yakın veya dikdörtgen bir fotoğraf seçin.');
+               return;
+             }
+             // NSFWJS ile +18 içerik kontrolü
+           setError('Fotoğraf analiz ediliyor, lütfen bekleyin...');
+           const nsfwImg = new window.Image();
+           nsfwImg.crossOrigin = 'anonymous';
+           nsfwImg.onload = async function() {
+             const { detectNsfwWithNsfwjs } = await import('@/src/utils/detectNsfwNsfwjs');
+             const isNsfw = await detectNsfwWithNsfwjs(nsfwImg);
+             if (isNsfw) {
+               setError('Uygunsuz (+18) içerikli fotoğraf yüklenemez. Lütfen başka bir fotoğraf seçin.');
+               return;
+             }
+             setError('');
+             setProfilePhoto(img.src);
+           };
+           nsfwImg.onerror = function() {
+             setError('Fotoğraf NSFW analizine uygun yüklenemedi.');
+           };
+           nsfwImg.src = img.src;
+           };
+           img.onerror = function() {
+             setError('Geçersiz fotoğraf dosyası.');
+           };
+           const reader = new FileReader();
+           reader.onload = function(loadEvt) {
+             if (!loadEvt.target?.result) return;
+             img.src = loadEvt.target.result as string;
+           };
+           reader.readAsDataURL(file);
         }}
       />
     </label>

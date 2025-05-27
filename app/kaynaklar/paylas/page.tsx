@@ -51,8 +51,6 @@ export default function KaynakPaylasPage() {
     tags: '',
     resourceType: 'file', // 'file' veya 'link'
     link: '',
-    department: user?.expertise || '',
-    university: user?.university || ''
   });
   
   const [file, setFile] = useState<File | null>(null);
@@ -189,12 +187,10 @@ export default function KaynakPaylasPage() {
         title: formData.title,
         description: formData.description,
         author: user?.name || 'Anonim',
-        authorId: user?.id, // Eksik olan alan eklendi
+        authorId: user?.id, 
         category: formData.category,
         format: formData.format,
         level: formData.level,
-        university: formData.university,
-        department: formData.department,
         fileSize: file ? `${(file.size / (1024 * 1024)).toFixed(2)} MB` : 'N/A',
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
         url: formData.resourceType === 'link' ? formData.link : '#',
@@ -207,7 +203,10 @@ export default function KaynakPaylasPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newResource)
       });
-      if (!response.ok) throw new Error('Kaynak eklenemedi. Lütfen tekrar deneyin.');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Kaynak eklenemedi. Lütfen tekrar deneyin.');
+      }
       setSuccess(true);
       setTimeout(() => { router.push('/kaynaklar'); }, 2000);
     } catch (err: any) {
@@ -327,34 +326,6 @@ export default function KaynakPaylasPage() {
                   <option key={key} value={key}>{t(key)}</option>
                 ))}
               </select>
-            </div>
-            
-            <div>
-              <label htmlFor="university" className="block text-sm font-medium text-[#6B3416] mb-1">
-                {t('general.university')}
-              </label>
-              <input
-                type="text"
-                id="university"
-                name="university"
-                value={formData.university}
-                onChange={handleInputChange}
-                className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="department" className="block text-sm font-medium text-[#6B3416] mb-1">
-                {t('general.department')}
-              </label>
-              <input
-                type="text"
-                id="department"
-                name="department"
-                value={formData.department}
-                onChange={handleInputChange}
-                className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
-              />
             </div>
             
             <div className="md:col-span-2">

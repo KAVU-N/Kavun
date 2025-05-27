@@ -13,6 +13,7 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 type Role = 'student' | 'instructor';
 
 import { Suspense } from 'react';
+import RegisterCaptcha from '@/src/components/RegisterCaptcha';
 
 function RegisterPageInner() {
   const router = useRouter();
@@ -33,11 +34,18 @@ function RegisterPageInner() {
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
+  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    if (!captchaVerified) {
+      setError('Lütfen robot olmadığınızı doğrulayın.');
+      setLoading(false);
+      return;
+    }
 
     const formData = new FormData(e.currentTarget);
     const name = formData.get('name') as string;
@@ -172,7 +180,6 @@ function RegisterPageInner() {
             <p className="mt-1 text-xs text-[#6B3416]">{t('auth.passwordRequirement')}</p>
           </div>
 
-
           <div>
             <label htmlFor="passwordConfirm" className="block text-sm font-medium text-[#6B3416] mb-1">
               {t('auth.confirmPassword')}
@@ -186,6 +193,9 @@ function RegisterPageInner() {
               className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
             />
           </div>
+
+          {/* Captcha Alanı */}
+          <RegisterCaptcha onVerify={setCaptchaVerified} />
 
           <div>
             <label htmlFor="role" className="block text-sm font-medium text-[#6B3416] mb-1">
@@ -311,10 +321,12 @@ function RegisterPageInner() {
             <select
               id="grade"
               name="grade"
-              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
+              required
+              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
+              defaultValue=""
             >
-              <option value="">{t('auth.selectClass')}</option>
-              <option value="hazirlik">{t('profile.preparatory') || 'Hazırlık'}</option>
+              <option value="" disabled>{t('auth.selectClass')}</option>
+              <option value="preparatory">{t('profile.preparatory')}</option>
               <option value="1">{t('profile.firstYear')}</option>
               <option value="2">{t('profile.secondYear')}</option>
               <option value="3">{t('profile.thirdYear')}</option>

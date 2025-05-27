@@ -3,9 +3,10 @@ import connectDB from '@/lib/mongodb';
 import Resource from '@/models/Resource';
 import User from '@/models/User';
 import fs from 'fs';
-
+import { loadBannedWords, validateTextField } from '../auth/register/nameValidation';
 // Production ortamında test dosyasına erişimi engellemek için yardımcı fonksiyon
 import path from 'path';
+
 
 function readTestPdfIfDev() {
   try {
@@ -100,52 +101,58 @@ export async function GET(request: NextRequest) {
 import pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
 
+// Gerçek NSFW kontrol fonksiyonu (dinamik require ile)
+let nsfwModel: any = null;
+async function checkNSFWImage(base64Data: string): Promise<boolean> {
+  try {
+    if (!base64Data) return false;
+    // Dinamik require
+    const nsfwjs = require('nsfwjs');
+    const tf = require('@tensorflow/tfjs-node');
+    // Sadece base64 kısmını al
+    const base64 = base64Data.split(',')[1];
+    const buffer = Buffer.from(base64, 'base64');
+    // Tensor oluştur
+    let image = tf.node.decodeImage(buffer, 3);
+    if (image.rank === 4) {
+      image = image.squeeze(); // Tensor4D -> Tensor3D
+    }
+    // Modeli yükle (singleton)
+    if (!nsfwModel) nsfwModel = await nsfwjs.load();
+    const predictions = await nsfwModel.classify(image);
+    image.dispose();
+    // NSFW etiketi varsa uygunsuz kabul et
+    const nsfwTags = ['Porn', 'Hentai', 'Sexy'];
+    return predictions.some((pred: any) => nsfwTags.includes(pred.className) && pred.probability > 0.7);
+  } catch (e) {
+    console.error('NSFW kontrol hatası:', e);
+    return false; // Hata olursa güvenli kabul et
+  }
+}
+
+
 // Yeni kaynak ekle
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
 
-    // Uygunsuz içerik anahtar kelimeleri
-    const forbiddenWords = [
-      // Türkçe küfür ve argo
-      'amk', 'aq', 'orospu', 'sik', 'piç', 'yarrak', 'ananı', 'göt', 'mal', 'salak', 'aptal', 'gerizekalı',
-      'ibne', 'ibine', 'pezevenk', 'kahpe', 'şerefsiz', 'yavşak', 'dallama', 'dingil', 'hıyar', 'kaltak',
-      'puşt', 'kancık', 'dangalak', 'oç', 'amına', 'amcık', 'sürtük', 'bok', 'boktan', 'taşak', 'taşşağı',
-      // İngilizce küfür ve argo
-      'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'motherfucker', 'cunt', 'faggot',
-      'slut', 'whore', 'cock', 'jerk', 'retard', 'nigger', 'nigga', 'wanker', 'twat', 'bollocks',
-      // Irkçılık, nefret
-      'hitler', 'nazi', 'jew', 'kike', 'israil düşmanı', 'antisemit', 'ırkçı', 'faşist', 'racist', 'hate',
-      // Cinsel, pornografi
-      'porn', 'porno', 'sex', 'seks', 'escort', 'fuhuş', 'fisting', 'anal', 'blowjob', 'handjob', 'sikiş',
-      'gay', 'lezbiyen', 'trans', 'travesti', 'fetish', 'fetishist', 'incest', 'zoofili', 'pedofili',
-      // Şiddet, tehdit
-      'öldür', 'öldüreceğim', 'katil', 'bomb', 'bomba', 'intihar', 'suicide', 'terror', 'terör', 'terorist',
-      'silah', 'gun', 'knife', 'stab', 'rape', 'tecavüz', 'saldırı', 'attack', 'lynch', 'linç',
-      // Uyuşturucu, illegal
-      'esrar', 'eroin', 'kokain', 'meth', 'methamphetamine', 'uyuşturucu', 'drug', 'drugs', 'weed', 'heroin',
-      'cocaine', 'ecstasy', 'mdma', 'lsd', 'trip', 'marihuana', 'marijuana', 'skunk', 'bonzai',
-      // Hack, scam, spam, illegal
-      'hack', 'hacker', 'phishing', 'scam', 'spam', 'malware', 'virus', 'trojan', 'keylogger', 'carding',
-      'crack', 'serial', 'warez', 'illegal', 'yasadışı', 'kaçak', 'darkweb', 'deepweb',
-      // Diğer
-      'yasaklı', 'ban', 'banlan', 'banlama', 'banlı', 'banlandın', 'banlayacağım', 'banlanacaksın',
-      'banlanacak', 'banlanıyor', 'banlanmıştır', 'banlanmış', 'banlandı', 'banlanır',
-    ];
-    const containsForbidden = (text: string) => {
-      const lower = text.toLocaleLowerCase('tr');
-      return forbiddenWords.some(word => lower.includes(word));
+        // Gelişmiş güvenlik ve içerik kontrolü
+    const bannedWords = loadBannedWords();
+    const titleCheck = validateTextField(data.title, bannedWords, { minLen: 3, maxLen: 100 });
+    if (!titleCheck.valid) {
+      return NextResponse.json({ error: `Başlık hatası: ${titleCheck.error}` }, { status: 400 });
     }
-
-    // Başlık, açıklama, etiketlerde uygunsuz içerik kontrolü
-    if (containsForbidden(data.title)) {
-      return NextResponse.json({ error: 'Başlıkta uygunsuz içerik tespit edildi.' }, { status: 400 });
+    const descCheck = validateTextField(data.description, bannedWords, { minLen: 10, maxLen: 1000 });
+    if (!descCheck.valid) {
+      return NextResponse.json({ error: `Açıklama hatası: ${descCheck.error}` }, { status: 400 });
     }
-    if (containsForbidden(data.description)) {
-      return NextResponse.json({ error: 'Açıklamada uygunsuz içerik tespit edildi.' }, { status: 400 });
-    }
-    if (Array.isArray(data.tags) && containsForbidden(data.tags.join(','))) {
-      return NextResponse.json({ error: 'Etiketlerde uygunsuz içerik tespit edildi.' }, { status: 400 });
+    if (Array.isArray(data.tags)) {
+      for (const tag of data.tags) {
+        const tagCheck = validateTextField(tag, bannedWords, { minLen: 2, maxLen: 40 });
+        if (!tagCheck.valid) {
+          return NextResponse.json({ error: `Etiket hatası: ${tagCheck.error}` }, { status: 400 });
+        }
+      }
     }
 
     // Dosya içeriği kontrolü (PDF/DOCX)
@@ -158,8 +165,9 @@ export async function POST(request: NextRequest) {
           const base64 = data.fileData.split(',')[1];
           const buffer = Buffer.from(base64, 'base64');
           const pdfData = await pdfParse(buffer);
-          if (containsForbidden(pdfData.text)) {
-            return NextResponse.json({ error: 'PDF dosya içeriğinde uygunsuz içerik bulundu.' }, { status: 400 });
+          const pdfTextCheck = validateTextField(pdfData.text, bannedWords, { minLen: 10, maxLen: 10000 });
+          if (!pdfTextCheck.valid) {
+            return NextResponse.json({ error: `PDF dosya içeriği hatası: ${pdfTextCheck.error}` }, { status: 400 });
           }
         } catch (err) {
           console.error('PDF dosyası okunurken hata:', err);
@@ -172,15 +180,44 @@ export async function POST(request: NextRequest) {
           const base64 = data.fileData.split(',')[1];
           const buffer = Buffer.from(base64, 'base64');
           const result = await mammoth.extractRawText({ buffer });
-          if (containsForbidden(result.value)) {
-            return NextResponse.json({ error: 'DOCX dosya içeriğinde uygunsuz içerik bulundu.' }, { status: 400 });
+          const docxTextCheck = validateTextField(result.value, bannedWords, { minLen: 10, maxLen: 10000 });
+          if (!docxTextCheck.valid) {
+            return NextResponse.json({ error: `DOCX dosya içeriği hatası: ${docxTextCheck.error}` }, { status: 400 });
           }
         } catch (err) {
           console.error('DOCX dosyası okunurken hata:', err);
           return NextResponse.json({ error: 'DOCX dosyası okunamadı veya bozuk. Lütfen geçerli bir DOCX yükleyin.' }, { status: 400 });
         }
       }
-      // Diğer dosya türleri için ek kontrol isterseniz eklenebilir.
+            // PPT/PPTX
+      else if (fileName.endsWith('.ppt') || fileName.endsWith('.pptx')) {
+        try {
+                    // pptx-parse ile metin çıkarımı
+          const base64 = data.fileData.split(',')[1];
+          const buffer = Buffer.from(base64, 'base64');
+          // pptx-parse sadece burada require edilir
+          const pptxParse = require('pptx-parse');
+          const pptxText = await pptxParse(buffer);
+          if (pptxText && pptxText.text) {
+            const pptxTextCheck = validateTextField(pptxText.text, bannedWords, { minLen: 10, maxLen: 10000 });
+            if (!pptxTextCheck.valid) {
+              return NextResponse.json({ error: `PPT/PPTX dosya içeriği hatası: ${pptxTextCheck.error}` }, { status: 400 });
+            }
+          }
+
+        } catch (err) {
+          console.error('PPT/PPTX dosyası okunurken hata:', err);
+          return NextResponse.json({ error: 'PPT/PPTX dosyası okunamadı veya bozuk. Lütfen geçerli bir PPT/PPTX yükleyin.' }, { status: 400 });
+        }
+      }
+      // PNG
+      else if (fileName.endsWith('.png')) {
+        // Basit +18/NSFW placeholder kontrolü (geliştirilebilir)
+        const isNSFW = await checkNSFWImage(data.fileData);
+        if (isNSFW) {
+          return NextResponse.json({ error: 'Yüklenen görsel +18 veya uygunsuz içerik içeriyor.' }, { status: 400 });
+        }
+      }
     }
 
     // Gerekli alanları kontrol et
@@ -192,6 +229,11 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
+    // Kullanıcıdan üniversite ve bölüm bilgisini çek
+    let userDoc = null;
+    if (data.authorId) {
+      userDoc = await User.findById(data.authorId).lean();
+    }
     // Kaynak oluştur
     const newResource = await Resource.create({
       title: data.title,
@@ -199,8 +241,10 @@ export async function POST(request: NextRequest) {
       author: data.author || '',
       category: data.category,
       format: data.format,
-      university: data.university || '',
-      department: data.department || null,
+      // university ve department frontend'den alınmayacak, user profilinden çekilecek
+      university: userDoc?.university || '',
+      department: userDoc?.expertise || null,
+      level: data.level || '',
       fileSize: data.fileSize || null,
       tags: data.tags || [],
       url: data.url || null,
@@ -222,22 +266,24 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newResource, { status: 201 });
   } catch (error) {
-    console.error('Kaynak oluşturulurken hata oluştu:', error);
+    // Hata detayını logla ve response'a ekle
     let details = '';
     if (error instanceof Error) {
       details = error.stack || error.message;
     } else {
       details = String(error);
     }
+    console.error('Kaynak oluşturulurken hata oluştu:', details);
     if (details.includes('ENOENT')) {
       return NextResponse.json(
         { error: 'Yüklenen dosya bulunamadı veya işlenemedi. Lütfen geçerli bir dosya yükleyin.', details },
         { status: 404 }
       );
     }
+    // 400: Validation veya beklenen kullanıcı hataları için
     return NextResponse.json(
       { error: 'Kaynak oluşturulurken bir hata oluştu', details },
-      { status: 500 }
+      { status: 400 }
     );
   }
 }

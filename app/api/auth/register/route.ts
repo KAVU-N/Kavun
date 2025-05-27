@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from 'next/server';
+import { loadBannedWords, isNameValid } from './nameValidation';
 import bcrypt from 'bcryptjs';
 import User, { IUser } from '@/models/User';
 import connectDB from '@/lib/mongodb';
@@ -46,6 +47,22 @@ export async function POST(req: Request) {
     }
 
     const { name, email, password, role, university, expertise, grade } = body;
+
+    // Ad Soyad gelişmiş validasyon
+    const bannedWords = loadBannedWords();
+    const nameValidation = isNameValid(name, bannedWords);
+    if (!nameValidation.valid) {
+      return NextResponse.json(
+        { error: nameValidation.error || 'Ad soyad geçersiz.' },
+        {
+          status: 400,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': 'true'
+          }
+        }
+      );
+    }
 
     // Validasyon
     if (!name || !email || !password || !role || !university) {
