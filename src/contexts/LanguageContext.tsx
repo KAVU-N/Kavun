@@ -61,6 +61,7 @@ const translations: Record<Language, Record<string, string>> = {
     'resourceCategory.projects': 'Projeler',
     'resourceCategory.other': 'Diğer',
     // Akademik seviyeler
+    'academicLevel.associate': 'Ön Lisans',
     'academicLevel.bachelor': 'Lisans',
     'academicLevel.master': 'Yüksek Lisans',
     'academicLevel.phd': 'Doktora',
@@ -538,6 +539,7 @@ const translations: Record<Language, Record<string, string>> = {
     'resourceCategory.projects': 'Projects',
     'resourceCategory.other': 'Other',
     // Academic levels
+    'academicLevel.associate': 'Associate Degree',
     'academicLevel.bachelor': 'Bachelor',
     'academicLevel.master': 'Master',
     'academicLevel.phd': 'PhD',

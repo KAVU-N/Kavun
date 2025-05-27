@@ -118,16 +118,15 @@ export default function KaynakPaylasPage() {
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.ms-powerpoint',
         'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'image/jpeg',
         'image/png',
       ];
-      const allowedExtensions = ['.pdf','.doc','.docx','.ppt','.pptx','.jpg','.jpeg','.png'];
+      const allowedExtensions = ['.pdf','.doc','.docx','.ppt','.pptx','.png'];
       const fileName = selectedFile.name.toLowerCase();
       const isValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
       const isValidType = allowedTypes.includes(selectedFile.type);
       const isValidSize = selectedFile.size <= 5 * 1024 * 1024;
       if (!isValidExtension || !isValidType) {
-        setError('Sadece PDF, DOC, PPT, JPG, PNG dosyaları yüklenebilir.');
+        setError('Sadece PDF, DOC, DOCX, PPT, PPTX ve PNG dosyaları yüklenebilir.');
         setFile(null);
         return;
       }
@@ -144,8 +143,8 @@ export default function KaynakPaylasPage() {
         setFormData(prev => ({ ...prev, format: 'resourceFormat.doc' }));
       } else if (fileName.endsWith('.ppt') || fileName.endsWith('.pptx')) {
         setFormData(prev => ({ ...prev, format: 'resourceFormat.ppt' }));
-      } else if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.png')) {
-        setFormData(prev => ({ ...prev, format: 'resourceFormat.image' }));
+      } else if (fileName.endsWith('.png')) {
+        setFormData(prev => ({ ...prev, format: 'resourceFormat.png' }));
       }
     }
   };
@@ -417,7 +416,7 @@ export default function KaynakPaylasPage() {
                           <span className="font-semibold">Dosya yüklemek için tıklayın</span> veya sürükleyip bırakın
                         </p>
                         <p className="text-xs text-[#6B3416]">
-                          PDF, DOC, DOCX, PPT, PPTX, JPG, JPEG, PNG (Max 5MB)
+                          PDF, DOC, DOCX, PPT, PPTX, PNG (Max 5MB)
                         </p>
                       </div>
                       <input
@@ -458,26 +457,7 @@ export default function KaynakPaylasPage() {
                     </div>
                   )}
                   
-                  <div className="mt-4">
-                    <label htmlFor="format" className="block text-sm font-medium text-[#6B3416] mb-1">
-                      {t('general.resourceFormat')} *
-                    </label>
-                    <select
-                      id="format"
-                      name="format"
-                      value={formData.format}
-                      onChange={handleInputChange}
-                      required
-                      className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
-                    >
-                      <option value="">{t('general.selectOption')}</option>
-                      {formatKeys.map((key) => (
-                        <option key={key} value={key}>
-                          {t(key)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+
                 </div>
               ) : (
                 <div>
@@ -494,27 +474,6 @@ export default function KaynakPaylasPage() {
                     required={formData.resourceType === 'link'}
                     className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
                   />
-                  
-                  <div className="mt-4">
-                    <label htmlFor="format" className="block text-sm font-medium text-[#6B3416] mb-1">
-                      {t('general.resourceFormat')} *
-                    </label>
-                    <select
-                      id="format"
-                      name="format"
-                      value={formData.format}
-                      onChange={handleInputChange}
-                      required
-                      className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
-                    >
-                      <option value="">{t('general.selectOption')}</option>
-                      {formatKeys.map((key) => (
-                        <option key={key} value={key}>
-                          {t(key)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
                 </div>
               )}
             </div>
