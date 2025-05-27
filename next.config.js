@@ -25,14 +25,18 @@ const nextConfig = {
     ],
     unoptimized: true
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': '.',
       '@/components': './src/components',
       '@/context': './src/context'
+    };
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push('pptx-parse', '@tensorflow/tfjs-node', 'nsfwjs');
     }
-    return config
+    return config;
   },
   async headers() {
     const allowedOrigins = process.env.NODE_ENV === 'production' 

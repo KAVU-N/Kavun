@@ -405,6 +405,22 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white shadow-lg rounded-b-xl overflow-hidden">
+            {/* Mobile Language Switcher */}
+            <div className="flex items-center justify-center space-x-2 py-2 border-b border-[#FFE5D9]">
+              <button
+                onClick={() => setLanguage('tr')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-300 ${language === 'tr' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
+              >
+                TR
+              </button>
+              <span className="text-gray-400">|</span>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-300 ${language === 'en' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
+              >
+                EN
+              </button>
+            </div>
             <div className="flex justify-end px-4 pt-2">
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -538,7 +554,7 @@ export default function Navbar() {
                     </svg>
                     <span>Derslerim</span>
                   </Link>
-                  {user.role === 'teacher' && (
+                  {(user.role === 'teacher' || user.role === 'instructor') && (
                     <>
                       <Link
                         href="/ilanlarim"
@@ -550,16 +566,7 @@ export default function Navbar() {
                         </svg>
                         <span>İlanlarım</span>
                       </Link>
-                      <Link
-                        href="/derslerim/ekle"
-                        className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        <span>Ders Oluştur</span>
-                      </Link>
+                      
                     </>
                   )}
                   <button

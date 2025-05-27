@@ -20,11 +20,11 @@ export default function IlanVerPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Sadece eğitmen (instructor) rolüne sahip kullanıcıların erişimine izin ver
+  // Sadece eğitmen (instructor) veya öğretmen (teacher) rolüne sahip kullanıcıların erişimine izin ver
   useEffect(() => {
     if (!loading && !user) {
       router.push('/auth/login');
-    } else if (!loading && user && user.role !== 'instructor' && user.role !== 'teacher') {
+    } else if (!loading && user && !['instructor', 'teacher'].includes(user.role)) {
       router.push('/');
     }
   }, [user, loading, router]);
@@ -34,6 +34,49 @@ export default function IlanVerPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Yasaklı kelimeler listesi
+  const bannedWords = [
+    "amk", "aq", "orospu", "piç", "sik", "sikerim", "siktir", "yarrak", "ananı", "anan",
+    "babanı", "baban", "göt", "got", "götveren", "pezevenk", "kahpe", "ibne", "ibneyim", "ibneler",
+    "ibnelik", "döl", "bok", "boktan", "boklu", "sikik", "sikilmiş", "amına", "koyayım", "koydum",
+    "koyarım", "kodum", "koduğum", "koyduğum", "koyduklarım", "siktiğim", "siktiğimin", "siktiğiminin",
+    "siktirgit", "siktir ol", "siktir et", "siktirip", "siktiriboktan", "siktirola", "siktiribok",
+    "amcık", "amcıklar", "amcığa", "amcığı", "amcığın", "amcığım", "amcığına", "amcığından",
+    "amcığını", "amcığınına", "amcığınından", "amcığınından", "amcığınından", "amcığınından",
+    "yarrağımı", "yarrağımın", "yarrağımda", "yarrağımdan", "yarrağımla", "yarrağımsı", "yarrağımsın",
+    "yarrağımsına", "yarrağımsınız", "yarrağımsınlar", "götlek", "götleğim", "götleğin", "götleği",
+    "götleğine", "götleğimi", "götleğimin", "götleğimde", "götleğimden", "götleğimle", "götleğimsi",
+    "götleğimsin", "götleğimsi", "götleğimsiniz", "götleğimsinler", "pezevenk", "pezevengim",
+    "pezevengin", "pezevengi", "pezevengine", "pezevengimi", "pezevengimin", "pezevengimde",
+    "pezevengimden", "pezevengimle", "pezevengimsi", "pezevengimsin", "pezevengimsi", "pezevengimsiniz",
+    "pezevengimsinler", "kaltak", "kaltaklık", "kaltaklar", "kaltaklığı", "kaltaklığa", "kaltaklıkta",
+    "kaltaklıktan", "kaltaklıkla", "kaltaklıksı", "kaltaklıksın", "kaltaklıksınız", "kaltaklıklar",
+    "sikik", "sikiklik", "sikikler", "sikikliği", "sikikliğe", "sikiklikte", "sikiklikten", "sikiklikle",
+    "sikikliksi", "sikikliksin", "sikikliksiniz", "sikiklikler", "sikiklikleri", "sikikliklere"
+  ];
+
+  function containsBannedWords(text: string) {
+    const lower = text.toLocaleLowerCase('tr');
+    return bannedWords.some(word => lower.includes(word));
+  }
+
+  // Ekstra güvenlik fonksiyonları
+  function hasRepeatedChars(text: string, count = 3) {
+    // aaa, !!!, ??? gibi tekrarları engelle
+    const regex = new RegExp(`(.)\\1{${count-1},}`);
+    return regex.test(text);
+  }
+  function isAllUpperCase(text: string) {
+    return text.length > 2 && text === text.toLocaleUpperCase('tr');
+  }
+  function containsSpamPhrases(text: string) {
+    const spamWords = [
+      'whatsapp', 'telegram', 'acil', 'satılık', 'bedava', 'ücretsiz', 'takipçi', 'takipci', 'instagram', 'tiktok', 'hemen ulaş', 'hemen ulas', 'hemen yaz', 'direkt mesaj', 'dm', 'wp', 'numaram', 'bana ulaş', 'bana ulas'
+    ];
+    const lower = text.toLocaleLowerCase('tr');
+    return spamWords.some(word => lower.includes(word));
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -41,9 +84,49 @@ export default function IlanVerPage() {
       setError(t('errors.titleRequired') || 'Lütfen bir başlık girin');
       return;
     }
+    if (formData.title.length > 100) {
+      setError('Başlık 100 karakterden uzun olamaz!');
+      return;
+    }
+    if (hasRepeatedChars(formData.title)) {
+      setError('Başlıkta çok fazla tekrar eden karakter kullanılamaz!');
+      return;
+    }
+    if (isAllUpperCase(formData.title)) {
+      setError('Başlık tamamen büyük harf olamaz!');
+      return;
+    }
+    if (containsSpamPhrases(formData.title)) {
+      setError('Başlıkta spam veya iletişim amaçlı kelime kullanılamaz!');
+      return;
+    }
+    if (containsBannedWords(formData.title)) {
+      setError(t('errors.bannedWordTitle') || 'Başlıkta uygunsuz kelime kullanılamaz!');
+      return;
+    }
     
     if (!formData.description.trim()) {
       setError(t('errors.descriptionRequired') || 'Lütfen bir açıklama girin');
+      return;
+    }
+    if (formData.description.length > 1000) {
+      setError('Açıklama 1000 karakterden uzun olamaz!');
+      return;
+    }
+    if (hasRepeatedChars(formData.description)) {
+      setError('Açıklamada çok fazla tekrar eden karakter kullanılamaz!');
+      return;
+    }
+    if (isAllUpperCase(formData.description)) {
+      setError('Açıklama tamamen büyük harf olamaz!');
+      return;
+    }
+    if (containsSpamPhrases(formData.description)) {
+      setError('Açıklamada spam veya iletişim amaçlı kelime kullanılamaz!');
+      return;
+    }
+    if (containsBannedWords(formData.description)) {
+      setError(t('errors.bannedWordDescription') || 'Açıklamada uygunsuz kelime kullanılamaz!');
       return;
     }
     

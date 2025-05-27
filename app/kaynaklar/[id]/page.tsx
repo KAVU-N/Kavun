@@ -251,7 +251,7 @@ export default function KaynakDetayPage() {
   }
   
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 pt-24 pb-8">
       <div className="mb-6">
         <Link href="/kaynaklar" className="text-[#994D1C] hover:text-[#6B3416] transition-colors duration-300 flex items-center">
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,7 +268,13 @@ export default function KaynakDetayPage() {
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-2xl md:text-3xl font-bold text-[#994D1C]">{resource.title}</h1>
                 <span className="bg-[#FF8B5E] text-white text-sm px-3 py-1 rounded-lg">
-                  {resource.format}
+                  {(() => {
+                    // resource.format örneği: 'resourceFormat.png' veya 'pdf' gibi
+                    if (!resource.format) return '';
+                    const match = resource.format.match(/\.([a-zA-Z0-9]+)$/);
+                    if (match) return match[1].toUpperCase(); // dosya uzantısı varsa
+                    return resource.format.toUpperCase(); // sadece format ismi varsa
+                  })()}
                 </span>
               </div>
               
@@ -297,12 +303,25 @@ export default function KaynakDetayPage() {
               )}
               
               <div className="text-sm text-[#6B3416] mb-2">
-                <span className="font-medium">{t('general.resourceCategory')}:</span> {resource.category}
+                <span className="font-medium">{t('general.resourceCategory')}:</span> {t(resource.category) !== resource.category ? t(resource.category) : resource.category}
               </div>
               
               <div className="text-sm text-[#6B3416] mb-2">
-                <span className="font-medium">{t('general.resourceLevel')}:</span> {resource.level}
-              </div>
+  <span className="font-medium">{t('general.resourceLevel')}:</span> {
+    // Try to translate if possible, fallback to raw
+    t(
+      resource.level && resource.level.startsWith('academicLevel.')
+        ? resource.level
+        : `academicLevel.${resource.level?.toLowerCase()}`
+    ) !== `academicLevel.${resource.level?.toLowerCase()}`
+      ? t(
+          resource.level && resource.level.startsWith('academicLevel.')
+            ? resource.level
+            : `academicLevel.${resource.level?.toLowerCase()}`
+        )
+      : (resource.level || '-')
+  }
+</div>
               
               <div className="text-sm text-[#6B3416] mb-2">
                 <span className="font-medium">{t('general.resourceDate')}:</span> <span className="text-xs text-gray-500">{formatDate(resource?.uploadDate || resource?.createdAt)}</span>
