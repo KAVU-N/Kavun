@@ -131,8 +131,8 @@ export default function KaynaklarPage() {
   const [previewResource, setPreviewResource] = useState<Resource | null>(null);
   const { t, language } = useLanguage();
   const academicLevels = language === 'en'
-    ? ['All', 'Bachelors', 'Masters', 'PhD']
-    : ['Hepsi', 'Lisans', 'Yüksek Lisans', 'Doktora'];
+    ? ['All', 'Associate Degree', 'Bachelors', 'Masters', 'PhD']
+    : ['Hepsi', 'Ön Lisans', 'Lisans', 'Yüksek Lisans', 'Doktora'];
   const { user } = useAuth();
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
@@ -644,7 +644,7 @@ export default function KaynaklarPage() {
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-lg font-semibold text-[#994D1C] line-clamp-2">{resource.title}</h3>
                   <div className="bg-[#FF8B5E] text-white text-xs px-2 py-1 rounded-lg ml-2 flex-shrink-0">
-                    {resource.format}
+                    {t(resource.format) || resource.format}
                   </div>
                 </div>
                 <p className="text-sm text-[#6B3416] mb-3 line-clamp-2">{resource.description}</p>
@@ -710,7 +710,7 @@ export default function KaynaklarPage() {
         </div>
       ) : (
         <div className="flex justify-center items-center py-20">
-          <h2 className="text-2xl font-bold text-[#994D1C]">{t('general.noResourcesFound')}</h2>
+          <h2 className="text-2xl font-bold text-[#994D1C]">{t('general.resourceSearchNoResults')}</h2>
         </div>
       )}
       {/* Pagination sadece kartların ALTINDA */}
