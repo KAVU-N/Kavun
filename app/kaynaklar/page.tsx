@@ -214,10 +214,6 @@ export default function KaynaklarPage() {
   const totalPages = Math.ceil(totalResourceCount / resourcesPerPage);
 
   // Sadece aktif sayfanın kaynakları
-  const pagedResources = useMemo(() => {
-    const startIdx = (currentPage - 1) * resourcesPerPage;
-    return filteredResources.slice(startIdx, startIdx + resourcesPerPage);
-  }, [filteredResources, currentPage]);
 
   // Sayfa veya filtre değişince otomatik olarak en başa dön
   useEffect(() => {
@@ -638,7 +634,7 @@ export default function KaynaklarPage() {
         </div>
       ) : filteredResources.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pagedResources.map((resource: Resource) => (
+          {filteredResources.map((resource: Resource) => (
             <div key={resource._id || resource.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
               <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
@@ -728,7 +724,7 @@ export default function KaynaklarPage() {
               <button
                 key={idx + 1}
                 onClick={() => setCurrentPage(idx + 1)}
-                className={`px-3 py-2 border-t border-b border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage === idx + 1 ? 'bg-[#FFB996] text-white font-bold' : ''}`}
+                className={`px-3 py-2 border-t border-b border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage === idx + 1 ? 'bg-[#FFB996] text-[#FC905A] font-bold' : ''}`}
               >
                 {idx + 1}
               </button>
