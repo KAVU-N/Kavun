@@ -724,7 +724,7 @@ export default function KaynaklarPage() {
               <button
                 key={idx + 1}
                 onClick={() => setCurrentPage(idx + 1)}
-                className={`px-3 py-2 border-t border-b border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage === idx + 1 ? 'bg-[#FFB996] text-white font-bold' : ''}`}
+                className={`px-3 py-2 border-t border-b border-[#FFB996] bg-white text-[#994D1C] hover:bg-[#FFE5D9] transition-colors duration-200 ${currentPage === idx + 1 ? 'bg-[#FFB996] text-[#FC905A] font-bold' : ''}`}
               >
                 {idx + 1}
               </button>
