@@ -3,7 +3,6 @@ import { Toaster } from 'react-hot-toast'
 import './globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { LanguageProvider } from '@/src/contexts/LanguageContext'
-import Navbar from '@/src/components/Navbar'
 import Footer from '@/src/components/Footer'
 import CookieConsentBar from '@/src/components/CookieConsentBar'
 import AnalyticsLoader from '@/src/components/AnalyticsLoader'
@@ -58,7 +57,6 @@ export default function RootLayout({
           <LanguageProvider>
             <div className="flex flex-col min-h-screen" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
               <ClientOnly hideOnAdmin>
-                <Navbar />
                 <AnalyticsLoader />
               </ClientOnly>
               <div className="flex-grow" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
