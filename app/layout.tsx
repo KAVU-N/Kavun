@@ -1,7 +1,7 @@
 import { Inter } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
-import { AuthProvider } from '@/contexts/AuthContext'
+import { AuthProvider } from '@/context/AuthContext'
 import { LanguageProvider } from '@/src/contexts/LanguageContext'
 import Navbar from '@/src/components/Navbar'
 import Footer from '@/src/components/Footer'

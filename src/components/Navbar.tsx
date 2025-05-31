@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
+import type { User } from '../types/User';
 import { useLanguage } from '../contexts/LanguageContext';
 import Image from 'next/image';
 
@@ -36,6 +37,7 @@ export default function Navbar() {
   const profileRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { user, logout } = useAuth();
+const typedUser = user as User | null;
   const { language, setLanguage, t } = useLanguage();
 
   // İstemci tarafında olduğumuzu işaretleyen effect
@@ -250,7 +252,7 @@ export default function Navbar() {
                   </Link>
                 ))}
                 {/* Eğitmen ise İlan Ver butonu */}
-                {mounted && user && (user.role === 'instructor' || user.role === 'teacher') && (
+                {mounted && user && (typedUser?.role === 'instructor' || typedUser?.role === 'teacher') && (
                   <Link
                     href="/ilan-ver"
                     className={`flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md ml-2 hover:scale-105 transition-transform`}
@@ -310,17 +312,17 @@ export default function Navbar() {
                     }
                   >
                     <div className={`relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-r from-[#FFB996] to-[#FF8B5E]`}>
-  {user.profilePhotoUrl ? (
+  {typedUser?.profilePhotoUrl ? (
     <Image
-      src={user.profilePhotoUrl}
-      alt={user.name}
+      src={typedUser?.profilePhotoUrl ?? '/default-profile.png'}
+      alt={typedUser?.name ?? 'Profil'}
       width={48}
       height={48}
       className="object-cover w-full h-full rounded-full"
     />
   ) : (
     <span className="text-white font-semibold text-lg select-none">
-      {user.name.charAt(0).toUpperCase()}
+      {(typedUser?.name?.charAt(0)?.toUpperCase() ?? '?')}
     </span>
   )}
 </div>
@@ -382,7 +384,7 @@ export default function Navbar() {
                           <span>{t('nav.myLessons')}</span>
                         </div>
                       </Link>
-                      {(user.role === 'instructor' || user.role === 'teacher') && (
+                      {user && (typedUser?.role === 'instructor' || typedUser?.role === 'teacher') && (
                         <>
                           <Link
                             href="/ilanlarim"
@@ -455,7 +457,7 @@ export default function Navbar() {
             <div className="px-4 py-3 space-y-1">
               
               
-              {mounted && user && (user.role === 'instructor' || user.role === 'teacher') && (
+              {mounted && user && (typedUser?.role === 'instructor' || typedUser?.role === 'teacher') && (
                 <>
                   <Link
                     href="/ilan-ver"
@@ -555,7 +557,7 @@ export default function Navbar() {
                     </svg>
                     <span>Derslerim</span>
                   </Link>
-                  {(user.role === 'teacher' || user.role === 'instructor') && (
+                  {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor') && (
                     <>
                       <Link
                         href="/ilanlarim"

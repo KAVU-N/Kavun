@@ -3,7 +3,7 @@ export interface User {
   _id?: string;
   name: string;
   email: string;
-  role?: string;
+  role: 'student' | 'teacher' | 'instructor';
   university?: string;
   isVerified?: boolean;
   expertise?: string;
