@@ -296,7 +296,13 @@ const typedUser = user as User | null;
                 <div className="flex items-center space-x-4">
                   <Link
                     href="/auth/login"
-                    className={`px-6 py-2 rounded-xl font-semibold transition-all duration-300 hover:bg-[#994D1C]/80 hover:scale-105 ${pathname === '/' ? 'text-white hover:text-[#FFD6B2]' : 'text-[#FFD6B2] hover:text-[#FFE8D8]'}`}
+                    className={`px-6 py-2 rounded-xl font-semibold transition-all duration-300 hover:bg-[#994D1C]/80 hover:scale-105 ${
+                      pathname === '/'
+                        ? (isScrolled
+                            ? 'text-[#994D1C] hover:text-[#FF8B5E]'
+                            : 'text-white hover:text-[#FFD6B2]')
+                        : 'text-[#FFD6B2] hover:text-[#FFE8D8]'
+                    }`}
                   >
                     {t('nav.login')}
                   </Link>
