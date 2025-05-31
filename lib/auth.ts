@@ -21,8 +21,14 @@ export async function getUserFromToken(requestOrToken: Request | { headers: { au
       // Direkt token geldi (pages/api)
       token = requestOrToken.replace('Bearer ', '');
     } else if ('headers' in requestOrToken && typeof requestOrToken.headers === 'object') {
-      // pages/api: req.headers['authorization']
-      const authHeader = requestOrToken.headers['authorization'] || requestOrToken.headers['Authorization'];
+      // Eğer headers bir Headers nesnesiyse (ör: new Headers())
+      let authHeader: string | undefined;
+      if (requestOrToken.headers instanceof Headers) {
+        authHeader = requestOrToken.headers.get('authorization') || requestOrToken.headers.get('Authorization') || undefined;
+      } else {
+        // Normal obje ise (ör: { authorization: ... })
+        authHeader = (requestOrToken.headers as any)['authorization'] || (requestOrToken.headers as any)['Authorization'];
+      }
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
         console.log('Token bulunamadı veya geçersiz format');
         return null;

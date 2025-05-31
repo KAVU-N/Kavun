@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   await connectDB();
   // Token'dan kullanıcıyı al
   const authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
-  const user = await getUserFromToken(authHeader);
+  const user = authHeader ? await getUserFromToken(authHeader) : null;
   if (!user || !user.id) {
     return NextResponse.json({ notifications: [] });
   }

@@ -13,6 +13,7 @@ interface User {
   expertise?: string; // Okuduğu bölüm
   grade?: number; // Kaçıncı sınıf
   viewQuota?: number; // Kullanıcının kaynak görme hakkı
+  profilePhotoUrl?: string; // Profil fotoğrafı opsiyonel
 }
 
 interface LoginData {
