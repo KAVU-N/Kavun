@@ -1,4 +1,5 @@
 'use client';
+import './recaptcha-hide.css';
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useRef } from 'react';
@@ -13,9 +14,28 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 type Role = 'student' | 'instructor';
 
 import { Suspense } from 'react';
-import RegisterCaptcha from '@/src/components/RegisterCaptcha';
+
 
 function RegisterPageInner() {
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
+  const RECAPTCHA_SITE_KEY = '6LdubVErAAAAALfSGXh8bTDiW0ir7b_PXfGROQ6h';
+
+  useEffect(() => {
+    if (!(window as any).grecaptcha) {
+      const script = document.createElement('script');
+      script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+      script.async = true;
+      script.onload = () => setRecaptchaReady(true);
+      document.body.appendChild(script);
+      return () => {
+        document.body.removeChild(script);
+      };
+    } else {
+      setRecaptchaReady(true);
+    }
+  }, []);
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const defaultRole = searchParams?.get('role') as Role || 'student';
@@ -34,20 +54,30 @@ function RegisterPageInner() {
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
-  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    if (!captchaVerified) {
-      setError('Lütfen robot olmadığınızı doğrulayın.');
+    if (!(window as any).grecaptcha) {
+      setError('reCAPTCHA yüklenemedi. Lütfen sayfayı yenileyin.');
       setLoading(false);
       return;
     }
-
     const formData = new FormData(e.currentTarget);
+    (window as any).grecaptcha.ready(() => {
+      (window as any).grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' }).then((token: string) => {
+        setRecaptchaToken(token);
+        submitWithRecaptcha(token, formData);
+      }).catch(() => {
+        setError('reCAPTCHA doğrulaması başarısız oldu.');
+        setLoading(false);
+      });
+    });
+  };
+
+  const submitWithRecaptcha = async (token: string, formData: FormData) => {
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
@@ -61,31 +91,22 @@ function RegisterPageInner() {
     }
     console.log("Formdan seçilen rol:", selectedRole);
 
-    let isValid = true;
-    
-    // Password match validation
     if (password !== passwordConfirm) {
       setError(t('errors.passwordsDoNotMatch') || 'Şifreler eşleşmiyor');
       setLoading(false);
       return;
     }
-    
-    // Email domain validation
     const emailDomain = email.split('@')[1];
     if (emailDomain !== 'std.ankaramedipol.edu.tr') {
       setError('Sadece @std.ankaramedipol.edu.tr uzantılı e-posta adresleri ile kayıt olabilirsiniz');
       setLoading(false);
       return;
     }
-    
-    // University validation
     if (!universities.includes(university)) {
       setError(t('errors.invalidUniversity') || 'Lütfen geçerli bir üniversite seçin');
       setLoading(false);
       return;
     }
-    
-    // Department validation
     if (!departments.includes(expertise)) {
       setError(t('errors.invalidDepartment') || 'Lütfen geçerli bir bölüm seçin');
       setLoading(false);
@@ -101,6 +122,7 @@ function RegisterPageInner() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     const fetchUniversities = async () => {
@@ -193,9 +215,6 @@ function RegisterPageInner() {
               className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
             />
           </div>
-
-          {/* Captcha Alanı */}
-          <RegisterCaptcha onVerify={setCaptchaVerified} />
 
           <div>
             <label htmlFor="role" className="block text-sm font-medium text-[#6B3416] mb-1">
@@ -350,6 +369,13 @@ function RegisterPageInner() {
           >
             {loading ? t('auth.registering') || 'Kayıt Yapılıyor...' : t('auth.register')}
           </button>
+
+          {/* Google reCAPTCHA badge yasal olarak gizleniyor, açıklama ve linkler ekleniyor */}
+          <div className="text-xs text-center text-gray-500 mt-2">
+            Bu site Google reCAPTCHA ile korunmaktadır.<br />
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline">Gizlilik Politikası</a> ve 
+            <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" className="underline ml-1">Kullanım Şartları</a> geçerlidir.
+          </div>
           
           <p className="mt-2 text-xs text-center text-[#6B3416]">
             {t('auth.termsAgreement') || 'By signing up, you agree to our'} <a href="#" className="text-[#FF8B5E] hover:text-[#994D1C]">{t('auth.termsOfUse') || 'Terms of Use'}</a> {t('auth.and') || 'and'} <a href="#" className="text-[#FF8B5E] hover:text-[#994D1C]">{t('auth.privacyPolicy') || 'Privacy Policy'}</a>.
