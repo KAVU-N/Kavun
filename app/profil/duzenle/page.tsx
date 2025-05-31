@@ -17,7 +17,7 @@ export default function ProfileEditPage() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
-  const { user, loading, setUser } = useAuth();
+  const { user, loading, setUser, updateUser } = useAuth();
   const router = useRouter();
   
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
@@ -67,7 +67,7 @@ export default function ProfileEditPage() {
           },
           body: JSON.stringify({
             image: profilePhoto,
-            userId: user.id
+            userId: user._id || user.id
           })
         });
         const uploadData = await uploadRes.json();
@@ -84,7 +84,7 @@ export default function ProfileEditPage() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          userId: user.id,
+          userId: user._id || user.id,
           profilePhotoUrl: uploadedPhotoUrl && !uploadedPhotoUrl.startsWith('data:') ? uploadedPhotoUrl : undefined
         })
       });
@@ -96,10 +96,12 @@ export default function ProfileEditPage() {
       }
       
       // Kullanıcı bilgilerini güncelle
-      setUser(data.user);
-      
-      // LocalStorage'daki kullanıcı bilgilerini güncelle
-      localStorage.setItem('user', JSON.stringify(data.user));
+      if (typeof updateUser === 'function') {
+        updateUser(data.user);
+      } else {
+        setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
       
       setSuccess(t('profile.updateSuccess'));
       

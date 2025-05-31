@@ -76,14 +76,7 @@ export function validateTextField(text: string, bannedWords: string[], options?:
       return { valid: false, error: "Uygunsuz kelime tespit edildi." };
     }
   }
-  // En az bir kelime gerçek Türkçe isim/kelime içermeli (isteğe bağlı)
-  if (options?.requireTurkishWord) {
-    const commonNames = loadCommonNames();
-    const words = text.trim().split(/\s+/);
-    if (!words.some(w => isTurkishName(w, commonNames))) {
-      return { valid: false, error: "Alan gerçek bir Türkçe kelime veya isme benzemelidir." };
-    }
-  }
+
   return { valid: true };
 }
 
@@ -139,11 +132,7 @@ export function isNameValid(name: string, bannedWords: string[]): { valid: boole
     }
   }
 
-  // En az bir kelime gerçek Türkçe isim listesinde olmalı
-  const commonNames = loadCommonNames();
-  if (!words.some(w => isTurkishName(w, commonNames))) {
-    return { valid: false, error: "En az bir kelime gerçek bir Türkçe isme benzemelidir." };
-  }
+
 
   // Normal bir isme benziyor mu? (tüm kelimeler harf, çok kısa/uzun değil)
   if (name.length < 5 || name.length > 50) {

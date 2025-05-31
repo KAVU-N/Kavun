@@ -173,7 +173,7 @@ export default function Navbar() {
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo - LEFT */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center space-x-2 group">
                 <Image
                   src="/logo.png"
@@ -183,12 +183,28 @@ export default function Navbar() {
                   className="mr-2"
                 />
                 <span className={`text-2xl font-bold transition-all duration-300 ${
-                  isScrolled ? 'text-[#6B3416]' : 'text-[#994D1C]'
+                  pathname === '/' ? 'text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.20)]' : (isScrolled ? 'text-[#6B3416]' : 'text-[#994D1C]')
                 } group-hover:text-[#FF8B5E]`}>
                   KAVUNLA
                 </span>
               </Link>
             </div>
+
+            {/* Mobilde navLinks hamburger menü butonunun solunda */}
+            {!isMenuOpen && (
+              <div className="flex md:hidden items-center space-x-1 ml-2">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`group flex items-center space-x-2 px-3 py-2 rounded-xl font-semibold text-[#994D1C] hover:bg-[#FFE5D9] transition-all duration-300`}
+                  >
+                    <span className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">{link.icon}</span>
+                    <span>{link.label}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
 
             {/* Mobile Menu Button - Only visible when menu is closed */}
             {!isMenuOpen && (
@@ -220,10 +236,10 @@ export default function Navbar() {
                     href={link.href}
                     className={`group flex items-center space-x-2 px-4 py-2 rounded-xl transform transition-all duration-500 ${
                       pathname === link.href
-                        ? 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md'
-                        : (link.href === '/ilanlar' || link.href === '/kaynaklar')
+                        ? (pathname === '/' ? 'text-white font-semibold bg-[#994D1C]/80 shadow-md' : 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md')
+                        : (pathname === '/' ? 'text-white/90 font-semibold hover:text-[#FFD6B2] hover:bg-[#994D1C]/80 hover:-translate-y-1 hover:shadow-lg' : (link.href === '/ilanlar' || link.href === '/kaynaklar')
                           ? 'text-[#994D1C] font-semibold hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
-                          : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
+                          : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg')
                     }`}
                   >
                     <div className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
@@ -270,7 +286,7 @@ export default function Navbar() {
                 <div className="flex items-center space-x-4">
                   <Link
                     href="/auth/login"
-                    className="px-6 py-2 rounded-xl text-[#FFD6B2] hover:text-[#FFE8D8] font-semibold transition-all duration-300 hover:bg-[#994D1C]/80 hover:scale-105"
+                    className={`px-6 py-2 rounded-xl font-semibold transition-all duration-300 hover:bg-[#994D1C]/80 hover:scale-105 ${pathname === '/' ? 'text-white hover:text-[#FFD6B2]' : 'text-[#FFD6B2] hover:text-[#FFE8D8]'}`}
                   >
                     {t('nav.login')}
                   </Link>
@@ -293,26 +309,25 @@ export default function Navbar() {
                     }
                   >
                     <div className={`relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-r from-[#FFB996] to-[#FF8B5E]`}>
-                      <span className="text-white font-semibold text-lg select-none">
-                        {user.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
+  {user.profilePhotoUrl ? (
+    <Image
+      src={user.profilePhotoUrl}
+      alt={user.name}
+      width={48}
+      height={48}
+      className="object-cover w-full h-full rounded-full"
+    />
+  ) : (
+    <span className="text-white font-semibold text-lg select-none">
+      {user.name.charAt(0).toUpperCase()}
+    </span>
+  )}
+</div>
                   </button>
                   
                   {/* Profile Dropdown */}
                   {isProfileOpen && (
                     <div className="fixed right-2 top-20 mt-2 w-64 max-w-xs bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9]" style={{minWidth: '12rem', maxWidth: '95vw', right: 'min(0.5rem, calc(100vw - 270px))'}}>
-                      <Link
-                        href="/profil"
-                        className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
-                      >
-                        <div className="flex items-center space-x-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                          </svg>
-                          <span>{t('nav.profile')}</span>
-                        </div>
-                      </Link>
                       <Link
                         href="/bildirimler"
                         className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
@@ -404,8 +419,9 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white shadow-lg rounded-b-xl overflow-hidden">
+            {/* navLinks hamburger menüde YOK, sadece navbar'da! */}
             {/* Mobile Language Switcher */}
-            <div className="flex items-center justify-center space-x-2 py-2 border-b border-[#FFE5D9]">
+            <div className="flex items-center justify-center space-x-2 py-2">
               <button
                 onClick={() => setLanguage('tr')}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-300 ${language === 'tr' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
@@ -436,22 +452,7 @@ export default function Navbar() {
               </button>
             </div>
             <div className="px-4 py-3 space-y-1">
-              {navLinks
-                .map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                      pathname === link.href
-                        ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
-                        : 'text-[#994D1C] hover:text-[#6B3416] hover:bg-[#FFF5F0]'
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.icon}
-                    <span>{link.label}</span>
-                  </Link>
-                ))}
+              
               
               {mounted && user && (user.role === 'instructor' || user.role === 'teacher') && (
                 <>
