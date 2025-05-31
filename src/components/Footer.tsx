@@ -8,11 +8,15 @@ import { useLanguage } from '../contexts/LanguageContext';
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   return (
     <footer className="bg-gradient-to-r from-[#FFCDB2] to-[#FFCDB2] border-t border-[#FFCDB2] mt-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-wrap justify-between gap-8">
+          {/* ... (diğer grid sütunları burada) ... */}
+        </div>
+
         <div className="flex flex-wrap justify-between gap-8">
           {/* Brand Column */}
           <div className="space-y-4">
@@ -91,6 +95,7 @@ export default function Footer() {
                 </Link>
               </li>
             </ul>
+
           </div>
 
           {/* Contact */}
@@ -109,16 +114,23 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-[#FFCDB2]">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <p className="text-[#994D1C] text-sm">
-              &copy; {currentYear} KAVUNLA. {t('footer.allRightsReserved')}
-            </p>
-            <div className="mt-4 md:mt-0">
-              <div className="flex items-center gap-16">
- 
-              </div>
-            </div>
+        {/* Copyright ve Dil Değiştirme Butonları aynı satırda */}
+        <div className="flex flex-col md:flex-row items-center justify-between border-t border-[#FFCDB2] pt-4 mt-8 gap-2">
+          <span className="text-[#994D1C] text-sm">© {currentYear} KAVUNLA. Tüm hakları saklıdır.</span>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setLanguage('tr')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-300 ${language === 'tr' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
+            >
+              TR
+            </button>
+            <span className="text-gray-400">|</span>
+            <button
+              onClick={() => setLanguage('en')}
+              className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-300 ${language === 'en' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
+            >
+              EN
+            </button>
           </div>
         </div>
       </div>
