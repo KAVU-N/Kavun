@@ -175,7 +175,7 @@ const typedUser = user as User | null;
       }`} suppressHydrationWarning>
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo - LEFT */}
+            {/* Logo - LEFT ve mobilde navLinks */}
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center space-x-2 group">
                 <Image
@@ -186,28 +186,33 @@ const typedUser = user as User | null;
                   className="mr-2"
                 />
                 <span className={`text-2xl font-bold transition-all duration-300 ${
-                  pathname === '/' ? 'text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.20)]' : (isScrolled ? 'text-[#6B3416]' : 'text-[#994D1C]')
+                  pathname === '/'
+                    ? (isScrolled
+                        ? 'text-[#994D1C]'
+                        : 'text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.20)]')
+                    : (isScrolled ? 'text-[#6B3416]' : 'text-[#994D1C]')
                 } group-hover:text-[#FF8B5E]`}>
                   KAVUNLA
                 </span>
               </Link>
+              {/* Mobilde hamburger menüsü kapalıyken navLinks */}
+              {!isMenuOpen && isMobile && (
+                <div className="flex items-center space-x-1 ml-2">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`group flex items-center space-x-2 px-3 py-2 rounded-xl font-semibold transition-all duration-300 ${
+                        pathname === '/' ? (isScrolled ? 'text-[#994D1C] hover:text-[#FF8B5E]' : 'text-white hover:text-[#FF8B5E]') : 'text-[#994D1C]'
+                      } hover:bg-[#FFE5D9]`}
+                    >
+                      <span className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">{link.icon}</span>
+                      <span>{link.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-
-            {/* Mobilde navLinks hamburger menü butonunun solunda */}
-            {!isMenuOpen && (
-              <div className="flex md:hidden items-center space-x-1 ml-2">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`group flex items-center space-x-2 px-3 py-2 rounded-xl font-semibold text-[#994D1C] hover:bg-[#FFE5D9] transition-all duration-300`}
-                  >
-                    <span className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">{link.icon}</span>
-                    <span>{link.label}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
 
             {/* Mobile Menu Button - Only visible when menu is closed */}
             {!isMenuOpen && (
@@ -238,11 +243,13 @@ const typedUser = user as User | null;
                     key={link.href}
                     href={link.href}
                     className={`group flex items-center space-x-2 px-4 py-2 rounded-xl transform transition-all duration-500 ${
-                      pathname === link.href
-                        ? (pathname === '/' ? 'text-white font-semibold bg-[#994D1C]/80 shadow-md' : 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md')
-                        : (pathname === '/' ? 'text-white/90 font-semibold hover:text-[#FFD6B2] hover:bg-[#994D1C]/80 hover:-translate-y-1 hover:shadow-lg' : (link.href === '/ilanlar' || link.href === '/kaynaklar')
-                          ? 'text-[#994D1C] font-semibold hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
-                          : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg')
+                      pathname === '/' && isScrolled
+                        ? 'text-[#994D1C] font-semibold hover:text-[#FF8B5E]'
+                        : pathname === link.href
+                          ? (pathname === '/' ? 'text-white font-semibold bg-[#994D1C]/80 shadow-md' : 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md')
+                          : (pathname === '/' ? 'text-white/90 font-semibold hover:text-[#FFD6B2] hover:bg-[#994D1C]/80 hover:-translate-y-1 hover:shadow-lg' : (link.href === '/ilanlar' || link.href === '/kaynaklar')
+                            ? 'text-[#994D1C] font-semibold hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
+                            : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg')
                     }`}
                   >
                     <div className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
@@ -455,27 +462,7 @@ const typedUser = user as User | null;
               </button>
             </div>
             <div className="px-4 py-3 space-y-1">
-              
-              
-              {mounted && user && (typedUser?.role === 'instructor' || typedUser?.role === 'teacher') && (
-                <>
-                  <Link
-                    href="/ilan-ver"
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                      pathname === '/ilan-ver'
-                        ? 'text-[#6B3416] font-medium bg-[#FFF5F0] shadow-sm'
-                        : 'bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white'
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <span>{t('nav.createListing')}</span>
-                  </Link>
-
-                </>
-              )}
+              {/* Mobilde navLinks artık hamburger menüde gösterilmeyecek */}
               
               {!user ? (
                 <div className="flex flex-col space-y-2 mt-4">
@@ -561,7 +548,9 @@ const typedUser = user as User | null;
                     <>
                       <Link
                         href="/ilanlarim"
-                        className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
+                        className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                        pathname === '/' && isScrolled ? 'text-[#994D1C]' : 'text-[#994D1C]'
+                      } hover:text-[#6B3416] hover:bg-[#FFF5F0]`}
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -572,18 +561,6 @@ const typedUser = user as User | null;
                       
                     </>
                   )}
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0] text-left"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Çıkış Yap</span>
-                  </button>
                 </div>
               )}
             </div>
