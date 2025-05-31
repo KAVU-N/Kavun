@@ -9,7 +9,8 @@ import User from '@/models/User';
 export async function GET(request: Request) {
   await connectDB();
   // Token'dan kullanıcıyı al
-  const user = await getUserFromToken(request);
+  const authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
+  const user = await getUserFromToken(authHeader);
   if (!user || !user.id) {
     return NextResponse.json({ notifications: [] });
   }

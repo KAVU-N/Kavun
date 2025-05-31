@@ -13,33 +13,41 @@ export interface UserJwtPayload {
   name?: string;
 }
 
-// Token'dan kullanıcı bilgilerini çıkaran fonksiyon
-export async function getUserFromToken(request: Request | NextRequest): Promise<UserJwtPayload | null> {
+// Token'dan kullanıcı bilgilerini çıkaran fonksiyon (hem Request/NextRequest hem string token destekler)
+export async function getUserFromToken(requestOrToken: Request | { headers: { authorization?: string } } | string): Promise<UserJwtPayload | null> {
   try {
-    // Authorization header'dan token'ı al
-    const authHeader = request.headers.get('Authorization');
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('Token bulunamadı veya geçersiz format');
-      return null;
+    let token = '';
+    if (typeof requestOrToken === 'string') {
+      // Direkt token geldi (pages/api)
+      token = requestOrToken.replace('Bearer ', '');
+    } else if ('headers' in requestOrToken && typeof requestOrToken.headers === 'object') {
+      // pages/api: req.headers['authorization']
+      const authHeader = requestOrToken.headers['authorization'] || requestOrToken.headers['Authorization'];
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log('Token bulunamadı veya geçersiz format');
+        return null;
+      }
+      token = authHeader.split(' ')[1];
+    } else if (requestOrToken instanceof Request) {
+      // app router: Request
+      const authHeader = requestOrToken.headers.get('Authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log('Token bulunamadı veya geçersiz format');
+        return null;
+      }
+      token = authHeader.split(' ')[1];
     }
-    
-    const token = authHeader.split(' ')[1];
-    
     if (!token) {
       console.log('Token boş');
       return null;
     }
-    
     // Token'ı doğrula ve payload'ı çıkar
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as UserJwtPayload;
-      
       if (!decoded || !decoded.id) {
         console.log('Token doğrulanamadı veya ID bulunamadı');
         return null;
       }
-      
       console.log('Token başarıyla doğrulandı, kullanıcı ID:', decoded.id);
       return decoded;
     } catch (jwtError) {
@@ -51,6 +59,7 @@ export async function getUserFromToken(request: Request | NextRequest): Promise<
     return null;
   }
 }
+
 
 // Kullanıcı tipi için arayüz tanımla
 interface UserWithId {

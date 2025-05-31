@@ -927,37 +927,37 @@ const translations: Record<Language, Record<string, string>> = {
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('tr');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Tarayıcıda localStorage'dan dil tercihini al
     if (typeof window !== 'undefined') {
       const savedLanguage = localStorage.getItem('language') as Language;
       if (savedLanguage && (savedLanguage === 'tr' || savedLanguage === 'en')) {
         setLanguage(savedLanguage);
       }
+      setMounted(true);
     }
   }, []);
 
-  // Dil değiştiğinde localStorage'a kaydet
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('language', language);
     }
   }, [language]);
 
-  // Çeviri fonksiyonu
   const t = (key: string, params?: Record<string, any>): string => {
     let translation = translations[language][key] || key;
-    
-    // Parametreli çeviri desteği
     if (params) {
       Object.keys(params).forEach(param => {
         translation = translation.replace(`{${param}}`, params[param]);
       });
     }
-    
     return translation;
   };
+
+  if (!mounted) {
+    return <div />;
+  }
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

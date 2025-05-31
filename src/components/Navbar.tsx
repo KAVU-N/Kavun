@@ -130,23 +130,22 @@ export default function Navbar() {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      // Gerçek uygulamada API'den bildirimleri çekeceksiniz
-      // Burada örnek olarak rastgele bir sayı atıyoruz
-      // const response = await fetch('/api/notifications/unread', {
-      //   headers: {
-      //     'Authorization': `Bearer ${token}`
-      //   }
-      // });
-      //
-      // if (response.ok) {
-      //   const data = await response.json();
-      //   setUnreadNotifications(data.count || 0);
-      // }
+      // Gerçek API'den okunmamış bildirim sayısını çek
+      const response = await fetch('/api/notifications/unread', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-      // Örnek veri
-      setUnreadNotifications(Math.floor(Math.random() * 5)); // 0-4 arası rastgele bir sayı
+      if (response.ok) {
+        const data = await response.json();
+        setUnreadNotifications(data.count || 0);
+      } else {
+        setUnreadNotifications(0);
+      }
     } catch (error) {
       console.error('Okunmamış bildirimler kontrol edilirken hata oluştu:', error);
+      setUnreadNotifications(0);
     }
   };
 

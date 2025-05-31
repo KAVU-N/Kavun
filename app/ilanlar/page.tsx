@@ -195,7 +195,7 @@ export default function IlanlarPage() {
                   className={`px-5 py-4 rounded-xl flex items-center justify-center md:w-auto transition-all duration-200 ${showFilters ? 'bg-[#FFB996] text-white' : 'bg-[#FFE5D9] text-[#6B3416] hover:bg-[#FFDAC1]'}`}
                 >
                   <FaFilter className="mr-2" />
-                  {t('general.filters')} {showFilters ? `(${t('general.open')})` : ''}
+                  {t('general.filters')} {showFilters ? (language === 'tr' ? '(Açık)' : '(Open)') : ''}
                 </button>
                 <button
                   type="submit"
@@ -324,11 +324,7 @@ export default function IlanlarPage() {
                   ? t('general.noSearchResults')
                   : t('general.noListingsYet')}
               </h3>
-              <p className="text-[#994D1C] mb-6 max-w-md mx-auto">
-                {searchTerm 
-                  ? `"${searchTerm}" ${t('general.noResultsForSearch')}` 
-                  : t('general.listingsWillAppearHere')}
-              </p>
+              
               {(searchTerm || filters.method || filters.priceMin || filters.priceMax) && (
                 <button 
                   onClick={() => {
