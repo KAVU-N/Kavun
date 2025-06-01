@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import Image from 'next/image';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 
@@ -24,7 +24,7 @@ export default function LoginPage() {
     const password = formData.get('password') as string;
 
     try {
-      await login({ email, password });
+      await login(email, password);
     } catch (err: any) {
       setError(err.message || t('errors.loginError') || 'Giriş yaparken bir hata oluştu');
     } finally {

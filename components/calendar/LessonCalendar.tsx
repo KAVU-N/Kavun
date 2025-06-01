@@ -6,7 +6,7 @@ import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/tr';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 // Moment yerelleştirmesi

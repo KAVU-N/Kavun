@@ -2,7 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import ReviewsList from '@/components/reviews/ReviewsList';
 import StarRating from '@/components/reviews/StarRating';

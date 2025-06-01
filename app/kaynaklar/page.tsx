@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import Link from 'next/link';
 
 // Kaynak kategorileri
@@ -63,6 +63,13 @@ type Resource = {
 };
 
 export default function KaynaklarPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  const { user } = useAuth();
+  useEffect(() => {
+    // Sadece bir kere ilk renderda user'ı logla
+    console.log('[KaynaklarPage] user:', user);
+  }, []);
   const [showPremiumBlock, setShowPremiumBlock] = useState(false);
 
   // Kaynakları indir
@@ -133,7 +140,7 @@ export default function KaynaklarPage() {
   const academicLevels = language === 'en'
     ? ['All', 'Associate Degree', 'Bachelors', 'Masters', 'PhD']
     : ['Hepsi', 'Ön Lisans', 'Lisans', 'Yüksek Lisans', 'Doktora'];
-  const { user } = useAuth();
+  
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -307,18 +314,22 @@ export default function KaynaklarPage() {
             {t('general.allResources')}
           </p>
         </div>
-        {user && (
-          <Link
-            href="/kaynaklar/paylas"
-            className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-xl 
-              transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 flex items-center"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            {t('general.shareResource')}
-          </Link>
-        )}
+        <button
+  onClick={() => {
+    if (user) {
+      window.location.href = '/kaynaklar/paylas';
+    } else {
+      window.location.href = '/auth/register';
+    }
+  }}
+  className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-xl \
+    transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 flex items-center"
+>
+  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+  </svg>
+  {t('general.shareResource')}
+</button>
       </div>
       
       {/* Arama ve Filtreleme */}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Notification from './Notification';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
@@ -22,7 +22,7 @@ interface Ilan {
 }
 
 export default function IlanlarimPage() {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [ilanlar, setIlanlar] = useState<Ilan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,12 +30,12 @@ export default function IlanlarimPage() {
 
   // Sadece eğitmen (instructor) rolüne sahip kullanıcıların erişimine izin ver
   useEffect(() => {
-    if (!loading && !user) {
+    if (!user) {
       router.push('/auth/login');
-    } else if (!loading && user && user.role !== 'instructor' && user.role !== 'teacher') {
+    } else if (user && user.role !== 'instructor' && user.role !== 'teacher') {
       router.push('/');
     }
-  }, [user, loading, router]);
+  }, [user, router]);
 
   useEffect(() => {
     const fetchIlanlar = async () => {
@@ -141,18 +141,7 @@ export default function IlanlarimPage() {
   };
 
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white pt-20">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center py-12">
-            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
+
   // Kullanıcı giriş yapmamış veya eğitmen değilse içeriği gösterme
   if (!user || user.role !== 'instructor' && user.role !== 'teacher') {
     return (

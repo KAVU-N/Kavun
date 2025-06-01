@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/src/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import Link from 'next/link';
 
 // Kaynak kategorileri (multilingual keys)

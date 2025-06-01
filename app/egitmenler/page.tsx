@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import Image from 'next/image';
 import { FaChalkboardTeacher, FaGraduationCap, FaStar, FaSearch, FaUniversity } from 'react-icons/fa';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import ChatBox from '@/src/components/ChatBox';
 
@@ -43,15 +43,15 @@ export default function InstructorsPage() {
   const [activeChat, setActiveChat] = useState<Instructor | null>(null);
   const [selectedDepartment, setSelectedDepartment] = useState<string>('');
   const [selectedRating, setSelectedRating] = useState<string>('all');
-  const { user } = useAuth();
+  const { user, authChecked } = useAuth();
   const router = useRouter();
 
-  // Kullanıcı giriş yapmamışsa login sayfasına yönlendir
+  // Sadece authChecked true olduğunda ve user yoksa login'e yönlendir
   useEffect(() => {
-    if (!user) {
+    if (authChecked && !user) {
       router.push('/auth/login');
     }
-  }, [user, router]);
+  }, [user, authChecked, router]);
 
   // Filtrelenmiş eğitmenler
   const filteredInstructors = instructors.filter((instructor) => {
@@ -107,8 +107,8 @@ export default function InstructorsPage() {
     }
   }, [searchTerm, user]);
 
-  // Eğer kullanıcı henüz yüklenmemişse veya giriş yapmamışsa yükleniyor göster
-  if (!user) {
+  // Eğer kullanıcı localStorage'dan yüklenmediyse loading göster
+  if (!authChecked) {
     return (
       <div className="min-h-screen bg-white pt-20">
         <div className="container mx-auto px-4">
@@ -119,6 +119,9 @@ export default function InstructorsPage() {
       </div>
     );
   }
+
+  // Eğer localStorage kontrolü bitti ve user yoksa, yönlendirme zaten yapılacak
+  if (authChecked && !user) return null;
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">

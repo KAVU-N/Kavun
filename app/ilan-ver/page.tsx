@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { FaPaperPlane } from 'react-icons/fa';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 
 export default function IlanVerPage() {
   const { user, loading } = useAuth();
+  console.log('ilan-ver/page user:', user, 'loading:', loading);
   const router = useRouter();
   const { t } = useLanguage();
   const [formData, setFormData] = useState({
@@ -20,11 +21,16 @@ export default function IlanVerPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  if (loading) {
+    return <div className="flex justify-center items-center h-96 text-xl">Yükleniyor...</div>;
+  }
+
   // Sadece eğitmen (instructor) veya öğretmen (teacher) rolüne sahip kullanıcıların erişimine izin ver
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading) return;
+    if (!user) {
       router.push('/auth/login');
-    } else if (!loading && user && !['instructor', 'teacher'].includes(user.role)) {
+    } else if (user && !['instructor', 'teacher'].includes(user.role)) {
       router.push('/');
     }
   }, [user, loading, router]);
@@ -35,53 +41,65 @@ export default function IlanVerPage() {
   };
 
   // Yasaklı kelimeler listesi
-  const bannedWords = [
-    "amk", "aq", "orospu", "piç", "sik", "sikerim", "siktir", "yarrak", "ananı", "anan",
-    "babanı", "baban", "göt", "got", "götveren", "pezevenk", "kahpe", "ibne", "ibneyim", "ibneler",
-    "ibnelik", "döl", "bok", "boktan", "boklu", "sikik", "sikilmiş", "amına", "koyayım", "koydum",
-    "koyarım", "kodum", "koduğum", "koyduğum", "koyduklarım", "siktiğim", "siktiğimin", "siktiğiminin",
-    "siktirgit", "siktir ol", "siktir et", "siktirip", "siktiriboktan", "siktirola", "siktiribok",
-    "amcık", "amcıklar", "amcığa", "amcığı", "amcığın", "amcığım", "amcığına", "amcığından",
-    "amcığını", "amcığınına", "amcığınından", "amcığınından", "amcığınından", "amcığınından",
-    "yarrağımı", "yarrağımın", "yarrağımda", "yarrağımdan", "yarrağımla", "yarrağımsı", "yarrağımsın",
-    "yarrağımsına", "yarrağımsınız", "yarrağımsınlar", "götlek", "götleğim", "götleğin", "götleği",
-    "götleğine", "götleğimi", "götleğimin", "götleğimde", "götleğimden", "götleğimle", "götleğimsi",
-    "götleğimsin", "götleğimsi", "götleğimsiniz", "götleğimsinler", "pezevenk", "pezevengim",
-    "pezevengin", "pezevengi", "pezevengine", "pezevengimi", "pezevengimin", "pezevengimde",
-    "pezevengimden", "pezevengimle", "pezevengimsi", "pezevengimsin", "pezevengimsi", "pezevengimsiniz",
-    "pezevengimsinler", "kaltak", "kaltaklık", "kaltaklar", "kaltaklığı", "kaltaklığa", "kaltaklıkta",
-    "kaltaklıktan", "kaltaklıkla", "kaltaklıksı", "kaltaklıksın", "kaltaklıksınız", "kaltaklıklar",
-    "sikik", "sikiklik", "sikikler", "sikikliği", "sikikliğe", "sikiklikte", "sikiklikten", "sikiklikle",
-    "sikikliksi", "sikikliksin", "sikikliksiniz", "sikiklikler", "sikiklikleri", "sikikliklere"
+  // +18 ve uygunsuz kelimeler, spam ve anlamsız içerikler dahil
+const bannedWords = [
+  // Küfür ve argo
+  "amk", "aq", "orospu", "piç", "sik", "sikerim", "siktir", "yarrak", "ananı", "anan",
+  "babanı", "baban", "göt", "got", "götveren", "pezevenk", "kahpe", "ibne", "ibneyim", "ibneler",
+  "ibnelik", "döl", "bok", "boktan", "boklu", "sikik", "sikilmiş", "amına", "koyayım", "koydum",
+  "koyarım", "kodum", "koduğum", "koyduğum", "koyduklarım", "siktiğim", "siktiğimin", "siktiğiminin",
+  "siktirgit", "siktir ol", "siktir et", "siktirip", "siktiriboktan", "siktirola", "siktiribok",
+  "amcık", "amcıklar", "amcığa", "amcığı", "amcığın", "amcığım", "amcığına", "amcığından",
+  "amcığını", "amcığınına", "yarrağımı", "yarrağımın", "yarrağımda", "yarrağımdan",
+  "yarrağımla", "yarrağımsı", "yarrağımsın", "yarrağımsına", "yarrağımsınız", "yarrağımsınlar",
+  "götlek", "götleğim", "götleğin", "götleği", "götleğine", "götleğimi", "götleğimin", "götleğimde",
+  "götleğimden", "götleğimle", "götleğimsi", "götleğimsin", "götleğimsi", "götleğimsiniz", "götleğimsinler",
+  "pezevenk", "pezevengim", "pezevengin", "pezevengi", "pezevengine", "pezevengimi", "pezevengimin", "pezevengimde",
+  "pezevengimden", "pezevengimle", "pezevengimsi", "pezevengimsin", "pezevengimsi", "pezevengimsiniz", "pezevengimsinler",
+  "kaltak", "kaltaklık", "kaltaklar", "kaltaklığı", "kaltaklığa", "kaltaklıkta", "kaltaklıktan", "kaltaklıkla", "kaltaklıksı", "kaltaklıksın", "kaltaklıksınız", "kaltaklıklar",
+  "sikik", "sikiklik", "sikikler", "sikikliği", "sikikliğe", "siklikte", "siklikten", "siklikle", "sikliksi", "sikliksin", "sikliksiniz", "siklikler", "siklikleri", "sikliklere",
+  // +18, müstehcen
+  "porn", "porno", "pornografi", "seks", "sex", "seksüel", "erotik", "mastürb", "masturb", "vajina", "penis", "göğüs", "memeler", "anal", "dildo", "vajinal", "vajin", "vajina", "vajinismus", "vajinal",
+  "fetish", "fetis", "fetishist", "fetisist", "fetiş", "fetişist", "fetişizm", "fetişistlik", "fetişizmci", "fetişistlik",
+  // Rastgele, anlamsız, spam
+  "asdasd", "qweqwe", "qwerty", "asdfgh", "lorem", "ipsum", "test", "deneme", "123456", "654321", "111111", "222222", "333333", "abcdef", "ghijkl", "zxczxc", "xcvbnm"
+];
+
+// Anlamsız içerik tespiti fonksiyonu (tekil ve globalde tanımlı)
+function isNonsense(text: string) {
+  const patterns = [
+    /^(a{3,}|s{3,}|d{3,}|w{3,}|q{3,}|z{3,}|x{3,}|c{3,}|v{3,}|b{3,}|n{3,}|m{3,})$/i,
+    /^(123456|654321|111111|222222|333333|abcdef|ghijkl|zxczxc|xcvbnm)$/i,
+    /^(asdasd|qweqwe|qwerty|asdfgh|lorem|ipsum|test|deneme)$/i
   ];
+  return patterns.some(re => re.test(text.trim().toLowerCase()));
+}
 
-  function containsBannedWords(text: string) {
-    const lower = text.toLocaleLowerCase('tr');
-    return bannedWords.some(word => lower.includes(word));
-  }
+function containsBannedWords(text: string) {
+  const lower = text.toLocaleLowerCase('tr');
+  return bannedWords.some(word => lower.includes(word));
+}
 
-  // Ekstra güvenlik fonksiyonları
-  function hasRepeatedChars(text: string, count = 3) {
-    // aaa, !!!, ??? gibi tekrarları engelle
-    const regex = new RegExp(`(.)\\1{${count-1},}`);
-    return regex.test(text);
-  }
-  function isAllUpperCase(text: string) {
-    return text.length > 2 && text === text.toLocaleUpperCase('tr');
-  }
-  function containsSpamPhrases(text: string) {
-    const spamWords = [
-      'whatsapp', 'telegram', 'acil', 'satılık', 'bedava', 'ücretsiz', 'takipçi', 'takipci', 'instagram', 'tiktok', 'hemen ulaş', 'hemen ulas', 'hemen yaz', 'direkt mesaj', 'dm', 'wp', 'numaram', 'bana ulaş', 'bana ulas'
-    ];
-    const lower = text.toLocaleLowerCase('tr');
-    return spamWords.some(word => lower.includes(word));
-  }
+function hasRepeatedChars(text: string, count = 3) {
+  // aaa, !!!, ??? gibi tekrarları engelle
+  const regex = new RegExp(`(.)\\1{${count-1},}`);
+  return regex.test(text);
+}
+
+function isAllUpperCase(text: string) {
+  return text.length > 2 && text === text.toLocaleUpperCase('tr');
+}
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim()) {
       setError(t('errors.titleRequired') || 'Lütfen bir başlık girin');
+      return;
+    }
+    if (isNonsense(formData.title)) {
+      setError('Başlıkta anlamsız veya rastgele karakter dizisi kullanılamaz!');
       return;
     }
     if (formData.title.length > 100) {
@@ -96,17 +114,17 @@ export default function IlanVerPage() {
       setError('Başlık tamamen büyük harf olamaz!');
       return;
     }
-    if (containsSpamPhrases(formData.title)) {
-      setError('Başlıkta spam veya iletişim amaçlı kelime kullanılamaz!');
-      return;
-    }
     if (containsBannedWords(formData.title)) {
       setError(t('errors.bannedWordTitle') || 'Başlıkta uygunsuz kelime kullanılamaz!');
       return;
     }
-    
+
     if (!formData.description.trim()) {
       setError(t('errors.descriptionRequired') || 'Lütfen bir açıklama girin');
+      return;
+    }
+    if (isNonsense(formData.description)) {
+      setError('Açıklamada anlamsız veya rastgele karakter dizisi kullanılamaz!');
       return;
     }
     if (formData.description.length > 1000) {
@@ -121,27 +139,20 @@ export default function IlanVerPage() {
       setError('Açıklama tamamen büyük harf olamaz!');
       return;
     }
-    if (containsSpamPhrases(formData.description)) {
-      setError('Açıklamada spam veya iletişim amaçlı kelime kullanılamaz!');
-      return;
-    }
     if (containsBannedWords(formData.description)) {
       setError(t('errors.bannedWordDescription') || 'Açıklamada uygunsuz kelime kullanılamaz!');
       return;
     }
-    
+
     if (!formData.price.trim()) {
       setError(t('errors.priceRequired') || 'Lütfen ücret bilgisi girin');
       return;
     }
-    
-    // instructorFrom validation removed
-    
-    
+
     try {
       setIsSubmitting(true);
       setError('');
-      
+
       // Kullanıcı bilgisini kontrol et
       if (!user || !user.id) {
         setError(t('errors.userIdNotFound') || 'Kullanıcı kimliği bulunamadı. Lütfen tekrar giriş yapın.');
@@ -197,38 +208,14 @@ export default function IlanVerPage() {
       
     } catch (err: any) {
       console.error(t('logs.listingCreationError') || 'İlan oluşturulurken hata:', err);
-      // Daha detaylı hata mesajı göster
       setError(err.message || t('errors.listingCreationErrorTryAgain') || 'İlan oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
-      
-      // Hata detaylarını konsola yazdır
-      if (err.response) {
-        try {
-          const errorData = await err.response.json();
-          console.error('API error details:', errorData);
-        } catch (e) {
-          console.error('Error parsing API error:', e);
-        }
-      }
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#FFF5F0] pt-20">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center py-12">
-            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
-            <p className="mt-4 text-[#6B3416]">{t('general.loading')}</p>
-          </div>
-        </div>
-      </div>
-    );
   }
-  
+
   // Kullanıcı giriş yapmamış veya eğitmen değilse içeriği gösterme
-  if (!user || user.role !== 'instructor' && user.role !== 'teacher') {
+  if (!user || (user.role !== 'instructor' && user.role !== 'teacher')) {
     return (
       <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
         <div className="container mx-auto px-4">
@@ -360,4 +347,4 @@ export default function IlanVerPage() {
       </div>
     </div>
   );
-} 
+}

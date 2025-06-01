@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -34,7 +34,7 @@ interface Ilan {
 }
 
 export default function IlanlarPage() {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const [ilanlar, setIlanlar] = useState<Ilan[]>([]);
@@ -52,10 +52,11 @@ export default function IlanlarPage() {
   const itemsPerPage = 9;
 
   useEffect(() => {
-    if (!loading && !user) {
+    // user null olduğunda login sayfasına yönlendir
+    if (user === null) {
       router.push('/auth/login');
     }
-  }, [user, loading, router]);
+  }, [user, router]);
 
   useEffect(() => {
     const fetchIlanlar = async () => {
@@ -78,7 +79,6 @@ export default function IlanlarPage() {
           : `/api/ilanlar/university?university=${encodeURIComponent(user.university)}`;
         
         console.log('Fetching listings from URL:', url);
-        console.log('User university:', user.university);
         
         const response = await fetch(url);
         
@@ -146,7 +146,7 @@ export default function IlanlarPage() {
     return 0;
   });
 
-  if (loading || !user) {
+  if (isLoading || !user) {
     return (
       <div className="min-h-screen bg-white pt-20">
         <div className="container mx-auto px-4">

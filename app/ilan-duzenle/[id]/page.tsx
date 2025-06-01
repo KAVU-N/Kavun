@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/src/context/AuthContext";
 
 interface Ilan {
   _id: string;
@@ -57,26 +57,42 @@ export default function IlanDuzenlePage({ params }: { params: { id: string } }) 
   };
 
   // Yasaklı kelimeler listesi
-  const bannedWords = [
-    "amk", "aq", "orospu", "piç", "sik", "sikerim", "siktir", "yarrak", "ananı", "anan",
-    "babanı", "baban", "göt", "got", "götveren", "pezevenk", "kahpe", "ibne", "ibneyim", "ibneler",
-    "ibnelik", "döl", "bok", "boktan", "boklu", "sikik", "sikilmiş", "amına", "koyayım", "koydum",
-    "koyarım", "kodum", "koduğum", "koyduğum", "koyduklarım", "siktiğim", "siktiğimin", "siktiğiminin",
-    "siktirgit", "siktir ol", "siktir et", "siktirip", "siktiriboktan", "siktirola", "siktiribok",
-    "amcık", "amcıklar", "amcığa", "amcığı", "amcığın", "amcığım", "amcığına", "amcığından",
-    "amcığını", "amcığınına", "amcığınından", "amcığınından", "amcığınından", "amcığınından",
-    "yarrağımı", "yarrağımın", "yarrağımda", "yarrağımdan", "yarrağımla", "yarrağımsı", "yarrağımsın",
-    "yarrağımsına", "yarrağımsınız", "yarrağımsınlar", "götlek", "götleğim", "götleğin", "götleği",
-    "götleğine", "götleğimi", "götleğimin", "götleğimde", "götleğimden", "götleğimle", "götleğimsi",
-    "götleğimsin", "götleğimsi", "götleğimsiniz", "götleğimsinler", "pezevenk", "pezevengim",
-    "pezevengin", "pezevengi", "pezevengine", "pezevengimi", "pezevengimin", "pezevengimde",
-    "pezevengimden", "pezevengimle", "pezevengimsi", "pezevengimsin", "pezevengimsi", "pezevengimsiniz",
-    "pezevengimsinler", "kaltak", "kaltaklık", "kaltaklar", "kaltaklığı", "kaltaklığa", "kaltaklıkta",
-    "kaltaklıktan", "kaltaklıkla", "kaltaklıksı", "kaltaklıksın", "kaltaklıksınız", "kaltaklıklar",
-    "sikik", "sikiklik", "sikikler", "sikikliği", "sikikliğe", "sikiklikte", "sikiklikten", "sikiklikle",
-    "sikikliksi", "sikikliksin", "sikikliksiniz", "sikiklikler", "sikiklikleri", "sikikliklere"
+  // +18 ve uygunsuz kelimeler, spam ve anlamsız içerikler dahil
+const bannedWords = [
+  // Küfür ve argo
+  "amk", "aq", "orospu", "piç", "sik", "sikerim", "siktir", "yarrak", "ananı", "anan",
+  "babanı", "baban", "göt", "got", "götveren", "pezevenk", "kahpe", "ibne", "ibneyim", "ibneler",
+  "ibnelik", "döl", "bok", "boktan", "boklu", "sikik", "sikilmiş", "amına", "koyayım", "koydum",
+  "koyarım", "kodum", "koduğum", "koyduğum", "koyduklarım", "siktiğim", "siktiğimin", "siktiğiminin",
+  "siktirgit", "siktir ol", "siktir et", "siktirip", "siktiriboktan", "siktirola", "siktiribok",
+  "amcık", "amcıklar", "amcığa", "amcığı", "amcığın", "amcığım", "amcığına", "amcığından",
+  "amcığını", "amcığına", "amcığından", "yarrağımı", "yarrağımın", "yarrağımda", "yarrağımdan",
+  "yarrağımla", "yarrağımsı", "yarrağımsın", "yarrağımsına", "yarrağımsınız", "yarrağımsınlar",
+  "götlek", "götleğim", "götleğin", "götleği", "götleğine", "götleğimi", "götleğimin", "götleğimde",
+  "götleğimden", "götleğimle", "götleğimsi", "götleğimsin", "götleğimsi", "götleğimsiniz", "götleğimsinler",
+  "pezevenk", "pezevengim", "pezevengin", "pezevengi", "pezevengine", "pezevengimi", "pezevengimin", "pezevengimde",
+  "pezevengimden", "pezevengimle", "pezevengimsi", "pezevengimsin", "pezevengimsi", "pezevengimsiniz", "pezevengimsinler",
+  "kaltak", "kaltaklık", "kaltaklar", "kaltaklığı", "kaltaklığa", "kaltaklıkta", "kaltaklıktan", "kaltaklıkla", "kaltaklıksı", "kaltaklıksın", "kaltaklıksınız", "kaltaklıklar",
+  "sikik", "sikiklik", "sikikler", "siklikliği", "siklikle", "siklikte", "siklikten", "siklikle", "sikliksi", "sikliksin", "sikliksiniz", "siklikler", "siklikleri", "sikliklere",
+  // +18, müstehcen
+  "porn", "porno", "pornografi", "seks", "sex", "seksüel", "erotik", "mastürb", "masturb", "vajina", "penis", "göğüs", "memeler", "anal", "dildo", "vajinal", "vajin", "vajina", "vajinismus", "vajinal",
+  "fetish", "fetis", "fetishist", "fetisist", "fetiş", "fetişist", "fetişizm", "fetişistlik", "fetişizmci", "fetişistlik",
+  // Rastgele, anlamsız, spam
+  "asdasd", "qweqwe", "qwerty", "asdfgh", "lorem", "ipsum", "test", "deneme", "123456", "654321", "111111", "222222", "333333", "abcdef", "ghijkl", "zxczxc", "xcvbnm"
+];
+
+// Anlamsız içerik tespiti
+function isNonsense(text: string) {
+  const patterns = [
+    /^(a{3,}|s{3,}|d{3,}|w{3,}|q{3,}|z{3,}|x{3,}|c{3,}|v{3,}|b{3,}|n{3,}|m{3,})$/i,
+    /^(123456|654321|111111|222222|333333|abcdef|ghijkl|zxczxc|xcvbnm)$/i,
+    /^(asdasd|qweqwe|qwerty|asdfgh|lorem|ipsum|test|deneme)$/i
   ];
-  function containsBannedWords(text: string) {
+  return patterns.some(re => re.test(text.trim().toLowerCase()));
+}
+
+// (DUPLICATE/Fazlalık bannedWords stringleri silindi, sadece fonksiyonlar kaldı)
+function containsBannedWords(text: string) {
     const lower = text.toLocaleLowerCase('tr');
     return bannedWords.some(word => lower.includes(word));
   }
@@ -106,6 +122,12 @@ export default function IlanDuzenlePage({ params }: { params: { id: string } }) 
     } else if (!ilan.title.trim()) {
       setError('Başlık zorunludur!');
       hasError = true;
+    } else if (isNonsense(ilan.title)) {
+      setError('Başlıkta anlamsız veya rastgele karakter dizisi kullanılamaz!');
+      hasError = true;
+    
+      setError('Başlık zorunludur!');
+      hasError = true;
     } else if (ilan.title.length > 100) {
       setError('Başlık 100 karakterden uzun olamaz!');
       hasError = true;
@@ -122,6 +144,12 @@ export default function IlanDuzenlePage({ params }: { params: { id: string } }) 
       setError('Başlıkta uygunsuz kelime kullanılamaz!');
       hasError = true;
     } else if (!ilan.description.trim()) {
+      setError('Açıklama zorunludur!');
+      hasError = true;
+    } else if (isNonsense(ilan.description)) {
+      setError('Açıklamada anlamsız veya rastgele karakter dizisi kullanılamaz!');
+      hasError = true;
+    
       setError('Açıklama zorunludur!');
       hasError = true;
     } else if (ilan.description.length > 1000) {

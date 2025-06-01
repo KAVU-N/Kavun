@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Notification from './Notification';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import ChatBox from '@/src/components/ChatBox';
@@ -40,7 +40,7 @@ export default function MessagesPage() {
   }, []);
 
   useEffect(() => {
-    if (user && mounted) {
+    if (user) {
       fetchConversations();
     }
   }, [user, mounted]);

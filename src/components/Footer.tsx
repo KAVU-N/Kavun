@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from 'src/context/AuthContext';
+import { useLanguage } from 'src/contexts/LanguageContext';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

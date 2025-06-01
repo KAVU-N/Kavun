@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -9,29 +9,15 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useMemo } from 'react';
 
 export default function ProfilePage() {
-  const { user: authUser, loading: authLoading, setUser } = useAuth();
+  const { user: authUser } = useAuth();
   const router = useRouter();
   const { t } = useLanguage();
 
   // Kullanıcı yoksa login'e yönlendir veya yükleniyor ise loading göster
-  if (!authUser || authLoading) {
-    if (!authLoading && !authUser) {
-      router.push('/auth/login');
-      return null;
-    }
-    return (
-      <div className="min-h-screen bg-[#FFF5F0] pt-20">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#FFE5D9]">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFB996]"></div>
-              <span className="ml-3 text-[#994D1C]">{t('general.loading')}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!authUser) {
+  router.push('/auth/login');
+  return null;
+}
 
   // useMemo ile rol etiketi ve baş harf
   const roleLabel = useMemo(() => authUser.role === 'student' ? t('auth.student') : t('auth.instructor'), [authUser.role, t]);

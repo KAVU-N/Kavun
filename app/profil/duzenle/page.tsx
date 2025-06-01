@@ -5,7 +5,7 @@ import Notification from './Notification';
 import Cropper from 'react-easy-crop';
 import Modal from 'react-modal';
 import getCroppedImg from './utils/cropImage'; // Kırpma yardımcı fonksiyonu (aşağıda eklenecek)
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/src/contexts/LanguageContext';
@@ -17,7 +17,7 @@ export default function ProfileEditPage() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
-  const { user, loading, setUser } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
@@ -26,18 +26,18 @@ export default function ProfileEditPage() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!user) {
       router.push('/auth/login');
       return;
     }
-    
     if (user) {
       // Mevcut kullanıcı bilgilerini form alanlarına doldur
       setProfilePhoto((user as any).profilePhotoUrl || null);
     }
-  }, [user, loading, router]);
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('Profil güncelleme: user.id:', user?.id, 'token:', localStorage.getItem('token'));
     e.preventDefault();
     
     if (!user) {
@@ -90,13 +90,12 @@ export default function ProfileEditPage() {
       });
       
       const data = await response.json();
-      
       if (!response.ok) {
+        console.error('Backend response:', data);
         throw new Error(data.error || 'Profil güncellenirken bir hata oluştu');
       }
       
       // Kullanıcı bilgilerini güncelle
-      setUser(data.user);
       if (typeof window !== 'undefined') {
         localStorage.setItem('user', JSON.stringify(data.user));
       }
@@ -116,7 +115,7 @@ export default function ProfileEditPage() {
     }
   };
 
-  if (loading) {
+  if (isSubmitting) {
     return (
       <div className="min-h-screen bg-[#FFF5F0] pt-20">
         <div className="max-w-4xl mx-auto px-6">

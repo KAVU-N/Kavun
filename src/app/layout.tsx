@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar";
-import { AuthProvider } from "../../context/AuthContext";
+import { AuthProvider } from 'src/context/AuthContext';
 import { usePathname } from 'next/navigation';
 import Link from "next/link";
 

@@ -76,7 +76,7 @@ export async function GET(
 
     // Kullanıcıyı bul - hassas bilgileri hariç tut
     const userDetail = await User.findById(params.id)
-      .select('name email role university profilePicture')
+      .select('name email role university profilePhotoUrl')
       .lean();
 
     if (!userDetail) {

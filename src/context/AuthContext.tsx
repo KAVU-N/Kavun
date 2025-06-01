@@ -6,16 +6,31 @@ import type { User } from '../types/User';
 
 interface AuthContextType {
   user: User | null;
+  loading: boolean;
+  error: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
+  authChecked: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+  error: null,
+  login: async () => {},
+  register: async () => {},
+  logout: () => {},
+  updateUser: () => {},
+  authChecked: false,
+});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -23,7 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+    } else {
+      setUser(null);
     }
+    setAuthChecked(true);
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -49,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const sameSite = isHttps && !isLocalhost ? 'None' : 'Strict';
         const secure = isHttps && !isLocalhost ? '; Secure' : '';
         const domain = isHttps && !isLocalhost ? '; domain=.kavunla.com' : '';
-document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${domain}`;
+        document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${domain}`;
         console.log('TOKEN (login sonrası, cookie):', document.cookie);
         console.log('TOKEN (login sonrası, value):', data.token);
       }
@@ -82,7 +101,7 @@ document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${d
         const sameSite = isHttps && !isLocalhost ? 'None' : 'Strict';
         const secure = isHttps && !isLocalhost ? '; Secure' : '';
         const domain = isHttps && !isLocalhost ? '; domain=.kavunla.com' : '';
-document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${domain}`;
+        document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${domain}`;
         console.log('TOKEN (register sonrası, cookie):', document.cookie);
         console.log('TOKEN (register sonrası, value):', data.token);
       }
@@ -91,7 +110,6 @@ document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${d
       throw error;
     }
   };
-
 
   const logout = () => {
     setUser(null);
@@ -106,16 +124,16 @@ document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${d
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, error, login, register, logout, updateUser, authChecked }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}

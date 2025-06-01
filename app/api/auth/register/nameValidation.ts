@@ -56,8 +56,12 @@ export function validateTextField(text: string, bannedWords: string[], options?:
   if (text.length < minLen || text.length > maxLen) {
     return { valid: false, error: `Alan ${minLen} ile ${maxLen} karakter arasında olmalıdır.` };
   }
-  if (!/^[a-zA-ZğüşöçıİĞÜŞÖÇ0-9 ,.'"!?()-]+$/.test(text)) {
-    return { valid: false, error: "Alana sadece harf, rakam ve temel noktalama işaretleri girilebilir." };
+  // Satır sonu ve tab karakterlerini de izin verilenlere ekle
+  const allowedRegex = /^[a-zA-ZğüşöçıİĞÜŞÖÇ0-9 ,.'"!?()\-\n\r\t]+$/;
+  if (!allowedRegex.test(text)) {
+    // İlk hatalı karakteri bul
+    const invalidChar = text.split('').find(c => !/[a-zA-ZğüşöçıİĞÜŞÖÇ0-9 ,.'"!?()\-\n\r\t]/.test(c));
+    return { valid: false, error: `Alana sadece harf, rakam ve temel noktalama işaretleri girilebilir. Hatalı karakter: '${invalidChar ?? '?'}'` };
   }
   // Spam & tekrar eden harf kontrolü
   if (hasRepeatingChars(text)) {

@@ -53,6 +53,7 @@ export async function PUT(req: Request) {
     const userIdFromToken = decoded.userId || decoded.id;
 
     // Kullanıcı ID kontrolü
+    console.log('Token’dan gelen userId:', userIdFromToken, 'Frontend’den gelen userId:', userId);
     if (userIdFromToken !== userId) {
       return NextResponse.json(
         { error: 'Yetkilendirme hatası' },

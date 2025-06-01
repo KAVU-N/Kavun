@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -34,17 +34,18 @@ interface Ilan {
 }
 
 export default function IlanDetayPage({ params }: { params: { id: string } }) {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const [ilan, setIlan] = useState<Ilan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!loading && !user) {
+    // user null olduğunda login sayfasına yönlendir
+    if (user === null) {
       router.push('/auth/login');
     }
-  }, [user, loading, router]);
+  }, [user, router]);
 
   useEffect(() => {
     const fetchIlanDetay = async () => {
@@ -103,7 +104,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
     });
   };
 
-  if (loading || !user) {
+  if (isLoading || !user) {
     return (
       <div className="min-h-screen bg-white pt-20">
         <div className="container mx-auto px-4">

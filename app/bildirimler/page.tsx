@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -15,14 +15,18 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     // DEBUG: Bildirimler her zaman yüklensin
+    const token = localStorage.getItem('token');
+    // DEBUG LOG KALDIRILDI [useEffect] user:', user);
+    // DEBUG LOG KALDIRILDI [useEffect] token:', token);
     fetchNotifications();
-  }, []);
+  }, [user]);
 
   const fetchNotifications = async () => {
     try {
       setLoading(true);
       setError(null);
       const token = localStorage.getItem('token');
+      // DEBUG LOG KALDIRILDI [fetchNotifications] token:', token);
       if (!token) {
         setError('Giriş yapmalısınız');
         setLoading(false);
@@ -35,12 +39,16 @@ export default function NotificationsPage() {
           'Authorization': `Bearer ${token}`
         }
       });
+      // DEBUG LOG KALDIRILDI [fetchNotifications] response status:', response.status);
 
       if (!response.ok) {
+        const errText = await response.text();
+        // DEBUG LOG KALDIRILDI [fetchNotifications] response error:', errText);
         throw new Error('Bildirimler getirilemedi');
       }
 
       const data = await response.json();
+      // DEBUG LOG KALDIRILDI [fetchNotifications] response data:', data);
       if (!data.notifications || !Array.isArray(data.notifications)) {
         setNotifications([]);
       } else {
@@ -48,7 +56,7 @@ export default function NotificationsPage() {
       }
       setLoading(false);
     } catch (error) {
-      console.error('Bildirimler getirme hatası:', error);
+      // DEBUG LOG KALDIRILDI Bildirimler getirme hatası:', error);
       setError('Bildirimler yüklenirken bir hata oluştu');
       setNotifications([]);
       setLoading(false);
@@ -75,7 +83,7 @@ export default function NotificationsPage() {
         )
       );
     } catch (error) {
-      console.error('Okundu işaretleme hatası:', error);
+      // DEBUG LOG KALDIRILDI Okundu işaretleme hatası:', error);
     }
   };
 
@@ -102,7 +110,7 @@ export default function NotificationsPage() {
         prevNotifications.map(notification => ({ ...notification, read: true }))
       );
     } catch (error) {
-      console.error('Tüm bildirimleri okundu işaretleme hatası:', error);
+      // DEBUG LOG KALDIRILDI Tüm bildirimleri okundu işaretleme hatası:', error);
     }
   };
 
@@ -122,7 +130,7 @@ export default function NotificationsPage() {
         prevNotifications.filter(notification => notification._id !== id)
       );
     } catch (error) {
-      console.error('Bildirim silme hatası:', error);
+      // DEBUG LOG KALDIRILDI Bildirim silme hatası:', error);
     }
   };
 
@@ -220,18 +228,10 @@ export default function NotificationsPage() {
             </svg>
           </div>
         );
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="pt-32 flex flex-col items-center">
-        <span className="text-[#994D1C] text-lg font-semibold mb-4">Bildirimler yükleniyor...</span>
-        <div className="w-10 h-10 border-4 border-[#FFD6B2] border-t-[#FF8B5E] rounded-full animate-spin"></div>
-      </div>
-    );
+      }
   }
 
+  // Hata kontrolü
   if (error) {
     return (
       <div className="pt-32 flex flex-col items-center">
@@ -240,6 +240,7 @@ export default function NotificationsPage() {
     );
   }
 
+  // Kullanıcı kontrolü
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-10">
@@ -260,6 +261,8 @@ export default function NotificationsPage() {
     );
   }
 
+  // DEBUG PANEL
+  const debugToken = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
   return (
     <div className="pt-24 pb-8 max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold text-[#994D1C] mb-8">Bildirimler</h1>

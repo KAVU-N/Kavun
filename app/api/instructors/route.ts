@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     
     // Eğitmen rolüne sahip kullanıcıları getir
     const query: any = {
-      role: 'teacher',
+      role: { $in: ['teacher', 'instructor'] },
       isVerified: true
     };
     

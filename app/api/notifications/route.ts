@@ -22,12 +22,12 @@ export async function GET(request: Request) {
     // Hoş geldin bildirimi silinmişse, asla yeni hoş geldin bildirimi oluşturma!
     let filter: any = {};
     if (user.role === 'student') {
-      filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'student' } ] };
-    } else if (user.role === 'teacher') {
-      filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'teacher' } ] };
+      filter = { read: false, $or: [ { userId: userId }, { userId: 'all' }, { userId: 'student' } ] };
+    } else if (user.role === 'teacher' || user.role === 'instructor') {
+      filter = { read: false, $or: [ { userId: userId }, { userId: 'all' }, { userId: 'teacher' }, { userId: 'instructor' } ] };
     } else {
       // admin ve diğer roller sadece kendi userId'si ile görebilir
-      filter = { userId: userId };
+      filter = { read: false, userId: userId };
     }
     const notifications = await Notification.find(filter).sort({ createdAt: -1 });
     return NextResponse.json({ notifications });
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     hasWelcome = await Notification.create({
       userId,
       title: `Merhaba ${user.name}! Kavun Eğitim Platformu Hakkında`,
-      message: `Kavun Eğitim Platformu'na hoş geldiniz! 🎉\n\nBu platformda ilanlar oluşturabilir, kaynak paylaşabilir, derslere katılabilir ve toplulukla etkileşimde bulunabilirsiniz.\n\nBaşlıca özellikler:\n- Kendi ilanlarınızı oluşturup yönetebilirsiniz.\n- Diğer kullanıcılarla mesajlaşabilir, bildirimler alabilirsiniz.\n- Kaynak paylaşım alanında dokümanlar, ders materyalleri ve notlar bulabilirsiniz.\n- Profilinizi düzenleyip, eğitim geçmişinizi ve başarılarınızı sergileyebilirsiniz.\n\nHer türlü soru ve öneriniz için bize iletişim bölümünden ulaşabilirsiniz.\n\nKavun ailesine katıldığınız için teşekkürler, başarılar dileriz! 🍈`,
+      message: `Kavun Eğitim Platformu'na hoş geldiniz! \n\nBu platformda ilanlar oluşturabilir, kaynak paylaşabilir, derslere katılabilir ve toplulukla etkileşimde bulunabilirsiniz.\n\nBaşlıca özellikler:\n- Kendi ilanlarınızı oluşturup yönetebilirsiniz.\n- Diğer kullanıcılarla mesajlaşabilir, bildirimler alabilirsiniz.\n- Kaynak paylaşım alanında dokümanlar, ders materyalleri ve notlar bulabilirsiniz.\n- Profilinizi düzenleyip, eğitim geçmişinizi ve başarılarınızı sergileyebilirsiniz.\n\nHer türlü soru ve öneriniz için bize iletişim bölümünden ulaşabilirsiniz.\n\nKavun ailesine katıldığınız için teşekkürler, başarılar dileriz! `,
       type: 'info',
       read: false,
       createdAt: new Date()
@@ -50,12 +50,12 @@ export async function GET(request: Request) {
   // Bildirimleri getirirken sadece hedef kitleye uygun olanları göster
   let filter: any = {};
   if (user.role === 'student') {
-    filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'student' } ] };
-  } else if (user.role === 'teacher') {
-    filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'teacher' } ] };
+    filter = { read: false, $or: [ { userId: userId }, { userId: 'all' }, { userId: 'student' } ] };
+  } else if (user.role === 'teacher' || user.role === 'instructor') {
+    filter = { read: false, $or: [ { userId: userId }, { userId: 'all' }, { userId: 'teacher' }, { userId: 'instructor' } ] };
   } else {
     // admin ve diğer roller sadece kendi userId'si ile görebilir
-    filter = { userId: userId };
+    filter = { read: false, userId: userId };
   }
   const notifications = await Notification.find(filter).sort({ createdAt: -1 });
   return NextResponse.json({ notifications });
