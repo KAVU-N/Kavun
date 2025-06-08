@@ -24,7 +24,7 @@ export default function TermsOfUsePage() {
                   <svg className="w-6 h-6 text-[#FF8B5E]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <h2 className="text-2xl font-semibold mb-0">1. Kabul</h2>
                 </div>
-                <p>Kullanıcı, bu platformu kullanarak ki&#351;isel verilerinin i&#351;lenmesine ili&#351;kin ayd&#305;nlama metnini okudu&#287;unu ve kabul etti&#287;ini beyan eder. Koşulları kabul etmiyorsanız, lütfen platformu kullanmayınız.</p>
+                <p>Bu platformu kullanarak, aşağıda belirtilen tüm kullanım koşullarını kabul etmiş olursunuz. Koşulları kabul etmiyorsanız, lütfen platformu kullanmayınız.</p>
               </section>
               <section className="mb-6">
                 <div className="flex items-center gap-2 mb-1">
@@ -57,7 +57,7 @@ export default function TermsOfUsePage() {
                   <svg className="w-6 h-6 text-[#FF8B5E]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <h2 className="text-2xl font-semibold mb-0">5. Sorumluluğun Sınırlandırılması</h2>
                 </div>
-                <p>Platformda sunulan içeriklerin doğruluğu ve güncelliği konusunda azami özen gösterilmekle birlikte, oluşabilecek hatalardan dolayı sorumluluk kabul edilmez. Kullanıcının kişisel verilerinin işlenmesine ilişkin hakları, veri sorumlusuna başvurarak kullanılabilir, düzeltilmesini veya silinmesini talep edebilir ve kişisel verilerinin işlenmesine itiraz edebilir.</p>
+                <p>Platformda sunulan içeriklerin doğruluğu ve güncelliği konusunda azami özen gösterilmekle birlikte, oluşabilecek hatalardan dolayı sorumluluk kabul edilmez.</p>
               </section>
               <section className="mb-6">
                 <div className="flex items-center gap-2 mb-1">

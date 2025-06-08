@@ -21,6 +21,11 @@ export default function IlanVerPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  if (loading) {
+    return <div className="flex justify-center items-center h-96 text-xl">Yükleniyor...</div>;
+  }
+
+  // Sadece eğitmen (instructor) veya öğretmen (teacher) rolüne sahip kullanıcıların erişimine izin ver
   useEffect(() => {
     if (loading) return;
     if (!user) {
@@ -29,10 +34,6 @@ export default function IlanVerPage() {
       router.push('/');
     }
   }, [user, loading, router]);
-
-  if (loading) {
-    return <div className="flex justify-center items-center h-96 text-xl">&quot;Y&uuml;kleniyor...&quot;</div>;
-  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

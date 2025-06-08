@@ -108,7 +108,7 @@ export default function AboutPage() {
               Vizyonumuz
             </h2>
             <p className="text-[#6B3416]">
-              Türkiye&#39;nin en güvenilir ve yenilikçi eğitim platformu olmak. Eğitimde fırsat eşitliği yaratarak toplumun her kesiminden öğrencilerin potansiyellerini gerçekleştirmelerine katkıda bulunmak.
+              Türkiye'nin en güvenilir ve tercih edilen çevrimiçi eğitim platformu olmak. Eğitimde fırsat eşitliği yaratarak toplumun her kesiminden öğrencilerin potansiyellerini gerçekleştirmelerine katkıda bulunmak.
             </p>
           </div>
         </div>

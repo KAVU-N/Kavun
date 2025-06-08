@@ -84,7 +84,7 @@ export default function IlanlarPage() {
         
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || '&#34;İlan Bulunamadı&#34; getirilirken bir hata oluştu');
+          throw new Error(errorData.error || 'İlanlar getirilirken bir hata oluştu');
         }
         
         const data = await response.json();
@@ -94,8 +94,8 @@ export default function IlanlarPage() {
         setIlanlar(data);
         setError('');
       } catch (err: any) {
-        console.error('&#34;İlan Bulunamadı&#34;r yüklenirken hata oluştu:', err);
-        setError('&#34;İlan Bulunamadı&#34;r yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+        console.error('İlanlar yüklenirken hata oluştu:', err);
+        setError('İlanlar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
       } finally {
         setIsLoading(false);
       }
@@ -304,7 +304,7 @@ export default function IlanlarPage() {
                 </svg>
               </div>
               <p className="text-red-500 font-medium text-lg mb-2">{t('general.errorOccurred')}</p>
-              <span className="text-red-500 font-semibold">&quot;{error}&quot;</span>
+              <p className="text-gray-600 mb-4">{error}</p>
               <button 
                 onClick={() => window.location.reload()} 
                 className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
