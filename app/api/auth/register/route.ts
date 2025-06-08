@@ -100,12 +100,11 @@ export async function POST(req: Request) {
     }
 
     // MongoDB bağlantısı
-    console.log('[DEBUG] MongoDB bağlantısı kuruluyor...');
+    console.log('MongoDB bağlantısı kuruluyor...');
     try {
       await connectDB();
-      console.log('[DEBUG] MongoDB bağlantısı başarılı');
+      console.log('MongoDB bağlantısı başarılı');
     } catch (error) {
-      console.error('[DEBUG] MongoDB bağlantı hatası:', error);
       console.error('MongoDB bağlantı hatası:', error);
       return NextResponse.json(
         { error: 'Veritabanı bağlantı hatası' },
@@ -187,7 +186,6 @@ export async function POST(req: Request) {
 
     let user: IUser;
     try {
-      console.log('[DEBUG] User.create başlıyor...');
       // Önce User modelini import ettiğimizden emin olalım
       console.log('User model:', User);
       console.log('User model schema:', User.schema.obj);
@@ -206,13 +204,12 @@ export async function POST(req: Request) {
         isVerified: false
       };
 
-      console.log('[DEBUG] Creating user with data:', userData);
+      console.log('Creating user with data:', userData);
 
       try {
         user = await User.create(userData) as IUser;
-        console.log('[DEBUG] User.create başarılı:', user);
       } catch (createError: any) {
-        console.error('[DEBUG] User.create error:', {
+        console.error('User.create error:', {
           error: createError,
           validationErrors: createError.errors,
           code: createError.code,
@@ -222,7 +219,7 @@ export async function POST(req: Request) {
       }
 
       // Kaydedilen veriyi kontrol et
-      console.log('[DEBUG] Kullanıcı oluşturuldu:', {
+      console.log('Kullanıcı oluşturuldu:', {
         id: user._id,
         name: user.name,
         email: user.email,
@@ -235,7 +232,7 @@ export async function POST(req: Request) {
 
       // MongoDB'den tekrar kontrol et
       const savedUser = await User.findById(user._id).lean();
-      console.log('[DEBUG] MongoDB\'den kontrol:', savedUser);
+      console.log('MongoDB\'den kontrol:', savedUser);
 
     } catch (error: any) {
       console.error('Kullanıcı oluşturma hatası:', error);
@@ -264,21 +261,12 @@ export async function POST(req: Request) {
     }
 
     // Doğrulama e-postası gönder
-    console.log('[DEBUG] Doğrulama e-postası gönderiliyor...');
+    console.log('Doğrulama e-postası gönderiliyor...');
     try {
       await sendVerificationEmail(email, verificationCode);
-      console.log('[DEBUG] Doğrulama e-postası gönderildi');
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('[DEBUG] Email gönderme hatası:', error.message);
-        console.error('Email gönderme hatası detay:', {
-          error: error,
-          message: error.message,
-          stack: error.stack
-        });
-      } else {
-        console.error('[DEBUG] Email gönderme hatası:', String(error));
-      }
+      console.log('Doğrulama e-postası gönderildi');
+    } catch (error) {
+      console.error('Email gönderme hatası:', error);
       // Email gönderilemese bile kullanıcı oluşturuldu, sadece log
     }
 
@@ -298,13 +286,17 @@ export async function POST(req: Request) {
       }
     );
 
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error('Register endpoint genel hata:', error.message);
-      console.error('Error stack:', error.stack);
-    } else {
-      console.error('Register endpoint genel hata:', String(error));
-    }
-    return NextResponse.json({ error: 'Kayıt sırasında bir hata oluştu' }, { status: 500 });
+  } catch (error) {
+    console.error('Register endpoint hatası:', error);
+    return NextResponse.json(
+      { error: 'Kayıt sırasında bir hata oluştu' },
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': 'true'
+        }
+      }
+    );
   }
 }

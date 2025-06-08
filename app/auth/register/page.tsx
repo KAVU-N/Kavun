@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from 'src/context/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { universities } from '@/data/universities';
 import { departments } from './departments';
@@ -19,7 +19,7 @@ import { Suspense } from 'react';
 function RegisterPageInner() {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [recaptchaReady, setRecaptchaReady] = useState(false);
-  const RECAPTCHA_SITE_KEY = '6Lcjp1krAAAAACt7yAb1jkBw_Aw48x5O2k3LBJPH';
+  const RECAPTCHA_SITE_KEY = '6LdubVErAAAAALfSGXh8bTDiW0ir7b_PXfGROQ6h';
 
   useEffect(() => {
     if (!(window as any).grecaptcha) {
@@ -56,38 +56,29 @@ function RegisterPageInner() {
   const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("[DEBUG] Form submit edildi");
     e.preventDefault();
     setError('');
     setLoading(true);
 
     if (!(window as any).grecaptcha) {
-      console.log("[DEBUG] window.grecaptcha YOK");
       setError('reCAPTCHA yüklenemedi. Lütfen sayfayı yenileyin.');
       setLoading(false);
       return;
     }
     const formData = new FormData(e.currentTarget);
-    console.log('[DEBUG] grecaptcha.ready çağrılıyor');
     (window as any).grecaptcha.ready(() => {
-      console.log('[DEBUG] grecaptcha.ready içi çalıştı');
-      (window as any).grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' })
-        .then((token: string) => {
-          console.log('[DEBUG] grecaptcha.execute then, token:', token);
-          setRecaptchaToken(token);
-          submitWithRecaptcha(token, formData);
-        })
-        .catch((err: any) => {
-          console.log('[DEBUG] grecaptcha.execute catch, hata:', err);
-          setError('reCAPTCHA doğrulaması başarısız oldu.');
-          setLoading(false);
-        });
+      (window as any).grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' }).then((token: string) => {
+        setRecaptchaToken(token);
+        submitWithRecaptcha(token, formData);
+      }).catch(() => {
+        setError('reCAPTCHA doğrulaması başarısız oldu.');
+        setLoading(false);
+      });
     });
   };
 
   const submitWithRecaptcha = async (token: string, formData: FormData) => {
-  console.log('[DEBUG] submitWithRecaptcha çağrıldı, token:', token);
-    const name = (formData.get('name') as string).trim();
+    const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const passwordConfirm = formData.get('passwordConfirm') as string;
@@ -99,7 +90,6 @@ function RegisterPageInner() {
       finalExpertise = otherExpertise;
     }
     console.log("Formdan seçilen rol:", selectedRole);
-    console.log("Backend'e gönderilecek name:", name, JSON.stringify(name));
 
     if (password !== passwordConfirm) {
       setError(t('errors.passwordsDoNotMatch') || 'Şifreler eşleşmiyor');
@@ -124,16 +114,7 @@ function RegisterPageInner() {
     }
 
     try {
-      console.log('[DEBUG] register fonksiyonu çağrılıyor');
-      await register(
-        name,
-        email,
-        password,
-        selectedRole,
-        university,
-        finalExpertise,
-        grade
-      );
+      await register({ name, email, password, role: selectedRole, university, expertise: finalExpertise, grade });
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       setError(err.message || t('errors.registrationError') || 'Kayıt olurken bir hata oluştu');
