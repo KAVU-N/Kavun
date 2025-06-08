@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -36,7 +37,6 @@ interface Ilan {
 export default function RandevuAlPage() {
   // Get language context
   const { language } = useLanguage();
-  
   // Content based on language
   const content = {
     tr: {
@@ -50,30 +50,8 @@ export default function RandevuAlPage() {
       buttonText: 'Return to Home Page'
     }
   };
-  
-  // Get content based on current language
   const currentContent = language === 'en' ? content.en : content.tr;
-  
-  // Showing only "Coming Soon" message while keeping the original code
-  const showComingSoon = true; // Set to true to show only the coming soon message
-  
-  if (showComingSoon) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="p-8 text-center">
-            <h1 className="text-4xl font-bold mb-6 text-gray-800">{currentContent.title}</h1>
-            <p className="text-xl text-gray-600 mb-8">{currentContent.description}</p>
-            <Link href="/" className="inline-block px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg font-medium hover:shadow-md transition-all">
-              {currentContent.buttonText}
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  // Original code below - will not be displayed when showComingSoon is true
+
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -110,35 +88,27 @@ export default function RandevuAlPage() {
   useEffect(() => {
     const fetchIlanDetay = async () => {
       if (!ilanId) return;
-      
       try {
         setIsLoading(true);
-        
-        // API endpoint'e istek at
         const response = await fetch(`/api/ilanlar/${ilanId}`);
-        
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || 'İlan detayları getirilirken bir hata oluştu');
         }
-        
         const data = await response.json();
         setIlan(data);
         setError('');
       } catch (err: any) {
-        console.error('İlan detayları yüklenirken hata oluştu:', err);
         setError('İlan detayları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
       } finally {
         setIsLoading(false);
       }
     };
-
     if (ilanId) {
       fetchIlanDetay();
     }
   }, [ilanId]);
 
-  // Tarih seçildiğinde uygun saatleri getir
   useEffect(() => {
     if (selectedDate) {
       const times = [];
@@ -150,7 +120,7 @@ export default function RandevuAlPage() {
         selectedDate.getDate() === now.getDate();
       let minHour = startHour;
       if (isToday) {
-        minHour = Math.max(startHour, now.getHours() + 1); // Şu anki saatten en az 1 saat sonrası
+        minHour = Math.max(startHour, now.getHours() + 1);
       }
       for (let hour = minHour; hour <= endHour; hour++) {
         times.push(`${hour.toString().padStart(2, '0')}:00`);
@@ -159,7 +129,6 @@ export default function RandevuAlPage() {
     }
   }, [selectedDate]);
 
-  // Sonraki adıma geç
   const handleNextStep = () => {
     if (step === 1 && selectedDate) {
       setStep(2);
@@ -168,35 +137,24 @@ export default function RandevuAlPage() {
     }
   };
 
-  // Önceki adıma dön
   const handlePrevStep = () => {
     if (step > 1) {
       setStep(step - 1);
     }
   };
 
-  // Ödeme işlemini gerçekleştir
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!selectedDate || !selectedTime || !ilan) return;
-    
-    // Kart bilgilerini kontrol et
     if (!cardNumber || !cardName || !expiryDate || !cvv) {
       setPaymentError('Lütfen tüm kart bilgilerini doldurun.');
       return;
     }
-    
     try {
       setIsProcessing(true);
       setPaymentError('');
-      
-      // 1. Rezervasyon sırasında yeni bir Lesson oluştur
-      // Açıklama ve süre validasyonunu garantiye al
       const description = ilan.description && ilan.description.length < 10 ? (ilan.description + ' - detay') : ilan.description;
       const duration = ilan.duration && ilan.duration < 15 ? 15 : ilan.duration;
-
-      // Süreyi uygun birime çevir
       let displayDuration = duration;
       let durationText = '';
       if (duration % 60 === 0) {
@@ -205,7 +163,6 @@ export default function RandevuAlPage() {
       } else {
         durationText = `${duration} dakika`;
       }
-
       const lessonCreateResponse = await fetch('/api/lessons', {
         method: 'POST',
         headers: {
@@ -324,21 +281,8 @@ export default function RandevuAlPage() {
     if (v.length >= 3) {
       return `${v.substring(0, 2)}/${v.substring(2, 4)}`;
     }
-    
     return value;
   };
-
-  if (loading || !user) {
-    return (
-      <div className="min-h-screen bg-white pt-20">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center py-12">
-            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">
@@ -353,7 +297,6 @@ export default function RandevuAlPage() {
               <span>Geri Dön</span>
             </button>
           </div>
-
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] p-6 text-white">
               <h1 className="text-3xl font-bold mb-3">Randevu Al</h1>
@@ -376,48 +319,8 @@ export default function RandevuAlPage() {
                   Yeniden Dene
                 </button>
               </div>
-            ) : !ilan ? (
-              <div className="p-8 text-center">
-                <p className="text-[#994D1C] mb-4">İlan bulunamadı.</p>
-                <Link 
-                  href="/ilanlar"
-                  className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg hover:shadow-md transition-all"
-                >
-                  İlanlara Dön
-                </Link>
-              </div>
             ) : (
-              <div className="p-6">
-                {/* Adım göstergesi */}
-                <div className="mb-8">
-                  <div className="flex items-center justify-between">
-                    <div className={`flex flex-col items-center ${step >= 1 ? 'text-[#FF8B5E]' : 'text-gray-400'}`}>
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${step >= 1 ? 'bg-[#FF8B5E] text-white' : 'bg-gray-200'}`}>
-                        <FaCalendarAlt />
-                      </div>
-                      <span className="text-sm">Tarih Seç</span>
-                    </div>
-                    <div className="flex-1 h-1 mx-4 bg-gray-200">
-                      <div className={`h-full bg-[#FF8B5E] transition-all ${step >= 2 ? 'w-full' : 'w-0'}`}></div>
-                    </div>
-                    <div className={`flex flex-col items-center ${step >= 2 ? 'text-[#FF8B5E]' : 'text-gray-400'}`}>
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${step >= 2 ? 'bg-[#FF8B5E] text-white' : 'bg-gray-200'}`}>
-                        <FaClock />
-                      </div>
-                      <span className="text-sm">Saat Seç</span>
-                    </div>
-                    <div className="flex-1 h-1 mx-4 bg-gray-200">
-                      <div className={`h-full bg-[#FF8B5E] transition-all ${step >= 3 ? 'w-full' : 'w-0'}`}></div>
-                    </div>
-                    <div className={`flex flex-col items-center ${step >= 3 ? 'text-[#FF8B5E]' : 'text-gray-400'}`}>
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${step >= 3 ? 'bg-[#FF8B5E] text-white' : 'bg-gray-200'}`}>
-                        <FaMoneyBillWave />
-                      </div>
-                      <span className="text-sm">Ödeme</span>
-                    </div>
-                  </div>
-                </div>
-
+              <div>
                 {/* Ders bilgileri özeti */}
                 <div className="bg-[#FFF9F5] p-4 rounded-lg mb-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -425,26 +328,25 @@ export default function RandevuAlPage() {
                       <FaChalkboardTeacher className="text-[#FF8B5E] mr-2" />
                       <div>
                         <p className="text-sm text-gray-500">Eğitmen</p>
-                        <p className="font-medium">{ilan.teacher.name}</p>
+                        <p className="font-medium">{ilan?.teacher?.name}</p>
                       </div>
                     </div>
                     <div className="flex items-center">
                       <FaClock className="text-[#FF8B5E] mr-2" />
                       <div>
                         <p className="text-sm text-gray-500">Süre</p>
-                        <p className="font-medium">{ilan.duration} Saat</p>
+                        <p className="font-medium">{ilan?.duration} Saat</p>
                       </div>
                     </div>
                     <div className="flex items-center">
                       <FaMoneyBillWave className="text-[#FF8B5E] mr-2" />
                       <div>
                         <p className="text-sm text-gray-500">Ücret</p>
-                        <p className="font-medium">{ilan.price} ₺</p>
+                        <p className="font-medium">{ilan?.price} ₺</p>
                       </div>
                     </div>
                   </div>
                 </div>
-
                 {/* Adım 1: Tarih Seçimi */}
                 {step === 1 && (
                   <div className="mb-6">
@@ -456,7 +358,6 @@ export default function RandevuAlPage() {
                           selectedDate.getDate() === date.getDate() && 
                           selectedDate.getMonth() === date.getMonth() && 
                           selectedDate.getFullYear() === date.getFullYear();
-                        
                         return (
                           <button
                             key={index}
@@ -640,13 +541,13 @@ export default function RandevuAlPage() {
                             <p className="text-gray-500">Saat:</p>
                             <p className="font-medium">{selectedTime}</p>
                             <p className="text-gray-500">Eğitmen:</p>
-                            <p className="font-medium">{ilan.teacher.name}</p>
+                            <p className="font-medium">{ilan?.teacher?.name}</p>
                             <p className="text-gray-500">Ders:</p>
-                            <p className="font-medium">{ilan.title}</p>
+                            <p className="font-medium">{ilan?.title}</p>
                             <p className="text-gray-500">Ders Tipi:</p>
                             <p className="font-medium">{lessonType === 'individual' ? 'Bireysel' : `Grup (${groupSize} kişi)`}</p>
                             <p className="text-gray-500">Ücret:</p>
-                            <p className="font-medium">{ilan.price} ₺</p>
+                            <p className="font-medium">{ilan?.price} ₺</p>
                           </div>
                         </div>
                         <div className="flex justify-center gap-4">
@@ -665,7 +566,7 @@ export default function RandevuAlPage() {
                         </div>
                       </div>
                     ) : (
-                      <>
+                      <div>
                         <h2 className="text-xl font-bold text-[#6B3416] mb-4">Ödeme Bilgileri</h2>
                         <div className="bg-[#FFF9F5] p-4 rounded-lg mb-6">
                           <h3 className="font-medium text-[#6B3416] mb-2">Randevu Özeti</h3>
@@ -675,16 +576,15 @@ export default function RandevuAlPage() {
                             <p className="text-gray-500">Saat:</p>
                             <p className="font-medium">{selectedTime}</p>
                             <p className="text-gray-500">Eğitmen:</p>
-                            <p className="font-medium">{ilan.teacher.name}</p>
+                            <p className="font-medium">{ilan?.teacher?.name}</p>
                             <p className="text-gray-500">Ders:</p>
-                            <p className="font-medium">{ilan.title}</p>
+                            <p className="font-medium">{ilan?.title}</p>
                             <p className="text-gray-500">Ders Tipi:</p>
                             <p className="font-medium">{lessonType === 'individual' ? 'Bireysel' : `Grup (${groupSize} kişi)`}</p>
                             <p className="text-gray-500">Toplam Tutar:</p>
-                            <p className="font-bold text-[#FF8B5E]">{ilan.price} ₺</p>
+                            <p className="font-bold text-[#FF8B5E]">{ilan?.price} ₺</p>
                           </div>
                         </div>
-                        
                         <form onSubmit={handlePayment} className="mb-6">
                           <div className="mb-4">
                             <label htmlFor="cardNumber" className="block text-gray-700 mb-2">Kart Numarası</label>
@@ -702,7 +602,6 @@ export default function RandevuAlPage() {
                               />
                             </div>
                           </div>
-                          
                           <div className="mb-4">
                             <label htmlFor="cardName" className="block text-gray-700 mb-2">Kart Üzerindeki İsim</label>
                             <input
@@ -715,7 +614,6 @@ export default function RandevuAlPage() {
                               required
                             />
                           </div>
-                          
                           <div className="grid grid-cols-2 gap-4 mb-4">
                             <div>
                               <label htmlFor="expiryDate" className="block text-gray-700 mb-2">Son Kullanma Tarihi</label>
@@ -744,13 +642,11 @@ export default function RandevuAlPage() {
                               />
                             </div>
                           </div>
-                          
                           {paymentError && (
                             <div className="mb-4 p-3 bg-red-100 text-red-600 rounded-lg">
                               {paymentError}
                             </div>
                           )}
-                          
                           <div className="flex justify-between">
                             <button
                               type="button"
@@ -773,7 +669,7 @@ export default function RandevuAlPage() {
                             </button>
                           </div>
                         </form>
-                      </>
+                      </div>
                     )}
                   </div>
                 )}

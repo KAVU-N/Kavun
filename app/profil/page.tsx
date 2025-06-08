@@ -13,15 +13,15 @@ export default function ProfilePage() {
   const router = useRouter();
   const { t } = useLanguage();
 
+  // useMemo ile rol etiketi ve baş harf
+  const roleLabel = useMemo(() => authUser?.role === 'student' ? t('auth.student') : t('auth.instructor'), [authUser?.role, t]);
+  const userInitial = useMemo(() => authUser?.name?.[0]?.toUpperCase() || 'U', [authUser?.name]);
+
   // Kullanıcı yoksa login'e yönlendir veya yükleniyor ise loading göster
   if (!authUser) {
-  router.push('/auth/login');
-  return null;
-}
-
-  // useMemo ile rol etiketi ve baş harf
-  const roleLabel = useMemo(() => authUser.role === 'student' ? t('auth.student') : t('auth.instructor'), [authUser.role, t]);
-  const userInitial = useMemo(() => authUser.name?.[0]?.toUpperCase() || 'U', [authUser.name]);
+    router.push('/auth/login');
+    return null;
+  }
 
   // Profil fotoğrafı componenti
   function ProfilePhoto() {

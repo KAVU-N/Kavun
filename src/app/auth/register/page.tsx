@@ -80,7 +80,7 @@ export default function RegisterPage() {
           Kayıt Ol
         </button>
         <div className="text-xs text-gray-400 mt-2 text-center">
-          Bu form Google reCAPTCHA ile korunmaktadır. <br />Devam ederek Google'ın <a href="https://policies.google.com/privacy" className="underline text-[#FF8B5E]">Gizlilik Politikası</a> ve <a href="https://policies.google.com/terms" className="underline text-[#FF8B5E]">Hizmet Şartları</a>'nı kabul etmiş olursunuz.
+          Bu form Google reCAPTCHA ile korunmaktadır. <br />Devam ederek Google&#39;ın <a href="https://policies.google.com/privacy" className="underline text-[#FF8B5E]">Google Gizlilik Politikası ve Hizmet Şartları</a>&#39;nı kabul etmiş olursunuz.
         </div>
         <div className="text-xs text-yellow-400 mt-1 text-center">
           <b>Not:</b> Google reCAPTCHA anahtarınızı <code>RECAPTCHA_SITE_KEY</code> ile değiştirin.
