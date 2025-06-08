@@ -284,7 +284,7 @@ export default function IlanlarPage() {
             <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between">
               <p className="text-[#6B3416] font-medium mb-2 md:mb-0">
                 <span className="text-[#FF8B5E] font-bold">{filteredIlanlar.length}</span> {t('general.resultsFound')}
-                {searchTerm && <span> &quot;{searchTerm}&quot; {t('general.noResultsForSearch')}</span>}
+                {searchTerm && <span> "{searchTerm}" {t('general.noResultsForSearch')}</span>}
                 {filters.method && <span>, {filters.method} {t('general.method')}</span>}
                 {(filters.priceMin || filters.priceMax) && <span>, {t('general.price')}: {filters.priceMin || '0'} - {filters.priceMax || '∞'} {t('general.currency')}</span>}
               </p>
