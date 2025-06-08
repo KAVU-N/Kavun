@@ -50,7 +50,7 @@ export default function TermsOfUsePage() {
                   <svg className="w-6 h-6 text-[#FF8B5E]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <h2 className="text-2xl font-semibold mb-0">4. Fikri Mülkiyet</h2>
                 </div>
-                <p>Platformda yer alan tüm içeriklerin telif hakkı Kavunla Eğitim Platformu'na aittir. İzinsiz kopyalama ve dağıtım yasaktır.</p>
+                <p>Platformda yer alan tüm içeriklerin telif hakkı Kavunla Eğitim Platformu&apos;na aittir. İzinsiz kopyalama ve dağıtım yasaktır.</p>
               </section>
               <section className="mb-6">
                 <div className="flex items-center gap-2 mb-1">
@@ -98,7 +98,7 @@ export default function TermsOfUsePage() {
                 <ul className="list-none pl-0 space-y-1">
                   <li className="flex items-start gap-2"><span className="mt-1"><svg className="w-4 h-4 text-[#FFB996]" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" /></svg></span>Registering with accurate and up-to-date information.</li>
                   <li className="flex items-start gap-2"><span className="mt-1"><svg className="w-4 h-4 text-[#FFB996]" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" /></svg></span>Not impersonating another person.</li>
-                  <li className="flex items-start gap-2"><span className="mt-1"><svg className="w-4 h-4 text-[#FFB996]" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" /></svg></span>Not engaging in activities that disrupt the platform's operation.</li>
+                  <li className="flex items-start gap-2"><span className="mt-1"><svg className="w-4 h-4 text-[#FFB996]" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" /></svg></span>Not engaging in activities that disrupt the platform&apos;s operation.</li>
                   <li className="flex items-start gap-2"><span className="mt-1"><svg className="w-4 h-4 text-[#FFB996]" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" /></svg></span>Complying with laws and platform rules.</li>
                 </ul>
               </section>
