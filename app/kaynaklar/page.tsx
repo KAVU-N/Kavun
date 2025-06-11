@@ -74,7 +74,10 @@ export default function KaynaklarPage() {
 
   // Kaynakları indir
   const handleDownload = async (resource: Resource) => {
-    if (!user) return;
+    if (!user) {
+      window.location.href = '/auth/login';
+      return;
+    }
     try {
       const response = await fetch(`/api/resources/${resource._id}`, {
         method: 'PATCH',
@@ -110,7 +113,10 @@ export default function KaynaklarPage() {
 
   // Kaynakları önizle
   const handlePreview = async (resource: Resource) => {
-    if (!user) return;
+    if (!user) {
+      window.location.href = '/auth/login';
+      return;
+    }
     try {
       const response = await fetch(`/api/resources/${resource._id}`, {
         method: 'PATCH',
