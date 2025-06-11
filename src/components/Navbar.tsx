@@ -209,23 +209,7 @@ const typedUser = user as User | null;
                     KAVUNLA
                   </span>
                 </Link>
-                {/* Mobilde hamburger menüsü kapalıyken navLinks */}
-                {!isMenuOpen && isMobile && (
-                  <div className="flex items-center space-x-1 ml-2">
-                    {navLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        className={`group flex items-center space-x-2 px-3 py-2 rounded-xl font-semibold transition-all duration-300 ${
-                          pathname === '/' ? (isScrolled ? 'text-[#994D1C] hover:text-[#FF8B5E]' : 'text-white hover:text-[#FF8B5E]') : 'text-[#994D1C]'
-                        } hover:bg-[#FFE5D9]`}
-                      >
-                        <span className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">{link.icon}</span>
-                        <span>{link.label}</span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                {/* Mobilde hamburger menüsü kapalıyken navLinks gösterilmeyecek */}
               </div>
 
               {/* Mobile Menu Button - Only visible when menu is closed */}
@@ -438,45 +422,46 @@ const typedUser = user as User | null;
                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
                               )}
                             </div>
-                            <span>{t('nav.messages')}</span>
+                            <span>Mesajlarım</span>
                           </div>
                         </Link>
                         <Link
                           href="/derslerim"
                           className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
                         >
-                          <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
-                            <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span>{t('nav.myLessons')}</span>
-                          </div>
+                          <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span>Derslerim</span>
                         </Link>
-                        
-                        {user && (typedUser?.role === 'instructor' || typedUser?.role === 'teacher') && (
+                        {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor') && (
                           <>
                             <Link
                               href="/ilanlarim"
-                              className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
+                              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
+                                pathname === '/' && isScrolled ? 'text-[#994D1C]' : 'text-[#994D1C]'
+                              } hover:text-[#6B3416] hover:bg-[#FFF5F0]`}
+                              onClick={() => setIsMenuOpen(false)}
                             >
                               <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
-                              <span>{t('nav.myListings')}</span>
+                              <span>İlanlarım</span>
                             </Link>
-
                           </>
                         )}
+                        {/* Mobilde çıkış yap butonu */}
                         <button
-                          onClick={logout}
-                          className="w-full text-left px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:px-4 md:py-2 md:text-sm px-2 py-1 text-xs"
+                          onClick={() => {
+                            logout();
+                            setIsMenuOpen(false);
+                          }}
+                          className="w-full text-left flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0] mt-2"
                         >
-                          <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
-                            <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v6" />
-                            </svg>
-                            <span>{t('nav.logout')}</span>
-                          </div>
+                          <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v6" />
+                          </svg>
+                          <span>{t('nav.logout')}</span>
                         </button>
                       </div>
                     )}
@@ -491,23 +476,22 @@ const typedUser = user as User | null;
           {/* Mobile Menu */}
           {isMenuOpen && (
             <div className="md:hidden bg-white shadow-lg rounded-b-xl overflow-hidden">
-              {/* navLinks hamburger menüde YOK, sadece navbar'da! */}
-              {/* Mobile Language Switcher */}
-              <div className="flex items-center justify-center space-x-2 py-2">
-                <button
-                  onClick={() => setLanguage('tr')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-300 ${language === 'tr' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
-                >
-                  TR
-                </button>
-                <span className="text-gray-400">|</span>
-                <button
-                  onClick={() => setLanguage('en')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-300 ${language === 'en' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
-                >
-                  EN
-                </button>
-              </div>
+              {/* navLinks hamburger menüde gösterilecek */}
+              {isMobile && (
+                <div className="flex flex-col space-y-2">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <span className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">{link.icon}</span>
+                      <span>{link.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
               <div className="flex justify-end px-4 pt-2">
                 <button
                   onClick={() => setIsMenuOpen(false)}
@@ -524,7 +508,6 @@ const typedUser = user as User | null;
                 </button>
               </div>
               <div className="px-4 py-3 space-y-1">
-                {/* Mobilde navLinks artık hamburger menüde gösterilmeyecek */}
                 
                 {!user ? (
                   <div className="flex flex-col space-y-2 mt-4">
