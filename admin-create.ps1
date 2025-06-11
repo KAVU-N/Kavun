@@ -1,4 +1,4 @@
-$email = "tohehex554@lesotica.com"  # Burayı gerçek bir kullanıcı e-posta adresi ile değiştirin
+$email = "taha.arslan@std.ankaramedipol.edu.tr"  # Burayı gerçek bir kullanıcı e-posta adresi ile değiştirin
 
 $body = @{
     email = $email

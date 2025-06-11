@@ -51,21 +51,10 @@ export function loadBannedWords(): string[] {
 
 export function validateTextField(text: string, bannedWords: string[], options?: { requireTurkishWord?: boolean, minLen?: number, maxLen?: number }): { valid: boolean, error?: string } {
   if (!text) return { valid: false, error: "Alan boş olamaz." };
-  const minLen = options?.minLen ?? 3;
-  const maxLen = options?.maxLen ?? 100;
-  if (text.length < minLen || text.length > maxLen) {
-    return { valid: false, error: `Alan ${minLen} ile ${maxLen} karakter arasında olmalıdır.` };
-  }
-  // Satır sonu ve tab karakterlerini de izin verilenlere ekle
-  const allowedRegex = /^[a-zA-ZğüşöçıİĞÜŞÖÇ0-9 ,.'"!?()\-\n\r\t]+$/;
-  if (!allowedRegex.test(text)) {
-    // İlk hatalı karakteri bul
-    const invalidChar = text.split('').find(c => !/[a-zA-ZğüşöçıİĞÜŞÖÇ0-9 ,.'"!?()\-\n\r\t]/.test(c));
-    return { valid: false, error: `Alana sadece harf, rakam ve temel noktalama işaretleri girilebilir. Hatalı karakter: '${invalidChar ?? '?'}'` };
-  }
-  // Spam & tekrar eden harf kontrolü
-  if (hasRepeatingChars(text)) {
-    return { valid: false, error: "Aynı harf veya karakter üçten fazla tekrar edemez." };
+  // Her kelimenin maksimum 50 karakter kontrolü
+  const words = text.trim().split(/\s+/);
+  if (words.some(w => w.length > 50)) {
+    return { valid: false, error: "Her bir kelime en fazla 50 karakter olabilir." };
   }
   if (allCharsSame(text.replace(/\s/g, ''))) {
     return { valid: false, error: "Metin farklı karakterlerden oluşmalıdır." };

@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
           const base64 = data.fileData.split(',')[1];
           const buffer = Buffer.from(base64, 'base64');
           const pdfData = await pdfParse(buffer);
-          const pdfTextCheck = validateTextField(pdfData.text, bannedWords, { minLen: 10, maxLen: 10000 });
+          const pdfTextCheck = validateTextField(pdfData.text, bannedWords);
           if (!pdfTextCheck.valid) {
             return NextResponse.json({ error: `PDF dosya içeriği hatası: ${pdfTextCheck.error}` }, { status: 400 });
           }
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
           const base64 = data.fileData.split(',')[1];
           const buffer = Buffer.from(base64, 'base64');
           const result = await mammoth.extractRawText({ buffer });
-          const docxTextCheck = validateTextField(result.value, bannedWords, { minLen: 10, maxLen: 10000 });
+          const docxTextCheck = validateTextField(result.value, bannedWords);
           if (!docxTextCheck.valid) {
             return NextResponse.json({ error: `DOCX dosya içeriği hatası: ${docxTextCheck.error}` }, { status: 400 });
           }

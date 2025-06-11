@@ -495,6 +495,15 @@ export default function KaynaklarPage() {
           {/* Ana içerik: Kaynağı kaydırılabilir şekilde göster */}
           <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full max-h-[96vh] flex flex-col overflow-hidden">
             <div className="flex-1 overflow-auto p-8 relative">
+              {/* Kapatma butonu */}
+              <button
+                onClick={() => setShowPreviewModal(false)}
+                className="absolute top-4 right-4 text-[#A85A1A] hover:text-[#FFB066] text-2xl font-bold bg-transparent border-none p-0 m-0 cursor-pointer z-50"
+                style={{lineHeight:'1'}}
+                aria-label="Close preview modal"
+              >
+                ×
+              </button>
                 {/* Eğer premium engel aktifse, önizleme üstüne etkileşimi tamamen engelleyen bir katman ekle */}
                 {showPremiumBlock && (
                   <div
