@@ -14,30 +14,27 @@ export default function NotificationsPage() {
   const [filter, setFilter] = useState<string>('all'); // 'all', 'unread', 'read'
 
   useEffect(() => {
-    // DEBUG: Bildirimler her zaman yüklensin
-    const token = localStorage.getItem('token');
-    // DEBUG LOG KALDIRILDI [useEffect] user:', user);
-    // DEBUG LOG KALDIRILDI [useEffect] token:', token);
-    fetchNotifications();
+    // user varsa bildirimleri getir
+    if (user) fetchNotifications();
   }, [user]);
 
   const fetchNotifications = async () => {
     try {
       setLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
-      // DEBUG LOG KALDIRILDI [fetchNotifications] token:', token);
-      if (!token) {
+      if (!user) {
         setError('Giriş yapmalısınız');
         setLoading(false);
         return;
       }
 
-      // Fetch notifications from API
+      // Cookie ile kimlik doğrulama
       const response = await fetch('/api/notifications', {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
       });
       // DEBUG LOG KALDIRILDI [fetchNotifications] response status:', response.status);
 

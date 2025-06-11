@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Notification from './Notification';
 import { useAuth } from 'src/context/AuthContext';
 import Link from 'next/link';
@@ -27,6 +28,13 @@ interface ChatUser {
 }
 
 export default function MessagesPage() {
+  // --- ÇOK YAKINDA YÖNLENDİRME BLOĞU (kaldırmak için bu bloğu silmen yeterli) ---
+  const router = useRouter();
+  useEffect(() => {
+    router.push('/cok-yakinda');
+  }, []);
+  // --- SONU ---
+
   const { user } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,23 +58,16 @@ export default function MessagesPage() {
       if (typeof window === 'undefined') return; // Sunucu tarafında çalışmayı engelle
       
       setLoading(true);
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error(t('errors.tokenNotFound') || 'Token bulunamadı');
-        setError(t('errors.sessionExpired') || 'Oturumunuz sonlanmış görünüyor. Lütfen tekrar giriş yapın.');
-        setLoading(false);
-        return;
-      }
-
-      console.log(t('logs.fetchingConversations') || 'Konuşmalar getiriliyor, token mevcut:', !!token);
+      // Artık token kontrolü yapılmıyor, kimlik doğrulama cookie ile gerçekleşiyor.
+      console.log(t('logs.fetchingConversations') || 'Konuşmalar getiriliyor, kimlik doğrulama cookie ile.');
       
       // API isteği
       const response = await fetch('/api/conversations', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include' // Cookie ile kimlik doğrulama
       });
 
       console.log('API yanıtı status:', response.status);

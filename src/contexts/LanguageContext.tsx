@@ -65,6 +65,10 @@ const translations: Record<Language, Record<string, string>> = {
     'academicLevel.bachelor': 'Lisans',
     'academicLevel.master': 'Yüksek Lisans',
     'academicLevel.phd': 'Doktora',
+    // Çok Yakında
+    'comingSoon.title': 'Çok Yakında!',
+    'comingSoon.description': 'Bu sayfa ve özellikler çok yakında aktif olacak. Takipte kalın!',
+    'comingSoon.backToHome': 'Ana Sayfaya Dön',
     // Navbar
     'nav.home': 'Ana Sayfa',
     'nav.listings': 'İlanlar',
@@ -464,6 +468,10 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.notification': 'Bildirim',
   },
   en: {
+    // Coming Soon
+    'comingSoon.title': 'Coming Soon!',
+    'comingSoon.description': 'This page and its features will be available very soon. Stay tuned!',
+    'comingSoon.backToHome': 'Back to Home',
     // Premium block modal
     'premiumBlock.title': 'Upload a document, get instant access!',
     'premiumBlock.desc1': 'Upload just one document to',

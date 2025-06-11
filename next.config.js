@@ -40,7 +40,7 @@ const nextConfig = {
   },
   async headers() {
     const allowedOrigins = process.env.NODE_ENV === 'production' 
-      ? ['https://www.medcodes.systems']
+      ? ['https://www.kavunla.com']
       : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004'];
 
     return [

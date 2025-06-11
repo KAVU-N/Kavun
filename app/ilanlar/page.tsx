@@ -34,9 +34,16 @@ interface Ilan {
 }
 
 export default function IlanlarPage() {
+  // --- ÇOK YAKINDA YÖNLENDİRME BLOĞU (kaldırmak için bu bloğu silmen yeterli) ---
+  const router = useRouter();
+  useEffect(() => {
+    router.push('/cok-yakinda');
+  }, []);
+  // --- SONU ---
+
   const { user } = useAuth();
   const { t, language } = useLanguage();
-  const router = useRouter();
+
   const [ilanlar, setIlanlar] = useState<Ilan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
