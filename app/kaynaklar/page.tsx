@@ -714,7 +714,7 @@ export default function KaynaklarPage() {
                   </Link>
                   <button
                     onClick={() => handlePreview(resource)}
-                    className="flex-1 px-4 py-2 bg-[#FFB996] text-white text-center rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300 text-sm"
+                    className="flex-1 px-4 py-2 bg-[#FFB996] text-white text-center rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300 text-sm hidden md:block"
                   >
                     {t('general.preview')}
                   </button>
