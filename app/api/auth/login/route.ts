@@ -59,6 +59,21 @@ export async function POST(req: Request) {
       );
     }
 
+    // Şifre kontrolü
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return NextResponse.json(
+        { error: 'Email veya şifre hatalı' },
+        { 
+          status: 401,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': 'true'
+          }
+        }
+      );
+    }
+
     // Debug için
     console.log('Found user:', {
       id: user._id ? user._id.toString() : '',
@@ -113,20 +128,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // Şifre kontrolü
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return NextResponse.json(
-        { error: 'Email veya şifre hatalı' },
-        { 
-          status: 401,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Credentials': 'true'
-          }
-        }
-      );
-    }
 
     // JWT token oluştur
     const jwtSecret = process.env.JWT_SECRET || 'default-secret';

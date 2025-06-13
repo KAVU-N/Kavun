@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Sayfa yüklendiğinde localStorage'dan kullanıcı bilgisini al
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    if (storedUser && storedUser !== 'undefined') {
       setUser(JSON.parse(storedUser));
     } else {
       setUser(null);
@@ -71,6 +71,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (!response.ok) {
         const error = await response.json();
+        // Eğer email doğrulanmamışsa, doğrulama sayfasına yönlendir
+        if (error.needsVerification && error.email) {
+          router.push(`/auth/verify?email=${encodeURIComponent(error.email)}`);
+          return;
+        }
         throw new Error(error.message || 'Giriş başarısız');
       }
 
