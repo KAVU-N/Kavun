@@ -126,14 +126,15 @@ function RegisterPageInner() {
     try {
       console.log('[DEBUG] register fonksiyonu çağrılıyor');
       await register(
-        name,
-        email,
-        password,
-        selectedRole,
-        university,
-        finalExpertise,
-        grade
-      );
+            name,
+            email,
+            password,
+            selectedRole,
+            university,
+            finalExpertise,
+            grade,
+            token
+          ); // 8 parametre, sırası doğru
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       setError(err.message || t('errors.registrationError') || 'Kayıt olurken bir hata oluştu');

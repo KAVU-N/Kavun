@@ -12,7 +12,16 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, recaptchaToken: string) => Promise<boolean>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    role: string,
+    university: string,
+    expertise: string,
+    grade: number | undefined,
+    recaptchaToken: string
+  ) => Promise<boolean>;
   logout: () => Promise<void>;
 }
 
@@ -38,7 +47,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  const register = async (name: string, email: string, password: string, recaptchaToken: string) => {
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    role: string,
+    university: string,
+    expertise: string,
+    grade: number | undefined,
+    recaptchaToken: string
+  ) => {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -46,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ name, email, password, recaptchaToken }),
+        body: JSON.stringify({ name, email, password, role, university, expertise, grade, recaptchaToken }),
       });
 
       const data = await response.json();
