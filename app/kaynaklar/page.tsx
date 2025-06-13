@@ -499,7 +499,7 @@ export default function KaynaklarPage() {
 {showPreviewModal && previewResource && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           {/* Ana içerik: Kaynağı kaydırılabilir şekilde göster */}
-          <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full max-h-[96vh] flex flex-col overflow-hidden">
+          <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full max-h-[96vh] flex flex-col overflow-hidden sm:max-w-lg sm:max-h-[90vh] md:max-w-2xl md:max-h-[90vh]">
             <div className="flex-1 overflow-auto p-8 relative">
               {/* Kapatma butonu */}
               <button
@@ -520,7 +520,7 @@ export default function KaynaklarPage() {
               {/* PDF Önizleme */}
               {/* PDF ve PNG/Resim dosyaları için önizleme desteği */}
               {((previewResource.format === 'PDF' || (previewResource.fileType && previewResource.fileType.includes('pdf')))) && (
-                <div className="relative w-full h-[85vh]">
+                <div className="relative w-full h-[60vh] sm:h-[40vh] md:h-[50vh]">
                   {/* PDF dosyası için iframe ile önizleme */}
                   <iframe
                     src={previewResource.fileData || previewResource.url}
@@ -533,12 +533,12 @@ export default function KaynaklarPage() {
                 </div>
               )}
               {((previewResource.format === 'Resim' || (previewResource.fileType && (previewResource.fileType.includes('png') || previewResource.fileType.includes('image'))))) && (
-  <div className="relative w-full h-[85vh] flex justify-center items-center bg-white rounded shadow-md">
+  <div className="relative w-full h-[60vh] sm:h-[40vh] md:h-[50vh] flex justify-center items-center bg-white rounded shadow-md">
     {/* PNG veya genel resim dosyası için merkezi ve şık önizleme */}
     <img
       src={previewResource.fileData || previewResource.url}
       alt={previewResource.title}
-      className="max-w-full max-h-[80vh] mx-auto border rounded-lg shadow-lg object-contain bg-white"
+      className="max-w-full max-h-[55vh] sm:max-h-[30vh] md:max-h-[40vh] mx-auto border rounded-lg shadow-lg object-contain bg-white"
       style={{ background: '#fff' }}
     />
     {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
@@ -547,11 +547,11 @@ export default function KaynaklarPage() {
 )}
               {/* Video Önizleme */}
               {previewResource.format === 'Video' && (
-                <div className="relative w-full">
+                <div className="relative w-full h-[60vh] sm:h-[40vh] md:h-[50vh]">
                   <video 
                     src={previewResource.fileData || previewResource.url}
                     controls
-                    className="w-full max-h-[85vh] border rounded"
+                    className="w-full h-full border rounded"
                   ></video>
                   {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
                   {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none"></div>}
