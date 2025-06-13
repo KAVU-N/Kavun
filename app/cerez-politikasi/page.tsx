@@ -44,7 +44,7 @@ export default function CookiePolicyPage() {
                 </div>
                 <p>Çerezler, site işlevselliğini sağlamak, kullanıcı tercihlerini hatırlamak, analiz ve performans ölçümü yapmak için kullanılır.</p>
                 <p>
-                  Google Analytics ve benzeri araçlarda <b>Geliştirilmiş Ölçüm</b> özelliği açık olarak kullanılmaktadır. Bu özellik; sayfa görüntüleme, tıklama, video izleme gibi ek site etkileşimlerini anonim olarak ölçer. Kimliği tanımlayabilecek hiçbir bilginin Google'a gönderilmediğinden emin olunur. Geliştirilmiş ölçüm hakkında detaylı bilgi için <a href="https://support.google.com/analytics/answer/9216061?hl=tr" target="_blank" rel="noopener" className="text-[#FF8B5E] underline">Google Analytics Yardım</a> sayfasını inceleyebilirsiniz.
+                  Google Analytics ve benzeri araçlarda <b>Geliştirilmiş Ölçüm</b> özelliği açık olarak kullanılmaktadır. Bu özellik; sayfa görüntüleme, tıklama, video izleme gibi ek site etkileşimlerini anonim olarak ölçer. Kimliği tanımlayabilecek hiçbir bilginin Google&apos;a gönderilmediğinden emin olunur. Geliştirilmiş ölçüm hakkında detaylı bilgi için <a href="https://support.google.com/analytics/answer/9216061?hl=tr" target="_blank" rel="noopener" className="text-[#FF8B5E] underline">Google Analytics Yardım</a> sayfasını inceleyebilirsiniz.
                 </p>
                 <p>
                   Bu analizler, yalnızca çerez izni verdiğinizde başlatılır.

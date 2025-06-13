@@ -33,7 +33,7 @@ export default function AboutPage() {
       name: 'Kurucu & CEO',
       role: 'Kurucu & CEO',
       image: '/team/placeholder.jpg',
-      bio: 'Eğitim teknolojileri alanında 10 yılı aşkın deneyime sahip, KAVUNLA\'nın vizyonunu şekillendiren lider.'
+      bio: 'Eğitim teknolojileri alanında 10 yılı aşkın deneyime sahip, KAVUNLA&apos;nın vizyonunu şekillendiren lider.'
     },
     {
       name: 'Eğitim Direktörü',
@@ -108,7 +108,7 @@ export default function AboutPage() {
               Vizyonumuz
             </h2>
             <p className="text-[#6B3416]">
-              Türkiye'nin en güvenilir ve tercih edilen çevrimiçi eğitim platformu olmak. Eğitimde fırsat eşitliği yaratarak toplumun her kesiminden öğrencilerin potansiyellerini gerçekleştirmelerine katkıda bulunmak.
+              Türkiye&apos;nin en güvenilir ve tercih edilen çevrimiçi eğitim platformu olmak. Eğitimde fırsat eşitliği yaratarak toplumun her kesiminden öğrencilerin potansiyellerini gerçekleştirmelerine katkıda bulunmak.
             </p>
           </div>
         </div>

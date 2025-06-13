@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher, FaArrowLeft } from 'react-icons/fa';

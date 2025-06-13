@@ -8,7 +8,6 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 
 export default function IlanVerPage() {
   const { user, loading } = useAuth();
-  console.log('ilan-ver/page user:', user, 'loading:', loading);
   const router = useRouter();
   const { t } = useLanguage();
   const [formData, setFormData] = useState({
@@ -21,19 +20,19 @@ export default function IlanVerPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        router.push('/auth/login');
+      } else if (!['instructor', 'teacher'].includes(user.role)) {
+        router.push('/');
+      }
+    }
+  }, [user, loading, router]);
+
   if (loading) {
     return <div className="flex justify-center items-center h-96 text-xl">Yükleniyor...</div>;
   }
-
-  // Sadece eğitmen (instructor) veya öğretmen (teacher) rolüne sahip kullanıcıların erişimine izin ver
-  useEffect(() => {
-    if (loading) return;
-    if (!user) {
-      router.push('/auth/login');
-    } else if (user && !['instructor', 'teacher'].includes(user.role)) {
-      router.push('/');
-    }
-  }, [user, loading, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

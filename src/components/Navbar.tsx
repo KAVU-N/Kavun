@@ -37,7 +37,7 @@ export default function Navbar() {
   const profileRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { user, logout } = useAuth();
-const typedUser = user as User | null;
+  const typedUser = user as User | null;
   const { language, setLanguage, t } = useLanguage();
 
   // İstemci tarafında olduğumuzu işaretleyen effect
@@ -64,7 +64,7 @@ const typedUser = user as User | null;
         window.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [user]);
+  }, [user, mounted]);
 
   // Scroll ve mesaj kontrolü için effect
   useEffect(() => {

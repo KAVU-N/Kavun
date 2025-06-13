@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { FaCalendarAlt, FaClock, FaMoneyBillWave, FaChalkboardTeacher, FaArrowLeft, FaCreditCard, FaCheckCircle } from 'react-icons/fa';
@@ -34,56 +34,16 @@ interface Ilan {
 }
 
 export default function RandevuAlPage() {
-  // Get language context
-  const { language } = useLanguage();
-  
-  // Content based on language
-  const content = {
-    tr: {
-      title: 'Çok Yakında',
-      description: 'Randevu alma sistemi çok yakında hizmetinizde olacak.',
-      buttonText: 'Ana Sayfaya Dön'
-    },
-    en: {
-      title: 'Coming Soon',
-      description: 'The appointment booking system will be available very soon for you. Stay tuned for updates!',
-      buttonText: 'Return to Home Page'
-    }
-  };
-  
-  // Get content based on current language
-  const currentContent = language === 'en' ? content.en : content.tr;
-  
-  // Showing only "Coming Soon" message while keeping the original code
-  const showComingSoon = true; // Set to true to show only the coming soon message
-  
-  if (showComingSoon) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="p-8 text-center">
-            <h1 className="text-4xl font-bold mb-6 text-gray-800">{currentContent.title}</h1>
-            <p className="text-xl text-gray-600 mb-8">{currentContent.description}</p>
-            <Link href="/" className="inline-block px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg font-medium hover:shadow-md transition-all">
-              {currentContent.buttonText}
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  // Original code below - will not be displayed when showComingSoon is true
+  // Tüm hook'lar component'in başında, koşulsuz çağrılıyor
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { language } = useLanguage();
   const ilanId = searchParams?.get('ilanId');
   const teacherId = searchParams?.get('teacherId');
-  
   const [ilan, setIlan] = useState<Ilan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  
   // Randevu bilgileri
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -91,7 +51,6 @@ export default function RandevuAlPage() {
   const [lessonType, setLessonType] = useState<'individual' | 'group'>('individual');
   const [groupSize, setGroupSize] = useState<number>(2);
   const [step, setStep] = useState(1); // 1: Tarih seçimi, 2: Saat seçimi, 3: Ödeme
-  
   // Ödeme bilgileri
   const [cardNumber, setCardNumber] = useState('');
   const [cardName, setCardName] = useState('');
@@ -100,6 +59,7 @@ export default function RandevuAlPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState('');
+  const [showComingSoon, setShowComingSoon] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -138,7 +98,6 @@ export default function RandevuAlPage() {
     }
   }, [ilanId]);
 
-  // Tarih seçildiğinde uygun saatleri getir
   useEffect(() => {
     if (selectedDate) {
       const times = [];
@@ -158,6 +117,35 @@ export default function RandevuAlPage() {
       setAvailableTimes(times);
     }
   }, [selectedDate]);
+
+  if (showComingSoon) {
+    const content = {
+      tr: {
+        title: 'Çok Yakında',
+        description: 'Randevu alma sistemi çok yakında hizmetinizde olacak.',
+        buttonText: 'Ana Sayfaya Dön'
+      },
+      en: {
+        title: 'Coming Soon',
+        description: 'The appointment booking system will be available very soon for you. Stay tuned for updates!',
+        buttonText: 'Return to Home Page'
+      }
+    };
+    const currentContent = language === 'en' ? content.en : content.tr;
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+        <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="p-8 text-center">
+            <h1 className="text-4xl font-bold mb-6 text-gray-800">{currentContent.title}</h1>
+            <p className="text-xl text-gray-600 mb-8">{currentContent.description}</p>
+            <Link href="/" className="inline-block px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg font-medium hover:shadow-md transition-all">
+              {currentContent.buttonText}
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Sonraki adıma geç
   const handleNextStep = () => {

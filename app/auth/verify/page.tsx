@@ -2,13 +2,13 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 
 function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams?.get('email');
-  const { setUser } = useAuth();
+  const { updateUser } = useAuth();
   const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -42,7 +42,7 @@ function VerifyContent() {
         localStorage.setItem('token', data.token);
         
         // Kullanıcı state'ini güncelle
-        setUser(data.user);
+        updateUser(data.user);
         
         setSuccess('Email adresiniz başarıyla doğrulandı! Ana sayfaya yönlendiriliyorsunuz...');
         

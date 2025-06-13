@@ -286,19 +286,25 @@ export default function IlanlarPage() {
             )}
           </div>
 
-          {/* {t('general.resultsInfo')} */}
+          {/* Filtre sonuçları */}
           {!isLoading && !error && filteredIlanlar.length > 0 && (
             <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between">
               <p className="text-[#6B3416] font-medium mb-2 md:mb-0">
                 <span className="text-[#FF8B5E] font-bold">{filteredIlanlar.length}</span> {t('general.resultsFound')}
-                {searchTerm && <span> "{searchTerm}" {t('general.noResultsForSearch')}</span>}
-                {filters.method && <span>, {filters.method} {t('general.method')}</span>}
-                {(filters.priceMin || filters.priceMax) && <span>, {t('general.price')}: {filters.priceMin || '0'} - {filters.priceMax || '∞'} {t('general.currency')}</span>}
+                {searchTerm && (
+                  <span> &quot;{searchTerm}&quot; {t('general.noResultsForSearch')}</span>
+                )}
+                {filters.method && (
+                  <span>, {filters.method} {t('general.method')}</span>
+                )}
+                {(filters.priceMin || filters.priceMax) && (
+                  <span>, {t('general.price')}: {filters.priceMin || '0'} - {filters.priceMax || '∞'} {t('general.currency')}</span>
+                )}
               </p>
             </div>
           )}
           
-          {/* {t('general.content')} */}
+          {/* İçerik */}
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
               <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>

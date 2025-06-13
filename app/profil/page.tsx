@@ -12,16 +12,19 @@ export default function ProfilePage() {
   const { user: authUser } = useAuth();
   const router = useRouter();
   const { t } = useLanguage();
+  const [state, setState] = useState(null);
+  const roleLabel = useMemo(() => authUser?.role === 'student' ? t('auth.student') : t('auth.instructor'), [authUser?.role, t]);
+  const userInitial = useMemo(() => authUser?.name?.[0]?.toUpperCase() || 'U', [authUser?.name]);
+  const shouldRedirect = !authUser;
+  useEffect(() => {
+    if (shouldRedirect) {
+      router.push('/auth/login');
+    }
+  }, [shouldRedirect, router]);
 
-  // Kullanıcı yoksa login'e yönlendir veya yükleniyor ise loading göster
-  if (!authUser) {
-  router.push('/auth/login');
-  return null;
-}
-
-  // useMemo ile rol etiketi ve baş harf
-  const roleLabel = useMemo(() => authUser.role === 'student' ? t('auth.student') : t('auth.instructor'), [authUser.role, t]);
-  const userInitial = useMemo(() => authUser.name?.[0]?.toUpperCase() || 'U', [authUser.name]);
+  if (shouldRedirect) {
+    return null;
+  }
 
   // Profil fotoğrafı componenti
   function ProfilePhoto() {

@@ -7,7 +7,7 @@ import Link from 'next/link';
 // Preserved imports for future use
 /* 
 import Notification from './Notification';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import LessonCalendar from '@/components/calendar/LessonCalendar';
 */
