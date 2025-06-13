@@ -9,7 +9,15 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    role: 'student' | 'teacher' | 'instructor',
+    university: string,
+    expertise?: string,
+    grade?: number | string
+  ) => Promise<void>;
   logout: () => void;
   updateUser: (user: User) => void;
   authChecked: boolean;
@@ -20,7 +28,15 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   error: null,
   login: async () => {},
-  register: async () => {},
+  register: async (
+    name: string,
+    email: string,
+    password: string,
+    role: 'student' | 'teacher' | 'instructor',
+    university: string,
+    expertise?: string,
+    grade?: number | string
+  ) => {},
   logout: () => {},
   updateUser: () => {},
   authChecked: false,
@@ -78,12 +94,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    role: 'student' | 'teacher' | 'instructor',
+    university: string,
+    expertise?: string,
+    grade?: number | string
+  ) => {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password, role, university, expertise, grade })
       });
 
       if (!response.ok) {

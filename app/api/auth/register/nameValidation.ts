@@ -74,9 +74,11 @@ export function validateTextField(text: string, bannedWords: string[], options?:
 }
 
 export function isNameValid(name: string, bannedWords: string[]): { valid: boolean, error?: string } {
+  console.log('[DEBUG][isNameValid] name:', name, JSON.stringify(name), name.split('').map(c => c.charCodeAt(0)));
   if (!name) return { valid: false, error: "Ad soyad boş olamaz." };
 
   // Sadece harf ve boşluk izin ver
+  console.log('[DEBUG][isNameValid] regex öncesi name:', name, JSON.stringify(name), name.split('').map(c => c.charCodeAt(0)));
   if (!/^[a-zA-ZğüşöçıİĞÜŞÖÇ ]+$/.test(name)) {
     return { valid: false, error: "Ad soyad sadece harflerden oluşmalıdır." };
   }

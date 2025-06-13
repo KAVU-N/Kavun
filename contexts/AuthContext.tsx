@@ -141,11 +141,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (data: RegisterData) => {
+  console.log('[DEBUG][AuthContext] register fonksiyonu başladı', data);
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/register', {
+      console.log('[DEBUG][AuthContext] fetch başlatılıyor');
+    const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
