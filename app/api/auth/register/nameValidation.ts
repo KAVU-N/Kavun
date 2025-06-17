@@ -52,8 +52,8 @@ export function loadBannedWords(): string[] {
 export function validateTextField(text: string, bannedWords: string[], options?: { requireTurkishWord?: boolean, minLen?: number, maxLen?: number }): { valid: boolean, error?: string } {
   if (!text) return { valid: false, error: "Alan boş olamaz." };
   // Her kelimenin maksimum 50 karakter kontrolü
-  const words = text.trim().split(/\s+/);
-  if (words.some(w => w.length > 50)) {
+  const wordsLenCheck = text.trim().split(/\s+/);
+  if (wordsLenCheck.some(w => w.length > 50)) {
     return { valid: false, error: "Her bir kelime en fazla 50 karakter olabilir." };
   }
   if (allCharsSame(text.replace(/\s/g, ''))) {
@@ -62,10 +62,11 @@ export function validateTextField(text: string, bannedWords: string[], options?:
   if (hasKeyboardPattern(text)) {
     return { valid: false, error: "Anlamsız dizi tespit edildi." };
   }
-  // Yasaklı kelime kontrolü
+  // Yasaklı kelime kontrolü (sadece tam kelime eşleşmesi)
   const lower = text.toLocaleLowerCase("tr-TR");
+  const words = lower.split(/[^a-zA-ZğüşöçıİĞÜŞÖÇ0-9]+/).filter(Boolean);
   for (const banned of bannedWords) {
-    if (lower.includes(banned)) {
+    if (words.includes(banned)) {
       return { valid: false, error: "Uygunsuz kelime tespit edildi." };
     }
   }

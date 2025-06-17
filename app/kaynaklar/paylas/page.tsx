@@ -210,9 +210,9 @@ export default function KaynakPaylasPage() {
       setSuccess(true);
       setTimeout(() => { router.push('/kaynaklar'); }, 2000);
     } catch (err: any) {
+      // Sadece "uygunsuz içerik" kelimesi geçen çok özel bir hata varsa fail sayfasına yönlendir, diğer tüm hata mesajlarını ekranda göster
       if (
-        err.message?.includes('uygunsuz içerik') ||
-        err.message?.toLowerCase().includes('uygunsuz')
+        err.message === 'uygunsuz içerik'
       ) {
         router.push('/kaynaklar/paylas/fail');
       } else {
