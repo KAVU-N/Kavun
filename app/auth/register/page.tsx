@@ -234,7 +234,7 @@ function RegisterPageInner() {
       {/* Info Icon */}
       <svg width="16" height="16" fill="currentColor" className="text-[#FF8B5E] inline-block"><circle cx="8" cy="8" r="8" fill="#FF8B5E"/><text x="8" y="12" textAnchor="middle" fontSize="10" fill="#fff">i</text></svg>
       {showNameInfo && (
-        <div className="absolute left-0 bottom-6 z-20 bg-white border border-[#FFB996] rounded-md shadow-lg p-3 w-64 text-xs text-[#6B3416] animate-fade-in">
+        <div className="absolute left-0 top-6 z-20 bg-white border border-[#FFB996] rounded-md shadow-lg p-3 w-64 text-xs text-[#6B3416] animate-fade-in">
           <div className="flex items-center gap-2 mb-1">
             {nameRuleChecks.capitalized ? <CheckIcon /> : <CrossIcon />} {t('nameRule.capitalized')}
           </div>
@@ -272,7 +272,7 @@ function RegisterPageInner() {
     >
       <svg width="16" height="16" fill="currentColor" className="text-[#FF8B5E] inline-block"><circle cx="8" cy="8" r="8" fill="#FF8B5E"/><text x="8" y="12" textAnchor="middle" fontSize="10" fill="#fff">i</text></svg>
       {showEmailInfo && (
-        <div className="absolute left-0 bottom-6 z-20 bg-white border border-[#FFB996] rounded-md shadow-lg p-3 w-64 text-xs text-[#6B3416] animate-fade-in">
+        <div className="absolute left-0 top-6 z-20 bg-white border border-[#FFB996] rounded-md shadow-lg p-3 w-64 text-xs text-[#6B3416] animate-fade-in">
           <div className="flex items-center gap-2 mb-1">
             {emailRuleChecks.validFormat ? <CheckIcon /> : <CrossIcon />} {t('emailRule.validFormat')}
           </div>
@@ -307,7 +307,7 @@ function RegisterPageInner() {
     >
       <svg width="16" height="16" fill="currentColor" className="text-[#FF8B5E] inline-block"><circle cx="8" cy="8" r="8" fill="#FF8B5E"/><text x="8" y="12" textAnchor="middle" fontSize="10" fill="#fff">i</text></svg>
       {showPasswordInfo && (
-        <div className="absolute left-0 bottom-6 z-20 bg-white border border-[#FFB996] rounded-md shadow-lg p-3 w-64 text-xs text-[#6B3416] animate-fade-in">
+        <div className="absolute left-0 top-6 z-20 bg-white border border-[#FFB996] rounded-md shadow-lg p-3 w-64 text-xs text-[#6B3416] animate-fade-in">
           <div className="flex items-center gap-2 mb-1">
             {passwordRuleChecks.minLength ? <CheckIcon /> : <CrossIcon />} {t('passwordRule.minLength')}
           </div>
