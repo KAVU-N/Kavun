@@ -15,6 +15,17 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 // Türkçe ve İngilizce çeviriler
 const translations: Record<Language, Record<string, string>> = {
   tr: {
+    // Kayıt kuralları info çevirileri
+    'nameRule.capitalized': 'Baş harfler büyük olmalı',
+    'nameRule.onlyLetters': 'Sadece harf ve boşluk olmalı',
+    'nameRule.twoWords': 'En az iki kelime olmalı',
+    'emailRule.validFormat': 'Geçerli e-posta formatı',
+    'emailRule.correctDomain': '@std.ankaramedipol.edu.tr uzantısı',
+    'passwordRule.minLength': 'En az 8 karakter',
+    'passwordRule.uppercase': 'En az bir büyük harf',
+    'passwordRule.lowercase': 'En az bir küçük harf',
+    'passwordRule.digit': 'En az bir rakam',
+    'passwordRule.special': 'En az bir özel karakter',
     // Premium engel modalı
     'premiumBlock.title': 'Belge yükle, erişim kazan!',
     'premiumBlock.desc1': 'Sadece bir belge yükleyerek',
@@ -468,6 +479,17 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.notification': 'Bildirim',
   },
   en: {
+    // Register rules info translations
+    'nameRule.capitalized': 'Each word must start with a capital letter',
+    'nameRule.onlyLetters': 'Only letters and spaces allowed',
+    'nameRule.twoWords': 'At least two words required',
+    'emailRule.validFormat': 'Valid email format',
+    'emailRule.correctDomain': 'Must end with @std.ankaramedipol.edu.tr',
+    'passwordRule.minLength': 'At least 8 characters',
+    'passwordRule.uppercase': 'At least one uppercase letter',
+    'passwordRule.lowercase': 'At least one lowercase letter',
+    'passwordRule.digit': 'At least one digit',
+    'passwordRule.special': 'At least one special character',
     // Coming Soon
     'comingSoon.title': 'Coming Soon!',
     'comingSoon.description': 'This page and its features will be available very soon. Stay tuned!',
