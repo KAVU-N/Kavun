@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('TOKEN (login sonrası, cookie):', document.cookie);
         console.log('TOKEN (login sonrası, value):', data.token);
       }
-      router.push('/');
+      router.push('/kaynaklar');
     } catch (error) {
       throw error;
     }
@@ -134,7 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('TOKEN (register sonrası, cookie):', document.cookie);
         console.log('TOKEN (register sonrası, value):', data.token);
       }
-      router.push('/');
+      router.push('/kaynaklar');
     } catch (error) {
       throw error;
     }
