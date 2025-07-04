@@ -279,11 +279,10 @@ const translations: Record<Language, Record<string, string>> = {
     'general.currency': 'TL',
     
     // Anasayfa
-    'home.mainTitle': 'İhtiyacına en uygun öğrencileri bul, hemen öğrenmeye başla!',
+    'home.mainTitle': 'Öğrenci hayatını kolaylaştıran her şey burada',
     'home.showAllUniversities': 'Tüm üniversiteleri göster',
     'home.allUniversities': 'Tüm Üniversiteler',
     'home.selectUniversity': 'Üniversitenizi seçin...',
-    'home.description': 'Kavunla, aynı üniversite öğrencilerini bir araya getiren yeni nesil bir eğitim platformudur.',
     'home.exploreCourses': 'Kursları Keşfet',
     'home.howToContinue': 'Nasıl devam etmek istersiniz?',
     'home.continueAsStudent': 'Öğrenci Olarak Devam Et',
