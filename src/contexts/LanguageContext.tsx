@@ -283,7 +283,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.showAllUniversities': 'Tüm üniversiteleri göster',
     'home.allUniversities': 'Tüm Üniversiteler',
     'home.selectUniversity': 'Üniversitenizi seçin...',
-    'home.description': 'Kavunla, aynı üniversite öğrencilerini bir araya getiren yeni nesil bir eğitim platformudur.',
+    'home.description': 'Kavunla,üniversite öğrencilerinin günlük yaşamlarını kolaylaştırmak için tasarlanmış bir platformudur.',
     'home.exploreCourses': 'Kursları Keşfet',
     'home.howToContinue': 'Nasıl devam etmek istersiniz?',
     'home.continueAsStudent': 'Öğrenci Olarak Devam Et',
