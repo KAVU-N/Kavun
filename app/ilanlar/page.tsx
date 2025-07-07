@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from 'src/context/AuthContext';
-import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaSearch, FaFilter, FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher } from 'react-icons/fa';
@@ -34,13 +34,7 @@ interface Ilan {
 }
 
 export default function IlanlarPage() {
-  // --- ÇOK YAKINDA YÖNLENDİRME BLOĞU (kaldırmak için bu bloğu silmen yeterli) ---
   const router = useRouter();
-  useEffect(() => {
-    router.push('/cok-yakinda');
-  }, []);
-  // --- SONU ---
-
   const { user } = useAuth();
   const { t, language } = useLanguage();
 

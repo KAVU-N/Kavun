@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Notification from './Notification';
 import { useAuth } from 'src/context/AuthContext';
 import Link from 'next/link';
@@ -28,12 +27,6 @@ interface ChatUser {
 }
 
 export default function MessagesPage() {
-  // --- ÇOK YAKINDA YÖNLENDİRME BLOĞU (kaldırmak için bu bloğu silmen yeterli) ---
-  const router = useRouter();
-  useEffect(() => {
-    router.push('/cok-yakinda');
-  }, []);
-  // --- SONU ---
 
   const { user } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);

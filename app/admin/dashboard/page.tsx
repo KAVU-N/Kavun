@@ -86,6 +86,7 @@ interface Stats {
   lessonCount: number
   paymentTotal: number
   resourceCount: number
+  projectCount: number
 }
 
 const AdminDashboard = () => {
@@ -94,7 +95,8 @@ const AdminDashboard = () => {
     courseCount: 0,
     lessonCount: 0,
     paymentTotal: 0,
-    resourceCount: 0
+    resourceCount: 0,
+     projectCount: 0
   })
   const [loading, setLoading] = useState(true)
   const { t } = useLanguage()
@@ -154,6 +156,17 @@ const AdminDashboard = () => {
           </div>
         </div>
         
+        {/* Projects Card */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="text-sm text-gray-500">Toplam Projeler</div>
+          <div className="text-3xl font-bold mt-2">{stats.projectCount}</div>
+          <div className="mt-4 flex gap-2">
+            <a href="/admin/projects" className="text-blue-600 text-sm hover:underline">
+              Projeleri Görüntüle →
+            </a>
+          </div>
+        </div>
+
         {/* Lessons Card */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="text-sm text-gray-500">{t('totalLessons') || 'Toplam Dersler'}</div>

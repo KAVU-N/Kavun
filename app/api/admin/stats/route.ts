@@ -6,6 +6,7 @@ import Course from '@/models/Course'
 import Lesson from '@/models/Lesson'
 import Payment from '@/models/Payment'
 import Resource from '@/models/Resource' // Added import statement for Resource model
+import Project from '@/models/Project' // Proje modeli
 import { cookies } from 'next/headers'
 import { verify } from 'jsonwebtoken'
 
@@ -48,7 +49,8 @@ export async function GET(request: NextRequest) {
     const userCount = await User.countDocuments()
     const courseCount = await Course.countDocuments()
     const lessonCount = await Lesson.countDocuments()
-    const resourceCount = await Resource.countDocuments(); // Added line to count resources
+    const resourceCount = await Resource.countDocuments();
+    const projectCount = await Project.countDocuments();
     
     // Toplam ödeme miktarını hesapla
     const payments = await Payment.find()
@@ -59,7 +61,8 @@ export async function GET(request: NextRequest) {
       courseCount,
       lessonCount,
       paymentTotal,
-      resourceCount // Added resourceCount to the returned statistics
+      resourceCount,
+      projectCount
     })
   } catch (error) {
     console.error('Stats error:', error)
