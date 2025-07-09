@@ -179,16 +179,8 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     if (instructor._id && user) {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.error('Token bulunamadı');
-          return;
-        }
-        
         const response = await fetch(`/api/messages?receiverId=${instructor._id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          credentials: 'include'
         });
         
         if (!response.ok) {
@@ -238,12 +230,6 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     if (!newMessage.trim() || !user) return;
     
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('Token bulunamadı');
-        return;
-      }
-      
       // Mesajı önce UI'da göster
       const tempMessage: Message = {
         sender: user.id,
@@ -273,9 +259,9 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           receiver: instructor._id,
           content: newMessage.trim()

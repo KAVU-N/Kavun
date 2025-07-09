@@ -21,10 +21,23 @@ export default function CreateProjectPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  const { containsProhibited, isValidLinkedInUrl } = require('@/lib/contentFilter');
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Basit içerik kontrolü (istemci tarafı)
+      const check = [form.title, form.description, form.requirements, form.benefits];
+      if (!isValidLinkedInUrl(form.linkedinUrl)) {
+        alert('LinkedIn URL geçersiz');
+        setLoading(false);
+        return;
+      }
+      if (check.some((f) => containsProhibited(f))) {
+        alert('Uygunsuz içerik tespit edildi. Lütfen metni düzenleyin.');
+        setLoading(false);
+        return;
+      }
       const payload = {
         ...form,
         ownerId: user?._id || user?.id || undefined,

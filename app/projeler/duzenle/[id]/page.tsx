@@ -66,10 +66,18 @@ export default function EditProjectPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const { containsProhibited } = require('@/lib/contentFilter');
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
     setSaving(true);
+    // İçerik kontrolü
+    const toCheck = [form.title, form.description, form.requirements, form.benefits];
+    if (toCheck.some((f) => containsProhibited(f))) {
+      alert('Uygunsuz içerik tespit edildi. Lütfen metni düzenleyin.');
+      setSaving(false);
+      return;
+    }
     try {
       const res = await fetch(`/api/projects/${id}`, {
         method: "PATCH",

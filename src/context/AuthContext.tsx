@@ -90,8 +90,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const secure = isHttps && !isLocalhost ? '; Secure' : '';
         const domain = isHttps && !isLocalhost ? '; domain=.kavunla.com' : '';
         document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${domain}`;
-        console.log('TOKEN (login sonrası, cookie):', document.cookie);
-        console.log('TOKEN (login sonrası, value):', data.token);
+        localStorage.setItem('token', data.token);
+        console.log('TOKEN (login sonrası):', data.token);
       }
       router.push('/kaynaklar');
     } catch (error) {
@@ -131,8 +131,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const secure = isHttps && !isLocalhost ? '; Secure' : '';
         const domain = isHttps && !isLocalhost ? '; domain=.kavunla.com' : '';
         document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${domain}`;
-        console.log('TOKEN (register sonrası, cookie):', document.cookie);
-        console.log('TOKEN (register sonrası, value):', data.token);
+        localStorage.setItem('token', data.token);
+        console.log('TOKEN (register sonrası):', data.token);
       }
       router.push('/kaynaklar');
     } catch (error) {
@@ -143,6 +143,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    // Çerezden token sil
+    document.cookie = 'token=; path=/; Max-Age=0';
     router.push('/');
   };
 

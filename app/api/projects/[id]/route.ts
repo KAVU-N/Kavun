@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
+import { containsProhibited, isValidLinkedInUrl } from '@/lib/contentFilter';
 import Project from '@/models/Project';
 
 // Tek proje getir
@@ -21,6 +22,16 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     await connectDB();
     const { id } = params;
     const updates = await request.json();
+
+    // İçerik güvenlik kontrolü
+    const checkFields = [updates.title, updates.description, updates.requirements, updates.benefits];
+    if (updates.linkedinUrl && !isValidLinkedInUrl(updates.linkedinUrl)) {
+      return NextResponse.json({ error: 'LinkedIn URL geçersiz' }, { status: 400 });
+    }
+
+    if (checkFields.some((f: string) => containsProhibited(f))) {
+      return NextResponse.json({ error: 'Uygunsuz içerik tespit edildi' }, { status: 400 });
+    }
 
     const updated = await (Project as any).findByIdAndUpdate(id, updates, { new: true });
     if (!updated) {
