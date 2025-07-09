@@ -24,7 +24,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     const updates = await request.json();
 
     // İçerik güvenlik kontrolü
-    const checkFields = [updates.title, updates.description, updates.requirements, updates.benefits];
+    const checkFields = [updates.title, updates.description, updates.requirements, updates.benefits, updates.position];
     if (updates.linkedinUrl && !isValidLinkedInUrl(updates.linkedinUrl)) {
       return NextResponse.json({ error: 'LinkedIn URL geçersiz' }, { status: 400 });
     }

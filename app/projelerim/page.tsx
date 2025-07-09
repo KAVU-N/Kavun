@@ -14,6 +14,7 @@ export default function MyProjectsPage() {
     linkedinUrl: string;
     category: string;
     ownerId: string;
+    position?: string;
   }
 
   const { t } = useLanguage();
@@ -64,10 +65,11 @@ export default function MyProjectsPage() {
             <div key={p._id} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02] flex flex-col p-4">
 
               <h2 className="font-semibold text-lg text-[#994D1C] mb-1 line-clamp-1">{p.title}</h2>
-              <p className="text-sm text-gray-700 line-clamp-3 mb-3 flex-1">{p.description}</p>
+              <p className="text-sm text-gray-700 line-clamp-3 mb-1 flex-1">{p.description}</p>
+               {p.position && <p className="text-xs text-gray-600 mb-3">{t('project.position')}: {p.position}</p>}
               <div className="flex justify-between items-center mt-auto gap-2">
-                <Link href={`/projeler/duzenle/${p._id}`} className="flex-1 text-center bg-[#FF8B5E] hover:bg-[#FFD7A8] text-white font-semibold px-3 py-1 rounded transition text-sm">Düzenle</Link>
-                <button onClick={() => setDeleteId(p._id)} className="flex-1 text-center bg-[#994D1C] hover:bg-[#7e3f17] text-white font-semibold px-3 py-1 rounded transition text-sm">Sil</button>
+                <Link href={`/projeler/duzenle/${p._id}`} className="flex-1 text-center bg-[#FF8B5E] hover:bg-[#FFD7A8] text-white font-semibold px-3 py-1 rounded transition text-sm">{t('common.edit') || 'Düzenle'}</Link>
+                <button onClick={() => setDeleteId(p._id)} className="flex-1 text-center bg-[#994D1C] hover:bg-[#7e3f17] text-white font-semibold px-3 py-1 rounded transition text-sm">{t('common.delete') || 'Sil'}</button>
               </div>
             </div>
           ))}

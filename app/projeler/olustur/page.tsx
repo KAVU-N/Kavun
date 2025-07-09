@@ -16,6 +16,7 @@ export default function CreateProjectPage() {
     contact: user?.email || "",
     requirements: "",
     benefits: "",
+    position: "",
   });
   const [loading, setLoading] = useState(false);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -67,6 +68,7 @@ export default function CreateProjectPage() {
 
         {/* Başvuran Gereksinimleri */}
         <textarea name="requirements" value={form.requirements} onChange={handleChange} placeholder="Başvuranın Gereksinimleri" className="w-full border p-2 h-24 rounded" />
+        <input name="position" value={form.position} onChange={handleChange} placeholder="Aradığımız Kişi / Pozisyon" className="w-full border p-2 rounded" />
         {/* Sağlanan Fırsatlar */}
         <textarea name="benefits" value={form.benefits} onChange={handleChange} placeholder="Başvurana Sağlayacaklarımız" className="w-full border p-2 h-24 rounded" />
         <select name="category" value={form.category} onChange={handleChange} className="w-full border p-2 rounded">

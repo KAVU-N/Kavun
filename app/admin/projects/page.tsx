@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/src/contexts/LanguageContext";
 
 interface Project {
+  position?: string;
   _id: string;
   title: string;
   description: string;
@@ -106,7 +107,8 @@ export default function AdminProjectsPage() {
                   {p.category}
                 </span>
               </div>
-              <p className="text-sm text-gray-700 line-clamp-3 mb-3 flex-1">{p.description}</p>
+              <p className="text-sm text-gray-700 line-clamp-3 mb-1 flex-1">{p.description}</p>
+               {p.position && <p className="text-xs text-gray-600 mb-3">{t('project.position')}: {p.position}</p>}
               <div className="text-xs text-gray-500 mb-2">Owner: {p.ownerId}</div>
               <div className="flex gap-2 mt-auto">
                 <a href={`/projeler/${p._id}`} target="_blank" className="flex-1 text-center bg-[#FF8B5E]/80 hover:bg-[#FF8B5E] text-white font-semibold px-3 py-1 rounded text-sm">Detay</a>

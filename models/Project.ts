@@ -6,6 +6,7 @@ export interface IProject extends Document {
   shortDescription?: string;
   requirements?: string;
   benefits?: string;
+  position?: string;
   category: 'Web' | 'Mobil' | 'Masaüstü' | 'Yapay Zeka' | 'Genel' | 'Diğer';
   ownerId: string;
   contact: string;
@@ -36,6 +37,9 @@ const projectSchema = new mongoose.Schema<IProject>({
     type: String
   },
   benefits: {
+    type: String
+  },
+  position: {
     type: String
   },
   category: {

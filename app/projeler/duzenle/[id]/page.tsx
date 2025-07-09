@@ -12,6 +12,7 @@ interface Project {
   contact: string;
   requirements: string;
   benefits: string;
+  position: string;
   category: string;
   status?: string;
 }
@@ -31,6 +32,7 @@ export default function EditProjectPage() {
     requirements: "",
     benefits: "",
     category: "Genel",
+    position: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -50,6 +52,7 @@ export default function EditProjectPage() {
           contact: data.contact || "",
           requirements: data.requirements || "",
           benefits: data.benefits || "",
+           position: data.position || "",
           category: data.category || "Genel",
           status: data.status,
         });
@@ -106,6 +109,7 @@ export default function EditProjectPage() {
         <input required name="contact" value={form.contact} onChange={handleChange} placeholder="İletişim (e-posta, Discord vs.)" className="w-full border p-2 rounded" />
         <textarea name="requirements" value={form.requirements} onChange={handleChange} placeholder="Başvuranın Gereksinimleri" className="w-full border p-2 h-24 rounded" />
         <textarea name="benefits" value={form.benefits} onChange={handleChange} placeholder="Başvurana Sağlayacaklarımız" className="w-full border p-2 h-24 rounded" />
+         <input name="position" value={form.position} onChange={handleChange} placeholder="Aradığımız Kişi / Pozisyon" className="w-full border p-2 rounded" />
         <select name="category" value={form.category} onChange={handleChange} className="w-full border p-2 rounded">
           <option value="Genel">Genel</option>
           <option value="Web">Web</option>

@@ -6,6 +6,12 @@ import Link from "next/link";
 import { useLanguage } from "@/src/contexts/LanguageContext";
 
 interface Project {
+  position?: string;
+  requirements?: string;
+  benefits?: string;
+  projectUrl?: string;
+  githubUrl?: string;
+  liveUrl?: string;
   _id: string;
   title: string;
   description: string;
@@ -19,6 +25,19 @@ interface Project {
 }
 
 export default function ProjectDetailPage() {
+  const categoryKey: Record<string,string> = {
+    'Web':'category.web',
+    'Mobil':'category.mobile',
+    'Masaüstü':'category.desktop',
+    'Yapay Zeka':'category.ai',
+    'Genel':'category.general',
+    'Diğer':'category.other'
+  };
+  const statusKey: Record<string,string> = {
+    'Devam Ediyor':'status.ongoing',
+    'Tamamlandı':'status.completed',
+    'Planlanıyor':'status.planned'
+  };
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const { t } = useLanguage();
@@ -47,17 +66,32 @@ export default function ProjectDetailPage() {
   if (!project) return <div className="pt-28 text-center">Proje bulunamadı</div>;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 pt-28 pb-12">
+    <div className="max-w-5xl mx-auto px-4 pt-28 pb-12">
       <h1 className="text-3xl font-bold text-[#994D1C] mb-4">{project.title}</h1>
-      <div className="bg-white rounded-xl shadow-md p-6 space-y-4">
-        <p className="text-[#6B3416] whitespace-pre-line">{project.description}</p>
+      <div className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
+        <p className="text-[#6B3416] whitespace-pre-line leading-relaxed text-lg">{project.description}</p>
         <div className="flex flex-wrap gap-2 text-sm">
-          <span className="bg-[#FF8B5E] text-white px-2 py-1 rounded-lg">{project.category}</span>
-          {project.status && <span className="bg-[#FFE5D9] text-[#994D1C] px-2 py-1 rounded-lg">{project.status}</span>}
+          <span className="bg-[#FF8B5E] text-white px-3 py-1 rounded-full text-xs font-medium">{t(categoryKey[project.category] ?? project.category)}</span>
+          {project.status && <span className="bg-[#FFE5D9] text-[#994D1C] px-3 py-1 rounded-full text-xs font-medium">{t(statusKey[project.status] ?? project.status)}</span>}
         </div>
+        {project.requirements && (
+          <div>
+            <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.requirements')}</h2>
+            <p className="whitespace-pre-line">{project.requirements}</p>
+          </div>
+        )}
+        {project.position && (
+          <p><span className="font-semibold">{t('project.position')}: </span>{project.position}</p>
+        )}
+        {project.benefits && (
+          <div>
+            <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.benefits')}</h2>
+            <p className="whitespace-pre-line">{project.benefits}</p>
+          </div>
+        )}
         {project.technologies && project.technologies.length > 0 && (
           <div>
-            <h2 className="font-semibold mb-1">Teknolojiler:</h2>
+            <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.technologies')}</h2>
             <ul className="list-disc list-inside">
               {project.technologies.map((tech) => (
                 <li key={tech}>{tech}</li>
@@ -66,8 +100,11 @@ export default function ProjectDetailPage() {
           </div>
         )}
         <div>
-          <h2 className="font-semibold mb-1">İletişim:</h2>
+          <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.contact')}</h2>
           <p>{project.contact}</p>
+          {project.projectUrl && (
+            <p><span className="font-semibold">{t('project.url')}: </span><Link href={project.projectUrl} target="_blank" className="text-blue-600 underline break-all">{project.projectUrl}</Link></p>
+          )}
         </div>
         {project.linkedinUrl && (
           <div>
