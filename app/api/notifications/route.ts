@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import connectDB from '@/lib/mongodb';
 import Notification from '@/models/Notification';
 import { NextResponse } from 'next/server';
@@ -9,8 +10,15 @@ import User from '@/models/User';
 export async function GET(request: Request) {
   await connectDB();
   // Token'dan kullanıcıyı al
+  let user = null as any;
   const authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
-  const user = authHeader ? await getUserFromToken(authHeader) : null;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    user = await getUserFromToken(authHeader);
+  }
+  // Eğer header yoksa veya kullanıcı doğrulanamadıysa, cookie içindeki token'ı dene
+  if (!user) {
+    user = await getUserFromToken(request);
+  }
   if (!user || !user.id) {
     return NextResponse.json({ notifications: [] });
   }
@@ -22,12 +30,12 @@ export async function GET(request: Request) {
     // Hoş geldin bildirimi silinmişse, asla yeni hoş geldin bildirimi oluşturma!
     let filter: any = {};
     if (user.role === 'student') {
-      filter = { read: false, $or: [ { userId: userId }, { userId: 'all' }, { userId: 'student' } ] };
+      filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'student' } ] };
     } else if (user.role === 'teacher' || user.role === 'instructor') {
-      filter = { read: false, $or: [ { userId: userId }, { userId: 'all' }, { userId: 'teacher' }, { userId: 'instructor' } ] };
+      filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'teacher' }, { userId: 'instructor' } ] };
     } else {
       // admin ve diğer roller sadece kendi userId'si ile görebilir
-      filter = { read: false, userId: userId };
+      filter = { userId: userId };
     }
     const notifications = await Notification.find(filter).sort({ createdAt: -1 });
     return NextResponse.json({ notifications });
@@ -50,15 +58,34 @@ export async function GET(request: Request) {
   // Bildirimleri getirirken sadece hedef kitleye uygun olanları göster
   let filter: any = {};
   if (user.role === 'student') {
-    filter = { read: false, $or: [ { userId: userId }, { userId: 'all' }, { userId: 'student' } ] };
+    filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'student' } ] };
   } else if (user.role === 'teacher' || user.role === 'instructor') {
-    filter = { read: false, $or: [ { userId: userId }, { userId: 'all' }, { userId: 'teacher' }, { userId: 'instructor' } ] };
+    filter = { $or: [ { userId: userId }, { userId: 'all' }, { userId: 'teacher' }, { userId: 'instructor' } ] };
   } else {
     // admin ve diğer roller sadece kendi userId'si ile görebilir
-    filter = { read: false, userId: userId };
+    filter = { userId: userId };
   }
-  const notifications = await Notification.find(filter).sort({ createdAt: -1 });
-  return NextResponse.json({ notifications });
+  const notifications = await Notification.find(filter).lean();
+  // Ek: Announcement'ları da dahil et
+  let annFilter: any = { target: 'all' };
+  if (user.role === 'student') {
+    annFilter = { target: { $in: ['all', 'student'] } };
+  } else if (user.role === 'teacher' || user.role === 'instructor') {
+    annFilter = { target: { $in: ['all', 'teacher'] } };
+  }
+  const announcements = await (await import('@/models/Announcement')).default.find(annFilter).lean();
+  const annAsNotifications = announcements.map((ann: any) => ({
+    _id: ann._id,
+    userId: ann.target,
+    title: ann.title,
+    message: ann.content,
+    type: 'announcement',
+    read: false,
+    createdAt: ann.date,
+    actionUrl: '/ilanlar'
+  }));
+  const combined = [...notifications, ...annAsNotifications].sort((a: any, b: any) => (b.createdAt as any) - (a.createdAt as any));
+  return NextResponse.json({ notifications: combined });
 }
 
 // Bildirim oluştur

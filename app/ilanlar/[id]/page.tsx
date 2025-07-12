@@ -237,17 +237,6 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               <div className="text-sm text-gray-500 mb-8">
                 İlan Tarihi: {formatDate(ilan.createdAt)}
               </div>
-              
-              {/* İletişim Butonu */}
-              <div className="flex justify-center">
-                <Link
-                  href={`/mesajlar?recipient=${ilan.userId}`}
-                  className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-xl font-medium hover:shadow-md transition-all duration-300 flex items-center"
-                >
-                  <FaUser className="mr-2" />
-                  Eğitmen ile İletişime Geç
-                </Link>
-              </div>
             </div>
           )}
         </div>

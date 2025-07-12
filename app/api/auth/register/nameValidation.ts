@@ -80,7 +80,8 @@ export function isNameValid(name: string, bannedWords: string[]): { valid: boole
 
   // Sadece harf ve boşluk izin ver
   console.log('[DEBUG][isNameValid] regex öncesi name:', name, JSON.stringify(name), name.split('').map(c => c.charCodeAt(0)));
-  if (!/^[a-zA-ZğüşöçıİĞÜŞÖÇ ]+$/.test(name)) {
+  // Unicode harfler ve boşluk izin ver
+  if (!/^([\p{L}]+\s?)+$/u.test(name)) {
     return { valid: false, error: "Ad soyad sadece harflerden oluşmalıdır." };
   }
 
@@ -100,8 +101,9 @@ export function isNameValid(name: string, bannedWords: string[]): { valid: boole
     return { valid: false, error: "Ad ve soyad aynı olamaz." };
   }
 
-  // Her kelime başı büyük harf, geri kalanı küçük harf olmalı
-  if (!isProperNameFormat(name)) {
+  // Türkçe/Latin karakterli isimler için baş harf büyük kontrolü isteğe bağlı; Unicode isimlerde atla
+  const isLatin = /^[a-zA-ZğüşöçıİĞÜŞÖÇ ]+$/i.test(name);
+  if (isLatin && !isProperNameFormat(name)) {
     return { valid: false, error: "Her kelime baş harfi büyük, devamı küçük harf olmalıdır (örn: Ali Veli)." };
   }
 

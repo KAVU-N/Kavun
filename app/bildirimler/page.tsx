@@ -28,11 +28,12 @@ export default function NotificationsPage() {
         return;
       }
 
-      // Cookie ile kimlik doğrulama
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const response = await fetch('/api/notifications', {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         credentials: 'include'
       });

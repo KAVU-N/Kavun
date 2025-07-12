@@ -37,14 +37,26 @@ export async function getUserFromToken(requestOrToken: Request | { headers: { au
     } else if (requestOrToken instanceof Request) {
       // app router: Request
       const authHeader = requestOrToken.headers.get('Authorization');
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        console.log('Token bulunamadı veya geçersiz format');
-        return null;
+    }
+    // Eğer Authorization başlığı yoksa veya token halen boşsa, cookie içinden almaya çalış
+    if (!token) {
+      let cookieHeader = '';
+      if (requestOrToken instanceof Request) {
+        cookieHeader = requestOrToken.headers.get('cookie') || '';
+      } else if (typeof requestOrToken !== 'string' && 'headers' in requestOrToken) {
+        if (requestOrToken.headers instanceof Headers) {
+          cookieHeader = requestOrToken.headers.get('cookie') || '';
+        } else {
+          cookieHeader = (requestOrToken.headers as any)['cookie'] || '';
+        }
       }
-      token = authHeader.split(' ')[1];
+      const match = cookieHeader.match(/token=([^;]+)/);
+      if (match) {
+        token = match[1];
+      }
     }
     if (!token) {
-      console.log('Token boş');
+      console.log('Token bulunamadı (header ve cookie).');
       return null;
     }
     // Token'ı doğrula ve payload'ı çıkar

@@ -1,6 +1,27 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
 
-const projectSchema = new mongoose.Schema({
+export interface IProject extends Document {
+  title: string;
+  description: string;
+  shortDescription?: string;
+  requirements?: string;
+  benefits?: string;
+  position?: string;
+  category: 'Web' | 'Mobil' | 'Masaüstü' | 'Yapay Zeka' | 'Genel' | 'Diğer';
+  ownerId: string;
+  contact: string;
+  isApproved: boolean;
+  linkedinUrl: string;
+  projectUrl?: string;
+  technologies?: string[];
+  githubUrl?: string;
+  liveUrl?: string;
+  status: 'Devam Ediyor' | 'Tamamlandı' | 'Planlanıyor';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const projectSchema = new mongoose.Schema<IProject>({
   title: {
     type: String,
     required: [true, 'Başlık zorunludur']
@@ -9,20 +30,43 @@ const projectSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Açıklama zorunludur']
   },
+  shortDescription: {
+    type: String
+  },
+  requirements: {
+    type: String
+  },
+  benefits: {
+    type: String
+  },
+  position: {
+    type: String
+  },
   category: {
     type: String,
     enum: ['Web', 'Mobil', 'Masaüstü', 'Yapay Zeka', 'Genel', 'Diğer'],
     required: [true, 'Kategori zorunludur'],
     default: 'Genel'
   },
-  imageUrl: {
+
+  ownerId: {
     type: String,
-    required: [true, 'Resim URL zorunludur'],
-    default: '/images/default-project.jpg'
+    required: [true, 'Kullanıcı zorunludur']
+  },
+  contact: {
+    type: String,
+    required: [true, 'İletişim bilgisi zorunludur']
+  },
+  isApproved: {
+    type: Boolean,
+    default: false
+  },
+  linkedinUrl: {
+    type: String,
+    required: [true, 'LinkedIn URL zorunludur']
   },
   projectUrl: {
-    type: String,
-    required: [true, 'Proje URL zorunludur']
+    type: String // eski alan ile geriye uyum
   },
   technologies: [{
     type: String
@@ -54,6 +98,6 @@ projectSchema.pre('save', function(next) {
   next();
 });
 
-const Project = mongoose.models.Project || mongoose.model('Project', projectSchema);
+const Project: Model<IProject> = (mongoose.models.Project as Model<IProject>) || mongoose.model<IProject>('Project', projectSchema);
 
 export default Project; 
