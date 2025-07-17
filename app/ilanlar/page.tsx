@@ -75,9 +75,16 @@ export default function IlanlarPage() {
         }
         
         // API endpoint'e istek at
-        const url = searchTerm 
-          ? `/api/ilanlar/university?university=${encodeURIComponent(user.university)}&search=${encodeURIComponent(searchTerm)}` 
-          : `/api/ilanlar/university?university=${encodeURIComponent(user.university)}`;
+        let url: string;
+        if (user.role === 'admin') {
+          url = searchTerm
+            ? `/api/ilanlar?search=${encodeURIComponent(searchTerm)}`
+            : `/api/ilanlar`;
+        } else {
+          url = searchTerm 
+            ? `/api/ilanlar/university?university=${encodeURIComponent(user.university)}&search=${encodeURIComponent(searchTerm)}` 
+            : `/api/ilanlar/university?university=${encodeURIComponent(user.university)}`;
+        }
         
         console.log('Fetching listings from URL:', url);
         
@@ -371,7 +378,7 @@ export default function IlanlarPage() {
                         {ilan.teacher?.profilePhotoUrl ? (
                           <img
                             src={ilan.teacher.profilePhotoUrl}
-                            alt={ilan.teacher.name}
+                            alt={ilan.teacher ? ilan.teacher.name : t('general.unknown')}
                             className="w-full h-full object-cover rounded-full"
                           />
                         ) : (
@@ -384,7 +391,7 @@ export default function IlanlarPage() {
                       </div>
                     </div>
                     <Link 
-                      href={`/egitmen-ilanlari/${ilan.teacher._id}`}
+                      href={ilan.teacher ? `/egitmen-ilanlari/${ilan.teacher._id}` : '#'}
                       className="text-sm text-[#FF8B5E] hover:text-[#FF6B1A] hover:underline transition-colors flex items-center"
                     >
                       <span>{t('general.allListings')}</span>
@@ -425,7 +432,7 @@ export default function IlanlarPage() {
                       {t('general.viewDetails')}
                     </Link>
                     <Link 
-                      href={`/egitmen-ilanlari/${ilan.teacher._id}`}
+                      href={ilan.teacher ? `/egitmen-ilanlari/${ilan.teacher._id}` : '#'}
                       className="block py-3 px-3 bg-[#FFF5F0] text-[#FF8B5E] rounded-lg font-medium hover:bg-[#FFE5D9] transition-all duration-300 transform group-hover:translate-y-[-2px]"
                     >
                       <FaChalkboardTeacher size={18} />

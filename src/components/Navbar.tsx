@@ -261,7 +261,7 @@ export default function Navbar() {
                       </Link>
                     ))}
                     {/* Eğitmen ise İlan Ver butonu */}
-                    {mounted && user && (typedUser?.role === 'instructor' || typedUser?.role === 'teacher') && (
+                    {mounted && user && (typedUser?.role === 'instructor' || typedUser?.role === 'teacher' || typedUser?.role === 'admin') && (
                       <Link
                         href="/ilan-ver"
                         className={`flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md ml-2 hover:scale-105 transition-transform`}
@@ -446,7 +446,7 @@ export default function Navbar() {
                           </svg>
                           <span>{t('nav.myProjects')}</span>
                         </Link>
-                        {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor') && (
+                        {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
                           <>
                             <Link
                               href="/ilanlarim"
@@ -502,6 +502,18 @@ export default function Navbar() {
                       <span>{link.label}</span>
                     </Link>
                   ))}
+                  {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
+  <Link
+    href="/ilan-ver"
+    className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20"
+    onClick={() => setIsMenuOpen(false)}
+  >
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+    </svg>
+    <span>{t('nav.createListing')}</span>
+  </Link>
+)}
                 </div>
               )}
               <div className="flex justify-end px-4 pt-2">
@@ -613,7 +625,7 @@ export default function Navbar() {
                       </svg>
                       <span>{t('nav.myProjects')}</span>
                     </Link>
-                    {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor') && (
+                    {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
                       <>
                         <Link
                           href="/ilanlarim"
