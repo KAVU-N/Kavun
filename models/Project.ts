@@ -16,6 +16,7 @@ export interface IProject extends Document {
   technologies?: string[];
   githubUrl?: string;
   liveUrl?: string;
+  views?: number;
   status: 'Devam Ediyor' | 'Tamamlandı' | 'Planlanıyor';
   createdAt: Date;
   updatedAt: Date;
@@ -44,7 +45,7 @@ const projectSchema = new mongoose.Schema<IProject>({
   },
   category: {
     type: String,
-    enum: ['Web', 'Mobil', 'Masaüstü', 'Yapay Zeka', 'Genel', 'Diğer'],
+    enum: ['Web', 'Mobil', 'Masaüstü', 'Yapay Zeka', 'Oyun', 'Veri Bilimi', 'Siber Güvenlik', 'Blockchain', 'IoT', 'AR/VR', 'Robotik', 'E-Ticaret', 'FinTech', 'Sağlık', 'Eğitim', 'Cloud', 'DevOps', 'Data Engineering', 'Donanım', 'Genel', 'Diğer'],
     required: [true, 'Kategori zorunludur'],
     default: 'Genel'
   },
@@ -63,7 +64,7 @@ const projectSchema = new mongoose.Schema<IProject>({
   },
   linkedinUrl: {
     type: String,
-    required: [true, 'LinkedIn URL zorunludur']
+    required: false
   },
   projectUrl: {
     type: String // eski alan ile geriye uyum
@@ -76,6 +77,10 @@ const projectSchema = new mongoose.Schema<IProject>({
   },
   liveUrl: {
     type: String
+  },
+  views: {
+    type: Number,
+    default: 0
   },
   status: {
     type: String,

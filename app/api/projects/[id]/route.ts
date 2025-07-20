@@ -7,7 +7,12 @@ import Project from '@/models/Project';
 export async function GET(_request: Request, { params }: { params: { id: string } }) {
   try {
     await connectDB();
-    const project = await (Project as any).findById(params.id);
+    // Görüntülenme sayısını artırarak projeyi getir
+    const project = await (Project as any).findByIdAndUpdate(
+      params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
     if (!project) return NextResponse.json({ error: 'Proje bulunamadı' }, { status: 404 });
     return NextResponse.json(project);
   } catch (error: any) {

@@ -10,7 +10,7 @@ export async function GET() {
     
     const projects = await Project.find({})
       .sort({ createdAt: -1 }) // En yeni projeler önce
-      .select('title description category position imageUrl projectUrl technologies status');
+      .select('title description category position imageUrl projectUrl technologies status views');
     
     return NextResponse.json(projects);
   } catch (error: any) {
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     // Basit içerik güvenlik kontrolü
     const fieldsToCheck = [body.title, body.description, body.requirements, body.benefits, body.position];
-    if (!isValidLinkedInUrl(body.linkedinUrl)) {
+    if (body.linkedinUrl && !isValidLinkedInUrl(body.linkedinUrl)) {
       return NextResponse.json({ error: 'LinkedIn URL geçersiz' }, { status: 400 });
     }
 

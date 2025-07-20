@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/src/contexts/LanguageContext";
+import ChatBox from "@/src/components/ChatBox";
 
 interface Project {
   position?: string;
@@ -44,21 +45,44 @@ export default function ProjectDetailPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const fetchedRef = useRef(false);
+  const [activeChat, setActiveChat] = useState(false);
+  const [instructor, setInstructor] = useState<{ _id: string; name: string; email: string; university: string; role: string } | null>(null);
 
   useEffect(() => {
+    if (!id || fetchedRef.current) return;
+    fetchedRef.current = true;
     const fetchProject = async () => {
       try {
         const res = await fetch(`/api/projects/${id}`);
         if (!res.ok) throw new Error("Proje getirilemedi");
         const data = await res.json();
         setProject(data);
+        // Proje sahibinin bilgilerini getir
+        if (data.ownerId) {
+          try {
+            const userRes = await fetch(`/api/users/${data.ownerId}`);
+            if (userRes.ok) {
+              const userData = await userRes.json();
+              setInstructor({
+                _id: userData.id || userData._id || data.ownerId,
+                name: userData.name,
+                email: userData.email,
+                university: userData.university,
+                role: userData.role
+              });
+            }
+          } catch (e) {
+            console.error("Kullanıcı bilgisi alınamadı", e);
+          }
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    if (id) fetchProject();
+    fetchProject();
   }, [id]);
 
   if (loading) return <div className="pt-28 text-center">Yükleniyor...</div>;
@@ -102,6 +126,19 @@ export default function ProjectDetailPage() {
         <div>
           <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.contact')}</h2>
           <p>{project.contact}</p>
+          {project.contact?.includes('@') && (
+            <a href={`mailto:${project.contact}`} className="inline-block mt-2 bg-[#994D1C] hover:bg-[#7e3f17] text-white font-semibold px-4 py-2 rounded transition">
+              İletişime Geç
+            </a>
+          )}
+          {project.ownerId && (
+            <button
+              onClick={() => setActiveChat(true)}
+              className="inline-block mt-2 ml-3 bg-[#FF8B5E] hover:bg-[#FFD7A8] text-white font-semibold px-4 py-2 rounded transition"
+            >
+              Site İçinden Mesaj Gönder
+            </button>
+          )}
           {project.projectUrl && (
             <p><span className="font-semibold">{t('project.url')}: </span><Link href={project.projectUrl} target="_blank" className="text-blue-600 underline break-all">{project.projectUrl}</Link></p>
           )}
@@ -114,6 +151,12 @@ export default function ProjectDetailPage() {
           </div>
         )}
       </div>
+    {activeChat && instructor && (
+      <ChatBox
+        instructor={instructor}
+        onClose={() => setActiveChat(false)}
+      />
+    )}
     </div>
   );
 }

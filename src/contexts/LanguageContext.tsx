@@ -338,6 +338,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Mesajlaşma sayfası
     'messages.myMessages': 'Mesajlarım',
     'messages.conversations': 'Konuşmalarım',
+    'messages.searchPlaceholder': 'Ara...',
     'messages.startMessaging': 'Mesajlaşmaya Başlayın',
     'messages.selectConversation': 'Sol taraftan bir konuşma seçin veya eğitmen profillerini ziyaret ederek yeni bir mesajlaşma başlatın.',
     'messages.loginRequired': 'Mesajlarınızı görmek için giriş yapmalısınız',
@@ -857,6 +858,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Messages page
     'messages.myMessages': 'My Messages',
     'messages.conversations': 'My Conversations',
+    'messages.searchPlaceholder': 'Search...',
     'messages.startMessaging': 'Start Messaging',
     'messages.selectConversation': 'Select a conversation from the left or visit instructor profiles to start a new conversation.',
     'messages.loginRequired': 'You need to log in to view your messages',

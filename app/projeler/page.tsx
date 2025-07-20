@@ -21,6 +21,7 @@ export default function ProjectsPage() {
     category: string;
     ownerId: string;
     position?: string;
+    views?: number;
   }
 
   const [projects, setProjects] = useState<Project[]>([]);
@@ -63,9 +64,11 @@ export default function ProjectsPage() {
         <h1 className="text-3xl font-bold text-[#994D1C]">
           {t("nav.projects")}
         </h1>
-        <Link href="/projeler/olustur" className="bg-[#994D1C] text-white px-4 py-2 rounded hover:bg-[#7e3f17] transition whitespace-nowrap">
-          + {t('common.createProject')}
-        </Link>
+        {user && (
+          <Link href="/projeler/olustur" className="bg-[#994D1C] text-white px-4 py-2 rounded hover:bg-[#7e3f17] transition whitespace-nowrap">
+            + {t('common.createProject')}
+          </Link>
+        )}
       </div>
        {/* Arama ve Filtreleme */}
        <div className="bg-white rounded-xl shadow-md p-4 mb-8 flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
@@ -82,10 +85,27 @@ export default function ProjectsPage() {
            className="w-full md:w-40 px-4 py-3 rounded-xl border-[#FFB996] focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 transition"
          >
           <option value="">{t('category.all')}</option>
-          <option value="Genel">{t('category.general')}</option>
-          <option value="Web">{t('category.web')}</option>
-          <option value="Mobil">{t('category.mobile')}</option>
-          <option value="Yapay Zeka">{t('category.ai')}</option>
+           <option value="Genel">{t('category.general')}</option>
+           <option value="Web">{t('category.web')}</option>
+           <option value="Mobil">{t('category.mobile')}</option>
+           <option value="Masaüstü">Masaüstü</option>
+           <option value="Yapay Zeka">Yapay Zeka</option>
+           <option value="Oyun">Oyun</option>
+           <option value="Veri Bilimi">Veri Bilimi</option>
+           <option value="Siber Güvenlik">Siber Güvenlik</option>
+           <option value="Blockchain">Blockchain</option>
+           <option value="IoT">IoT</option>
+           <option value="AR/VR">AR/VR</option>
+           <option value="Robotik">Robotik</option>
+           <option value="E-Ticaret">E-Ticaret</option>
+           <option value="FinTech">FinTech</option>
+           <option value="Sağlık">Sağlık</option>
+           <option value="Eğitim">Eğitim</option>
+           <option value="Cloud">Cloud</option>
+           <option value="DevOps">DevOps</option>
+           <option value="Data Engineering">Data Engineering</option>
+           <option value="Donanım">Donanım</option>
+           <option value="Diğer">Diğer</option>
         </select>
         <input
           type="text"
@@ -120,7 +140,10 @@ export default function ProjectsPage() {
               </div>
               <p className="text-sm text-gray-700 line-clamp-3 mb-1 flex-1">{p.description}</p>
               {p.position && <p className="text-xs text-gray-600 mb-3">{t('project.position')}: {p.position}</p>}
-              <Link href={`/projeler/${p._id}`} className="w-full bg-[#FF8B5E] hover:bg-[#FFD7A8] text-white font-semibold py-2 rounded-lg text-center transition block mt-auto">{t('project.detail')}</Link>
+              <div className="flex justify-between items-center mt-auto pt-2">
+                <span className="text-xs text-gray-500 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>{p.views || 0}</span>
+                <Link href={`/projeler/${p._id}`} className="bg-[#FF8B5E] hover:bg-[#FFD7A8] text-white font-semibold py-2 px-3 rounded-lg text-center transition">{t('project.detail')}</Link>
+               </div>
             </div>
           ))}
         </div>

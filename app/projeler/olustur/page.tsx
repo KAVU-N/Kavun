@@ -29,7 +29,7 @@ export default function CreateProjectPage() {
     try {
       // Basit içerik kontrolü (istemci tarafı)
       const check = [form.title, form.description, form.requirements, form.benefits];
-      if (!isValidLinkedInUrl(form.linkedinUrl)) {
+      if (form.linkedinUrl && !isValidLinkedInUrl(form.linkedinUrl)) {
         alert('LinkedIn URL geçersiz');
         setLoading(false);
         return;
@@ -63,7 +63,7 @@ export default function CreateProjectPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <input required name="title" value={form.title} onChange={handleChange} placeholder="Proje Adı" className="w-full border p-2 rounded" />
         <textarea required name="description" value={form.description} onChange={handleChange} placeholder="Açıklama" className="w-full border p-2 h-32 rounded" />
-        <input required name="linkedinUrl" value={form.linkedinUrl || ""} onChange={handleChange} placeholder="LinkedIn URL" className="w-full border p-2 rounded" />
+        <input name="linkedinUrl" value={form.linkedinUrl || ""} onChange={handleChange} placeholder="LinkedIn URL (opsiyonel)" className="w-full border p-2 rounded" />
         <input required name="contact" value={form.contact} onChange={handleChange} placeholder="İletişim (e-posta, Discord vs.)" className="w-full border p-2 rounded" />
 
         {/* Başvuran Gereksinimleri */}
@@ -75,7 +75,24 @@ export default function CreateProjectPage() {
           <option value="Genel">Genel</option>
           <option value="Web">Web</option>
           <option value="Mobil">Mobil</option>
+          <option value="Masaüstü">Masaüstü</option>
           <option value="Yapay Zeka">Yapay Zeka</option>
+          <option value="Oyun">Oyun</option>
+          <option value="Veri Bilimi">Veri Bilimi</option>
+          <option value="Siber Güvenlik">Siber Güvenlik</option>
+          <option value="Blockchain">Blockchain</option>
+          <option value="IoT">IoT</option>
+          <option value="AR/VR">AR/VR</option>
+          <option value="Robotik">Robotik</option>
+          <option value="E-Ticaret">E-Ticaret</option>
+          <option value="FinTech">FinTech</option>
+          <option value="Sağlık">Sağlık</option>
+          <option value="Eğitim">Eğitim</option>
+          <option value="Cloud">Cloud</option>
+          <option value="DevOps">DevOps</option>
+          <option value="Data Engineering">Data Engineering</option>
+          <option value="Donanım">Donanım</option>
+          <option value="Diğer">Diğer</option>
         </select>
         <button disabled={loading} type="submit" className="bg-[#994D1C] text-white px-4 py-2 rounded hover:bg-[#7e3f17] transition">
           {loading ? "Kaydediliyor..." : "Kaydet"}
