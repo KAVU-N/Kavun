@@ -94,6 +94,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(data.error || 'Giriş başarısız');
       }
 
+      // Token'ı sakla
+      if (typeof window !== 'undefined' && data.token) {
+        localStorage.setItem('token', data.token);
+      }
       setUser(data.user);
       router.push('/');
     } catch (error: any) {

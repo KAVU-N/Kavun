@@ -33,6 +33,7 @@ export default function MessagesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [mounted, setMounted] = useState(false);
   const { t } = useLanguage();
 
@@ -174,7 +175,16 @@ export default function MessagesPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
             {/* Konuşmalar Listesi */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden lg:col-span-1 h-full flex flex-col">
-              <div className="p-4 bg-[#FFE5D9] font-medium">{t('messages.conversations')}</div>
+              <div className="p-4 bg-[#FFE5D9] font-medium flex flex-col gap-2">
+                <span>{t('messages.conversations')}</span>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder={t('messages.searchPlaceholder') || 'Ara...'}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#FF8B5E] focus:border-transparent text-sm"
+                />
+              </div>
               
               {conversations.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full p-6 text-center">
@@ -191,7 +201,13 @@ export default function MessagesPage() {
                 </div>
               ) : (
                 <div className="overflow-y-auto flex-grow">
-                  {conversations.map((conversation) => (
+                  {conversations
+                    .filter(c => {
+                      if (!searchTerm) return true;
+                      const lower = searchTerm.toLocaleLowerCase();
+                      return c.name.toLocaleLowerCase().includes(lower) || c.lastMessage.toLocaleLowerCase().includes(lower);
+                    })
+                    .map((conversation) => (
                     <div
                       key={conversation._id}
                       onClick={() => handleUserSelect(conversation._id, conversation.name, conversation.avatar)}

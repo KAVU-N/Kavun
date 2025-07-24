@@ -32,8 +32,8 @@ export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [mounted, setMounted] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(0);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState<number>(0);
+  const [unreadNotifications, setUnreadNotifications] = useState<number>(0)
   const profileRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { user, logout } = useAuth();
@@ -41,50 +41,40 @@ export default function Navbar() {
   const { language, setLanguage, t } = useLanguage();
 
   // İstemci tarafında olduğumuzu işaretleyen effect
+  // Scroll ve okunmamış mesaj/bildirim kontrolü
   useEffect(() => {
     setMounted(true);
-    
-    // Scroll olayını dinle
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     if (typeof window !== "undefined") {
       window.addEventListener('scroll', handleScroll);
     }
-    
-    // Okunmamış mesajları ve bildirimleri kontrol et
-    if (typeof window !== "undefined" && mounted && user) {
+        if (user) {
       checkUnreadMessages();
       checkUnreadNotifications();
     }
-    
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, [user, mounted]);
-
-  // Scroll ve mesaj kontrolü için effect
-  useEffect(() => {
-    if (!mounted) return;
-    
-    // Okunmamış mesajları ve bildirimleri sadece client tarafında kontrol et
-    if (user) {
-      checkUnreadMessages();
-      checkUnreadNotifications();
-    }
-    
     const interval = setInterval(() => {
       if (user) {
         checkUnreadMessages();
         checkUnreadNotifications();
       }
-    }, 60000); // Her dakika kontrol et
-    
-    return () => clearInterval(interval);
-  }, [mounted, user]);
+    }, 60000);
+
+    const cleanup = () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener('scroll', handleScroll);
+      }
+      clearInterval(interval);
+    };
+
+    return cleanup;
+  }, [user]);
+
+  // Bildirim okundu eventi
+  useEffect(() => {
+    const readListener = () => checkUnreadNotifications();
+    window.addEventListener('notificationsRead', readListener);
+    return () => window.removeEventListener('notificationsRead', readListener);
+  }, []);
 
   // Profil menüsü dışında bir yere tıklandığında menüyü kapat
   useEffect(() => {
@@ -261,17 +251,7 @@ export default function Navbar() {
                       </Link>
                     ))}
                     {/* Eğitmen ise İlan Ver butonu */}
-                    {mounted && user && (typedUser?.role === 'instructor' || typedUser?.role === 'teacher') && (
-                      <Link
-                        href="/ilan-ver"
-                        className={`flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md ml-2 hover:scale-105 transition-transform`}
-                      >
-                        <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        <span>{t('nav.createListing')}</span>
-                      </Link>
-                    )}
+                    
                   </div>
                 </div>
               )}
@@ -355,21 +335,24 @@ export default function Navbar() {
                         `flex items-center p-0 rounded-full transition-all duration-300 border-2 border-[#e4e2f5] shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#FFB996]`
                       }
                     >
-                      <div className={`relative w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-r from-[#FFB996] to-[#FF8B5E]`}>
-                        {typedUser?.profilePhotoUrl ? (
-                          <Image
-                            src={typedUser?.profilePhotoUrl ?? '/default-profile.png'}
-                            alt={typedUser?.name ?? 'Profil'}
-                            width={48}
-                            height={48}
-                            className="object-cover w-full h-full rounded-full"
-                          />
-                        ) : (
-                          <span className="text-white font-semibold text-lg select-none">
-                            {(typedUser?.name?.charAt(0)?.toUpperCase() ?? '?')}
-                          </span>
-                        )}
-                      </div>
+                      <div className={`relative w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-r from-[#FFB996] to-[#FF8B5E]`}>
+  {typedUser?.profilePhotoUrl ? (
+    <Image
+      src={typedUser?.profilePhotoUrl ?? '/default-profile.png'}
+      alt={typedUser?.name ?? 'Profil'}
+      width={48}
+      height={48}
+      className="object-cover w-full h-full rounded-full"
+    />
+  ) : (
+    <span className="text-white font-semibold text-lg select-none">
+      {(typedUser?.name?.charAt(0)?.toUpperCase() ?? '?')}
+    </span>
+  )}
+  {(unreadMessages > 0 || unreadNotifications > 0) && (
+    <span className="w-4 h-4 bg-red-600 rounded-full border-2 border-white z-[99] animate-pulse" style={{ position: 'absolute', left: 0, bottom: 0, margin: '2px' }}></span>
+  )}
+</div>
                     </button>
                     
                     {/* Profile Dropdown */}
@@ -426,6 +409,11 @@ export default function Navbar() {
                               )}
                             </div>
                             <span>Mesajlarım</span>
+                            {unreadMessages > 0 && (
+                              <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center md:text-xs md:h-5 md:w-5 text-[10px] h-4 w-4">
+                                {unreadMessages > 9 ? '9+' : unreadMessages}
+                              </span>
+                            )}
                           </div>
                         </Link>
                         <Link
@@ -446,7 +434,7 @@ export default function Navbar() {
                           </svg>
                           <span>{t('nav.myProjects')}</span>
                         </Link>
-                        {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor') && (
+                        {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
                           <>
                             <Link
                               href="/ilanlarim"
@@ -502,6 +490,18 @@ export default function Navbar() {
                       <span>{link.label}</span>
                     </Link>
                   ))}
+                  {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
+  <Link
+    href="/ilan-ver"
+    className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20"
+    onClick={() => setIsMenuOpen(false)}
+  >
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+    </svg>
+    <span>{t('nav.createListing')}</span>
+  </Link>
+)}
                 </div>
               )}
               <div className="flex justify-end px-4 pt-2">
@@ -613,7 +613,7 @@ export default function Navbar() {
                       </svg>
                       <span>{t('nav.myProjects')}</span>
                     </Link>
-                    {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor') && (
+                    {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
                       <>
                         <Link
                           href="/ilanlarim"

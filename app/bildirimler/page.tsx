@@ -80,6 +80,7 @@ export default function NotificationsPage() {
           notification._id === id ? { ...notification, read: true } : notification
         )
       );
+      window.dispatchEvent(new Event('notificationsRead'));
     } catch (error) {
       // DEBUG LOG KALDIRILDI Okundu işaretleme hatası:', error);
     }
@@ -107,6 +108,8 @@ export default function NotificationsPage() {
       setNotifications(prevNotifications => 
         prevNotifications.map(notification => ({ ...notification, read: true }))
       );
+      // Navbar'a haber ver
+      window.dispatchEvent(new Event('notificationsRead'));
     } catch (error) {
       // DEBUG LOG KALDIRILDI Tüm bildirimleri okundu işaretleme hatası:', error);
     }

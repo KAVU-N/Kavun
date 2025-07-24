@@ -80,7 +80,7 @@ export async function GET(request: Request) {
     title: ann.title,
     message: ann.content,
     type: 'announcement',
-    read: false,
+    read: ann.readBy?.includes(userId) || false,
     createdAt: ann.date,
     actionUrl: '/ilanlar'
   }));
@@ -113,7 +113,16 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   await connectDB();
   const { id } = await request.json();
-  await Notification.findByIdAndUpdate(id, { read: true });
+  const updatedNotif = await Notification.findByIdAndUpdate(id, { read: true });
+  if (!updatedNotif) {
+    // Belki Announcement'dır
+    const Announcement = (await import('@/models/Announcement')).default;
+    const userInfo = await getUserFromToken(request);
+    await Announcement.updateOne(
+      { _id: id },
+      userInfo?.id ? { $addToSet: { readBy: userInfo.id } } : {}
+    );
+  }
   return NextResponse.json({ success: true });
 }
 

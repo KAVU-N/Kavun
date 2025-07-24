@@ -24,7 +24,7 @@ export default function IlanVerPage() {
     if (!loading) {
       if (!user) {
         router.push('/auth/login');
-      } else if (!['instructor', 'teacher'].includes(user.role)) {
+      } else if (!['instructor', 'teacher', 'admin'].includes(user.role)) {
         router.push('/');
       }
     }
@@ -159,13 +159,9 @@ function isAllUpperCase(text: string) {
         return;
       }
       
-      // Token al
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError(t('errors.sessionNotFound') || 'Oturum bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
-        setIsSubmitting(false);
-        return;
-      }
+      // Token al (localStorage ya da cookie üzerinden)
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      // Eğer localStorage'da yoksa sorun değil; sunucu tarafı çerezden okuyabilir
       
       console.log('Listing creation data:', {
         ...formData,
@@ -177,8 +173,9 @@ function isAllUpperCase(text: string) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
+        credentials: 'include', // çerezdeki JWT gönderilsin
         body: JSON.stringify({
           ...formData,
           userId: user.id
@@ -214,7 +211,7 @@ function isAllUpperCase(text: string) {
   }
 
   // Kullanıcı giriş yapmamış veya eğitmen değilse içeriği gösterme
-  if (!user || (user.role !== 'instructor' && user.role !== 'teacher')) {
+  if (!user || (user.role !== 'instructor' && user.role !== 'teacher' && user.role !== 'admin')) {
     return (
       <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
         <div className="container mx-auto px-4">

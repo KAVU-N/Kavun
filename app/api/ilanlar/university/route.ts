@@ -84,13 +84,18 @@ export async function GET(request: Request) {
     
     console.log('University API - Found teachers/instructors:', teachers.length);
     
-    const teacherIds = teachers.map(teacher => teacher._id.toString());
+    const teacherIds = teachers.map(teacher => teacher._id);
+    // teacherIds are ObjectIds; we'll query with them directly
     
     // Arama filtresi oluştur
+    // Varsayılan olarak tüm ilanları getir. İstenirse URL parametresi ile status=active gönderilirse filtre uygula
     let query: any = {
-      userId: { $in: teacherIds },
-      status: 'active'
+      userId: { $in: teacherIds }
     };
+    const statusParam = searchParams.get('status');
+    if (statusParam) {
+      query.status = statusParam;
+    }
     
     // Eğer arama terimi varsa başlık ve açıklamada ara
     if (searchTerm) {
