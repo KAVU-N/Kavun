@@ -4,13 +4,20 @@ import { containsProhibited, isValidLinkedInUrl } from '@/lib/contentFilter';
 import Project from '@/models/Project';
 
 // Tüm projeleri getir
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await connectDB();
     
-    const projects = await Project.find({})
+        // İsteğin query parametrelerinden userId al
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    const filter: any = {};
+    if (userId) filter.ownerId = userId;
+
+    const projects = await Project.find(filter)
       .sort({ createdAt: -1 }) // En yeni projeler önce
-      .select('title description category position imageUrl projectUrl technologies status views');
+      .select('title description category position imageUrl projectUrl technologies status views ownerId');
     
     return NextResponse.json(projects);
   } catch (error: any) {
