@@ -73,32 +73,33 @@ console.log('JWT Secret kullanılıyor (ilk 5 karakter):', jwtSecret.substring(0
   }
 }
 
-// Tarih formatını düzenle
+// Tarih formatını düzenle - Bugün/Dün için özel format, diğerleri için tam tarih
 function formatDate(date: Date): string {
   const now = new Date();
   const messageDate = new Date(date);
   
   // Bugün
   if (messageDate.toDateString() === now.toDateString()) {
-    return messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+    const timeStr = messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+    return `Bugün ${timeStr}`;
   }
   
   // Dün
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
   if (messageDate.toDateString() === yesterday.toDateString()) {
-    return 'Dün';
+    const timeStr = messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+    return `Dün ${timeStr}`;
   }
   
-  // Bu haftaki gün
-  const daysDiff = Math.floor((now.getTime() - messageDate.getTime()) / (1000 * 3600 * 24));
-  if (daysDiff < 7) {
-    const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
-    return days[messageDate.getDay()];
-  }
-  
-  // Diğer
-  return messageDate.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  // Diğer tarihler için tam tarih ve saat
+  return messageDate.toLocaleDateString('tr-TR', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric',
+    hour: '2-digit', 
+    minute: '2-digit'
+  });
 }
 
 // Kullanıcının tüm konuşmalarını getir
@@ -255,7 +256,8 @@ export async function GET(request: Request) {
             lastMessage: 'Merhaba! Bu bir test mesajıdır.',
             date: formatDate(new Date()),
             unread: 1,
-            avatar: randomUserObj.profilePicture || ''
+            avatar: randomUserObj.profilePicture || '',
+            userId: randomUserObj._id // Chat partner's user ID for profile linking
           }]);
         }
       }
@@ -308,7 +310,8 @@ export async function GET(request: Request) {
         lastMessage: lastMessage ? lastMessage.content : '',
         date: lastMessage ? formatDate(lastMessage.createdAt) : formatDate(conversation.createdAt),
         unread: unreadCount,
-        avatar: participant.profilePicture || ''
+        avatar: participant.profilePicture || '',
+        userId: participant._id // Chat partner's user ID for profile linking
       };
     }));
     

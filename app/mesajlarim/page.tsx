@@ -15,6 +15,7 @@ interface Conversation {
   date: string;
   unread: number;
   avatar?: string;
+  userId?: string; // Chat partner's user ID for profile linking
 }
 
 interface ChatUser {
@@ -237,7 +238,18 @@ export default function MessagesPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-center">
-                          <h3 className="text-sm font-medium text-gray-900 truncate">{conversation.name}</h3>
+                          <h3 
+                            className="text-sm font-medium text-gray-900 truncate hover:text-[#FF8B5E] cursor-pointer transition-colors duration-200"
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent conversation selection
+                              if (conversation.userId) {
+                                window.open(`/egitmenler/${conversation.userId}`, '_blank');
+                              }
+                            }}
+                            title="Profili görüntüle"
+                          >
+                            {conversation.name}
+                          </h3>
                           <span className="text-xs text-gray-500">{conversation.date}</span>
                         </div>
                         <p className={`text-xs truncate ${conversation.unread > 0 ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
