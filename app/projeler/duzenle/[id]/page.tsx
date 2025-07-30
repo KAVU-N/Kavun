@@ -85,7 +85,7 @@ export default function EditProjectPage() {
       const res = await fetch(`/api/projects/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, userId: user?._id }),
       });
       if (!res.ok) throw new Error("Güncellenemedi");
       router.push("/projelerim");

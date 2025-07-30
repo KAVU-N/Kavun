@@ -21,16 +21,18 @@ export default function MyProjectsPage() {
   const { user } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [deleteId,setDeleteId]=useState<string|null>(null);
+  const myId = (user as any)?._id || (user as any)?.id;
+  const isMine = true; 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/projects");
+        const res = await fetch(`/api/projects${myId ? `?userId=${myId}` : ''}`);
         if (!res.ok) throw new Error("Projeler alınamadı");
         const data: Project[] = await res.json();
-        setProjects(data.filter((p) => p.ownerId === user?._id));
+        setProjects(data);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -42,9 +44,9 @@ export default function MyProjectsPage() {
 
   const deleteProject = async (id: string) => {
     try {
-      const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/projects/${id}${ myId ? `?userId=${myId}` : ''}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Silinemedi");
-      setProjects((prev) => prev.filter((p) => p._id !== id));
+      setProjects(projects.filter((p) => p._id !== id));
     } catch (err: any) {
       alert(err.message);
     } finally {

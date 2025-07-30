@@ -61,7 +61,7 @@ export default function ProjectDetailPage() {
         // Proje sahibinin bilgilerini getir
         if (data.ownerId) {
           try {
-            const userRes = await fetch(`/api/users/${data.ownerId}`);
+            const userRes = await fetch(`/api/users/public/${data.ownerId}`);
             if (userRes.ok) {
               const userData = await userRes.json();
               setInstructor({
