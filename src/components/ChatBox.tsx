@@ -67,13 +67,18 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
       console.log('Socket.io bağlantısı kuruluyor...');
       
       // Socket.io bağlantısını kur - 5000 portuna bağlan
-      const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000', {
-        transports: ['polling', 'websocket'], // Önce polling, sonra websocket dene
+      const socketUrl =
+        process.env.NEXT_PUBLIC_SOCKET_URL ||
+        (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5000');
+
+      const socket = io(socketUrl, {
+        transports: ['websocket', 'polling'], // Önce websocket, sonra polling dene
+        secure: socketUrl.startsWith('https'), // HTTPS ise güvenli websocket
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         timeout: 20000, // Bağlantı zaman aşımı süresini artır
         forceNew: true, // Her zaman yeni bir bağlantı kur
-        autoConnect: true // Otomatik bağlan
+        autoConnect: true, // Otomatik bağlan
       });
       
       socketRef.current = socket;
