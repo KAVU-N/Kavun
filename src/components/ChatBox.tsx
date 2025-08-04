@@ -205,13 +205,17 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     }
   }, [messages]);
 
+  // Yerel depolamadan JWT token al
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
   // Mesajları getirme
   const fetchMessages = async () => {
     if (instructor._id && user) {
       setLoading(true);
       try {
         const response = await fetch(`/api/messages?receiverId=${instructor._id}`, {
-          credentials: 'include'
+          credentials: 'include',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
         
         if (!response.ok) {
@@ -290,6 +294,7 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: {
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
           'Content-Type': 'application/json'
         },
         credentials: 'include',
@@ -413,7 +418,15 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
             )}
           </div>
           <div>
-            <h3 className="text-white font-medium text-sm">{instructor.name}</h3>
+            <h3
+                className="text-white font-medium text-sm underline-offset-2 hover:underline cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation(); // minimize engelle
+                  router.push(`/egitmenler/${instructor._id}`);
+                }}
+              >
+                {instructor.name}
+              </h3>
             <p className="text-white/70 text-xs">{instructor.university}</p>
           </div>
         </div>
