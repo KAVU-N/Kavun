@@ -237,6 +237,52 @@ export default function Home() {
           </div>
         </div>
       </div>
+      {/* Özellik Tanıtım Bölümü */}
+      <section className="relative z-20 mt-24 py-16">
+        <div className="max-w-6xl mx-auto px-4 grid gap-8 md:grid-cols-3">
+          {/* Kaynaklar */}
+          <Link href="/kaynaklar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+            <div className="relative h-60 w-full overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/kaynaklar.jpg" alt="Kaynaklar" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-4">
+              <h3 className="text-white text-lg font-semibold">kaynaklar</h3>
+              <p className="text-gray-200 text-sm">Dökümanları keşfet & paylaş</p>
+            </div>
+          </Link>
+          {/* Projeler */}
+          <Link href="/projeler" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+            <div className="relative h-60 w-full overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=60" alt="Projeler" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-4">
+              <h3 className="text-white text-lg font-semibold">projeler</h3>
+              <p className="text-gray-200 text-sm">Projelerini sergile, iş birliği yap</p>
+            </div>
+          </Link>
+          {/* İlanlar Card */}
+          <Link href="/ilanlar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+            <div className="relative h-60 w-full overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/özel-ders.jpg" alt="Duyuru panosu" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-4">
+              <h3 className="text-white text-lg font-semibold">ilanlar</h3>
+              <p className="text-gray-200 text-sm">Yeni ders ilanlarını keşfet</p>
+            </div>
+          </Link>
+
+
+          </div>
+      </section>
+
       </main>
 
       {showRoleDialog && (
