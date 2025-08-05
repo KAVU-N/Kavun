@@ -345,6 +345,8 @@ const translations: Record<Language, Record<string, string>> = {
     'messages.noMessages': 'Henüz mesajınız yok',
     'messages.visitInstructors': 'Eğitmenlerle mesajlaşmaya başlamak için profillerini ziyaret edebilirsiniz.',
     'messages.exploreInstructors': 'Eğitmenleri Keşfet',
+    'messages.today': 'Bugün',
+    'messages.yesterday': 'Dün',
     
     // İlanlarım sayfası
     'myListings.myListings': 'İlanlarım',
@@ -946,6 +948,8 @@ const translations: Record<Language, Record<string, string>> = {
     'lessons.payNow': 'Pay Now',
     'lessons.paid': 'Payment completed',
     'messages.sendMessage': 'Send Message',
+    'messages.today': 'Today',
+    'messages.yesterday': 'Yesterday',
     'lessons.student ': 'Student',
     'lessons.teacher': 'Instructor',
     'general.noName': 'No name specified',

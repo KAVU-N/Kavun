@@ -5,6 +5,36 @@ import Image from 'next/image';
 import io, { Socket } from 'socket.io-client';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/src/contexts/LanguageContext';
+
+// Akıllı tarih formatlama fonksiyonu
+const formatSmartDate = (date: Date, t: (key: string) => string): string => {
+  const now = new Date();
+  const messageDate = new Date(date);
+  
+  // Bugün
+  if (messageDate.toDateString() === now.toDateString()) {
+    const timeStr = messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+    return `${t('messages.today')} ${timeStr}`;
+  }
+  
+  // Dün
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (messageDate.toDateString() === yesterday.toDateString()) {
+    const timeStr = messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+    return `${t('messages.yesterday')} ${timeStr}`;
+  }
+  
+  // Diğer tarihler için tam tarih
+  return messageDate.toLocaleDateString('tr-TR', { 
+    day: '2-digit', 
+    month: '2-digit', 
+    year: 'numeric',
+    hour: '2-digit', 
+    minute: '2-digit'
+  });
+};
 
 type Message = {
   _id?: string;
@@ -35,6 +65,7 @@ interface ChatBoxProps {
 const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: ChatBoxProps) => {
   const { user } = useAuth();
   const router = useRouter();
+  const { t } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -179,13 +210,17 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     }
   }, [messages]);
 
+  // Yerel depolamadan JWT token al
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
   // Mesajları getirme
   const fetchMessages = async () => {
     if (instructor._id && user) {
       setLoading(true);
       try {
         const response = await fetch(`/api/messages?receiverId=${instructor._id}`, {
-          credentials: 'include'
+          credentials: 'include',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
         
         if (!response.ok) {
@@ -264,6 +299,7 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: {
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
           'Content-Type': 'application/json'
         },
         credentials: 'include',
@@ -330,7 +366,7 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
               className={`flex justify-end ${message.isMine ? 'text-white/70' : 'text-gray-500'}`}
               style={{ fontSize: '0.5rem', lineHeight: '0.7rem', marginTop: '3px' }}
             >
-              {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {formatSmartDate(new Date(message.createdAt), t)}
               {message.isMine && <span className="ml-1">✓</span>}
             </div>
           </div>
@@ -387,7 +423,15 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
             )}
           </div>
           <div>
-            <h3 className="text-white font-medium text-sm">{instructor.name}</h3>
+            <h3
+                className="text-white font-medium text-sm underline-offset-2 hover:underline cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation(); // minimize engelle
+                  router.push(`/egitmenler/${instructor._id}`);
+                }}
+              >
+                {instructor.name}
+              </h3>
             <p className="text-white/70 text-xs">{instructor.university}</p>
           </div>
         </div>
