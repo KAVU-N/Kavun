@@ -152,7 +152,7 @@ export default function ProjectDetailPage() {
                   setActiveChat(true);
                 }
               }}
-              className="inline-block mt-2 ml-3 bg-[#FF8B5E] hover:bg-[#FFD7A8] text-white font-semibold px-4 py-2 rounded transition"
+              className="inline-block mt-2 ml-3 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded transition"
             >
               Site İçinden Mesaj Gönder
             </button>
