@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/src/contexts/LanguageContext";
 import ChatBox from "@/src/components/ChatBox";
+import { useAuth } from "@/src/context/AuthContext";
 
 interface Project {
   position?: string;
@@ -42,6 +43,8 @@ export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -127,13 +130,28 @@ export default function ProjectDetailPage() {
           <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.contact')}</h2>
           <p>{project.contact}</p>
           {project.contact?.includes('@') && (
-            <a href={`mailto:${project.contact}`} className="inline-block mt-2 bg-[#994D1C] hover:bg-[#7e3f17] text-white font-semibold px-4 py-2 rounded transition">
+            <a 
+              href={user ? `mailto:${project.contact}` : '#'}
+              onClick={(e) => {
+                if (!user) {
+                  e.preventDefault();
+                  router.push('/auth/login');
+                }
+              }}
+              className="inline-block mt-2 bg-[#994D1C] hover:bg-[#7e3f17] text-white font-semibold px-4 py-2 rounded transition"
+             >
               İletişime Geç
             </a>
           )}
           {project.ownerId && (
             <button
-              onClick={() => setActiveChat(true)}
+              onClick={() => {
+                if (!user) {
+                  router.push('/auth/login');
+                } else {
+                  setActiveChat(true);
+                }
+              }}
               className="inline-block mt-2 ml-3 bg-[#FF8B5E] hover:bg-[#FFD7A8] text-white font-semibold px-4 py-2 rounded transition"
             >
               Site İçinden Mesaj Gönder
