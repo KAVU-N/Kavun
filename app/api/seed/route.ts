@@ -6,6 +6,10 @@ import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 
 export async function GET() {
+  // Seed endpoint should only be used in development to avoid deleting real data in production
+  if (process.env.NODE_ENV !== 'development') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
   try {
     await connectDB();
 
