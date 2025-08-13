@@ -15,6 +15,12 @@ export default function EgitmenProfilPage({ params }: PageProps) {
   const { id } = params;
   const { user } = useAuth();
   const router = useRouter();
+
+  // Eğer kullanıcı giriş yapmamışsa login sayfasına yönlendir
+  if (typeof window !== 'undefined' && !user) {
+    router.push(`/auth/login?redirect=/egitmenler/${id}`);
+    return null; // Component render etme
+  }
   
   const [teacher, setTeacher] = useState<any>(null);
   const [openLessons, setOpenLessons] = useState<any[]>([]);
@@ -34,10 +40,12 @@ export default function EgitmenProfilPage({ params }: PageProps) {
 
   const fetchTeacherDetails = async () => {
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`/api/users/${id}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        credentials: 'include' // Cookie tabanlı kimlik doğrulama için
       });
 
       if (!response.ok) {

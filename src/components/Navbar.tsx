@@ -40,6 +40,14 @@ export default function Navbar() {
   const typedUser = user as User | null;
   const { language, setLanguage, t } = useLanguage();
 
+  // Kullanıcı çıkış yaptığında bildirim/mesaj rozeti sıfırla
+  useEffect(() => {
+    if (!user) {
+      setUnreadMessages(0);
+      setUnreadNotifications(0);
+    }
+  }, [user]);
+
   // İstemci tarafında olduğumuzu işaretleyen effect
   // Scroll ve okunmamış mesaj/bildirim kontrolü
   useEffect(() => {
@@ -48,7 +56,7 @@ export default function Navbar() {
     if (typeof window !== "undefined") {
       window.addEventListener('scroll', handleScroll);
     }
-        if (user) {
+    if (user) {
       checkUnreadMessages();
       checkUnreadNotifications();
     }
@@ -112,6 +120,8 @@ export default function Navbar() {
       if (response.ok) {
         const data = await response.json();
         setUnreadMessages(data.count || 0);
+      } else {
+        setUnreadMessages(0);
       }
     } catch (error) {
       console.error('Okunmamış mesajlar kontrol edilirken hata oluştu:', error);
