@@ -45,7 +45,7 @@ export default function ProjectDetailPage() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const router = useRouter();
-  const isLoggedIn = !!(user && (user as any)?._id);
+  const isLoggedIn = !!user;
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
