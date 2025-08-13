@@ -45,6 +45,7 @@ export default function ProjectDetailPage() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const router = useRouter();
+  const isLoggedIn = !!(user && (user as any)?._id);
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -131,9 +132,9 @@ export default function ProjectDetailPage() {
           <p>{project.contact}</p>
           {project.contact?.includes('@') && (
             <a 
-              href={user ? `mailto:${project.contact}` : '#'}
+              href={isLoggedIn ? `mailto:${project.contact}` : '#'}
               onClick={(e) => {
-                if (!user) {
+                if (!isLoggedIn) {
                   e.preventDefault();
                   router.push('/auth/login');
                 }
@@ -145,17 +146,13 @@ export default function ProjectDetailPage() {
           )}
           {project.ownerId && (
             <button
- chatbot
               onClick={() => {
-                if (!user) {
+                if (!isLoggedIn) {
                   router.push('/auth/login');
                 } else {
                   setActiveChat(true);
                 }
               }}
-
-              onClick={() => setActiveChat(true)}
- main
               className="inline-block mt-2 ml-3 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded transition"
             >
               Site İçinden Mesaj Gönder
