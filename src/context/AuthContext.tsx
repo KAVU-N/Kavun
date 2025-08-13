@@ -88,7 +88,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
         const sameSite = isHttps && !isLocalhost ? 'None' : 'Strict';
         const secure = isHttps && !isLocalhost ? '; Secure' : '';
-        const domain = isHttps && !isLocalhost ? '; domain=.kavunla.com' : '';
+        const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+        const domain = isHttps && !isLocalhost && hostname.endsWith('kavunla.com') ? '; domain=.kavunla.com' : '';
         document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${domain}`;
         localStorage.setItem('token', data.token);
         console.log('TOKEN (login sonrası):', data.token);
@@ -129,7 +130,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
         const sameSite = isHttps && !isLocalhost ? 'None' : 'Strict';
         const secure = isHttps && !isLocalhost ? '; Secure' : '';
-        const domain = isHttps && !isLocalhost ? '; domain=.kavunla.com' : '';
+        const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+        const domain = isHttps && !isLocalhost && hostname.endsWith('kavunla.com') ? '; domain=.kavunla.com' : '';
         document.cookie = `token=${data.token}; path=/; SameSite=${sameSite}${secure}${domain}`;
         localStorage.setItem('token', data.token);
         console.log('TOKEN (register sonrası):', data.token);
