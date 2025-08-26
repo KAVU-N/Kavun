@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ReviewsList from '@/components/reviews/ReviewsList';
 import StarRating from '@/components/reviews/StarRating';
+import ChatBox from 'src/components/ChatBox';
 
 interface PageProps {
   params: { id: string };
@@ -23,6 +24,8 @@ export default function EgitmenProfilPage({ params }: PageProps) {
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
   
+  // Chat modal visibility
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     fetchTeacherDetails();
@@ -159,12 +162,13 @@ export default function EgitmenProfilPage({ params }: PageProps) {
               <h2 className="text-lg font-bold text-[#994D1C] mb-4">İletişim</h2>
               
               {user ? (
-                <Link
-                  href={`/mesajlarim?recipient=${teacher._id}`}
+                <button
+                  type="button"
+                  onClick={() => setShowChat(true)}
                   className="w-full block text-center bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-medium py-3 px-4 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300"
                 >
                   Mesaj Gönder
-                </Link>
+                </button>
               ) : (
                 <Link
                   href="/auth/login"
@@ -250,6 +254,20 @@ export default function EgitmenProfilPage({ params }: PageProps) {
           <ReviewsList teacherId={id} limit={5} showPagination={true} />
         </div>
       </div>
+      {/* Floating ChatBox (diğer chatboxlar gibi) */}
+      {showChat && teacher && (
+        <ChatBox
+          instructor={{
+            _id: teacher._id,
+            name: teacher.name || 'Eğitmen',
+            email: teacher.email || '',
+            university: teacher.university || '',
+            role: teacher.role || 'instructor',
+            price: teacher.price
+          }}
+          onClose={() => setShowChat(false)}
+        />
+      )}
     </div>
   );
 }
