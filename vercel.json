@@ -3,8 +3,7 @@
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Headers", "value": "Authorization,Content-Type" },
-        { "key": "Authorization", "value": "{%Authorization%}" }
+        { "key": "Access-Control-Allow-Headers", "value": "Authorization,Content-Type" }
       ]
     }
   ]
