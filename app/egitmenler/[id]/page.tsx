@@ -7,6 +7,7 @@ import Link from 'next/link';
 import ReviewsList from '@/components/reviews/ReviewsList';
 import StarRating from '@/components/reviews/StarRating';
 import ChatBox from 'src/components/ChatBox';
+import ReviewForm from '@/components/reviews/ReviewForm';
 
 interface PageProps {
   params: { id: string };
@@ -26,12 +27,24 @@ export default function EgitmenProfilPage({ params }: PageProps) {
   
   // Chat modal visibility
   const [showChat, setShowChat] = useState(false);
+  
+  // Review section state
+  const [showReview, setShowReview] = useState(false);
+  const [eligibleLessons, setEligibleLessons] = useState<any[]>([]);
+  const [selectedLessonId, setSelectedLessonId] = useState<string>('');
 
   useEffect(() => {
     fetchTeacherDetails();
     fetchTeacherLessons();
     fetchTeacherRating();
   }, [id]);
+
+  // When opening review section, fetch completed lessons with this teacher
+  useEffect(() => {
+    if (showReview && user?.id) {
+      fetchEligibleLessons();
+    }
+  }, [showReview, user?.id]);
 
   const fetchTeacherDetails = async () => {
     try {
@@ -52,6 +65,26 @@ export default function EgitmenProfilPage({ params }: PageProps) {
       setError('Öğretmen bilgileri yüklenirken bir hata oluştu');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Get completed lessons for this teacher; if student filter to current student, if admin show all
+  const fetchEligibleLessons = async () => {
+    try {
+      const res = await fetch(`/api/lessons?status=completed&teacherId=${id}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      if (!res.ok) return;
+      const lessons = await res.json();
+      const mine = Array.isArray(lessons)
+        ? (user?.role === 'admin' 
+            ? lessons 
+            : lessons.filter((l: any) => l.studentId === user?.id || l?.studentId?._id === user?.id))
+        : [];
+      setEligibleLessons(mine);
+      if (mine.length > 0) setSelectedLessonId(mine[0]._id);
+    } catch (e) {
+      console.error('Uygun dersler alınamadı', e);
     }
   };
 
@@ -177,6 +210,28 @@ export default function EgitmenProfilPage({ params }: PageProps) {
                   Mesaj göndermek için giriş yapın
                 </Link>
               )}
+
+              {/* Değerlendir butonu - Mesaj Gönder'in hemen altında */}
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!user) {
+                      router.push('/auth/login');
+                      return;
+                    }
+                    if (user.role === 'student' || user.role === 'admin') {
+                      setShowReview(v => !v);
+                    }
+                  }}
+                  className="w-full inline-flex items-center justify-center px-4 py-2 bg-[#FFF5F0] text-[#994D1C] rounded-md hover:bg-[#FFE5D9] transition-colors"
+                >
+                  {showReview ? 'Değerlendirmeyi Gizle' : 'Değerlendir'}
+                </button>
+                {user && user.role !== 'student' && user.role !== 'admin' && (
+                  <p className="mt-2 text-xs text-gray-500 text-center">Değerlendirme yalnızca öğrenciler ve adminler tarafından yapılabilir.</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -238,17 +293,42 @@ export default function EgitmenProfilPage({ params }: PageProps) {
             )}
           </div>
           
-          {/* Değerlendir düğmesi */}
-          <div className="flex justify-end mb-2">
-            {user && user.role === 'student' ? (
-              <Link
-                href="/derslerim"
-                className="inline-flex items-center px-4 py-2 bg-[#FFF5F0] text-[#994D1C] rounded-md hover:bg-[#FFE5D9] transition-colors"
-              >
-                Değerlendir
-              </Link>
-            ) : null}
-          </div>
+          {/* Değerlendirme Paneli (buton solda) */}
+
+          {showReview && user && (user.role === 'student' || user.role === 'admin') && (
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+              <h3 className="text-lg font-bold text-[#994D1C] mb-4">Eğitmeni Değerlendir</h3>
+              {eligibleLessons.length === 0 ? (
+                <div className="bg-gray-100 p-4 rounded-md text-gray-600">
+                  Bu eğitmenle tamamlanmış dersiniz bulunamadı. Değerlendirme yapabilmek için tamamlanmış bir dersiniz olmalı.
+                </div>
+              ) : (
+                <>
+                  <label className="block text-sm text-gray-700 mb-2">Dersi seçin</label>
+                  <select
+                    value={selectedLessonId}
+                    onChange={(e) => setSelectedLessonId(e.target.value)}
+                    className="w-full mb-4 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+                  >
+                    {eligibleLessons.map((l) => (
+                      <option key={l._id} value={l._id}>
+                        {l.title} — {new Date(l.scheduledAt || l.createdAt).toLocaleDateString('tr-TR')}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedLessonId && (
+                    <ReviewForm
+                      lessonId={selectedLessonId}
+                      teacherId={id}
+                      onSuccess={() => {
+                        fetchTeacherRating();
+                      }}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          )}
 
           {/* Değerlendirmeler */}
           <ReviewsList teacherId={id} limit={5} showPagination={true} />
