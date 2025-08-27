@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 export const viewport = 'width=device-width, initial-scale=1, maximum-scale=1';
-export const themeColor = '#ffffff';
+export const themeColor = 'var(--brand-bg)';
 
 export default function RootLayout({
   children,
@@ -37,50 +37,51 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" style={{backgroundColor: '#ffffff !important'}}>
+    <html lang="en" style={{ backgroundColor: 'var(--brand-bg) !important' }}>
       <head>
         <link rel="icon" href="/logo.ico" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="var(--brand-bg)" />
+
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Kavunla" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <style>{`
           html, body {
-            background-color: #ffffff !important;
-            background: #ffffff !important;
+            background-color: var(--brand-bg) !important;
+            background: var(--brand-bg) !important;
           }
         `}</style>
       </head>
-      <body className={inter.className} style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
+      <body className={inter.className} style={{ backgroundColor: 'var(--brand-bg) !important', background: 'var(--brand-bg) !important' }}>
         <AuthProvider>
           <LanguageProvider>
-            <div className="flex flex-col min-h-screen" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
+            <div className="flex flex-col min-h-screen" style={{ backgroundColor: 'var(--brand-bg) !important', background: 'var(--brand-bg) !important' }}>
               <ClientOnly hideOnAdmin>
                 <Navbar />
                 <AnalyticsLoader />
               </ClientOnly>
-              <div className="flex-grow" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
+              <div className="flex-grow" style={{ backgroundColor: 'var(--brand-bg) !important', background: 'var(--brand-bg) !important' }}>
                 <Toaster 
                   position="top-right"
                   toastOptions={{
                     duration: 3000,
                     style: {
-                      background: '#ffffff',
-                      color: '#6B3416',
-                      border: '1px solid #FFE5D9',
+                      background: 'var(--brand-bg)',
+                      color: 'var(--brand-brown)',
+                      border: '1px solid var(--brand-border)',
                     },
                     success: {
                       iconTheme: {
-                        primary: '#6B3416',
-                        secondary: '#FFF5F0',
+                        primary: 'var(--brand-brown)',
+                        secondary: 'var(--brand-accent-bg)',
                       },
                     },
                     error: {
                       iconTheme: {
-                        primary: '#FF8B5E',
-                        secondary: '#FFF5F0',
+                        primary: 'var(--brand-primary)',
+                        secondary: 'var(--brand-accent-bg)',
                       },
                     },
                   }}

@@ -3,9 +3,10 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { universities } from '@/data/universities';
-import Navbar from '@/src/components/Navbar';
 import Link from 'next/link';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import { FiFolder, FiBookOpen } from 'react-icons/fi';
+import { HiOutlineMegaphone } from 'react-icons/hi2';
 
 export default function Home() {
   const router = useRouter();
@@ -97,8 +98,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FFF5F0]">
-      <Navbar />
-      <main className="relative py-20 pt-40 flex-grow mb-0 pb-16 overflow-hidden" style={{ minHeight: '100vh' }}>
+          <main className="relative py-20 pt-40 flex-grow mb-0 pb-16 overflow-hidden" style={{ minHeight: '100vh' }}>
   {/* Background görsel ve overlay */}
   <div className="absolute inset-0 w-full h-full z-0">
     <Image 
@@ -110,14 +110,15 @@ export default function Home() {
       className="object-cover" 
       style={{ objectPosition: 'center 40%', filter: 'brightness(0.55)' }}
     />
-    <div className="absolute inset-0 bg-[#6B3416]/60" />
+    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-transparent" />
+    <div className="absolute inset-0 bg-[#994D1C]/30 mix-blend-multiply" />
   </div>
   {/* İçerik */}
   <div className="relative z-10">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center">
             <div className="w-full max-w-3xl text-center mb-12">
-              <h1 className="text-5xl font-bold text-[#FFE8D8] mb-8 leading-tight drop-shadow-lg">
+              <h1 className="text-4xl md:text-6xl font-bold text-[#FFE8D8] mb-8 leading-[1.15] drop-shadow-lg">
                 {t('home.mainTitle')}
               </h1>
               <div className="w-full max-w-xl mx-auto mb-8 relative">
@@ -157,14 +158,13 @@ export default function Home() {
                       setTimeout(() => setShowDropdown(false), 200);
                     }}
                     onKeyDown={handleKeyDown}
-                    className={`w-full pl-4 pr-10 py-3 bg-white border rounded-full outline-none transition-all duration-200
+                    className={`w-full pl-4 pr-10 py-3 rounded-full outline-none transition-all duration-200 border
                       ${loading 
-                        ? 'border-[#FFB996] opacity-75 cursor-not-allowed animate-pulse' 
+                        ? 'border-white/30 bg-white/10 backdrop-blur-md text-white placeholder-white/70 opacity-75 cursor-not-allowed animate-pulse' 
                         : error
-                          ? 'border-[#FF8B5E] hover:border-[#FF8B5E] focus:border-[#FF8B5E] focus:ring-2 focus:ring-[#FF8B5E]/20'
-                          : 'border-[#FFE5D9] hover:border-[#FFB996] focus:border-[#FFB996] focus:ring-2 focus:ring-[#FFB996]/20'
-                      }
-                      text-[#6B3416] placeholder-[#FFB996]`}
+                          ? 'border-white/40 bg-white/15 backdrop-blur-md text-white placeholder-white/70 focus:border-[#FF8B5E] focus:ring-2 focus:ring-[#FF8B5E]/30'
+                          : 'border-white/30 bg-white/15 backdrop-blur-md text-white placeholder-white/70 hover:border-white/50 focus:border-white/70 focus:ring-2 focus:ring-white/20'
+                      }`}
                     disabled={loading}
                     role="combobox"
                     aria-expanded={showDropdown}
@@ -190,7 +190,7 @@ export default function Home() {
                     ref={dropdownRef}
                     id="university-listbox"
                     role="listbox"
-                    className="absolute w-full mt-1 bg-white border border-[#FFE5D9] rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto"
+                    className="absolute w-full mt-1 rounded-lg shadow-xl z-10 max-h-60 overflow-y-auto bg-white/10 backdrop-blur-lg border border-white/20 text-white"
                     aria-label="Üniversite seçenekleri"
                   >
                     {loading ? (
@@ -233,6 +233,37 @@ export default function Home() {
               <p className="text-xl text-[#FFD6B2] mb-8 drop-shadow">
                 {t('home.description')}
               </p>
+              <div className="mx-auto max-w-3xl px-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <Link href="/ilanlar" className="group flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
+                    <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white">
+                      <HiOutlineMegaphone className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-white font-medium truncate">{t('nav.listings')}</div>
+                      <div className="text-white/70 text-sm truncate">{t('home.cards.listings.subtitle')}</div>
+                    </div>
+                  </Link>
+                  <Link href="/projeler" className="group flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
+                    <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white">
+                      <FiFolder className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-white font-medium truncate">{t('home.cards.projects.title')}</div>
+                      <div className="text-white/70 text-sm truncate">{t('home.cards.projects.subtitle')}</div>
+                    </div>
+                  </Link>
+                  <Link href="/kaynaklar" className="group flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
+                    <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white">
+                      <FiBookOpen className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-white font-medium truncate">{t('home.cards.resources.title')}</div>
+                      <div className="text-white/70 text-sm truncate">{t('home.cards.resources.subtitle')}</div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
               
             </div>
           </div>
@@ -248,8 +279,8 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4">
-              <h3 className="text-white text-lg font-semibold">kaynaklar</h3>
-              <p className="text-gray-200 text-sm">Dökümanları keşfet & paylaş</p>
+              <h3 className="text-white text-lg font-semibold">{t('home.cards.resources.title')}</h3>
+              <p className="text-gray-200 text-sm">{t('home.cards.resources.subtitle')}</p>
             </div>
           </Link>
           {/* Projeler */}
@@ -265,8 +296,8 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4">
-              <h3 className="text-white text-lg font-semibold">projeler</h3>
-              <p className="text-gray-200 text-sm">Projelerini sergile, iş birliği yap</p>
+              <h3 className="text-white text-lg font-semibold">{t('home.cards.projects.title')}</h3>
+              <p className="text-gray-200 text-sm">{t('home.cards.projects.subtitle')}</p>
             </div>
           </Link>
 
@@ -277,8 +308,8 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4">
-              <h3 className="text-white text-lg font-semibold">ilanlar</h3>
-              <p className="text-gray-200 text-sm">Yeni ders ilanlarını keşfet</p>
+              <h3 className="text-white text-lg font-semibold">{t('home.cards.listings.title')}</h3>
+              <p className="text-gray-200 text-sm">{t('home.cards.listings.subtitle')}</p>
             </div>
           </Link>
 

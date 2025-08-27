@@ -60,6 +60,7 @@ export default function ProjectsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 pt-28 pb-12">
+      <div className="bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
         <h1 className="text-3xl font-bold text-[#994D1C]">
           {t("nav.projects")}
@@ -148,6 +149,7 @@ export default function ProjectsPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

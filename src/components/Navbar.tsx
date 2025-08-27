@@ -157,17 +157,17 @@ export default function Navbar() {
   const navLinks = [
     { href: '/ilanlar', label: t('nav.listings'), icon: (
       <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+        <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
       </svg>
     )},
     { href: '/projeler', label: t('nav.projects'), icon: (
       <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7m-6 4l-4 4-4-4" />
+        <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7m-6 4l-4 4-4-4" />
       </svg>
     )},
     { href: '/kaynaklar', label: t('nav.resources'), icon: (
       <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
     )}
   ];
@@ -178,7 +178,7 @@ export default function Navbar() {
       <div>
         {/* ... */}
         <nav className={`w-full transition-all duration-500 ${
-          isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4'
+          isScrolled ? 'bg-white/60 backdrop-blur-xl border-b border-black/5 shadow-sm py-2' : 'bg-transparent py-4'
         }`} suppressHydrationWarning>
           <div className="mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -245,7 +245,7 @@ export default function Navbar() {
                                 : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg')
                         }`}
                       >
-                        <div className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
+                        <div className="transition-all duration-500">
                           {link.icon}
                         </div>
                         <span className="relative transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all after:duration-500 group-hover:after:w-full">{link.label}</span>
@@ -358,10 +358,10 @@ export default function Navbar() {
                     
                     {/* Profile Dropdown */}
                     {isProfileOpen && (
-                      <div className="fixed right-2 top-20 mt-2 w-64 max-w-xs bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9]" style={{minWidth: '12rem', maxWidth: '95vw', right: 'min(0.5rem, calc(100vw - 270px))'}}>
+                      <div className="fixed right-2 top-20 mt-2 w-64 max-w-xs bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9] text-sm" style={{minWidth: '12rem', maxWidth: '95vw', right: 'min(0.5rem, calc(100vw - 270px))'}}>
                         <Link
                           href="/profil"
-                          className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
+                          className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                         >
                           <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
                             <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -372,7 +372,7 @@ export default function Navbar() {
                         </Link>
                         <Link
                           href="/bildirimler"
-                          className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
+                          className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                         >
                           <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
                             <div className="relative">
@@ -398,7 +398,7 @@ export default function Navbar() {
                         </Link>
                         <Link
                           href="/mesajlarim"
-                          className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
+                          className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                         >
                           <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
                             <div className="relative">
@@ -419,7 +419,7 @@ export default function Navbar() {
                         </Link>
                         <Link
                           href="/derslerim"
-                          className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
+                          className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                         >
                           <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
                             <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -430,7 +430,7 @@ export default function Navbar() {
                         </Link>
                         <Link
                           href="/projelerim"
-                          className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
+                          className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                         >
                           <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
                             <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

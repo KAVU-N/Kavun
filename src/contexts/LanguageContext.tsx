@@ -313,6 +313,16 @@ const translations: Record<Language, Record<string, string>> = {
     'home.howToContinue': 'Nasıl devam etmek istersiniz?',
     'home.continueAsStudent': 'Öğrenci Olarak Devam Et',
     'home.continueAsInstructor': 'Eğitmen Olarak Devam Et',
+    'home.loadingUniversities': 'Üniversiteler yükleniyor...',
+    // CTA ve kartlar
+    'home.cta.exploreResources': 'Kaynakları keşfet',
+    'home.cta.exploreProjects': 'Projeleri incele',
+    'home.cards.resources.title': 'Kaynaklar',
+    'home.cards.resources.subtitle': 'Dökümanları keşfet & paylaş',
+    'home.cards.projects.title': 'Projeler',
+    'home.cards.projects.subtitle': 'Projelerini sergile, iş birliği yap',
+    'home.cards.listings.title': 'İlanlar',
+    'home.cards.listings.subtitle': 'Yeni ders ilanlarını keşfet',
     
     // Profil sayfası
     'profile.profileInfo': 'Profil Bilgileri',
@@ -508,6 +518,22 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.notification': 'Bildirim',
   },
   en: {
+    // Home (EN)
+    'home.mainTitle': 'Everything to make student life easier is here',
+    'home.selectUniversity': 'Select your university...',
+    'home.allUniversities': 'All Universities',
+    'home.loadingUniversities': 'Loading universities...',
+    'home.howToContinue': 'How would you like to continue?',
+    'home.continueAsStudent': 'Continue as Student',
+    'home.continueAsInstructor': 'Continue as Instructor',
+    'home.cta.exploreResources': 'Explore resources',
+    'home.cta.exploreProjects': 'Browse projects',
+    'home.cards.resources.title': 'Resources',
+    'home.cards.resources.subtitle': 'Discover & share documents',
+    'home.cards.projects.title': 'Projects',
+    'home.cards.projects.subtitle': 'Showcase your work, collaborate',
+    'home.cards.listings.title': 'Listings',
+    'home.cards.listings.subtitle': 'Find new lesson listings',
     'category.all': 'All Categories',
     'category.general': 'General',
     'category.web': 'Web',
@@ -827,16 +853,7 @@ const translations: Record<Language, Record<string, string>> = {
     'general.locale': 'en',
     'general.currency': 'Turkish Lira',
     
-    // Homepage
-    'home.mainTitle': 'Find the students that best suit your needs, start learning now!',
-    'home.showAllUniversities': 'Show all universities',
-    'home.allUniversities': 'All Universities',
-    'home.selectUniversity': 'Select your university...',
-    'home.description ': 'Kavunla is a next-generation education platform that brings together students from the same university.',
-    'home.exploreCourses': 'Explore Courses',
-    'home.howToContinue': 'How would you like to continue?',
-    'home.continueAsStudent': 'Continue as Student',
-    'home.continueAsInstructor': 'Continue as Instructor',
+    // Homepage (moved to the top EN block)
     
     // Profile page
     'profile.profileInfo': 'Profile Information',

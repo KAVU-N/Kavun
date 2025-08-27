@@ -156,7 +156,7 @@ export default function IlanlarPage() {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen bg-white pt-20">
+      <div className="min-h-screen pt-20">
         <div className="container mx-auto px-4">
           <div className="flex justify-center items-center py-12">
             <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
@@ -167,32 +167,32 @@ export default function IlanlarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
+    <div className="min-h-screen pt-24 pb-16">
       <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
           <div className="mb-8 text-center md:text-left">
-  <div className="inline-block mb-3 px-4 py-1 bg-[#FFF5F0] rounded-full text-[#994D1C] text-sm font-medium">
-    <FaUniversity className="inline-block mr-2" />
-    {user.university}
-  </div>
-  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3">
-    <h1 className="text-4xl font-bold text-[#6B3416]">{t('listings.universityListings')}</h1>
-    {(user.role === 'instructor' || user.role === 'teacher' || user.role === 'admin') && (
-      <Link
-        href="/ilan-ver"
-        className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md hover:scale-105 transition-transform md:ml-4"
-      >
-        <svg className="w-5 h-5 md:w-5 md:h-5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        <span>{t('nav.createListing')}</span>
-      </Link>
-    )}
-  </div>
-  <p className="text-[#994D1C] max-w-2xl md:mx-0 mx-auto">
-    {t('listings.exploreTeacherLessons')}
-  </p>
-</div>
+            <div className="inline-block mb-3 px-4 py-1 bg-[#FFF5F0] rounded-full text-[#994D1C] text-sm font-medium">
+              <FaUniversity className="inline-block mr-2" />
+              {user.university}
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3">
+              <h1 className="text-4xl font-bold text-[#6B3416]">{t('listings.universityListings')}</h1>
+              {(user.role === 'instructor' || user.role === 'teacher' || user.role === 'admin') && (
+                <Link
+                  href="/ilan-ver"
+                  className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md hover:scale-105 transition-transform md:ml-4"
+                >
+                  <svg className="w-5 h-5 md:w-5 md:h-5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>{t('nav.createListing')}</span>
+                </Link>
+              )}
+            </div>
+            <p className="text-[#994D1C] max-w-2xl md:mx-0 mx-auto">
+              {t('listings.exploreTeacherLessons')}
+            </p>
+          </div>
 
           {/* Arama ve Filtre */}
           <div className="mb-8">

@@ -358,10 +358,47 @@ export default function KaynaklarPage() {
       .toLowerCase();
   };
 
+  // Önizleme türü tespiti: PDF | Image | Video | Audio
+  const detectKind = (r: Resource): 'pdf' | 'image' | 'video' | 'audio' | null => {
+    if (!r) return null;
+    const fileType = (r.fileType || '').toLowerCase();
+    const format = (r.format || '').toLowerCase();
+    const url = (r.url || r.fileData || '').toLowerCase();
+    const extMatch = url.match(/\.([a-z0-9]+)(?:\?|#|$)/);
+    const ext = extMatch ? extMatch[1] : '';
+
+    // PDF
+    if (fileType.includes('pdf') || format.includes('pdf') || ext === 'pdf') return 'pdf';
+
+    // Image
+    if (
+      fileType.startsWith('image/') ||
+      ['png','jpg','jpeg','gif','webp','bmp','tiff'].includes(ext) ||
+      format.includes('image') || format.includes('resim')
+    ) return 'image';
+
+    // Video
+    if (
+      fileType.startsWith('video/') ||
+      ['mp4','webm','ogg','mov','mkv'].includes(ext) ||
+      format.includes('video')
+    ) return 'video';
+
+    // Audio
+    if (
+      fileType.startsWith('audio/') ||
+      ['mp3','wav','ogg','m4a','flac'].includes(ext) ||
+      format.includes('audio') || format.includes('ses')
+    ) return 'audio';
+
+    return null;
+  };
+
   // Kullanıcının kaynak görme hakkı ile ilgili kısıtlama kaldırıldı.
 
   return (
     <div className="container mx-auto px-4 py-8 mt-20">
+      <div className="bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-[#994D1C] mb-2">{t('nav.resources')}</h1>
@@ -548,13 +585,13 @@ export default function KaynaklarPage() {
       </div>
       {/* Sonuç Sayısı */}
       
-      
       {/* Kaynaklar Listesi */}
       {/* Kaynak Önizleme Modalı */}
       {/* Pagination */}
       
+      
 
-{showPreviewModal && previewResource && (
+      {showPreviewModal && previewResource && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           {/* Ana içerik: Kaynağı kaydırılabilir şekilde göster */}
           <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full max-h-[96vh] flex flex-col overflow-hidden sm:max-w-lg sm:max-h-[90vh] md:max-w-2xl md:max-h-[90vh]">
@@ -568,20 +605,20 @@ export default function KaynaklarPage() {
               >
                 ×
               </button>
-                {/* Eğer premium engel aktifse, önizleme üstüne etkileşimi tamamen engelleyen bir katman ekle */}
-                {showPremiumBlock && (
-                  <div
-                    className="absolute inset-0 z-40 pointer-events-auto cursor-not-allowed bg-transparent"
-                    style={{}}
-                  />
-                )}
+              {/* Eğer premium engel aktifse, önizleme üstüne etkileşimi tamamen engelleyen bir katman ekle */}
+              {showPremiumBlock && (
+                <div
+                  className="absolute inset-0 z-40 pointer-events-auto cursor-not-allowed bg-transparent"
+                  style={{}}
+                />
+              )}
               {/* PDF Önizleme */}
               {/* PDF ve PNG/Resim dosyaları için önizleme desteği */}
-              {((previewResource.format === 'PDF' || (previewResource.fileType && previewResource.fileType.includes('pdf')))) && (
+              {detectKind(previewResource!) === 'pdf' && (
                 <div className="relative w-full h-[60vh] sm:h-[40vh] md:h-[50vh]">
                   {/* PDF dosyası için iframe ile önizleme */}
                   <iframe
-                    src={previewResource.fileData || previewResource.url}
+                    src={previewResource!.fileData || previewResource!.url}
                     title="PDF Önizleme"
                     className="w-full h-full border rounded"
                     frameBorder="0"
@@ -590,28 +627,28 @@ export default function KaynaklarPage() {
                   {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none"></div>}
                 </div>
               )}
-              {((previewResource.format === 'Resim' || (previewResource.fileType && (previewResource.fileType.includes('png') || previewResource.fileType.includes('image'))))) && (
-  <div className="relative w-full h-[60vh] sm:h-[40vh] md:h-[50vh] flex justify-center items-center bg-white rounded shadow-md">
-    {/* PNG veya genel resim dosyası için merkezi ve şık önizleme */}
-    <div className="relative w-full h-full">
-      <Image
-        src={previewResource.fileData || previewResource.url}
-        alt={previewResource.title}
-        fill
-        sizes="100vw"
-        className="object-contain bg-white"
-        style={{ background: '#fff' }}
-      />
-    </div>
-    {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
-    {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none rounded"></div>}
-  </div>
-)}
+              {detectKind(previewResource!) === 'image' && (
+                <div className="relative w-full h-[60vh] sm:h-[40vh] md:h-[50vh] flex justify-center items-center bg-white rounded shadow-md">
+                  {/* PNG veya genel resim dosyası için merkezi ve şık önizleme */}
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={previewResource!.fileData || previewResource!.url}
+                      alt={previewResource!.title}
+                      fill
+                      sizes="100vw"
+                      className="object-contain bg-white"
+                      style={{ background: '#fff' }}
+                    />
+                  </div>
+                  {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
+                  {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none rounded"></div>}
+                </div>
+              )}
               {/* Video Önizleme */}
-              {previewResource.format === 'Video' && (
+              {detectKind(previewResource!) === 'video' && (
                 <div className="relative w-full h-[60vh] sm:h-[40vh] md:h-[50vh]">
                   <video 
-                    src={previewResource.fileData || previewResource.url}
+                    src={previewResource!.fileData || previewResource!.url}
                     controls
                     className="w-full h-full border rounded"
                   ></video>
@@ -620,10 +657,10 @@ export default function KaynaklarPage() {
                 </div>
               )}
               {/* Ses Önizleme */}
-              {previewResource.format === 'Ses' && (
+              {detectKind(previewResource!) === 'audio' && (
                 <div className="relative w-full">
                   <audio 
-                    src={previewResource.fileData || previewResource.url}
+                    src={previewResource!.fileData || previewResource!.url}
                     controls
                     className="w-full border rounded p-4"
                   ></audio>
@@ -633,41 +670,26 @@ export default function KaynaklarPage() {
               )}
               {/* Diğer Dosya Türleri */}
               {/* Sadece desteklenmeyen dosya türlerinde "desteklenmiyor" mesajı göster */}
-              {!(
-                (previewResource.format === 'PDF' || (previewResource.fileType && previewResource.fileType.includes('pdf')))
-                || (previewResource.format === 'Resim' || (previewResource.fileType && (previewResource.fileType.includes('png') || previewResource.fileType.includes('image'))))
-                || previewResource.format === 'Video'
-                || previewResource.format === 'Ses'
-              ) && (
+              {detectKind(previewResource!) === null && (
                 <div className="text-center py-10">
                   <div className="text-[#994D1C] text-5xl mb-4">
                     <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <h2 className="text-xl font-bold text-[#994D1C] mb-2">{previewResource.format} formatında dosya</h2>
-                  <p className="text-[#6B3416] mb-6">
-                    Bu dosya türü için önizleme desteklenmiyor. Lütfen dosyayı indirin.
-                  </p>
+                  <div className="text-lg font-bold text-[#994D1C] mb-4">{t('general.noResources')}</div>
+                  <p className="text-sm text-[#6B3416] mb-6">{t('general.noResourcesDesc')}</p>
                   <button
                     onClick={() => {
-                      setShowPreviewModal(false);
-                      // Dosya indirme işlemini başlat
-                      if (previewResource.fileData) {
-                        const link = document.createElement('a');
-                        link.href = previewResource.fileData;
-                        const fileName = previewResource.fileName || `${previewResource.title}.${previewResource.format.toLowerCase()}`;
-                        link.download = fileName;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                      } else if (previewResource.url && previewResource.url !== '#') {
-                        window.open(previewResource.url, '_blank');
+                      if (user) {
+                        window.location.href = '/kaynaklar/paylas';
+                      } else {
+                        window.location.href = '/auth/register';
                       }
                     }}
-                    className="px-6 py-3 bg-[#FF8B5E] text-white font-medium rounded-xl transition-all duration-300 hover:bg-[#FF7A45]"
+                    className="px-6 py-3 bg-[#FF8B5E] text-white font-medium rounded-lg transition-all duration-300 hover:bg-[#FF7A45]"
                   >
-                    Dosyayı İndir
+                    {t('general.shareResource')}
                   </button>
                 </div>
               )}
@@ -853,6 +875,7 @@ export default function KaynaklarPage() {
           </nav>
         </div>
       )}
+      </div>
     </div>
   );
 }
