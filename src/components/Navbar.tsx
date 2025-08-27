@@ -420,19 +420,23 @@ export default function Navbar() {
                           href="/derslerim"
                           className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
                         >
-                          <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          <span>Derslerim</span>
+                          <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
+                            <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>Derslerim</span>
+                          </div>
                         </Link>
                         <Link
                           href="/projelerim"
                           className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
                         >
-                          <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7m-6 4l-4 4-4-4" />
-                          </svg>
-                          <span>{t('nav.myProjects')}</span>
+                          <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
+                            <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7m-6 4l-4 4-4-4" />
+                            </svg>
+                            <span>{t('nav.myProjects')}</span>
+                          </div>
                         </Link>
                         {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
                           <>

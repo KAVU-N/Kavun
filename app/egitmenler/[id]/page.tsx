@@ -8,6 +8,7 @@ import ReviewsList from '@/components/reviews/ReviewsList';
 import StarRating from '@/components/reviews/StarRating';
 import ChatBox from 'src/components/ChatBox';
 import ReviewForm from '@/components/reviews/ReviewForm';
+import { useLanguage } from 'src/contexts/LanguageContext';
 
 interface PageProps {
   params: { id: string };
@@ -17,6 +18,7 @@ export default function EgitmenProfilPage({ params }: PageProps) {
   const { id } = params;
   const { user } = useAuth();
   const router = useRouter();
+  const { t } = useLanguage();
   
   const [teacher, setTeacher] = useState<any>(null);
   const [openLessons, setOpenLessons] = useState<any[]>([]);
@@ -187,8 +189,44 @@ export default function EgitmenProfilPage({ params }: PageProps) {
               
               <p className="text-gray-600">{teacher.expertise || 'Uzmanlık alanı belirtilmemiş'}</p>
               <p className="text-gray-500 text-sm mt-1">{teacher.university || 'Üniversite belirtilmemiş'}</p>
-              
-              
+              {/* Ek Bilgiler: E-posta, Bölüm, Sınıf */}
+              <div className="mt-4 text-left space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 mr-2">{t('profile.email')}:</span>
+                  {teacher.email ? (
+                    <a href={`mailto:${teacher.email}`} className="text-[#994D1C] hover:underline break-all">{teacher.email}</a>
+                  ) : (
+                    <span className="text-gray-600">{t('general.noEmail')}</span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 mr-2">{t('profile.department')}:</span>
+                  <span className="text-gray-700">{
+                    (() => {
+                      const dept = (teacher.department || teacher.expertise || '').toString().trim();
+                      return dept ? dept : t('general.notSpecified');
+                    })()
+                  }</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 mr-2">{t('profile.class')}:</span>
+                  <span className="text-gray-700">{
+                    (() => {
+                      const g = Number(teacher.grade);
+                      if (!g) return t('general.notSpecified');
+                      const keyMap: Record<number, string> = {
+                        1: 'profile.firstYear',
+                        2: 'profile.secondYear',
+                        3: 'profile.thirdYear',
+                        4: 'profile.fourthYear',
+                        5: 'profile.fifthYear',
+                        6: 'profile.sixthYear',
+                      };
+                      return t(keyMap[g] || 'general.notSpecified');
+                    })()
+                  }</span>
+                </div>
+              </div>
             </div>
             
             <div className="border-t border-gray-200 p-6">
