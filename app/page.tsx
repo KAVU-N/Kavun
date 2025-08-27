@@ -1,6 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { universities } from '@/data/universities';
 import Navbar from '@/src/components/Navbar';
 import Link from 'next/link';
@@ -57,10 +58,7 @@ export default function Home() {
 
   useEffect(() => {
     setActiveIndex(-1);
-  }, [searchTerm]);
-
-  useEffect(() => {
-    if (error) setError('');
+    setError('');
   }, [searchTerm]);
 
   const filteredUniversities = searchTerm
@@ -103,10 +101,13 @@ export default function Home() {
       <main className="relative py-20 pt-40 flex-grow mb-0 pb-16 overflow-hidden" style={{ minHeight: '100vh' }}>
   {/* Background görsel ve overlay */}
   <div className="absolute inset-0 w-full h-full z-0">
-    <img 
+    <Image 
       src="/images/homepage-students.jpg" 
       alt="Kütüphanede ders çalışan öğrenciler arka plan" 
-      className="w-full h-full object-cover" 
+      fill
+      priority
+      sizes="100vw"
+      className="object-cover" 
       style={{ objectPosition: 'center 40%', filter: 'brightness(0.55)' }}
     />
     <div className="absolute inset-0 bg-[#6B3416]/60" />
@@ -243,9 +244,7 @@ export default function Home() {
           {/* Kaynaklar */}
           <Link href="/kaynaklar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
             <div className="relative h-60 w-full overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/kaynaklar.jpg" alt="Kaynaklar" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+              <Image src="/images/kaynaklar.jpg" alt="Kaynaklar" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4">
@@ -256,8 +255,13 @@ export default function Home() {
           {/* Projeler */}
           <Link href="/projeler" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
             <div className="relative h-60 w-full overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=60" alt="Projeler" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+              <Image
+                src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=60"
+                alt="Projeler"
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="object-cover transition-transform duration-300 group-hover:scale-110"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4">
@@ -265,12 +269,11 @@ export default function Home() {
               <p className="text-gray-200 text-sm">Projelerini sergile, iş birliği yap</p>
             </div>
           </Link>
+
           {/* İlanlar Card */}
           <Link href="/ilanlar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
             <div className="relative h-60 w-full overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/özel-ders.jpg" alt="Duyuru panosu" className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+              <Image src="/images/özel-ders.jpg" alt="Duyuru panosu" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4">

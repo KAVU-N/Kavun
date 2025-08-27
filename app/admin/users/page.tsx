@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useLanguage } from '@/src/contexts/LanguageContext'
 import { toast } from 'react-hot-toast'
 
@@ -27,7 +27,7 @@ const UsersPage = () => {
   const [newPassword, setNewPassword] = useState('')
   const { t } = useLanguage()
   
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/admin/users?page=${page}&search=${searchTerm}`)
@@ -46,11 +46,11 @@ const UsersPage = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, searchTerm, t])
 
   useEffect(() => {
     fetchUsers()
-  }, [page, searchTerm])
+  }, [fetchUsers])
 
   const handleEdit = (user: User) => {
     setSelectedUser(user)

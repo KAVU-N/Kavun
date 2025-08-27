@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useLanguage } from '@/src/contexts/LanguageContext'
 import { toast } from 'react-hot-toast'
 
@@ -28,7 +28,7 @@ const LessonsPage = () => {
   const [courses, setCourses] = useState<{_id: string, title: string}[]>([])
   const { t } = useLanguage()
   
-  const fetchLessons = async () => {
+  const fetchLessons = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/admin/lessons?page=${page}&search=${searchTerm}`)
@@ -47,9 +47,9 @@ const LessonsPage = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, searchTerm, t])
 
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/courses?limit=100')
       
@@ -62,12 +62,12 @@ const LessonsPage = () => {
     } catch (error) {
       console.error('Error fetching courses:', error)
     }
-  }
+  }, [t])
 
   useEffect(() => {
     fetchLessons()
     fetchCourses()
-  }, [page, searchTerm])
+  }, [fetchLessons, fetchCourses])
 
   const handleCreateLesson = () => {
     setSelectedLesson({

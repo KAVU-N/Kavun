@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from 'src/context/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -13,12 +13,8 @@ export default function NotificationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all'); // 'all', 'unread', 'read'
 
-  useEffect(() => {
-    // user varsa bildirimleri getir
-    if (user) fetchNotifications();
-  }, [user]);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -59,7 +55,12 @@ export default function NotificationsPage() {
       setNotifications([]);
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    // user varsa bildirimleri getir
+    if (user) fetchNotifications();
+  }, [user, fetchNotifications]);
 
   const markAsRead = async (id: string) => {
     try {

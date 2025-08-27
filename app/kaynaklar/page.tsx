@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useAuth } from 'src/context/AuthContext';
 import Link from 'next/link';
@@ -67,9 +68,9 @@ export default function KaynaklarPage() {
   useEffect(() => { setMounted(true); }, []);
   const { user } = useAuth();
   useEffect(() => {
-    // Sadece bir kere ilk renderda user'ı logla
+    // Kullanıcı değiştiğinde logla
     console.log('[KaynaklarPage] user:', user);
-  }, []);
+  }, [user]);
   const [showPremiumBlock, setShowPremiumBlock] = useState(false);
   
   // Favorites state
@@ -214,7 +215,7 @@ export default function KaynaklarPage() {
   const [totalResourceCount, setTotalResourceCount] = useState(0);
 
   // Filtrelenmiş kaynakları hesapla
-  const fetchTotalResourceCount = async () => {
+  const fetchTotalResourceCount = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (searchTerm) params.append('search', searchTerm);
@@ -230,10 +231,10 @@ export default function KaynaklarPage() {
     } catch (error) {
       setTotalResourceCount(0);
     }
-  };
+  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
   useEffect(() => {
     fetchTotalResourceCount();
-  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
+  }, [fetchTotalResourceCount]);
 
   const filteredResources = useMemo(() => {
     let filtered = [...resources];
@@ -290,7 +291,7 @@ export default function KaynaklarPage() {
   }, [totalPages, currentPage]);
 
   // Kaynakları getir (arama, filtre ve sayfa/pagination'a göre)
-  const fetchResources = async () => {
+  const fetchResources = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -317,14 +318,13 @@ export default function KaynaklarPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, currentPage]);
 
 
   // Sayfa yüklendiğinde ve filtre/arama veya sayfa değiştiğinde kaynakları getir
   useEffect(() => {
     fetchResources();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, currentPage]);
+  }, [fetchResources]);
 
   // Formatı insan tarafından okunabilir hale getir
   const formatFileSize = (sizeInMB: string): string => {
@@ -593,12 +593,16 @@ export default function KaynaklarPage() {
               {((previewResource.format === 'Resim' || (previewResource.fileType && (previewResource.fileType.includes('png') || previewResource.fileType.includes('image'))))) && (
   <div className="relative w-full h-[60vh] sm:h-[40vh] md:h-[50vh] flex justify-center items-center bg-white rounded shadow-md">
     {/* PNG veya genel resim dosyası için merkezi ve şık önizleme */}
-    <img
-      src={previewResource.fileData || previewResource.url}
-      alt={previewResource.title}
-      className="max-w-full max-h-[55vh] sm:max-h-[30vh] md:max-h-[40vh] mx-auto border rounded-lg shadow-lg object-contain bg-white"
-      style={{ background: '#fff' }}
-    />
+    <div className="relative w-full h-full">
+      <Image
+        src={previewResource.fileData || previewResource.url}
+        alt={previewResource.title}
+        fill
+        sizes="100vw"
+        className="object-contain bg-white"
+        style={{ background: '#fff' }}
+      />
+    </div>
     {/* %75 gölgeli overlay (sadece premium engel aktifse) */}
     {showPremiumBlock && <div className="absolute inset-0 bg-black/75 pointer-events-none rounded"></div>}
   </div>

@@ -387,12 +387,14 @@ export default function IlanlarPage() {
                   {/* {t('general.teacherInfo')} */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3 shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3 shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden relative">
                         {ilan.teacher?.profilePhotoUrl ? (
-                          <img
+                          <Image
                             src={ilan.teacher.profilePhotoUrl}
                             alt={ilan.teacher ? ilan.teacher.name : t('general.unknown')}
-                            className="w-full h-full object-cover rounded-full"
+                            fill
+                            sizes="40px"
+                            className="object-cover rounded-full"
                           />
                         ) : (
                           ilan.teacher?.name.charAt(0).toUpperCase()

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -33,28 +33,8 @@ export default function WalletPage() {
   const [typeFilter, setTypeFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  useEffect(() => {
-    // Kullanıcı giriş yapmamışsa login sayfasına yönlendir
-    if (!user) {
-      router.push('/auth/login');
-      return;
-    }
-
-    // Kullanıcı öğretmen değilse ana sayfaya yönlendir
-    if (user.role !== 'teacher') {
-      router.push('/');
-      return;
-    }
-
-    // Bakiye bilgisini getir
-    fetchBalance();
-    
-    // İşlem geçmişini getir
-    fetchTransactions();
-  }, [user, router, page, typeFilter, statusFilter]);
-
-  // Bakiye bilgisini getir
-  const fetchBalance = async () => {
+  // Bakiye bilgisini getir (callback)
+  const fetchBalance = useCallback(async () => {
     try {
       const response = await fetch('/api/wallet/balance', {
         headers: {
@@ -71,10 +51,10 @@ export default function WalletPage() {
     } catch (error) {
       setError('Sunucu hatası');
     }
-  };
+  }, []);
 
-  // İşlem geçmişini getir
-  const fetchTransactions = async () => {
+  // İşlem geçmişini getir (callback)
+  const fetchTransactions = useCallback(async () => {
     setLoading(true);
     try {
       let url = `/api/wallet/transactions?page=${page}&limit=10`;
@@ -107,7 +87,25 @@ export default function WalletPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, typeFilter, statusFilter]);
+
+  useEffect(() => {
+    // Kullanıcı giriş yapmamışsa login sayfasına yönlendir
+    if (!user) {
+      router.push('/auth/login');
+      return;
+    }
+
+    // Kullanıcı öğretmen değilse ana sayfaya yönlendir
+    if (user.role !== 'teacher') {
+      router.push('/');
+      return;
+    }
+
+    // Bakiye ve işlemleri getir
+    fetchBalance();
+    fetchTransactions();
+  }, [user, router, fetchBalance, fetchTransactions]);
 
   // İşlem türünü Türkçe olarak göster
   const getTransactionTypeText = (type: string) => {

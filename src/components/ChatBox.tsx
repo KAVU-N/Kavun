@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import io, { Socket } from 'socket.io-client';
 import { useAuth } from 'src/context/AuthContext';
@@ -82,12 +82,62 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
   // Ders oluşturma ile ilgili state'ler
   const [showLessonModal, setShowLessonModal] = useState(false);
 
-  // Mesajları yükleme
+  // Mesajları getirme (fetchMessages) - önce tanımla
+  const fetchMessages = useCallback(async () => {
+    if (instructor._id && user) {
+      setLoading(true);
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const response = await fetch(`/api/messages?receiverId=${instructor._id}`, {
+          credentials: 'include',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Mesajlar yüklenirken bir hata oluştu: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // API yanıtını kontrol et
+        console.log('API yanıtı:', data);
+        
+        // Mesajları kullanıcı perspektifinden işaretle
+        if (data && Array.isArray(data.messages)) {
+          // API messages dizisi döndürüyorsa
+          const processedMessages = data.messages.map((msg: any) => ({
+            ...msg,
+            isMine: msg.sender === user?.id
+          }));
+          setMessages(processedMessages);
+        } else if (data && Array.isArray(data)) {
+          // API doğrudan mesaj dizisi döndürüyorsa
+          const processedMessages = data.map((msg: any) => ({
+            ...msg,
+            isMine: msg.sender === user?.id
+          }));
+          setMessages(processedMessages);
+        } else {
+          console.error('Beklenmeyen API yanıt formatı:', data);
+          setMessages([]);
+        }
+        
+        // Mesajlar yüklendikten sonra kaydırma işlemi
+        setTimeout(scrollToBottom, 300);
+      } catch (error) {
+        console.error('Mesajlar yüklenirken hata oluştu:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }, [instructor._id, user]);
+
+  // Mesajları yükleme effect'i
   useEffect(() => {
     if (instructor._id && user) {
       fetchMessages();
     }
-  }, [instructor._id, user]);
+  }, [fetchMessages, instructor._id, user]);
 
   // Socket.io bağlantısını kurma
   useEffect(() => {
@@ -202,6 +252,13 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     }
   }, [instructor._id, user]);
 
+  // Mesajları yükleme
+  useEffect(() => {
+    if (instructor._id && user) {
+      fetchMessages();
+    }
+  }, [fetchMessages, instructor._id, user]);
+
   // Tam yüksekliği hesapla
   useEffect(() => {
     if (chatBoxRef.current) {
@@ -210,57 +267,7 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     }
   }, [messages]);
 
-  // Yerel depolamadan JWT token al
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
-  // Mesajları getirme
-  const fetchMessages = async () => {
-    if (instructor._id && user) {
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/messages?receiverId=${instructor._id}`, {
-          credentials: 'include',
-            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Mesajlar yüklenirken bir hata oluştu: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        // API yanıtını kontrol et
-        console.log('API yanıtı:', data);
-        
-        // Mesajları kullanıcı perspektifinden işaretle
-        if (data && Array.isArray(data.messages)) {
-          // API messages dizisi döndürüyorsa
-          const processedMessages = data.messages.map((msg: any) => ({
-            ...msg,
-            isMine: msg.sender === user?.id
-          }));
-          setMessages(processedMessages);
-        } else if (data && Array.isArray(data)) {
-          // API doğrudan mesaj dizisi döndürüyorsa
-          const processedMessages = data.map((msg: any) => ({
-            ...msg,
-            isMine: msg.sender === user?.id
-          }));
-          setMessages(processedMessages);
-        } else {
-          console.error('Beklenmeyen API yanıt formatı:', data);
-          setMessages([]);
-        }
-        
-        // Mesajlar yüklendikten sonra kaydırma işlemi
-        setTimeout(scrollToBottom, 300);
-      } catch (error) {
-        console.error('Mesajlar yüklenirken hata oluştu:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
+  // (fetchMessages tanımı yukarı taşındı)
 
   // Mesaj gönderme
   const sendMessage = async (e: React.FormEvent) => {
@@ -296,6 +303,7 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
       }
       
       // API'ye mesajı kaydet
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: {

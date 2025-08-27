@@ -40,7 +40,7 @@ export default function MyProjectsPage() {
       }
     };
     if (user) fetchData();
-  }, [user]);
+  }, [user, myId]);
 
   const deleteProject = async (id: string) => {
     try {

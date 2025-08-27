@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -28,14 +28,7 @@ export default function DersDetayPage({ params }: PageProps) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmSuccess, setConfirmSuccess] = useState(false);
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/auth/login');
-      return;
-    }
-
-    fetchLessonDetails();
-  }, [user, router, id]);
+  
 
   useEffect(() => {
     if (!lesson || !user) return;
@@ -49,7 +42,49 @@ export default function DersDetayPage({ params }: PageProps) {
     }
   }, [lesson, user]);
 
-  const fetchLessonDetails = async () => {
+  const checkPaymentStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/payments/check?lessonId=${id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Ödeme yapılmamışsa ödeme formunu göster
+        if (!data.isPaid) {
+          setShowPayment(true);
+        }
+      }
+    } catch (err) {
+      console.error('Ödeme durumu kontrol hatası:', err);
+    }
+  }, [id]);
+
+  const checkReviewStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/reviews?lessonId=${id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Kullanıcının bu derse daha önce değerlendirme yapıp yapmadığını kontrol et
+        if (data.reviews && data.reviews.length > 0) {
+          setHasReviewed(true);
+        }
+      }
+    } catch (err) {
+      console.error('Değerlendirme durumu kontrol hatası:', err);
+    }
+  }, [id]);
+
+  const fetchLessonDetails = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/lessons/${id}`, {
@@ -80,49 +115,18 @@ export default function DersDetayPage({ params }: PageProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, user?.role, checkPaymentStatus, checkReviewStatus]);
 
-  const checkPaymentStatus = async () => {
-    try {
-      const response = await fetch(`/api/payments/check?lessonId=${id}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Ödeme yapılmamışsa ödeme formunu göster
-        if (!data.isPaid) {
-          setShowPayment(true);
-        }
-      }
-    } catch (err) {
-      console.error('Ödeme durumu kontrol hatası:', err);
+  useEffect(() => {
+    if (!user) {
+      router.push('/auth/login');
+      return;
     }
-  };
+
+    fetchLessonDetails();
+  }, [user, router, fetchLessonDetails]);
+
   
-  const checkReviewStatus = async () => {
-    try {
-      const response = await fetch(`/api/reviews?lessonId=${id}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Kullanıcının bu derse daha önce değerlendirme yapıp yapmadığını kontrol et
-        if (data.reviews && data.reviews.length > 0) {
-          setHasReviewed(true);
-        }
-      }
-    } catch (err) {
-      console.error('Değerlendirme durumu kontrol hatası:', err);
-    }
-  };
 
   const handleCompleteLesson = async () => {
     setActionLoading(true);

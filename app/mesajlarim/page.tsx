@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Notification from './Notification';
 import { useAuth } from 'src/context/AuthContext';
 import Link from 'next/link';
@@ -42,13 +42,7 @@ export default function MessagesPage() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      fetchConversations();
-    }
-  }, [user, mounted]);
-
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     try {
       if (typeof window === 'undefined') return; // Sunucu tarafında çalışmayı engelle
       
@@ -96,7 +90,13 @@ export default function MessagesPage() {
       setError(`${t('errors.loadingConversationsDetail') || 'Konuşmalar yüklenirken bir hata oluştu:'} ${err.message || t('errors.unknownError') || 'Bilinmeyen hata'}`);
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    if (user) {
+      fetchConversations();
+    }
+  }, [user, mounted, fetchConversations]);
 
   const handleUserSelect = async (userId: string, userName: string, profilePicture?: string) => {
     try {

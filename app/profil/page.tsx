@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import Image from 'next/image';
 
 import { useMemo } from 'react';
 
@@ -29,9 +30,15 @@ export default function ProfilePage() {
   // Profil fotoğrafı componenti
   function ProfilePhoto() {
     return (
-      <div className="w-24 h-24 rounded-full bg-[#191921] flex items-center justify-center text-white text-4xl font-bold border-4 border-[#FF9B6A]" style={{letterSpacing: '2px'}}>
+      <div className="w-24 h-24 rounded-full bg-[#191921] flex items-center justify-center text-white text-4xl font-bold border-4 border-[#FF9B6A] relative overflow-hidden" style={{letterSpacing: '2px'}}>
         {(authUser as any).profilePhotoUrl ? (
-          <img src={(authUser as any).profilePhotoUrl} alt="Profil Fotoğrafı" className="w-full h-full object-cover rounded-full" />
+          <Image 
+            src={(authUser as any).profilePhotoUrl}
+            alt="Profil Fotoğrafı"
+            fill
+            sizes="96px"
+            className="object-cover rounded-full"
+          />
         ) : (
           userInitial
         )}

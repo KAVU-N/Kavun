@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import StarRating from './StarRating';
 
 interface Review {
@@ -43,11 +43,7 @@ const ReviewsList: React.FC<ReviewsListProps> = ({
   const [hasNextPage, setHasNextPage] = useState(false);
   const [hasPrevPage, setHasPrevPage] = useState(false);
 
-  useEffect(() => {
-    fetchReviews();
-  }, [teacherId, page, limit]);
-
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/reviews?teacherId=${teacherId}&page=${page}&limit=${limit}`, {
@@ -73,7 +69,11 @@ const ReviewsList: React.FC<ReviewsListProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [teacherId, page, limit]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

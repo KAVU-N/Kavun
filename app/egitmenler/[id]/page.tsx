@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -35,20 +36,8 @@ export default function EgitmenProfilPage({ params }: PageProps) {
   const [eligibleLessons, setEligibleLessons] = useState<any[]>([]);
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
 
-  useEffect(() => {
-    fetchTeacherDetails();
-    fetchTeacherLessons();
-    fetchTeacherRating();
-  }, [id]);
 
-  // When opening review section, fetch completed lessons with this teacher
-  useEffect(() => {
-    if (showReview && user?.id) {
-      fetchEligibleLessons();
-    }
-  }, [showReview, user?.id]);
-
-  const fetchTeacherDetails = async () => {
+  const fetchTeacherDetails = useCallback(async () => {
     try {
       const response = await fetch(`/api/users/${id}`, {
         headers: {
@@ -68,10 +57,10 @@ export default function EgitmenProfilPage({ params }: PageProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   // Get completed lessons for this teacher; if student filter to current student, if admin show all
-  const fetchEligibleLessons = async () => {
+  const fetchEligibleLessons = useCallback(async () => {
     try {
       const res = await fetch(`/api/lessons?status=completed&teacherId=${id}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -88,9 +77,9 @@ export default function EgitmenProfilPage({ params }: PageProps) {
     } catch (e) {
       console.error('Uygun dersler alınamadı', e);
     }
-  };
+  }, [id, user?.role, user?.id]);
 
-  const fetchTeacherLessons = async () => {
+  const fetchTeacherLessons = useCallback(async () => {
     try {
       // Öğretmenin aktif ilanlarını getir
       const response = await fetch(`/api/ilanlar/teacher?teacherId=${id}`, {
@@ -108,9 +97,9 @@ export default function EgitmenProfilPage({ params }: PageProps) {
     } catch (err) {
       console.error('İlanlar getirme hatası:', err);
     }
-  };
+  }, [id]);
 
-  const fetchTeacherRating = async () => {
+  const fetchTeacherRating = useCallback(async () => {
     try {
       const response = await fetch(`/api/reviews?teacherId=${id}&limit=1`, {
         headers: {
@@ -128,9 +117,23 @@ export default function EgitmenProfilPage({ params }: PageProps) {
     } catch (err) {
       console.error('Değerlendirmeler getirme hatası:', err);
     }
-  };
+  }, [id]);
 
   
+
+  // Run initial data fetches once callbacks are defined
+  useEffect(() => {
+    fetchTeacherDetails();
+    fetchTeacherLessons();
+    fetchTeacherRating();
+  }, [fetchTeacherDetails, fetchTeacherLessons, fetchTeacherRating]);
+
+  // When opening review section, fetch completed lessons with this teacher
+  useEffect(() => {
+    if (showReview && user?.id) {
+      fetchEligibleLessons();
+    }
+  }, [showReview, user?.id, fetchEligibleLessons]);
 
   if (loading) {
     return (
@@ -173,9 +176,15 @@ export default function EgitmenProfilPage({ params }: PageProps) {
         <div className="md:col-span-1">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="p-6 text-center">
-              <div className="w-24 h-24 rounded-full bg-[#FFB996] flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 overflow-hidden">
+              <div className="w-24 h-24 rounded-full bg-[#FFB996] flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 overflow-hidden relative">
                 {teacher.profilePhotoUrl ? (
-                  <img src={teacher.profilePhotoUrl} alt={teacher.name || 'Eğitmen'} className="w-full h-full object-cover rounded-full" />
+                  <Image 
+                    src={teacher.profilePhotoUrl}
+                    alt={teacher.name || 'Eğitmen'}
+                    fill
+                    sizes="96px"
+                    className="object-cover rounded-full"
+                  />
                 ) : (
                   teacher.name?.charAt(0) || '?'
                 )}

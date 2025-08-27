@@ -283,10 +283,9 @@ const translations: Record<Language, Record<string, string>> = {
     'general.minPricePlaceholder': 'Minimum fiyat',
     'general.maxPricePlaceholder': 'Maksimum fiyat',
     'general.resultsFound': 'ilan bulundu',
-    'general.notSpecified': 'Belirtilmemiş',
     'general.unknown': 'Bilinmiyor',
     'general.noResultsFound': 'Arama Sonuçları Bulunamadı',
-    'general. resourceSearchNoResults': 'Kaynak Bulunamadı',
+    
     'general.noResultsForSearch': 'Aradığınız kriterlere uygun sonuç bulunamadı.',
     'general.downloadStarted': 'İndirme başladı.',
     'general.downloadError': 'İndirme sırasında bir hata oluştu. Lütfen tekrar deneyin.',
