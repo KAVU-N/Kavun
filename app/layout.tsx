@@ -1,4 +1,5 @@
 import { Inter } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 import { AuthProvider } from 'src/context/AuthContext'
@@ -12,7 +13,7 @@ import ClientOnly from '@/src/components/ClientOnly'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Kavunla - Geleceğe Adım At',
   description: 'Kavunla resmi web sitesi',
   manifest: '/manifest.json',
@@ -25,11 +26,15 @@ export const metadata = {
     capable: true,
     statusBarStyle: 'default',
     title: 'Kavunla'
-  }
+  },
+  themeColor: 'var(--brand-bg)'
 };
 
-export const viewport = 'width=device-width, initial-scale=1, maximum-scale=1';
-export const themeColor = 'var(--brand-bg)';
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1
+};
 
 export default function RootLayout({
   children,
