@@ -367,7 +367,7 @@ export default function Navbar() {
                             <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A9 9 0 1112 21a8.963 8.963 0 01-6.879-3.196zM15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span>Profil</span>
+                            <span>{t('nav.profile')}</span>
                           </div>
                         </Link>
                         <Link
@@ -409,7 +409,7 @@ export default function Navbar() {
                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
                               )}
                             </div>
-                            <span>Mesajlarım</span>
+                            <span>{t('nav.messages')}</span>
                             {unreadMessages > 0 && (
                               <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center md:text-xs md:h-5 md:w-5 text-[10px] h-4 w-4">
                                 {unreadMessages > 9 ? '9+' : unreadMessages}
@@ -425,7 +425,7 @@ export default function Navbar() {
                             <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span>Derslerim</span>
+                            <span>{t('nav.myLessons')}</span>
                           </div>
                         </Link>
                         <Link
@@ -451,7 +451,7 @@ export default function Navbar() {
                               <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
-                              <span>İlanlarım</span>
+                              <span>{t('nav.myListings')}</span>
                             </Link>
                           </>
                         )}
@@ -556,7 +556,7 @@ export default function Navbar() {
                       <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      <span>Profilim</span>
+                      <span>{t('nav.profile')}</span>
                     </Link>
                     <Link
                       href="/bildirimler"
@@ -596,7 +596,7 @@ export default function Navbar() {
                           <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
                         )}
                       </div>
-                      <span>Mesajlarım</span>
+                      <span>{t('nav.messages')}</span>
                     </Link>
                     <Link
                       href="/derslerim"
@@ -606,7 +606,7 @@ export default function Navbar() {
                       <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <span>Derslerim</span>
+                      <span>{t('nav.myLessons')}</span>
                     </Link>
                     <Link
                       href="/projelerim"
@@ -630,7 +630,7 @@ export default function Navbar() {
                           <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
-                          <span>İlanlarım</span>
+                          <span>{t('nav.myListings')}</span>
                         </Link>
                       </>
                     )}

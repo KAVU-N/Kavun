@@ -272,18 +272,18 @@ export default function Home() {
       {/* Özellik Tanıtım Bölümü */}
       <section className="relative z-20 mt-24 py-16">
         <div className="max-w-6xl mx-auto px-4 grid gap-8 md:grid-cols-3">
-          {/* Kaynaklar */}
-          <Link href="/kaynaklar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+          {/* İlanlar Card (sol) */}
+          <Link href="/ilanlar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
             <div className="relative h-60 w-full overflow-hidden">
-              <Image src="/images/kaynaklar.jpg" alt="Kaynaklar" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
+              <Image src="/images/özel-ders.jpg" alt="Duyuru panosu" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4">
-              <h3 className="text-white text-lg font-semibold">{t('home.cards.resources.title')}</h3>
-              <p className="text-gray-200 text-sm">{t('home.cards.resources.subtitle')}</p>
+              <h3 className="text-white text-lg font-semibold">{t('home.cards.listings.title')}</h3>
+              <p className="text-gray-200 text-sm">{t('home.cards.listings.subtitle')}</p>
             </div>
           </Link>
-          {/* Projeler */}
+          {/* Projeler (orta) */}
           <Link href="/projeler" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
             <div className="relative h-60 w-full overflow-hidden">
               <Image
@@ -301,15 +301,15 @@ export default function Home() {
             </div>
           </Link>
 
-          {/* İlanlar Card */}
-          <Link href="/ilanlar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+          {/* Kaynaklar (sağ) */}
+          <Link href="/kaynaklar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
             <div className="relative h-60 w-full overflow-hidden">
-              <Image src="/images/özel-ders.jpg" alt="Duyuru panosu" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
+              <Image src="/images/kaynaklar.jpg" alt="Kaynaklar" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4">
-              <h3 className="text-white text-lg font-semibold">{t('home.cards.listings.title')}</h3>
-              <p className="text-gray-200 text-sm">{t('home.cards.listings.subtitle')}</p>
+              <h3 className="text-white text-lg font-semibold">{t('home.cards.resources.title')}</h3>
+              <p className="text-gray-200 text-sm">{t('home.cards.resources.subtitle')}</p>
             </div>
           </Link>
 

@@ -39,6 +39,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   const [ilan, setIlan] = useState<Ilan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [photoError, setPhotoError] = useState(false);
 
   useEffect(() => {
     // user null olduğunda login sayfasına yönlendir
@@ -63,8 +64,29 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
         }
         
         const data = await response.json();
+        console.log('[ILAN DETAY] data:', data);
+        // Önce ilanı set et
         setIlan(data);
+        setPhotoError(false);
         setError('');
+
+        // Ardından öğretmenin en güncel profilini public endpoint'ten çek
+        const teacherId = data?.userId || data?.teacher?._id || data?.teacher?.id;
+        console.log('[ILAN DETAY] teacherId computed:', teacherId);
+        if (teacherId) {
+          try {
+            const tuRes = await fetch(`/api/users/public/${teacherId}`);
+            if (tuRes.ok) {
+              const teacherPublic = await tuRes.json();
+              console.log('[ILAN DETAY] public teacher:', teacherPublic);
+              setIlan((prev) => prev ? { ...prev, teacher: teacherPublic } as Ilan : prev);
+              // Foto URL güncellenmiş olabilir; hata durumunu sıfırla
+              setPhotoError(false);
+            }
+          } catch (e) {
+            console.warn('Öğretmen public profili alınamadı:', e);
+          }
+        }
       } catch (err: any) {
         console.error('İlan detayları yüklenirken hata oluştu:', err);
         setError('İlan detayları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
@@ -77,6 +99,13 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
       fetchIlanDetay();
     }
   }, [params.id]);
+
+  // Foto URL’si değiştiğinde hata durumunu sıfırla
+  useEffect(() => {
+    if (ilan?.teacher?.profilePhotoUrl) {
+      setPhotoError(false);
+    }
+  }, [ilan?.teacher?.profilePhotoUrl]);
 
   // Frekans bilgisini Türkçe'ye çevir
   const getFrequencyText = (frequency: string) => {
@@ -103,6 +132,10 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
       day: 'numeric'
     });
   };
+
+  // Görsel URL’i: öğretmenin URL’i yoksa ve ilan kullanıcı ID’si oturumdaki kullanıcıya eşitse, AuthContext’teki kullanıcı fotoğrafını kullan
+  const fallbackUserPhoto = user?.id && ilan?.userId === user.id ? (user as any)?.profilePhotoUrl : undefined;
+  const displayPhotoUrl = !photoError ? (ilan?.teacher?.profilePhotoUrl || fallbackUserPhoto) : undefined;
 
   if (isLoading || !user) {
     return (
@@ -156,17 +189,20 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               
               {/* Eğitmen Bilgisi */}
               <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
-                {ilan.teacher?.profilePhotoUrl ? (
-                  <Image
-                    src={ilan.teacher.profilePhotoUrl}
-                    alt={ilan.teacher.name + ' profil fotoğrafı'}
+                {displayPhotoUrl ? (
+                  <img
+                    src={displayPhotoUrl}
+                    alt={(ilan.teacher?.name || 'Eğitmen') + ' profil fotoğrafı'}
                     width={64}
                     height={64}
                     className="w-16 h-16 rounded-full object-cover mr-4"
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                    onError={() => setPhotoError(true)}
                   />
                 ) : (
                   <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white text-xl font-bold mr-4">
-                    {ilan.teacher?.name.charAt(0).toUpperCase()}
+                    {ilan.teacher?.name?.charAt(0)?.toUpperCase()}
                   </div>
                 )}
                 <div>

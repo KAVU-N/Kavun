@@ -9,7 +9,7 @@ export async function GET(
   try {
     await connectDB();
 
-    const user = await User.findById(params.id).select('name email role university profilePhotoUrl');
+    const user = await User.findById(params.id).select('name email role university profilePhotoUrl expertise');
     if (!user) {
       return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
     }
@@ -20,6 +20,7 @@ export async function GET(
       email: user.email,
       role: user.role,
       university: user.university,
+      expertise: user.expertise,
       profilePhotoUrl: user.profilePhotoUrl,
     });
   } catch (error) {

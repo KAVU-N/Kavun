@@ -42,6 +42,7 @@ export default function IlanlarPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [photoErrors, setPhotoErrors] = useState<Record<string, boolean>>({});
   const [filters, setFilters] = useState({
     method: '',
     priceMin: '',
@@ -98,8 +99,26 @@ export default function IlanlarPage() {
         const data = await response.json();
         console.log('Received listings data:', data);
         console.log('Number of listings found:', data.length);
-        
-        setIlanlar(data);
+
+        // Öğretmenin en güncel profilini public endpoint'ten çek ve teacher alanını güncelle
+        const enriched = await Promise.all(
+          (data || []).map(async (ilan: Ilan) => {
+            const teacherId = (ilan as any)?.userId || (ilan as any)?.teacher?._id || (ilan as any)?.teacher?.id;
+            if (teacherId) {
+              try {
+                const tuRes = await fetch(`/api/users/public/${teacherId}`);
+                if (tuRes.ok) {
+                  const tPublic = await tuRes.json();
+                  return { ...ilan, teacher: tPublic } as Ilan;
+                }
+              } catch (_) {}
+            }
+            return ilan;
+          })
+        );
+
+        setIlanlar(enriched);
+        setPhotoErrors({});
         setError('');
       } catch (err: any) {
         console.error('İlanlar yüklenirken hata oluştu:', err);
@@ -388,21 +407,22 @@ export default function IlanlarPage() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3 shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden relative">
-                        {ilan.teacher?.profilePhotoUrl ? (
-                          <Image
+                        {ilan.teacher?.profilePhotoUrl && !photoErrors[ilan._id] ? (
+                          <img
                             src={ilan.teacher.profilePhotoUrl}
-                            alt={ilan.teacher ? ilan.teacher.name : t('general.unknown')}
-                            fill
-                            sizes="40px"
-                            className="object-cover rounded-full"
+                            alt={ilan.teacher ? ilan.teacher.name : (t('general.unknown') as string)}
+                            className="w-10 h-10 object-cover rounded-full"
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                            onError={() => setPhotoErrors(prev => ({ ...prev, [ilan._id]: true }))}
                           />
                         ) : (
-                          ilan.teacher?.name.charAt(0).toUpperCase()
+                          (ilan.teacher?.name || '?').charAt(0).toUpperCase()
                         )}
                       </div>
                       <div>
                         <p className="font-medium text-gray-800">{ilan.teacher?.name}</p>
-                        <p className="text-xs text-gray-500">{ilan.teacher?.expertise || t('general.teacher')}</p>
+                        <p className="text-xs text-gray-500">{ilan.teacher?.expertise || t('general.notSpecified')}</p>
                       </div>
                     </div>
                     <Link 

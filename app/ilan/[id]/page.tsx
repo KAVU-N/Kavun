@@ -15,6 +15,7 @@ interface Teacher {
   university: string;
   expertise: string;
   role: string;
+  profilePhotoUrl?: string;
 }
 
 interface Ilan {
@@ -39,6 +40,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeChat, setActiveChat] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -63,7 +65,23 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
         
         const data = await response.json();
         setIlan(data);
+        setPhotoError(false);
         setError('');
+
+        // Öğretmenin en güncel profilini public endpoint'ten çek ve teacher alanını güncelle
+        const teacherId = data?.userId || data?.teacher?._id || data?.teacher?.id;
+        if (teacherId) {
+          try {
+            const tuRes = await fetch(`/api/users/public/${teacherId}`);
+            if (tuRes.ok) {
+              const teacherPublic = await tuRes.json();
+              setIlan((prev) => prev ? { ...prev, teacher: teacherPublic } as Ilan : prev);
+              setPhotoError(false);
+            }
+          } catch (e) {
+            console.warn('Öğretmen public profili alınamadı:', e);
+          }
+        }
       } catch (err: any) {
         console.error('İlan detayları yüklenirken hata oluştu:', err);
         setError('İlan detayları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
@@ -76,6 +94,17 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
       fetchIlanDetay();
     }
   }, [params.id]);
+
+  // Foto URL değişince hata durumunu sıfırla
+  useEffect(() => {
+    if (ilan?.teacher?.profilePhotoUrl) {
+      setPhotoError(false);
+    }
+  }, [ilan?.teacher?.profilePhotoUrl]);
+
+  // Görsel URL’i: öğretmenin URL’i yoksa ve ilan kullanıcı ID’si oturumdaki kullanıcıya eşitse, AuthContext’teki kullanıcı fotoğrafını yedek al
+  const fallbackUserPhoto = user?.id && ilan?.userId === user.id ? (user as any)?.profilePhotoUrl : undefined;
+  const displayPhotoUrl = !photoError ? (ilan?.teacher?.profilePhotoUrl || fallbackUserPhoto) : undefined;
 
 
 
@@ -191,9 +220,22 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                 <div className="mb-8">
                   <h2 className="text-xl font-bold text-[#6B3416] mb-4">{t('general.teacherInfo')}</h2>
                   <div className="bg-[#FFF9F5] p-6 rounded-lg flex items-start">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white text-2xl font-bold mr-4">
-                      {ilan.teacher?.name.charAt(0).toUpperCase()}
-                    </div>
+                    {displayPhotoUrl ? (
+                      <img
+                        src={displayPhotoUrl}
+                        alt={(ilan.teacher?.name || 'Eğitmen') + ' profil fotoğrafı'}
+                        width={64}
+                        height={64}
+                        className="w-16 h-16 rounded-full object-cover mr-4"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        onError={() => setPhotoError(true)}
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white text-2xl font-bold mr-4">
+                        {ilan.teacher?.name?.charAt(0)?.toUpperCase()}
+                      </div>
+                    )}
                     <div>
                       <h3 className="text-lg font-bold text-[#6B3416] mb-1">{ilan.teacher?.name}</h3>
                       <p className="text-[#994D1C] mb-2">{ilan.teacher?.university}</p>

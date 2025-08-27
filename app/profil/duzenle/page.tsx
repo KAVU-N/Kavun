@@ -18,7 +18,7 @@ export default function ProfileEditPage() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const router = useRouter();
   
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
@@ -96,9 +96,9 @@ export default function ProfileEditPage() {
         throw new Error(data.error || 'Profil güncellenirken bir hata oluştu');
       }
       
-      // Kullanıcı bilgilerini güncelle
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(data.user));
+      // Kullanıcı bilgilerini global AuthContext'te güncelle
+      if (data?.user) {
+        updateUser(data.user);
       }
       
       setSuccess(t('profile.updateSuccess'));

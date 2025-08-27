@@ -54,6 +54,7 @@ const userSchema = new mongoose.Schema({
   role: String,
   university: String,
   expertise: String,
+  profilePhotoUrl: String,
 });
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
