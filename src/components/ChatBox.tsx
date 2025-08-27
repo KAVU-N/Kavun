@@ -52,6 +52,7 @@ type Instructor = {
   email: string;
   university: string;
   role: string;
+  avatarUrl?: string;
   price?: number;
 };
 
@@ -422,8 +423,18 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
         onClick={() => !embedded && setIsMinimized(!isMinimized)} // Sadece embedded olmadığında minimize özelliği aktif
       >
         <div className="flex items-center">
-          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mr-3 relative">
-            <span className="text-[#FF8B5E] font-bold">{instructor.name.charAt(0)}</span>
+          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mr-3 relative overflow-hidden">
+            {instructor.avatarUrl ? (
+              <Image
+                src={instructor.avatarUrl}
+                alt={instructor.name}
+                width={32}
+                height={32}
+                className="rounded-full object-cover"
+              />
+            ) : (
+              <span className="text-[#FF8B5E] font-bold">{instructor.name.charAt(0)}</span>
+            )}
             {Array.isArray(messages) && messages.filter(msg => !msg.read && msg.sender === instructor._id).length > 0 && (
               <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
                 {messages.filter(msg => !msg.read && msg.sender === instructor._id).length}

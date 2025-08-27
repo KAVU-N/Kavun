@@ -126,7 +126,7 @@ export default function MessagesPage() {
         _id: userData._id,
         name: userData.name,
         email: userData.email || '',
-        profilePicture: userData.profilePicture,
+        profilePicture: userData.profilePhotoUrl,
         university: userData.university || 'Bilinmiyor',
         role: userData.role || 'user'
       });
@@ -272,7 +272,8 @@ export default function MessagesPage() {
                       name: selectedUser.name,
                       email: selectedUser.email,
                       university: selectedUser.university,
-                      role: selectedUser.role
+                      role: selectedUser.role,
+                      avatarUrl: selectedUser.profilePicture
                     }}
                     onClose={handleChatClose}
                     embedded={true}

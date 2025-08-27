@@ -188,7 +188,7 @@ export async function GET(request: Request) {
     const conversations = await Conversation.find({
       participants: user.id
     })
-    .populate('participants', 'name email university role profilePicture')
+    .populate('participants', 'name email university role profilePhotoUrl')
     .sort({ updatedAt: -1 });
     
     console.log('Bulunan konuşma sayısı:', conversations.length);
@@ -310,7 +310,7 @@ export async function GET(request: Request) {
         lastMessage: lastMessage ? lastMessage.content : '',
         date: lastMessage ? formatDate(lastMessage.createdAt) : formatDate(conversation.createdAt),
         unread: unreadCount,
-        avatar: participant.profilePicture || '',
+        avatar: participant.profilePhotoUrl || '',
         userId: participant._id // Chat partner's user ID for profile linking
       };
     }));
