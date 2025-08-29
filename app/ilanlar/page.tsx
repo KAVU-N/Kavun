@@ -7,7 +7,6 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaSearch, FaFilter, FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher } from 'react-icons/fa';
-import AnimatedBackground from '@/components/AnimatedBackground';
 
 
 interface Teacher {
@@ -174,31 +173,21 @@ export default function IlanlarPage() {
     return 0;
   });
 
-  if (isLoading || !user) {
-    return (
-      <div className="min-h-screen pt-20">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center py-12">
-            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Projeler/Kaynaklar ile tutarlılık için erken dönüş yapılmıyor; 
+  // loading durumu içerikte gösterilecek.
 
   return (
     <div className="relative min-h-screen pt-24 pb-16 overflow-hidden">
-      <AnimatedBackground src="/images/homepage-students.jpg" alt="Arka plan" priority />
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
           <div className="mb-8 text-center md:text-left">
             <div className="inline-block mb-3 px-4 py-1 bg-[#FFF5F0] rounded-full text-[#994D1C] text-sm font-medium">
               <FaUniversity className="inline-block mr-2" />
-              {user.university}
+              {user?.university}
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3">
               <h1 className="text-4xl font-bold text-[#6B3416]">{t('listings.universityListings')}</h1>
-              {(user.role === 'instructor' || user.role === 'teacher' || user.role === 'admin') && (
+              {user && (user.role === 'instructor' || user.role === 'teacher' || user.role === 'admin') && (
                 <Link
                   href="/ilan-ver"
                   className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md hover:scale-105 transition-transform md:ml-4"
@@ -341,8 +330,8 @@ export default function IlanlarPage() {
           
           {/* İçerik */}
           {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
             </div>
           ) : error ? (
             <div className="bg-white p-8 rounded-xl shadow-md text-center border border-red-100">
@@ -450,7 +439,7 @@ export default function IlanlarPage() {
                     </div>
                     <div className="flex items-center bg-gray-50 p-2 rounded-lg">
                       <FaUniversity className="text-orange-600 mr-2" />
-                      <span className="text-gray-800 text-sm line-clamp-1">{user.university}</span>
+                      <span className="text-gray-800 text-sm line-clamp-1">{user?.university}</span>
                     </div>
                     {ilan.instructorFrom && (
                       <div className="flex items-center bg-gray-50 p-2 rounded-lg">

@@ -79,7 +79,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF5F0] pt-20">
+    <div className="min-h-screen bg-[#FFF5F0] pt-28 pb-20">
       <div className="max-w-4xl mx-auto px-6">
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#EEE8FC]">
           {/* Modern üst blok */}

@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/src/context/AuthContext";
-import AnimatedBackground from "@/components/AnimatedBackground";
 
 export default function ProjectsPage() {
   const { t } = useLanguage();
@@ -61,7 +60,6 @@ export default function ProjectsPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
-      <AnimatedBackground src="/images/homepage-students.jpg" alt="Arka plan" priority />
       <div className="max-w-6xl mx-auto px-4 relative z-10">
       <div className="bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-2">

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Image from 'next/image';
-import AnimatedBackground from '@/components/AnimatedBackground';
 
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useAuth } from 'src/context/AuthContext';
@@ -399,8 +398,7 @@ export default function KaynaklarPage() {
   // Kullanıcının kaynak görme hakkı ile ilgili kısıtlama kaldırıldı.
 
   return (
-    <div className="relative min-h-screen overflow-hidden mt-20">
-      <AnimatedBackground src="/images/homepage-students.jpg" alt="Arka plan" priority />
+    <div className="relative min-h-screen overflow-hidden pt-24 pb-12">
       <div className="container mx-auto px-4 py-8 relative z-10">
       <div className="bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">

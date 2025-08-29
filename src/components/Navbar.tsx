@@ -185,15 +185,16 @@ export default function Navbar() {
               {/* Logo - LEFT ve mobilde navLinks */}
               <div className="flex-shrink-0 flex items-center">
                 <Link href="/" className="flex items-center space-x-2 group">
-                  <div className="mr-2 -mt-2">
+                  <div className="mr-2 flex items-center">
                     <Image
                       src="/logo.png"
                       alt="Kavunla Logo"
                       width={56}
                       height={56}
+                      className="block w-14 h-14 align-middle"
                     />
                   </div>
-                  <span className={`text-2xl font-bold transition-all duration-300 ${
+                  <span className={`text-2xl font-bold leading-none transition-all duration-300 ${
                     pathname === '/'
                       ? (isScrolled
                           ? 'text-[#994D1C]'

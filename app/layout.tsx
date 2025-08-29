@@ -10,6 +10,7 @@ import CookieConsentBar from '@/src/components/CookieConsentBar'
 import AnalyticsLoader from '@/src/components/AnalyticsLoader'
 import Link from 'next/link'
 import ClientOnly from '@/src/components/ClientOnly'
+import RouteBackgroundHost from '@/src/components/RouteBackgroundHost'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,13 +28,13 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'Kavunla'
   },
-  themeColor: 'var(--brand-bg)'
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1
+  maximumScale: 1,
+  themeColor: 'var(--brand-bg)'
 };
 
 export default function RootLayout({
@@ -46,7 +47,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/logo.ico" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="var(--brand-bg)" />
+        {/* theme-color artık viewport.themeColor ile yönetiliyor */}
 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -59,15 +60,16 @@ export default function RootLayout({
           }
         `}</style>
       </head>
-      <body className={inter.className} style={{ backgroundColor: 'var(--brand-bg) !important', background: 'var(--brand-bg) !important' }}>
+      <body className={inter.className}>
         <AuthProvider>
           <LanguageProvider>
-            <div className="flex flex-col min-h-screen" style={{ backgroundColor: 'var(--brand-bg) !important', background: 'var(--brand-bg) !important' }}>
+            <div className="flex flex-col min-h-screen">
               <ClientOnly hideOnAdmin>
                 <Navbar />
+                <RouteBackgroundHost />
                 <AnalyticsLoader />
               </ClientOnly>
-              <div className="flex-grow" style={{ backgroundColor: 'var(--brand-bg) !important', background: 'var(--brand-bg) !important' }}>
+              <div className="flex-grow">
                 <Toaster 
                   position="top-right"
                   toastOptions={{
