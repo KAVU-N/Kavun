@@ -31,6 +31,7 @@ export default function ProjectsPage() {
   const [onlyMine, setOnlyMine] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const myId = (user as any)?._id || (user as any)?.id;
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -52,7 +53,7 @@ export default function ProjectsPage() {
     return projects.filter((p) => {
       const inSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) || (p.position ?? '').toLowerCase().includes(searchTerm.toLowerCase());
       const inCategory = categoryFilter ? p.category === categoryFilter : true;
-      const isMine = onlyMine ? p.ownerId === user?._id : true;
+      const isMine = onlyMine ? p.ownerId === myId : true;
       const inPosition = positionFilter ? (p.position ?? '').toLowerCase().includes(positionFilter.toLowerCase()) : true;
        return inSearch && inCategory && isMine && inPosition;
     });
@@ -67,7 +68,10 @@ export default function ProjectsPage() {
           {t("nav.projects")}
         </h1>
         {user && (
-          <Link href="/projeler/olustur" className="bg-[#994D1C] text-white px-4 py-2 rounded hover:bg-[#7e3f17] transition whitespace-nowrap">
+          <Link
+            href="/projeler/olustur"
+            className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white px-4 py-2 rounded-lg hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 whitespace-nowrap"
+          >
             + {t('common.createProject')}
           </Link>
         )}

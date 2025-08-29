@@ -4,8 +4,10 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/src/contexts/LanguageContext";
-import ChatBox from "@/src/components/ChatBox";
+import dynamic from "next/dynamic";
 import { useAuth } from "@/src/context/AuthContext";
+
+const ChatBox = dynamic(() => import("@/src/components/ChatBox"), { ssr: false });
 
 interface Project {
   position?: string;
@@ -94,9 +96,10 @@ export default function ProjectDetailPage() {
   if (!project) return <div className="pt-28 text-center">Proje bulunamadı</div>;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 pt-28 pb-12">
-      <h1 className="text-3xl font-bold text-[#994D1C] mb-4">{project.title}</h1>
-      <div className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
+    <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
+        <div className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
+        <h1 className="text-3xl font-bold text-[#994D1C] -mt-2">{project.title}</h1>
         <p className="text-[#6B3416] whitespace-pre-line leading-relaxed text-lg">{project.description}</p>
         <div className="flex flex-wrap gap-2 text-sm">
           <span className="bg-[#FF8B5E] text-white px-3 py-1 rounded-full text-xs font-medium">{t(categoryKey[project.category] ?? project.category)}</span>
@@ -139,9 +142,9 @@ export default function ProjectDetailPage() {
                   router.push('/auth/login');
                 }
               }}
-              className="inline-block mt-2 bg-[#994D1C] hover:bg-[#7e3f17] text-white font-semibold px-4 py-2 rounded transition"
+              className="inline-block mt-2 bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white font-semibold px-4 py-2 rounded-lg hover:shadow-md hover:shadow-[#60A5FA]/20 transition-all duration-300"
              >
-              İletişime Geç
+              Mail Gönder
             </a>
           )}
           {project.ownerId && (
@@ -153,9 +156,9 @@ export default function ProjectDetailPage() {
                   setActiveChat(true);
                 }
               }}
-              className="inline-block mt-2 ml-3 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded transition"
+              className="inline-block mt-2 ml-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold px-4 py-2 rounded-lg hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300"
             >
-              Site İçinden Mesaj Gönder
+              Mesaj Gönder
             </button>
           )}
           {project.projectUrl && (
@@ -169,6 +172,7 @@ export default function ProjectDetailPage() {
             </Link>
           </div>
         )}
+        </div>
       </div>
     {activeChat && instructor && (
       <ChatBox

@@ -4,13 +4,14 @@ import { Toaster } from 'react-hot-toast'
 import './globals.css'
 import { AuthProvider } from 'src/context/AuthContext'
 import { LanguageProvider } from '@/src/contexts/LanguageContext'
-import Navbar from '@/src/components/Navbar'
 import Footer from '@/src/components/Footer'
 import CookieConsentBar from '@/src/components/CookieConsentBar'
-import AnalyticsLoader from '@/src/components/AnalyticsLoader'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import ClientOnly from '@/src/components/ClientOnly'
-import RouteBackgroundHost from '@/src/components/RouteBackgroundHost'
+const Navbar = dynamic(() => import('@/src/components/Navbar'), { ssr: false })
+const AnalyticsLoader = dynamic(() => import('@/src/components/AnalyticsLoader'), { ssr: false })
+const RouteBackgroundHost = dynamic(() => import('@/src/components/RouteBackgroundHost'), { ssr: false })
 
 const inter = Inter({ subsets: ['latin'] })
 

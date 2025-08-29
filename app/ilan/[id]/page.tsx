@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher, FaCalendarAlt, FaArrowLeft, FaEnvelope, FaCalendarCheck } from 'react-icons/fa';
-import ChatBox from '@/src/components/ChatBox';
+const ChatBox = dynamic(() => import('@/src/components/ChatBox'), { ssr: false });
 
 interface Teacher {
   _id: string;
@@ -221,7 +223,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                   <h2 className="text-xl font-bold text-[#6B3416] mb-4">{t('general.teacherInfo')}</h2>
                   <div className="bg-[#FFF9F5] p-6 rounded-lg flex items-start">
                     {displayPhotoUrl ? (
-                      <img
+                      <Image
                         src={displayPhotoUrl}
                         alt={(ilan.teacher?.name || 'Eğitmen') + ' profil fotoğrafı'}
                         width={64}
@@ -242,6 +244,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                       <p className="text-gray-600 mb-4">{ilan.teacher?.expertise || t('general.notSpecified')}</p>
                       <Link 
                         href={`/egitmen-ilanlari/${ilan.teacher?._id}`}
+                        prefetch={false}
                         className="inline-flex items-center text-[#FF8B5E] hover:text-[#FF6B1A] font-medium"
                       >
                         <span>{t('general.showAllListings')}</span>

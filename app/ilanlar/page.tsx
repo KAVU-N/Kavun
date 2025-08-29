@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import Link from 'next/link';
-import Image from 'next/image';
 import { FaSearch, FaFilter, FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher } from 'react-icons/fa';
+import ListingCard from '@/src/components/ListingCard';
 
 
 interface Teacher {
@@ -49,6 +49,10 @@ export default function IlanlarPage() {
     priceMax: '',
     sortBy: 'en-yeni',
   });
+
+  const onAvatarError = useCallback((id: string) => {
+    setPhotoErrors(prev => ({ ...prev, [id]: true }));
+  }, []);
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
@@ -143,35 +147,21 @@ export default function IlanlarPage() {
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
-  const filteredIlanlar = ilanlar.filter(ilan => {
-    // Metod filtresi
-    if (filters.method && ilan.method !== filters.method) {
-      return false;
-    }
-    
-    // Fiyat aralığı filtresi
-    if (filters.priceMin && ilan.price < Number(filters.priceMin)) {
-      return false;
-    }
-    
-    if (filters.priceMax && ilan.price > Number(filters.priceMax)) {
-      return false;
-    }
-    
-    return true;
-  }).sort((a, b) => {
-    // Sıralama filtresi
-    if (filters.sortBy === 'en-yeni') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    } else if (filters.sortBy === 'en-eski') {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    } else if (filters.sortBy === 'fiyat-artan') {
-      return a.price - b.price;
-    } else if (filters.sortBy === 'fiyat-azalan') {
-      return b.price - a.price;
-    }
-    return 0;
-  });
+  const filteredIlanlar = useMemo(() => {
+    const list = ilanlar.filter(ilan => {
+      if (filters.method && ilan.method !== filters.method) return false;
+      if (filters.priceMin && ilan.price < Number(filters.priceMin)) return false;
+      if (filters.priceMax && ilan.price > Number(filters.priceMax)) return false;
+      return true;
+    });
+    return list.sort((a, b) => {
+      if (filters.sortBy === 'en-yeni') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (filters.sortBy === 'en-eski') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      if (filters.sortBy === 'fiyat-artan') return a.price - b.price;
+      if (filters.sortBy === 'fiyat-azalan') return b.price - a.price;
+      return 0;
+    });
+  }, [ilanlar, filters.method, filters.priceMin, filters.priceMax, filters.sortBy]);
 
   // Projeler/Kaynaklar ile tutarlılık için erken dönüş yapılmıyor; 
   // loading durumu içerikte gösterilecek.
@@ -376,96 +366,18 @@ export default function IlanlarPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredIlanlar.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((ilan) => (
-                <div key={ilan._id} className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#FFE5D9] transition-all duration-300">
-                  {/* Üst Kısım - Başlık ve Fiyat */}
-                  <div className="flex justify-between items-start mb-3">
-                    <h2 className="text-xl font-bold text-[#6B3416] line-clamp-1 group-hover:text-[#FF8B5E] transition-colors duration-200">
-                      {ilan.title}
-                    </h2>
-                    <div className="bg-[#FFF5F0] px-3 py-1 rounded-full text-[#FF8B5E] font-bold text-sm">
-                      {ilan.price} {t('general.currency')}
-                    </div>
-                  </div>
-                  
-                  {/* {t('general.description')} */}
-                  <p className="text-gray-600 mb-4 line-clamp-2 text-sm">{ilan.description}</p>
-                  
-                  {/* {t('general.divider')} */}
-                  <div className="border-t border-gray-100 my-4"></div>
-                  
-                  {/* {t('general.teacherInfo')} */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3 shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden relative">
-                        {ilan.teacher?.profilePhotoUrl && !photoErrors[ilan._id] ? (
-                          <img
-                            src={ilan.teacher.profilePhotoUrl}
-                            alt={ilan.teacher ? ilan.teacher.name : (t('general.unknown') as string)}
-                            className="w-10 h-10 object-cover rounded-full"
-                            loading="lazy"
-                            referrerPolicy="no-referrer"
-                            onError={() => setPhotoErrors(prev => ({ ...prev, [ilan._id]: true }))}
-                          />
-                        ) : (
-                          (ilan.teacher?.name || '?').charAt(0).toUpperCase()
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-800">{ilan.teacher?.name}</p>
-                        <p className="text-xs text-gray-500">{ilan.teacher?.expertise || t('general.notSpecified')}</p>
-                      </div>
-                    </div>
-                    <Link 
-                      href={ilan.teacher ? `/egitmen-ilanlari/${ilan.teacher._id}` : '#'}
-                      className="text-sm text-[#FF8B5E] hover:text-[#FF6B1A] hover:underline transition-colors flex items-center"
-                    >
-                      <span>{t('general.allListings')}</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </div>
-                  
-                  {/* {t('general.features')} */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="flex items-center bg-gray-50 p-2 rounded-lg">
-                      <FaMoneyBillWave className="text-green-600 mr-2" />
-                      <span className="text-gray-800 text-sm">{ilan.price} {t('general.currency')}/{t('general.hour')}</span>
-                    </div>
-                    <div className="flex items-center bg-gray-50 p-2 rounded-lg">
-                      <FaChalkboardTeacher className="text-purple-600 mr-2" />
-                      <span className="text-gray-800 text-sm capitalize">{ilan.method}</span>
-                    </div>
-                    <div className="flex items-center bg-gray-50 p-2 rounded-lg">
-                      <FaUniversity className="text-orange-600 mr-2" />
-                      <span className="text-gray-800 text-sm line-clamp-1">{user?.university}</span>
-                    </div>
-                    {ilan.instructorFrom && (
-                      <div className="flex items-center bg-gray-50 p-2 rounded-lg">
-                        <FaChalkboardTeacher className="text-indigo-600 mr-2" />
-                        <span className="text-gray-800 text-sm line-clamp-1">Eğitmen: {ilan.instructorFrom}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* {t('general.button')} */}
-                  <div className="flex gap-2">
-                    <Link 
-                      href={`/ilan/${ilan._id}`}
-                      className="block flex-1 text-center py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg font-medium hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 transform group-hover:translate-y-[-2px]"
-                    >
-                      {t('general.viewDetails')}
-                    </Link>
-                    <Link 
-                      href={ilan.teacher ? `/egitmen-ilanlari/${ilan.teacher._id}` : '#'}
-                      className="block py-3 px-3 bg-[#FFF5F0] text-[#FF8B5E] rounded-lg font-medium hover:bg-[#FFE5D9] transition-all duration-300 transform group-hover:translate-y-[-2px]"
-                    >
-                      <FaChalkboardTeacher size={18} />
-                    </Link>
-                  </div>
-                </div>
-              ))}
+              {filteredIlanlar
+                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                .map((ilan) => (
+                  <ListingCard
+                    key={ilan._id}
+                    ilan={ilan as any}
+                    t={t as any}
+                    userUniversity={user?.university}
+                    photoError={!!photoErrors[ilan._id]}
+                    onAvatarError={onAvatarError}
+                  />
+                ))}
             </div>
           )}
 

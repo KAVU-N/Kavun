@@ -190,7 +190,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               {/* Eğitmen Bilgisi */}
               <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
                 {displayPhotoUrl ? (
-                  <img
+                  <Image
                     src={displayPhotoUrl}
                     alt={(ilan.teacher?.name || 'Eğitmen') + ' profil fotoğrafı'}
                     width={64}

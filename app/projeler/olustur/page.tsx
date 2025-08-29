@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/src/contexts/LanguageContext";
 
@@ -58,9 +59,21 @@ export default function CreateProjectPage() {
     }
   };
   return (
-    <div className="max-w-xl mx-auto px-4 pt-28 pb-12">
-      <h1 className="text-2xl font-bold mb-6 text-[#994D1C]">{t("nav.projects")} - Yeni Proje</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+      <div className="max-w-xl mx-auto px-4 relative z-10">
+        <div className="relative">
+          <Link
+            href="/projeler"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#994D1C]/30 text-[#994D1C] bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md hover:border-[#6B3416]/40 transition-all duration-300 absolute top-0 -left-3 -translate-x-full"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span className="font-medium">Geri Dön</span>
+          </Link>
+          <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+          <h1 className="text-2xl font-bold mb-6 text-[#994D1C] text-center">Yeni Proje Oluştur</h1>
+          <form onSubmit={handleSubmit} className="space-y-4">
         <input required name="title" value={form.title} onChange={handleChange} placeholder="Proje Adı" className="w-full border p-2 rounded" />
         <textarea required name="description" value={form.description} onChange={handleChange} placeholder="Açıklama" className="w-full border p-2 h-32 rounded" />
         <input name="linkedinUrl" value={form.linkedinUrl || ""} onChange={handleChange} placeholder="LinkedIn URL (opsiyonel)" className="w-full border p-2 rounded" />
@@ -94,10 +107,13 @@ export default function CreateProjectPage() {
           <option value="Donanım">Donanım</option>
           <option value="Diğer">Diğer</option>
         </select>
-        <button disabled={loading} type="submit" className="bg-[#994D1C] text-white px-4 py-2 rounded hover:bg-[#7e3f17] transition">
-          {loading ? "Kaydediliyor..." : "Kaydet"}
+        <button disabled={loading} type="submit" className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white px-6 py-3 text-base md:text-lg rounded-lg hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 block mx-auto">
+          {loading ? "Kaydediliyor..." : "Oluştur"}
         </button>
-      </form>
+        </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
