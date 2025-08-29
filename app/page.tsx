@@ -19,6 +19,7 @@ export default function Home() {
   const [error, setError] = useState('');
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [parallaxY, setParallaxY] = useState(0);
 
   const handleRoleSelect = (role: 'student' | 'instructor') => {
     router.push(`/auth/register?role=${role}&university=${encodeURIComponent(searchTerm)}`);
@@ -55,6 +56,48 @@ export default function Home() {
     }, 500);
 
     return () => clearTimeout(timer);
+  }, []);
+
+  // Parallax: hero içeriklerini scroll'a göre çok hafif yukarı/aşağı kaydır
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || 0;
+      const clamped = Math.min(30, Math.max(0, y * 0.1));
+      setParallaxY(clamped);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Scroll-reveal: görünür olan öğelere fade-up animasyonu uygula
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const els = document.querySelectorAll('[data-reveal]');
+    if (prefersReduced) {
+      els.forEach((el) => {
+        (el as HTMLElement).classList.remove('opacity-0', 'translate-y-2');
+      });
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          const target = e.target as HTMLElement;
+          if (e.isIntersecting) {
+            const delay = target.getAttribute('data-delay');
+            if (delay) target.style.animationDelay = `${delay}ms`;
+            target.classList.add('animate-fade-up');
+            target.classList.remove('opacity-0', 'translate-y-2');
+            io.unobserve(target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
   }, []);
 
   useEffect(() => {
@@ -107,21 +150,21 @@ export default function Home() {
       fill
       priority
       sizes="100vw"
-      className="object-cover" 
-      style={{ objectPosition: 'center 40%', filter: 'brightness(0.55)' }}
+      className="object-cover animate-slow-pan origin-center motion-reduce:animate-none" 
+      style={{ objectPosition: 'center 40%', filter: 'brightness(0.55)', willChange: 'transform', transformOrigin: 'center', animation: 'slowpan 20s ease-in-out infinite' }}
     />
-    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-transparent" />
-    <div className="absolute inset-0 bg-[#994D1C]/30 mix-blend-multiply" />
+    <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/20 to-transparent" />
+    <div className="absolute inset-0 bg-[#994D1C]/20 mix-blend-multiply" />
   </div>
   {/* İçerik */}
-  <div className="relative z-10">
+  <div className="relative z-10" style={{ transform: `translateY(${parallaxY * 0.6}px)`, willChange: 'transform' }}>
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center">
             <div className="w-full max-w-3xl text-center mb-12">
-              <h1 className="text-4xl md:text-6xl font-bold text-[#FFE8D8] mb-8 leading-[1.15] drop-shadow-lg">
+              <h1 className="text-4xl md:text-6xl font-bold text-[#FFE8D8] mb-8 leading-[1.15] drop-shadow-lg opacity-0" data-reveal data-delay="0">
                 {t('home.mainTitle')}
               </h1>
-              <div className="w-full max-w-xl mx-auto mb-8 relative">
+              <div className="w-full max-w-xl mx-auto mb-8 relative opacity-0 translate-y-2" data-reveal data-delay="50">
                 <div className="w-full relative">
                   <div 
                     className="absolute inset-y-0 right-3 flex items-center cursor-pointer hover:opacity-80 transition-opacity"
@@ -230,37 +273,40 @@ export default function Home() {
                   </div>
                 )}
               </div>
-              <p className="text-xl text-[#FFD6B2] mb-8 drop-shadow">
+              <p className="text-xl text-[#FFD6B2] mb-8 drop-shadow opacity-0 translate-y-2" data-reveal data-delay="100">
                 {t('home.description')}
               </p>
               <div className="mx-auto max-w-3xl px-4">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <Link href="/ilanlar" className="group flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
-                    <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white">
+                  <Link href="/ilanlar" className="group relative overflow-hidden flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 hover:brightness-110 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 opacity-0 translate-y-2" data-reveal data-delay="0">
+                    <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white transition group-hover:bg-white/20 group-hover:border-white/40 animate-float-slow motion-reduce:animate-none">
                       <HiOutlineMegaphone className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
                       <div className="text-white font-medium truncate">{t('nav.listings')}</div>
                       <div className="text-white/70 text-sm truncate">{t('home.cards.listings.subtitle')}</div>
                     </div>
+                    <span className="pointer-events-none absolute inset-y-0 -skew-x-12 left-[-120%] w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70 will-change-transform group-hover:animate-shine" />
                   </Link>
-                  <Link href="/projeler" className="group flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
-                    <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white">
+                  <Link href="/projeler" className="group relative overflow-hidden flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 hover:brightness-110 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 opacity-0 translate-y-2" data-reveal data-delay="100">
+                    <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white transition group-hover:bg-white/20 group-hover:border-white/40 animate-float-slow motion-reduce:animate-none">
                       <FiFolder className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
                       <div className="text-white font-medium truncate">{t('home.cards.projects.title')}</div>
                       <div className="text-white/70 text-sm truncate">{t('home.cards.projects.subtitle')}</div>
                     </div>
+                    <span className="pointer-events-none absolute inset-y-0 -skew-x-12 left-[-120%] w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70 will-change-transform group-hover:animate-shine" />
                   </Link>
-                  <Link href="/kaynaklar" className="group flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60">
-                    <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white">
+                  <Link href="/kaynaklar" className="group relative overflow-hidden flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 hover:brightness-110 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 opacity-0 translate-y-2" data-reveal data-delay="200">
+                    <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white transition group-hover:bg-white/20 group-hover:border-white/40 animate-float-slow motion-reduce:animate-none">
                       <FiBookOpen className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
                       <div className="text-white font-medium truncate">{t('home.cards.resources.title')}</div>
                       <div className="text-white/70 text-sm truncate">{t('home.cards.resources.subtitle')}</div>
                     </div>
+                    <span className="pointer-events-none absolute inset-y-0 -skew-x-12 left-[-120%] w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70 will-change-transform group-hover:animate-shine" />
                   </Link>
                 </div>
               </div>
@@ -273,7 +319,7 @@ export default function Home() {
       <section className="relative z-20 mt-24 py-16">
         <div className="max-w-6xl mx-auto px-4 grid gap-8 md:grid-cols-3">
           {/* İlanlar Card (sol) */}
-          <Link href="/ilanlar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+          <Link href="/ilanlar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="0">
             <div className="relative h-60 w-full overflow-hidden">
               <Image src="/images/özel-ders.jpg" alt="Duyuru panosu" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
@@ -284,7 +330,7 @@ export default function Home() {
             </div>
           </Link>
           {/* Projeler (orta) */}
-          <Link href="/projeler" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+          <Link href="/projeler" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="100">
             <div className="relative h-60 w-full overflow-hidden">
               <Image
                 src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=60"
@@ -302,7 +348,7 @@ export default function Home() {
           </Link>
 
           {/* Kaynaklar (sağ) */}
-          <Link href="/kaynaklar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+          <Link href="/kaynaklar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="200">
             <div className="relative h-60 w-full overflow-hidden">
               <Image src="/images/kaynaklar.jpg" alt="Kaynaklar" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />

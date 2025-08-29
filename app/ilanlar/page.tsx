@@ -7,6 +7,7 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaSearch, FaFilter, FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher } from 'react-icons/fa';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 
 interface Teacher {
@@ -186,8 +187,9 @@ export default function IlanlarPage() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-16">
-      <div className="container mx-auto px-4">
+    <div className="relative min-h-screen pt-24 pb-16 overflow-hidden">
+      <AnimatedBackground src="/images/homepage-students.jpg" alt="Arka plan" priority />
+      <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
           <div className="mb-8 text-center md:text-left">
             <div className="inline-block mb-3 px-4 py-1 bg-[#FFF5F0] rounded-full text-[#994D1C] text-sm font-medium">
