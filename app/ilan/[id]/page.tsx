@@ -182,7 +182,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                   </div>
                   <div className="flex items-center">
                     <FaCalendarAlt className="mr-2" />
-                    <span>{t('general.createdAt')}: {new Date(ilan.createdAt).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
+                    <span>{t('general.postDate')}: {new Date(ilan.createdAt).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
                   </div>
                 </div>
               </div>

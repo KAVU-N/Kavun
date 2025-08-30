@@ -31,12 +31,12 @@ export default function CreateProjectPage() {
       // Basit içerik kontrolü (istemci tarafı)
       const check = [form.title, form.description, form.requirements, form.benefits];
       if (form.linkedinUrl && !isValidLinkedInUrl(form.linkedinUrl)) {
-        alert('LinkedIn URL geçersiz');
+        alert(t('errors.invalidLinkedInUrl'));
         setLoading(false);
         return;
       }
       if (check.some((f) => containsProhibited(f))) {
-        alert('Uygunsuz içerik tespit edildi. Lütfen metni düzenleyin.');
+        alert(t('errors.prohibitedContentDetected'));
         setLoading(false);
         return;
       }
@@ -44,13 +44,13 @@ export default function CreateProjectPage() {
         ...form,
         ownerId: user?._id || user?.id || undefined,
       };
-      if (!payload.ownerId) { alert("Oturum bulunamadı"); setLoading(false); return; }
+      if (!payload.ownerId) { alert(t('errors.sessionNotFound')); setLoading(false); return; }
       const res = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Proje oluşturulamadı");
+      if (!res.ok) throw new Error(t('errors.projectCreationFailed'));
       router.push("/projeler");
     } catch (err) {
       alert((err as Error).message);
@@ -69,46 +69,46 @@ export default function CreateProjectPage() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span className="font-medium">Geri Dön</span>
+            <span className="font-medium">{t('general.goBack')}</span>
           </Link>
           <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-          <h1 className="text-2xl font-bold mb-6 text-[#994D1C] text-center">Yeni Proje Oluştur</h1>
+          <h1 className="text-2xl font-bold mb-6 text-[#994D1C] text-center">{t('project.createNewTitle')}</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
-        <input required name="title" value={form.title} onChange={handleChange} placeholder="Proje Adı" className="w-full border p-2 rounded" />
-        <textarea required name="description" value={form.description} onChange={handleChange} placeholder="Açıklama" className="w-full border p-2 h-32 rounded" />
-        <input name="linkedinUrl" value={form.linkedinUrl || ""} onChange={handleChange} placeholder="LinkedIn URL (opsiyonel)" className="w-full border p-2 rounded" />
-        <input required name="contact" value={form.contact} onChange={handleChange} placeholder="İletişim (e-posta, Discord vs.)" className="w-full border p-2 rounded" />
+        <input required name="title" value={form.title} onChange={handleChange} placeholder={t('project.title')} className="w-full border p-2 rounded" />
+        <textarea required name="description" value={form.description} onChange={handleChange} placeholder={t('project.description')} className="w-full border p-2 h-32 rounded" />
+        <input name="linkedinUrl" value={form.linkedinUrl || ""} onChange={handleChange} placeholder={t('project.linkedinUrlOptional')} className="w-full border p-2 rounded" />
+        <input required name="contact" value={form.contact} onChange={handleChange} placeholder={t('project.contactPlaceholder')} className="w-full border p-2 rounded" />
 
         {/* Başvuran Gereksinimleri */}
-        <textarea name="requirements" value={form.requirements} onChange={handleChange} placeholder="Başvuranın Gereksinimleri" className="w-full border p-2 h-24 rounded" />
-        <input name="position" value={form.position} onChange={handleChange} placeholder="Aradığımız Kişi / Pozisyon" className="w-full border p-2 rounded" />
+        <textarea name="requirements" value={form.requirements} onChange={handleChange} placeholder={t('project.applicantRequirements')} className="w-full border p-2 h-24 rounded" />
+        <input name="position" value={form.position} onChange={handleChange} placeholder={t('project.position')} className="w-full border p-2 rounded" />
         {/* Sağlanan Fırsatlar */}
-        <textarea name="benefits" value={form.benefits} onChange={handleChange} placeholder="Başvurana Sağlayacaklarımız" className="w-full border p-2 h-24 rounded" />
+        <textarea name="benefits" value={form.benefits} onChange={handleChange} placeholder={t('project.benefitsPlaceholder')} className="w-full border p-2 h-24 rounded" />
         <select name="category" value={form.category} onChange={handleChange} className="w-full border p-2 rounded">
-          <option value="Genel">Genel</option>
-          <option value="Web">Web</option>
-          <option value="Mobil">Mobil</option>
-          <option value="Masaüstü">Masaüstü</option>
-          <option value="Yapay Zeka">Yapay Zeka</option>
-          <option value="Oyun">Oyun</option>
-          <option value="Veri Bilimi">Veri Bilimi</option>
-          <option value="Siber Güvenlik">Siber Güvenlik</option>
-          <option value="Blockchain">Blockchain</option>
-          <option value="IoT">IoT</option>
-          <option value="AR/VR">AR/VR</option>
-          <option value="Robotik">Robotik</option>
-          <option value="E-Ticaret">E-Ticaret</option>
-          <option value="FinTech">FinTech</option>
-          <option value="Sağlık">Sağlık</option>
-          <option value="Eğitim">Eğitim</option>
-          <option value="Cloud">Cloud</option>
-          <option value="DevOps">DevOps</option>
-          <option value="Data Engineering">Data Engineering</option>
-          <option value="Donanım">Donanım</option>
-          <option value="Diğer">Diğer</option>
+          <option value="Genel">{t('category.general')}</option>
+          <option value="Web">{t('category.web')}</option>
+          <option value="Mobil">{t('category.mobile')}</option>
+          <option value="Masaüstü">{t('category.desktop')}</option>
+          <option value="Yapay Zeka">{t('category.ai')}</option>
+          <option value="Oyun">{t('category.game')}</option>
+          <option value="Veri Bilimi">{t('category.dataScience')}</option>
+          <option value="Siber Güvenlik">{t('category.cyberSecurity')}</option>
+          <option value="Blockchain">{t('category.blockchain')}</option>
+          <option value="IoT">{t('category.iot')}</option>
+          <option value="AR/VR">{t('category.arvr')}</option>
+          <option value="Robotik">{t('category.robotics')}</option>
+          <option value="E-Ticaret">{t('category.ecommerce')}</option>
+          <option value="FinTech">{t('category.fintech')}</option>
+          <option value="Sağlık">{t('category.health')}</option>
+          <option value="Eğitim">{t('category.education')}</option>
+          <option value="Cloud">{t('category.cloud')}</option>
+          <option value="DevOps">{t('category.devops')}</option>
+          <option value="Data Engineering">{t('category.dataEngineering')}</option>
+          <option value="Donanım">{t('category.hardware')}</option>
+          <option value="Diğer">{t('category.other')}</option>
         </select>
         <button disabled={loading} type="submit" className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white px-6 py-3 text-base md:text-lg rounded-lg hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 block mx-auto">
-          {loading ? "Kaydediliyor..." : "Oluştur"}
+          {loading ? t('project.creating') : t('project.create')}
         </button>
         </form>
           </div>

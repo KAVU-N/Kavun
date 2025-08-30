@@ -91,9 +91,9 @@ export default function ProjectDetailPage() {
     fetchProject();
   }, [id]);
 
-  if (loading) return <div className="pt-28 text-center">Yükleniyor...</div>;
+  if (loading) return <div className="pt-28 text-center">{t('general.loading')}</div>;
   if (error) return <div className="pt-28 text-center text-red-600">{error}</div>;
-  if (!project) return <div className="pt-28 text-center">Proje bulunamadı</div>;
+  if (!project) return <div className="pt-28 text-center">{t('project.notFound')}</div>;
 
   return (
     <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
@@ -144,7 +144,7 @@ export default function ProjectDetailPage() {
               }}
               className="inline-block mt-2 bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white font-semibold px-4 py-2 rounded-lg hover:shadow-md hover:shadow-[#60A5FA]/20 transition-all duration-300"
              >
-              Mail Gönder
+              {t('general.sendEmail')}
             </a>
           )}
           {project.ownerId && (
@@ -158,7 +158,7 @@ export default function ProjectDetailPage() {
               }}
               className="inline-block mt-2 ml-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold px-4 py-2 rounded-lg hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300"
             >
-              Mesaj Gönder
+              {t('general.sendMessage')}
             </button>
           )}
           {project.projectUrl && (

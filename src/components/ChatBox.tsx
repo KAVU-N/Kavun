@@ -566,7 +566,7 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Mesajınızı yazın..."
+                  placeholder={t('messages.typeMessagePlaceholder')}
                   className="flex-1 border border-[#FFE5D9] rounded-xl py-2 px-4 focus:outline-none focus:border-[#FF8B5E] transition-colors duration-300"
                   autoComplete="off"
                   onClick={(e) => e.stopPropagation()}
