@@ -139,10 +139,12 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen bg-white pt-20">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center py-12">
-            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+      <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+        <div className="max-w-5xl mx-auto px-4 relative z-10">
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="flex justify-center items-center py-8">
+              <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -150,31 +152,16 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Geri Butonu */}
-          <div className="mb-6">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center text-[#6B3416] hover:text-[#994D1C] transition-colors"
-            >
-              <FaArrowLeft className="mr-2" />
-              Geri Dön
-            </button>
-          </div>
-
+    <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
+        <div className="bg-white rounded-2xl shadow-lg p-8">
           {/* İçerik */}
-          {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
-            </div>
-          ) : error ? (
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <p className="text-red-500 text-center">{error}</p>
+          {error ? (
+            <div className="p-6">
+              <p className="text-red-600 text-center">{error}</p>
             </div>
           ) : !ilan ? (
-            <div className="bg-white p-8 rounded-xl shadow-md text-center">
+            <div className="p-8 text-center">
               <p className="text-[#994D1C] mb-4">İlan bulunamadı.</p>
               <Link 
                 href="/ilanlar"
@@ -184,11 +171,11 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               </Link>
             </div>
           ) : (
-            <div className="bg-white p-8 rounded-xl shadow-lg">
-              <h1 className="text-3xl font-bold text-[#6B3416] mb-4">{ilan.title}</h1>
-              
+            <div className="space-y-6">
+              <h1 className="text-3xl font-bold text-[#994D1C] -mt-2">{ilan.title}</h1>
+
               {/* Eğitmen Bilgisi */}
-              <div className="flex items-center mb-6 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center p-4 bg-gray-50 rounded-lg">
                 {displayPhotoUrl ? (
                   <Image
                     src={displayPhotoUrl}
@@ -214,10 +201,10 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                   </p>
                 </div>
               </div>
-              
+
               {/* Ders Detayları */}
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-[#6B3416] mb-4">Ders Detayları</h3>
+              <div>
+                <h3 className="font-semibold mb-3 text-[#994D1C]">Ders Detayları</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center p-3 bg-gray-50 rounded-lg">
                     <FaMoneyBillWave className="text-green-600 text-xl mr-3" />
@@ -249,18 +236,16 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                   </div>
                 </div>
               </div>
-              
+
               {/* Açıklama */}
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-[#6B3416] mb-4">Ders Açıklaması</h3>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-gray-800 whitespace-pre-line">{ilan.description}</p>
-                </div>
+              <div>
+                <h3 className="font-semibold mb-3 text-[#994D1C]">Ders Açıklaması</h3>
+                <p className="text-[#6B3416] whitespace-pre-line leading-relaxed">{ilan.description}</p>
               </div>
-              
+
               {/* Ek Bilgiler */}
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-[#6B3416] mb-4">Ek Bilgiler</h3>
+              <div>
+                <h3 className="font-semibold mb-3 text-[#994D1C]">Ek Bilgiler</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 bg-[#FFF9F5] rounded-lg">
                     <p className="text-sm font-medium text-[#994D1C] mb-1">Eğitim Aldığı Öğretmen:</p>
@@ -268,11 +253,9 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                   </div>
                 </div>
               </div>
-              
+
               {/* İlan Tarihi */}
-              <div className="text-sm text-gray-500 mb-8">
-                İlan Tarihi: {formatDate(ilan.createdAt)}
-              </div>
+              <div className="text-sm text-gray-500">İlan Tarihi: {formatDate(ilan.createdAt)}</div>
             </div>
           )}
         </div>

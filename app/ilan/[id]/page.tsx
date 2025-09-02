@@ -112,10 +112,12 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-white pt-20">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center py-12">
-            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+      <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+        <div className="max-w-5xl mx-auto px-4 relative z-10">
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="flex justify-center items-center py-8">
+              <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -123,9 +125,12 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
+    <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
+        <div className="mb-6">
+          <div className="hidden">{/* boşluk koruyucu */}</div>
+        </div>
+        <div className="">
           <div className="mb-6">
             <button 
               onClick={() => router.back()} 
@@ -141,7 +146,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
             </div>
           ) : error ? (
-            <div className="bg-white p-8 rounded-xl shadow-md text-center border border-red-100">
+            <div className="bg-white p-8 rounded-2xl shadow-lg text-center border border-red-100">
               <div className="text-red-500 text-5xl mb-4 flex justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-16 h-16">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -157,7 +162,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               </button>
             </div>
           ) : !ilan ? (
-            <div className="bg-white p-8 rounded-xl shadow-md text-center border border-[#FFE5D9]">
+            <div className="bg-white p-8 rounded-2xl shadow-lg text-center border border-[#FFE5D9]">
               <p className="text-[#994D1C] mb-4">{t('general.noListingFound')}</p>
               <Link 
                 href="/ilanlar"
@@ -167,7 +172,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               </Link>
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               {/* Header Section */}
               <div className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] p-6 text-white">
                 <div className="flex items-center mb-2">

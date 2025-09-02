@@ -169,6 +169,11 @@ export default function Navbar() {
       <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
+    )},
+    { href: '/kulupler', label: (t('nav.clubs') || 'Kulüpler'), icon: (
+      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M12 20v-2a4 4 0 013-3.87M7 20H2v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z" />
+      </svg>
     )}
   ];
 
@@ -241,7 +246,7 @@ export default function Navbar() {
                             ? 'text-[#994D1C] font-semibold hover:text-[#FF8B5E]'
                             : pathname === link.href
                               ? (pathname === '/' ? 'text-white font-semibold bg-[#994D1C]/80 shadow-md' : 'text-[#FFD6B2] font-semibold bg-[#994D1C]/80 shadow-md')
-                              : (pathname === '/' ? 'text-white/90 font-semibold hover:text-[#FFD6B2] hover:bg-[#994D1C]/80 hover:-translate-y-1 hover:shadow-lg' : (link.href === '/ilanlar' || link.href === '/kaynaklar' || link.href === '/projeler')
+                              : (pathname === '/' ? 'text-white/90 font-semibold hover:text-[#FFD6B2] hover:bg-[#994D1C]/80 hover:-translate-y-1 hover:shadow-lg' : (link.href === '/ilanlar' || link.href === '/kaynaklar' || link.href === '/projeler' || link.href === '/kulupler')
                                 ? 'text-[#994D1C] font-semibold hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg'
                                 : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg')
                         }`}
@@ -440,6 +445,17 @@ export default function Navbar() {
                             <span>{t('nav.myProjects')}</span>
                           </div>
                         </Link>
+                        <Link
+                          href="/kuluplerim"
+                          className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
+                        >
+                          <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
+                            <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M12 20v-2a4 4 0 013-3.87M7 20H2v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z" />
+                            </svg>
+                            <span>{(t('nav.myClub') || 'Kulübüm')}</span>
+                          </div>
+                        </Link>
                         {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
                           <>
                             <Link
@@ -618,6 +634,16 @@ export default function Navbar() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7m-6 4l-4 4-4-4" />
                       </svg>
                       <span>{t('nav.myProjects')}</span>
+                    </Link>
+                    <Link
+                      href="/kuluplerim"
+                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M12 20v-2a4 4 0 013-3.87M7 20H2v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z" />
+                      </svg>
+                      <span>{(t('nav.myClub') || 'Kulübüm')}</span>
                     </Link>
                     {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
                       <>

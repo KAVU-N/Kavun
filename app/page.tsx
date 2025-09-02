@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { universities } from '@/data/universities';
 import Link from 'next/link';
 import { useLanguage } from '@/src/contexts/LanguageContext';
-import { FiFolder, FiBookOpen } from 'react-icons/fi';
+import { FiFolder, FiBookOpen, FiUsers } from 'react-icons/fi';
 import { HiOutlineMegaphone } from 'react-icons/hi2';
 
 export default function Home() {
@@ -277,7 +277,7 @@ export default function Home() {
                 {t('home.description')}
               </p>
               <div className="mx-auto max-w-3xl px-4">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                   <Link href="/ilanlar" className="group relative overflow-hidden flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 hover:brightness-110 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 opacity-0 translate-y-2" data-reveal data-delay="0">
                     <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white transition group-hover:bg-white/20 group-hover:border-white/40 animate-float-slow motion-reduce:animate-none">
                       <HiOutlineMegaphone className="h-5 w-5" />
@@ -308,6 +308,16 @@ export default function Home() {
                     </div>
                     <span className="pointer-events-none absolute inset-y-0 -skew-x-12 left-[-120%] w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70 will-change-transform group-hover:animate-shine" />
                   </Link>
+                  <Link href="/kulupler" className="group relative overflow-hidden flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md p-4 hover:bg-white/15 hover:-translate-y-0.5 hover:brightness-110 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 opacity-0 translate-y-2" data-reveal data-delay="300">
+                    <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white transition group-hover:bg-white/20 group-hover:border-white/40 animate-float-slow motion-reduce:animate-none">
+                      <FiUsers className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-white font-medium truncate">Kulüpler</div>
+                      <div className="text-white/70 text-sm truncate">Üniversite kulüplerini keşfet</div>
+                    </div>
+                    <span className="pointer-events-none absolute inset-y-0 -skew-x-12 left-[-120%] w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70 will-change-transform group-hover:animate-shine" />
+                  </Link>
                 </div>
               </div>
               
@@ -317,7 +327,7 @@ export default function Home() {
       </div>
       {/* Özellik Tanıtım Bölümü */}
       <section className="relative z-20 mt-24 py-16">
-        <div className="max-w-6xl mx-auto px-4 grid gap-8 md:grid-cols-3">
+        <div className="max-w-6xl mx-auto px-4 grid gap-8 md:grid-cols-4">
           {/* İlanlar Card (sol) */}
           <Link href="/ilanlar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="0">
             <div className="relative h-60 w-full overflow-hidden">
@@ -347,7 +357,7 @@ export default function Home() {
             </div>
           </Link>
 
-          {/* Kaynaklar (sağ) */}
+          {/* Kaynaklar */}
           <Link href="/kaynaklar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="200">
             <div className="relative h-60 w-full overflow-hidden">
               <Image src="/images/kaynaklar.jpg" alt="Kaynaklar" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
@@ -356,6 +366,17 @@ export default function Home() {
             <div className="absolute inset-x-0 bottom-0 p-4">
               <h3 className="text-white text-lg font-semibold">{t('home.cards.resources.title')}</h3>
               <p className="text-gray-200 text-sm">{t('home.cards.resources.subtitle')}</p>
+            </div>
+          </Link>
+          {/* Kulüpler */}
+          <Link href="/kulupler" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="300">
+            <div className="relative h-60 w-full overflow-hidden">
+              <Image src="/images/homepage-students.jpg" alt="Kulüpler" fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 p-4">
+              <h3 className="text-white text-lg font-semibold">Kulüpler</h3>
+              <p className="text-gray-200 text-sm">Üniversite kulüplerini keşfet</p>
             </div>
           </Link>
 

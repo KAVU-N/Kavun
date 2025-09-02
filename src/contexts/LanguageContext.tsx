@@ -97,6 +97,8 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.resources': 'Kaynaklar',
     'nav.projects': 'Projeler',
     'nav.myProjects': 'Projelerim',
+    'nav.clubs': 'Kulüpler',
+    'nav.myClub': 'Kulübüm',
     'nav.contact': 'İletişim',
     'nav.about': 'Hakkımızda',
     'nav.faq': 'Sıkça Sorulan Sorular',
@@ -582,6 +584,9 @@ const translations: Record<Language, Record<string, string>> = {
     'home.cards.projects.subtitle': 'Showcase your work, collaborate',
     'home.cards.listings.title': 'Listings',
     'home.cards.listings.subtitle': 'Find new lesson listings',
+    // Navbar (EN)
+    'nav.clubs': 'Clubs',
+    'nav.myClub': 'My Club',
     'category.all': 'All Categories',
     'category.general': 'General',
     'category.web': 'Web',

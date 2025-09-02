@@ -97,8 +97,10 @@ export default function RootLayout({
                 {children}
               </div>
               <ClientOnly hideOnAdmin>
-                <CookieConsentBar />
-                <Footer />
+                <div className="relative z-10">
+                  <CookieConsentBar />
+                  <Footer />
+                </div>
               </ClientOnly>
             </div>
           </LanguageProvider>

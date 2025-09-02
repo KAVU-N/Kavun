@@ -12,7 +12,13 @@ const AnimatedBackground = dynamic(() => import("@/components/AnimatedBackground
 export default function RouteBackgroundHost() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const enabled = pathname?.startsWith("/ilanlar") || pathname?.startsWith("/projeler") || pathname?.startsWith("/kaynaklar");
+  const enabled = (
+    pathname?.startsWith("/ilan") ||
+    pathname?.startsWith("/ilanlar") ||
+    pathname?.startsWith("/projeler") ||
+    pathname?.startsWith("/kaynaklar") ||
+    pathname?.startsWith("/kulupler")
+  );
 
   useEffect(() => {
     setMounted(true);
