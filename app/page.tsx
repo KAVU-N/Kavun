@@ -331,7 +331,7 @@ export default function Home() {
           {/* İlanlar Card (sol) */}
           <Link href="/ilanlar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="0">
             <div className="relative h-60 w-full overflow-hidden">
-              <Image src="/images/özel-ders.jpg" alt="Duyuru panosu" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
+              <Image src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=60" alt="Duyuru panosu" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4">
@@ -371,7 +371,7 @@ export default function Home() {
           {/* Kulüpler */}
           <Link href="/kulupler" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="300">
             <div className="relative h-60 w-full overflow-hidden">
-              <Image src="/images/homepage-students.jpg" alt="Kulüpler" fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
+              <Image src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=800&q=60" alt="Kulüpler" fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
             </div>
             <div className="absolute inset-x-0 bottom-0 p-4">
