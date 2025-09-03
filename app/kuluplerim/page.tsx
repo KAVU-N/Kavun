@@ -17,6 +17,7 @@ export default function MyClubPage() {
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [name, setName] = useState('');
@@ -65,9 +66,10 @@ export default function MyClubPage() {
     setError(null);
     try {
       setSaving(true);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const res = await fetch(`/api/kulupler/${club._id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: token ? { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } : { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, category, description })
       });
       const data = await res.json();
@@ -123,6 +125,32 @@ export default function MyClubPage() {
                   {saving ? 'Kaydediliyor...' : 'Kaydet'}
                 </button>
                 <Link href={`/kulupler/${club._id}`} className="px-5 py-2.5 rounded-lg border border-black/10 text-[#994D1C] hover:bg-black/5">Detay sayfası</Link>
+                <button
+                  type="button"
+                  disabled={deleting}
+                  onClick={async () => {
+                    if (!club) return;
+                    const ok = window.confirm('Kulübünüzü silmek istediğinize emin misiniz? Bu işlem geri alınamaz.');
+                    if (!ok) return;
+                    setError(null);
+                    try {
+                      setDeleting(true);
+                      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+                      const res = await fetch(`/api/kulupler/${club._id}`, { method: 'DELETE', headers: token ? { 'Authorization': `Bearer ${token}` } : undefined });
+                      const data = await res.json();
+                      if (!res.ok) throw new Error(data?.error || 'Silme başarısız');
+                      // Silindikten sonra state'i temizle
+                      setClub(null);
+                    } catch (err: any) {
+                      setError(err?.message || 'Silme başarısız');
+                    } finally {
+                      setDeleting(false);
+                    }
+                  }}
+                  className="px-5 py-2.5 rounded-lg border border-red-200 text-red-700 hover:bg-red-50 disabled:opacity-60"
+                >
+                  {deleting ? 'Siliniyor...' : 'Kulübü Sil'}
+                </button>
               </div>
             </form>
           )}

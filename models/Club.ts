@@ -24,6 +24,9 @@ const clubSchema = new mongoose.Schema<IClub>({
   updatedAt: { type: Date, default: Date.now },
 }, { timestamps: true });
 
+// Kullanıcı başına tek kulüp: ownerId benzersiz
+clubSchema.index({ ownerId: 1 }, { unique: true });
+
 clubSchema.pre('save', function(next) {
   this.updatedAt = new Date();
   next();

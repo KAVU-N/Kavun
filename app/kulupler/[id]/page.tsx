@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import ClubContactActions from '@/src/components/ClubContactActions';
+import Image from 'next/image';
 
 async function getClub(id: string) {
   const h = headers();
@@ -28,6 +29,11 @@ export default async function ClubDetailPage({ params }: { params: { id: string 
             <div className="text-black/70">Kulüp bulunamadı.</div>
           ) : (
             <div className="space-y-4">
+              {club.logoUrl && (
+                <div className="w-full h-48 sm:h-56 md:h-64 rounded-xl overflow-hidden bg-gray-100">
+                  <Image src={club.logoUrl} alt={`${club.name} logo`} width={1200} height={600} className="w-full h-full object-cover" />
+                </div>
+              )}
               <div>
                 <h1 className="text-2xl font-bold text-[#994D1C]">{club.name}</h1>
                 <div className="text-black/70">{club.university}{club.category ? ` • ${club.category}` : ''}</div>
@@ -66,4 +72,3 @@ export default async function ClubDetailPage({ params }: { params: { id: string 
     </div>
   );
 }
-

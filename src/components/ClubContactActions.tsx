@@ -47,7 +47,7 @@ export default function ClubContactActions({ ownerId, ownerName, ownerEmail, uni
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l.8-4A7.6 7.6 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        Mesaj Gönder
+        İletişime Geç
       </button>
 
       {open && (

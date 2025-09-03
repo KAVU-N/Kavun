@@ -34,7 +34,13 @@ export async function GET(request: Request) {
 export async function POST(req: Request) {
   try {
     await connectDB();
+    // DEBUG: Gelen headerları kontrol et
+    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
+    const cookieHeader = req.headers.get('cookie');
+    console.log('[DEBUG][POST /api/kulupler] Authorization:', authHeader ? `${authHeader.substring(0, 20)}...` : 'yok');
+    console.log('[DEBUG][POST /api/kulupler] Cookie var mi:', !!cookieHeader, 'uzunluk:', cookieHeader?.length || 0);
     const me = await getUserFromToken(req);
+    console.log('[DEBUG][POST /api/kulupler] me:', me);
     if (!me?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -44,15 +50,20 @@ export async function POST(req: Request) {
     if (!user.university) return NextResponse.json({ error: 'Profilinizde üniversite bilgisi yok' }, { status: 400 });
 
     const body = await req.json();
-    const { name, category, description } = body || {};
+    const { name, category, description, logoUrl } = body || {};
     if (!name) return NextResponse.json({ error: 'name zorunludur' }, { status: 400 });
+
+    // Kullanıcı başına tek kulüp
+    const existing = await Club.findOne({ ownerId: me.id });
+    if (existing) return NextResponse.json({ error: 'Bu kullanıcı zaten bir kulüp sahibi.' }, { status: 400 });
 
     const created = await Club.create({
       name,
       category,
       description,
       ownerId: me.id,
-      university: user.university
+      university: user.university,
+      logoUrl,
     });
     return NextResponse.json({ data: created }, { status: 201 });
   } catch (err: any) {

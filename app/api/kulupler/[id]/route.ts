@@ -40,7 +40,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 
     const body = await req.json();
-    const allowed = ['name', 'university', 'category', 'description', 'isApproved'] as const;
+    const allowed = ['name', 'university', 'category', 'description', 'isApproved', 'logoUrl'] as const;
     const update: any = {};
     for (const key of allowed) {
       if (key in (body || {})) update[key] = (body as any)[key];
@@ -72,4 +72,3 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     return NextResponse.json({ error: 'Server error', details: err?.message }, { status: 500 });
   }
 }
-

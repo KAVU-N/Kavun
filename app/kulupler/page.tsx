@@ -1,8 +1,10 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { universities } from '@/data/universities';
+import ClubContactActions from '@/src/components/ClubContactActions';
 
 type Club = {
   _id: string;
@@ -10,6 +12,8 @@ type Club = {
   university: string;
   category?: string;
   description?: string;
+  logoUrl?: string;
+  ownerId: string;
 };
 
 export default function ClubsPage() {
@@ -88,10 +92,24 @@ export default function ClubsPage() {
             {clubs.length === 0 ? (
               <div className="col-span-full text-center text-black/70">Kriterlere uygun kulüp bulunamadı.</div>
             ) : clubs.map((club) => (
-              <Link key={club._id} href={`/kulupler/${club._id}`} className="rounded-xl bg-white/70 border border-black/10 p-4 shadow-sm hover:shadow transition">
-                <div className="font-semibold text-[#994D1C]">{club.name}</div>
-                <div className="text-sm text-black/70">{club.university}{club.category ? ` • ${club.category}` : ''}</div>
-              </Link>
+              <div key={club._id} className="relative rounded-xl bg-white/70 border border-black/10 p-4 pb-16 shadow-sm hover:shadow transition flex items-start gap-3">
+                <div className="w-12 h-12 rounded-md bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center text-sm text-black/50">
+                  {club.logoUrl ? (
+                    <Image src={club.logoUrl} alt={`${club.name} logo`} width={48} height={48} className="w-12 h-12 object-cover" />
+                  ) : (
+                    club.name.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <Link href={`/kulupler/${club._id}`} className="block">
+                    <div className="font-semibold text-[#994D1C] line-clamp-1">{club.name}</div>
+                    <div className="text-sm text-black/70 line-clamp-1">{club.university}{club.category ? ` • ${club.category}` : ''}</div>
+                  </Link>
+                  <div className="absolute bottom-3 right-3">
+                    <ClubContactActions ownerId={club.ownerId} university={club.university} />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}
