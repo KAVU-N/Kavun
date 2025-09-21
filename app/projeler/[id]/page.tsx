@@ -51,7 +51,7 @@ export default function ProjectDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const fetchedRef = useRef(false);
   const [activeChat, setActiveChat] = useState(false);
-  const [instructor, setInstructor] = useState<{ _id: string; name: string; email: string; university: string; role: string } | null>(null);
+  const [instructor, setInstructor] = useState<{ _id: string; name: string; email: string; university: string; role: string; grade?: number } | null>(null);
 
   useEffect(() => {
     if (!id || fetchedRef.current) return;
@@ -73,7 +73,8 @@ export default function ProjectDetailPage() {
                 name: userData.name,
                 email: userData.email,
                 university: userData.university,
-                role: userData.role
+                role: userData.role,
+                grade: userData.grade
               });
             }
           } catch (e) {
@@ -94,19 +95,109 @@ export default function ProjectDetailPage() {
   if (!project) return <div className="pt-28 text-center">Proje bulunamadı</div>;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 pt-28 pb-12">
-      <h1 className="text-3xl font-bold text-[#994D1C] mb-4">{project.title}</h1>
-      <div className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
-        <p className="text-[#6B3416] whitespace-pre-line leading-relaxed text-lg">{project.description}</p>
-        <div className="flex flex-wrap gap-2 text-sm">
-          <span className="bg-[#FF8B5E] text-white px-3 py-1 rounded-full text-xs font-medium">{t(categoryKey[project.category] ?? project.category)}</span>
-          {project.status && <span className="bg-[#FFE5D9] text-[#994D1C] px-3 py-1 rounded-full text-xs font-medium">{t(statusKey[project.status] ?? project.status)}</span>}
-        </div>
-        {project.requirements && (
-          <div>
-            <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.requirements')}</h2>
-            <p className="whitespace-pre-line">{project.requirements}</p>
+    <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
+        {/* Kart ve buton: buton kartın DIŞINDA, hemen solunda */}
+        <div className="relative">
+          {/* Geri butonu (kartın dışında, solunda) */}
+          <button
+            onClick={() => router.back()}
+            aria-label="Geri Dön"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#994D1C]/30 text-[#994D1C] bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md hover:border-[#6B3416]/40 transition-all duration-300 absolute top-0 -left-3 -translate-x-full"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span className="font-medium">Geri Dön</span>
+          </button>
+          {/* İçerik kartı */}
+          <div className="relative bg-white rounded-2xl shadow-lg p-8 space-y-6">
+            <h1 className="text-3xl font-bold text-[#994D1C] -mt-2">{project.title}</h1>
+            <p className="text-[#6B3416] whitespace-pre-line leading-relaxed text-lg">{project.description}</p>
+            <div className="flex flex-wrap gap-2 text-sm">
+              <span className="bg-[#FF8B5E] text-white px-3 py-1 rounded-full text-xs font-medium">{t(categoryKey[project.category] ?? project.category)}</span>
+              {project.status && <span className="bg-[#FFE5D9] text-[#994D1C] px-3 py-1 rounded-full text-xs font-medium">{t(statusKey[project.status] ?? project.status)}</span>}
+            </div>
+            {project.requirements && (
+              <div>
+                <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.requirements')}</h2>
+                <p className="whitespace-pre-line">{project.requirements}</p>
+              </div>
+            )}
+            {project.position && (
+              <p><span className="font-semibold">{t('project.position')}: </span>{project.position}</p>
+            )}
+            {project.benefits && (
+              <div>
+                <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.benefits')}</h2>
+                <p className="whitespace-pre-line">{project.benefits}</p>
+              </div>
+            )}
+            {project.technologies && project.technologies.length > 0 && (
+              <div>
+                <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.technologies')}</h2>
+                <ul className="list-disc list-inside">
+                  {project.technologies.map((tech) => (
+                    <li key={tech}>{tech}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div>
+              <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.contact')}</h2>
+              <p>{project.contact}</p>
+              {project.contact?.includes('@') && (
+                <a 
+                  href={isLoggedIn ? `mailto:${project.contact}` : '#'}
+                  onClick={(e) => {
+                    if (!isLoggedIn) {
+                      e.preventDefault();
+                      router.push('/auth/login');
+                    }
+                  }}
+                  className="inline-block mt-2 bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white font-semibold px-4 py-2 rounded-lg hover:shadow-md hover:shadow-[#60A5FA]/20 transition-all duration-300"
+                >
+                  {t('general.sendEmail')}
+                </a>
+              )}
+              {instructor?.grade !== undefined && (
+                <div className="mt-2">
+                  <span className="font-semibold">{t('project.ownerGrade')}: </span>
+                  <span>{instructor.grade}</span>
+                </div>
+              )}
+              {project.ownerId && (
+                <button
+                  onClick={() => {
+                    if (!isLoggedIn) {
+                      router.push('/auth/login');
+                    } else {
+                      setActiveChat(true);
+                    }
+                  }}
+                  className="inline-block mt-2 ml-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold px-4 py-2 rounded-lg hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300"
+                >
+                  {t('general.sendMessage')}
+                </button>
+              )}
+              {project.projectUrl && (
+                <p><span className="font-semibold">{t('project.url')}: </span><Link href={project.projectUrl} target="_blank" className="text-blue-600 underline break-all">{project.projectUrl}</Link></p>
+              )}
+            </div>
+            {project.linkedinUrl && (
+              <div>
+                <Link href={project.linkedinUrl} target="_blank" className="inline-block bg-[#FF8B5E] hover:bg-[#FFD7A8] text-white font-semibold px-4 py-2 rounded transition">
+                  LinkedIn
+                </Link>
+              </div>
+            )}
           </div>
+        </div>
+        {activeChat && instructor && (
+          <ChatBox
+            instructor={instructor}
+            onClose={() => setActiveChat(false)}
+          />
         )}
         {project.position && (
           <p><span className="font-semibold">{t('project.position')}: </span>{project.position}</p>

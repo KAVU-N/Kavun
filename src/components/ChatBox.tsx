@@ -71,6 +71,7 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);
   const [socketConnected, setSocketConnected] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
@@ -266,67 +267,58 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation(); // Sayfa kaydırmasını önlemek için event'i durdur
-    
+    setSendError(null);
     if (!newMessage.trim() || !user) return;
     
-    try {
-      // Mesajı önce UI'da göster
-      const tempMessage: Message = {
+    // Mesajı önce UI'da göster
+    const tempId = Math.random().toString(36).substr(2, 9);
+    const tempMessage: Message = {
+      _id: tempId,
+      sender: user.id,
+      receiver: instructor._id,
+      content: newMessage.trim(),
+      createdAt: new Date(),
+      read: false,
+      isMine: true
+    };
+    setMessages(prev => [...prev, tempMessage]);
+    setNewMessage('');
+    setTimeout(scrollToBottom, 100);
+
+    // Socket.io ile mesajı gönder
+    if (socketRef.current) {
+      socketRef.current.emit('send-message', {
         sender: user.id,
         receiver: instructor._id,
         content: newMessage.trim(),
-        createdAt: new Date(),
-        read: false,
-        isMine: true
-      };
-      
-      setMessages(prev => [...prev, tempMessage]);
-      setNewMessage('');
-      
-      // Mesaj gönderildikten sonra kaydırma işlemi
-      setTimeout(scrollToBottom, 100);
-      
-      // Socket.io ile mesajı gönder
-      if (socketRef.current) {
-        socketRef.current.emit('send-message', {
-          sender: user.id,
-          receiver: instructor._id,
-          content: newMessage.trim()
-        });
-      }
-      
-      // API'ye mesajı kaydet
+      });
+    }
+
+    // API'ye mesajı kaydet
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    try {
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: {
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
           'Content-Type': 'application/json'
         },
         credentials: 'include',
         body: JSON.stringify({
           receiver: instructor._id,
-          content: newMessage.trim()
+          content: tempMessage.content
         })
       });
-      
       if (!response.ok) {
-        console.error('Mesaj gönderilirken bir hata oluştu:', response.status);
+        setSendError('Mesaj gönderilemedi. Lütfen tekrar deneyin.');
+        // Optimistic mesajı UI'dan kaldır
+        setMessages(prev => prev.filter(m => m._id !== tempId));
       }
     } catch (error) {
-      console.error('Mesaj gönderilirken hata oluştu:', error);
+      setSendError('Mesaj gönderilemedi. Lütfen tekrar deneyin.');
+      setMessages(prev => prev.filter(m => m._id !== tempId));
     }
   };
-
-  // Enter tuşu ile mesaj gönderme
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      e.stopPropagation(); // Sayfa kaydırmasını önlemek için event'i durdur
-      sendMessage(e);
-    }
-  };
-
-  // Yazıyor... bildirimi gönderme
   const handleTyping = () => {
     if (socketRef.current && user) {
       socketRef.current.emit('typing', {
@@ -340,6 +332,15 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  };
+
+  // Enter tuşu ile mesaj gönderme
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      e.stopPropagation();
+      sendMessage(e as any);
     }
   };
 
@@ -526,6 +527,9 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
             }}
             onClick={(e) => e.stopPropagation()}
           >
+            {sendError && (
+              <div className="mb-2 text-red-600 text-sm font-medium">{sendError}</div>
+            )}
             {/* Ders Al butonu - Sadece öğrenci için göster ve eğitmen rolüne sahip kişilerle konuşurken */}
             {user?.role === 'student' && instructor.role === 'instructor' && (
               <div className="mb-3">

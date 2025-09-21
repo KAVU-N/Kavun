@@ -172,15 +172,21 @@ export default function KaynaklarPage() {
         return;
       }
       if (!response.ok) {
-        alert('Bir hata oluştu.');
+        let msg = 'Bir hata oluştu.';
+        try {
+          const data = await response.json();
+          if (data && data.error) msg = data.error;
+        } catch {}
+        alert(msg);
         return;
       }
       setPreviewResource(resource);
       setShowPreviewModal(true);
-    } catch (error) {
-      alert('Bir hata oluştu.');
+    } catch (error: any) {
+      alert(error?.message || 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
     }
   };
+
 
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [previewResource, setPreviewResource] = useState<Resource | null>(null);
