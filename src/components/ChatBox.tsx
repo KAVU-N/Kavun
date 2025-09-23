@@ -544,30 +544,37 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
                 </button>
               </div>
             )}
-            <form onSubmit={sendMessage} className="w-full h-full">
-              <div className="flex items-center w-full h-full space-x-2">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Mesajınızı yazın..."
-                  className="flex-1 border border-[#FFE5D9] rounded-xl py-2 px-4 focus:outline-none focus:border-[#FF8B5E] transition-colors duration-300"
-                  autoComplete="off"
-                  onClick={(e) => e.stopPropagation()}
-                />
-                <button
-                  type="submit"
-                  disabled={!newMessage.trim()}
-                  className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white p-2 rounded-xl disabled:opacity-50 flex items-center justify-center w-[42px] h-[42px] hover:shadow-md transition-all duration-300"
-                  aria-label="Mesaj gönder"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                </button>
+            {!user ? (
+              <div className="w-full text-center text-red-500 font-medium py-3">
+                Mesaj göndermek için giriş yapmalısınız.
               </div>
-            </form>
+            ) : (
+              <form onSubmit={sendMessage} className="w-full h-full">
+                <div className="flex items-center w-full h-full space-x-2">
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Mesajınızı yazın..."
+                    className="flex-1 border border-[#FFE5D9] rounded-xl py-2 px-4 focus:outline-none focus:border-[#FF8B5E] transition-colors duration-300"
+                    autoComplete="off"
+                    onClick={(e) => e.stopPropagation()}
+                    disabled={!user}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!newMessage.trim() || !user}
+                    className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white p-2 rounded-xl disabled:opacity-50 flex items-center justify-center w-[42px] h-[42px] hover:shadow-md transition-all duration-300"
+                    aria-label="Mesaj gönder"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </>
       )}

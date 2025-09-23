@@ -15,6 +15,7 @@ export default function IlanVerPage() {
     description: '',
     price: '',
     method: 'online', // 'online', 'yüzyüze' veya 'hibrit'
+    gecmeNotu: '', // Dersi kaç notla geçtiğiniz
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -41,54 +42,53 @@ export default function IlanVerPage() {
 
   // Yasaklı kelimeler listesi
   // +18 ve uygunsuz kelimeler, spam ve anlamsız içerikler dahil
-const bannedWords = [
-  // Küfür ve argo
-  "amk", "aq", "orospu", "piç", "sik", "sikerim", "siktir", "yarrak", "ananı", "anan",
-  "babanı", "baban", "göt", "got", "götveren", "pezevenk", "kahpe", "ibne", "ibneyim", "ibneler",
-  "ibnelik", "döl", "bok", "boktan", "boklu", "sikik", "sikilmiş", "amına", "koyayım", "koydum",
-  "koyarım", "kodum", "koduğum", "koyduğum", "koyduklarım", "siktiğim", "siktiğimin", "siktiğiminin",
-  "siktirgit", "siktir ol", "siktir et", "siktirip", "siktiriboktan", "siktirola", "siktiribok",
-  "amcık", "amcıklar", "amcığa", "amcığı", "amcığın", "amcığım", "amcığına", "amcığından",
-  "amcığını", "amcığınına", "yarrağımı", "yarrağımın", "yarrağımda", "yarrağımdan",
-  "yarrağımla", "yarrağımsı", "yarrağımsın", "yarrağımsına", "yarrağımsınız", "yarrağımsınlar",
-  "götlek", "götleğim", "götleğin", "götleği", "götleğine", "götleğimi", "götleğimin", "götleğimde",
-  "götleğimden", "götleğimle", "götleğimsi", "götleğimsin", "götleğimsi", "götleğimsiniz", "götleğimsinler",
-  "pezevenk", "pezevengim", "pezevengin", "pezevengi", "pezevengine", "pezevengimi", "pezevengimin", "pezevengimde",
-  "pezevengimden", "pezevengimle", "pezevengimsi", "pezevengimsin", "pezevengimsi", "pezevengimsiniz", "pezevengimsinler",
-  "kaltak", "kaltaklık", "kaltaklar", "kaltaklığı", "kaltaklığa", "kaltaklıkta", "kaltaklıktan", "kaltaklıkla", "kaltaklıksı", "kaltaklıksın", "kaltaklıksınız", "kaltaklıklar",
-  "sikik", "sikiklik", "sikikler", "sikikliği", "sikikliğe", "siklikte", "siklikten", "siklikle", "sikliksi", "sikliksin", "sikliksiniz", "siklikler", "siklikleri", "sikliklere",
-  // +18, müstehcen
-  "porn", "porno", "pornografi", "seks", "sex", "seksüel", "erotik", "mastürb", "masturb", "vajina", "penis", "göğüs", "memeler", "anal", "dildo", "vajinal", "vajin", "vajina", "vajinismus", "vajinal",
-  "fetish", "fetis", "fetishist", "fetisist", "fetiş", "fetişist", "fetişizm", "fetişistlik", "fetişizmci", "fetişistlik",
-  // Rastgele, anlamsız, spam
-  "asdasd", "qweqwe", "qwerty", "asdfgh", "lorem", "ipsum", "test", "deneme", "123456", "654321", "111111", "222222", "333333", "abcdef", "ghijkl", "zxczxc", "xcvbnm"
-];
-
-// Anlamsız içerik tespiti fonksiyonu (tekil ve globalde tanımlı)
-function isNonsense(text: string) {
-  const patterns = [
-    /^(a{3,}|s{3,}|d{3,}|w{3,}|q{3,}|z{3,}|x{3,}|c{3,}|v{3,}|b{3,}|n{3,}|m{3,})$/i,
-    /^(123456|654321|111111|222222|333333|abcdef|ghijkl|zxczxc|xcvbnm)$/i,
-    /^(asdasd|qweqwe|qwerty|asdfgh|lorem|ipsum|test|deneme)$/i
+  const bannedWords = [
+    // Küfür ve argo
+    "amk", "aq", "orospu", "piç", "sik", "sikerim", "siktir", "yarrak", "ananı", "anan",
+    "babanı", "baban", "göt", "got", "götveren", "pezevenk", "kahpe", "ibne", "ibneyim", "ibneler",
+    "ibnelik", "döl", "bok", "boktan", "boklu", "sikik", "sikilmiş", "amına", "koyayım", "koydum",
+    "koyarım", "kodum", "koduğum", "koyduğum", "koyduklarım", "siktiğim", "siktiğimin", "siktiğiminin",
+    "siktirgit", "siktir ol", "siktir et", "siktirip", "siktiriboktan", "siktirola", "siktiribok",
+    "amcık", "amcıklar", "amcığa", "amcığı", "amcığın", "amcığım", "amcığına", "amcığından",
+    "amcığını", "amcığınına", "yarrağımı", "yarrağımın", "yarrağımda", "yarrağımdan",
+    "yarrağımla", "yarrağımsı", "yarrağımsın", "yarrağımsına", "yarrağımsınız", "yarrağımsınlar",
+    "götlek", "götleğim", "götleğin", "götleği", "götleğine", "götleğimi", "götleğimin", "götleğimde",
+    "götleğimden", "götleğimle", "götleğimsi", "götleğimsin", "götleğimsi", "götleğimsiniz", "götleğimsinler",
+    "pezevenk", "pezevengim", "pezevengin", "pezevengi", "pezevengine", "pezevengimi", "pezevengimin", "pezevengimde",
+    "pezevengimden", "pezevengimle", "pezevengimsi", "pezevengimsin", "pezevengimsi", "pezevengimsiniz", "pezevengimsinler",
+    "kaltak", "kaltaklık", "kaltaklar", "kaltaklığı", "kaltaklığa", "kaltaklıkta", "kaltaklıktan", "kaltaklıkla", "kaltaklıksı", "kaltaklıksın", "kaltaklıksınız", "kaltaklıklar",
+    "sikik", "sikiklik", "sikikler", "sikikliği", "sikikliğe", "siklikte", "siklikten", "siklikle", "sikliksi", "sikliksin", "sikliksiniz", "siklikler", "siklikleri", "sikliklere",
+    // +18, müstehcen
+    "porn", "porno", "pornografi", "seks", "sex", "seksüel", "erotik", "mastürb", "masturb", "vajina", "penis", "göğüs", "memeler", "anal", "dildo", "vajinal", "vajin", "vajina", "vajinismus", "vajinal",
+    "fetish", "fetis", "fetishist", "fetisist", "fetiş", "fetişist", "fetişizm", "fetişistlik", "fetişizmci", "fetişistlik",
+    // Rastgele, anlamsız, spam
+    "asdasd", "qweqwe", "qwerty", "asdfgh", "lorem", "ipsum", "test", "deneme", "123456", "654321", "111111", "222222", "333333", "abcdef", "ghijkl", "zxczxc", "xcvbnm"
   ];
-  return patterns.some(re => re.test(text.trim().toLowerCase()));
-}
 
-function containsBannedWords(text: string) {
-  const lower = text.toLocaleLowerCase('tr');
-  return bannedWords.some(word => lower.includes(word));
-}
+  // Anlamsız içerik tespiti fonksiyonu (tekil ve globalde tanımlı)
+  function isNonsense(text: string) {
+    const patterns = [
+      /^(a{3,}|s{3,}|d{3,}|w{3,}|q{3,}|z{3,}|x{3,}|c{3,}|v{3,}|b{3,}|n{3,}|m{3,})$/i,
+      /^(123456|654321|111111|222222|333333|abcdef|ghijkl|zxczxc|xcvbnm)$/i,
+      /^(asdasd|qweqwe|qwerty|asdfgh|lorem|ipsum|test|deneme)$/i
+    ];
+    return patterns.some(re => re.test(text.trim().toLowerCase()));
+  }
 
-function hasRepeatedChars(text: string, count = 3) {
-  // aaa, !!!, ??? gibi tekrarları engelle
-  const regex = new RegExp(`(.)\\1{${count-1},}`);
-  return regex.test(text);
-}
+  function containsBannedWords(text: string) {
+    const lower = text.toLocaleLowerCase('tr');
+    return bannedWords.some(word => lower.includes(word));
+  }
 
-function isAllUpperCase(text: string) {
-  return text.length > 2 && text === text.toLocaleUpperCase('tr');
-}
+  function hasRepeatedChars(text: string, count = 3) {
+    // aaa, !!!, ??? gibi tekrarları engelle
+    const regex = new RegExp(`(.)\\1{${count-1},}`);
+    return regex.test(text);
+  }
 
+  function isAllUpperCase(text: string) {
+    return text.length > 2 && text === text.toLocaleUpperCase('tr');
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,6 +147,10 @@ function isAllUpperCase(text: string) {
       setError(t('errors.priceRequired') || 'Lütfen ücret bilgisi girin');
       return;
     }
+    if (!formData.gecmeNotu.trim()) {
+      setError('Lütfen dersi kaç notla geçtiğinizi girin');
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -195,6 +199,7 @@ function isAllUpperCase(text: string) {
         description: '',
         price: '',
         method: 'online',
+        gecmeNotu: '',
       });
       
       // İlan oluşturulduktan sonra ilanlarım sayfasına yönlendir
@@ -311,33 +316,43 @@ function isAllUpperCase(text: string) {
                     <option value="hibrit">{t('general.hybrid')}</option>
                   </select>
                 </div>
-                
-
-                
-                {/* instructorFrom field removed */}
-              </div>
-              
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`w-full px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-lg flex items-center justify-center space-x-2 
-                    transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-[#FF8B5E] rounded-full animate-spin"></div>
-                      <span>{t('general.processing')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <FaPaperPlane />
-                      <span>{t('general.publishListing')}</span>
-                    </>
-                  )}
-                </button>
+                <div className="md:col-span-2">
+                  <label htmlFor="gecmeNotu" className="block text-[#6B3416] font-medium mb-2">
+                    Dersi kaç notla geçtiğiniz <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="gecmeNotu"
+                    name="gecmeNotu"
+                    value={formData.gecmeNotu}
+                    onChange={handleChange}
+                    placeholder="Örn: 70"
+                    min="0"
+                    max="100"
+                    required
+                    className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
+                  />
+                </div>
               </div>
             </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-lg flex items-center justify-center space-x-2 
+                transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-[#FF8B5E] rounded-full animate-spin"></div>
+                  <span>{t('general.processing')}</span>
+                </>
+              ) : (
+                <>
+                  <FaPaperPlane />
+                  <span>{t('general.publishListing')}</span>
+                </>
+              )}
+            </button>
           </form>
         </div>
       </div>
