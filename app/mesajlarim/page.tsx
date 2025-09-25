@@ -50,11 +50,14 @@ export default function MessagesPage() {
       // Artık token kontrolü yapılmıyor, kimlik doğrulama cookie ile gerçekleşiyor.
       console.log(t('logs.fetchingConversations') || 'Konuşmalar getiriliyor, kimlik doğrulama cookie ile.');
       
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
       // API isteği
       const response = await fetch('/api/conversations', {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         credentials: 'include' // Cookie ile kimlik doğrulama
       });

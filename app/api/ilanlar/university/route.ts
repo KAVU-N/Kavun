@@ -79,29 +79,26 @@ export async function GET(request: Request) {
     }
     
     // Önce belirtilen üniversitedeki eğitmenleri bul - case insensitive arama yap
-    // Hem 'teacher' hem de 'instructor' rolüne sahip kullanıcıları getir
     // Üniversiteyi normalize ederek toleranslı bir regex oluştur (fazla boşlukları yoksay, case-insensitive)
     const uniInput = (university || '').trim();
     const uniPattern = new RegExp(
       uniInput
         .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // regex kaçış
-        .replace(/\s+/g, '\\s*'), // birden fazla boşluğu toleranslı yap
+        .replace(/\s+/g, '\\s*'), // birden fazla boşluğu toleranslı
       'i'
     );
     console.log('[University API] normalized pattern:', uniPattern);
-
-    const teachers = await User.find({
-      university: { $regex: uniPattern },
-      role: { $in: ['teacher', 'instructor', 'admin'] }
-    }).select('_id');
     
+    const teachers = await User.find({
+      university: { $regex: uniPattern }
+    }).select('_id');
+
     console.log('[University API] Found teachers/instructors:', teachers.length);
     
     const teacherIds = teachers.map(teacher => teacher._id);
-    // Hem ObjectId hem String olarak listeler oluştur
+    // hem ObjectId hem String olarak listeler oluştur
     const teacherIdsStr = teacherIds.map((id: any) => id.toString());
     console.log('[University API] teacherIdsStr length:', teacherIdsStr.length);
-    // Arama filtresi oluştur
     // Varsayılan olarak tüm ilanları getir. İstenirse URL parametresi ile status=active gönderilirse filtre uygula
     // userId bazı kayıtlarda ObjectId, bazılarında String olabilir; ikisini de dene
     let query: any = {
@@ -128,8 +125,8 @@ export async function GET(request: Request) {
     // Her ilan için öğretmen bilgilerini ekle
     const ilanlarWithTeachers = await Promise.all(
       ilanlar.map(async (ilan) => {
-        const teacher = await User.findOne({ _id: ilan.userId })
-          .select('name email university expertise profilePhotoUrl');
+        const teacher = await User.findOne({ _id: new mongoose.Types.ObjectId(ilan.userId) })
+          .select('name email university expertise profilePhotoUrl role');
         
         return {
           ...ilan.toObject(),

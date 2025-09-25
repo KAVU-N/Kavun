@@ -7,7 +7,6 @@ export interface DecodedToken {
   id: string;
   userId?: string;
   email: string;
-  role: string;
   name?: string;
   university?: string;
 }
@@ -26,8 +25,7 @@ export function verifyToken(token: string): DecodedToken {
     return {
       ...decoded,
       id: decoded.userId || decoded.id || decoded._id || '',
-      email: decoded.email || '',
-      role: decoded.role || ''
+      email: decoded.email || ''
     };
   } catch (error) {
     console.error('JWT doğrulama hatası:', error);
@@ -44,8 +42,7 @@ export async function verifyJwt(token: string): Promise<DecodedToken | null> {
     return {
       ...decoded,
       id: decoded.userId || decoded.id || decoded._id || '',
-      email: decoded.email || '',
-      role: decoded.role || ''
+      email: decoded.email || ''
     };
   } catch (error) {
     console.error('JWT doğrulama hatası:', error);

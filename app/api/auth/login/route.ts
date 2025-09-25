@@ -79,7 +79,7 @@ export async function POST(req: Request) {
       id: user._id ? user._id.toString() : '',
       name: user.name,
       email: user.email,
-      role: user.role,
+      isAdmin: Boolean(user.isAdmin),
       university: user.university,
       isVerified: user.isVerified
     });
@@ -136,7 +136,7 @@ export async function POST(req: Request) {
       { 
         id: user._id ? user._id.toString() : '', 
         email: user.email,
-        role: user.role,
+        isAdmin: Boolean(user.isAdmin),
         name: user.name 
       },
       jwtSecret,
@@ -150,7 +150,7 @@ export async function POST(req: Request) {
       id: user._id ? user._id.toString() : '',
       name: user.name,
       email: user.email,
-      role: user.role,
+      isAdmin: Boolean(user.isAdmin),
       university: user.university,
       expertise: user.expertise,
       grade: user.grade,
@@ -162,7 +162,7 @@ export async function POST(req: Request) {
       id: user._id ? user._id.toString() : '',
       name: user.name,
       email: user.email,
-      role: user.role,
+      isAdmin: Boolean(user.isAdmin),
       university: user.university,
       expertise: user.expertise,
       grade: user.grade,

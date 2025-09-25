@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
     await connectDB()
 
     // Admin rolündeki kullanıcıyı bul ve şifreyi de seç
-    const user = await User.findOne({ email, role: 'admin' }).select('+password')
+    // const user = await User.findOne({ email, isAdmin: true }).select('+password')
+    const user = await User.findOne({ email }).select('+password')
 
     if (!user) {
       return NextResponse.json(
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
       {
         userId: user._id,
         email: user.email,
-        role: user.role,
+        // isAdmin: true,
       },
       process.env.JWT_SECRET || 'kavun-admin-secret',
       { expiresIn: '8h' }

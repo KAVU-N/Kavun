@@ -48,14 +48,18 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({ onSelectEvent }) => {
     setLoading(true);
     try {
       if (!user) return; // Guard: user is possibly null
-      const endpoint = user.role === 'teacher' 
-        ? `/api/lessons?teacherId=${user.id}` 
-        : `/api/lessons?studentId=${user.id}`;
-      
-      const response = await fetch(endpoint, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+      const userId = (user as any)?.id ?? (user as any)?._id;
+      if (!userId) {
+        throw new Error('Kullanici bilgisi alinamadi');
+      }
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`/api/lessons?userId=${userId}`, {
+        headers
       });
 
       if (!response.ok) {

@@ -19,13 +19,8 @@ async function checkAdminAuth() {
   }
   
   try {
-    const decoded = verify(token, process.env.JWT_SECRET || 'kavun-admin-secret') as {
-      userId: string
-      email: string
-      role: string
-    }
-    
-    return decoded.role === 'admin'
+    verify(token, process.env.JWT_SECRET || 'kavun-admin-secret')
+    return true
   } catch (error) {
     return false
   }

@@ -17,7 +17,6 @@ export default function AdminAnnouncementsPage() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editAnnouncement, setEditAnnouncement] = useState<Announcement | null>(null);
-  const [target, setTarget] = useState<'all' | 'student' | 'teacher'>('all');
 
   const fetchAnnouncements = async () => {
     setLoading(true);
@@ -36,11 +35,10 @@ export default function AdminAnnouncementsPage() {
     e.preventDefault();
     const method = editAnnouncement?._id ? "PUT" : "POST";
     const url = editAnnouncement?._id ? `/api/admin/announcements/${editAnnouncement._id}` : "/api/admin/announcements";
-    // target değerini her zaman select'ten al
     const payload = {
       title: editAnnouncement?.title || '',
       content: editAnnouncement?.content || '',
-      target // sadece select'ten gelen target kullanılacak
+      target: 'all'
     };
     const res = await fetch(url, {
       method,
@@ -72,7 +70,15 @@ export default function AdminAnnouncementsPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-blue-800">{t("announcements") || "İlanlar"}</h1>
-        <button onClick={() => { setEditAnnouncement({ title: "", content: "", target: 'all' }); setTarget('all'); setModalOpen(true); }} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow transition">{t("addAnnouncement") || "İlan Ekle"}</button>
+        <button
+          onClick={() => {
+            setEditAnnouncement({ title: "", content: "", target: 'all' });
+            setModalOpen(true);
+          }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow transition"
+        >
+          {t("addAnnouncement") || "İlan Ekle"}
+        </button>
       </div>
       {loading ? <div className="text-center text-gray-500">Yükleniyor...</div> : (
         <div className="overflow-x-auto rounded shadow">
@@ -94,7 +100,15 @@ export default function AdminAnnouncementsPage() {
                   <td className="p-2">{a.date ? new Date(a.date).toLocaleDateString() : ""}</td>
                   <td className="p-2">{a.target === 'all' ? 'Tüm Kullanıcılar' : a.target === 'student' ? 'Sadece Öğrenciler' : 'Sadece Eğitmenler'}</td>
                   <td className="p-2 space-x-2">
-                    <button className="text-blue-600 hover:underline" onClick={() => { setEditAnnouncement(a); setTarget(a.target); setModalOpen(true); }}>{t("edit") || "Düzenle"}</button>
+                    <button
+                      className="text-blue-600 hover:underline"
+                      onClick={() => {
+                        setEditAnnouncement({ ...a, target: 'all' });
+                        setModalOpen(true);
+                      }}
+                    >
+                      {t("edit") || "Düzenle"}
+                    </button>
                     <button className="text-red-600 hover:underline" onClick={() => handleDelete(a._id!)}>{t("delete") || "Sil"}</button>
                   </td>
                 </tr>
@@ -111,11 +125,6 @@ export default function AdminAnnouncementsPage() {
             <form onSubmit={handleSave} className="space-y-3">
               <input className="w-full border p-2 rounded" placeholder={t("title") || "Başlık"} value={editAnnouncement?.title || ""} onChange={e => setEditAnnouncement(a => ({ ...a!, title: e.target.value }))} required />
               <textarea className="w-full border p-2 rounded" placeholder={t("content") || "İçerik"} value={editAnnouncement?.content || ""} onChange={e => setEditAnnouncement(a => ({ ...a!, content: e.target.value }))} required />
-              <select className="w-full border p-2 rounded" value={target} onChange={e => setTarget(e.target.value as 'all' | 'student' | 'teacher')} required>
-                <option value="all">Tüm Kullanıcılar</option>
-                <option value="student">Sadece Öğrenciler</option>
-                <option value="teacher">Sadece Eğitmenler</option>
-              </select>
               <div className="flex justify-end space-x-2 mt-4">
                 <button type="button" className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" onClick={() => { setModalOpen(false); setEditAnnouncement(null); }}>{t("cancel") || "İptal"}</button>
                 <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{t("save") || "Kaydet"}</button>

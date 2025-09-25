@@ -324,7 +324,7 @@ export default function Navbar() {
                     >
                       {t('nav.login')}
                     </Link>
-                    <Link
+                        <Link
                       href="/auth/register"
                       className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
                         transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
@@ -424,18 +424,17 @@ export default function Navbar() {
                           </div>
                         </Link>
                         <Link
-                          href="/derslerim"
+                          href="/ilanlarim"
                           className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                         >
                           <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
                             <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
-                            <span>{t('nav.myLessons')}</span>
+                            <span>{t('nav.myListings')}</span>
                           </div>
                         </Link>
                         <Link
-                          href="/projelerim"
                           className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                         >
                           <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
@@ -456,212 +455,8 @@ export default function Navbar() {
                             <span>{(t('nav.myClub') || 'Kulübüm')}</span>
                           </div>
                         </Link>
-                        {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
-                          <>
-                            <Link
-                              href="/ilanlarim"
-                              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                                pathname === '/' && isScrolled ? 'text-[#994D1C]' : 'text-[#994D1C]'
-                              } hover:text-[#6B3416] hover:bg-[#FFF5F0]`}
-                              onClick={() => setIsMenuOpen(false)}
-                            >
-                              <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                              <span>{t('nav.myListings')}</span>
-                            </Link>
-                          </>
-                        )}
-                        {/* Mobilde çıkış yap butonu */}
-                        <button
-                          onClick={() => {
-                            logout();
-                            setIsMenuOpen(false);
-                          }}
-                          className="w-full text-left flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0] mt-2"
-                        >
-                          <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v6" />
-                          </svg>
-                          <span>{t('nav.logout')}</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
 
-              {/* Eski hamburger menü düğmesi kaldırıldı */}
-            </div>
-          </div>
-
-          {/* Mobile Menu */}
-          {isMenuOpen && (
-            <div className="md:hidden bg-white shadow-lg rounded-b-xl overflow-hidden">
-              {/* navLinks hamburger menüde gösterilecek */}
-              {isMobile && (
-                <div className="flex flex-col space-y-2">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <span className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">{link.icon}</span>
-                      <span>{link.label}</span>
-                    </Link>
-                  ))}
-                  {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
-  <Link
-    href="/ilan-ver"
-    className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20"
-    onClick={() => setIsMenuOpen(false)}
-  >
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-    </svg>
-    <span>{t('nav.createListing')}</span>
-  </Link>
-)}
-                </div>
-              )}
-              <div className="flex justify-end px-4 pt-2">
-                <button
-                  onClick={() => setIsMenuOpen(false)}
-                  className="p-2 rounded-xl transition-all duration-300"
-                >
-                  <svg className="w-6 h-6 text-[#994D1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <div className="px-4 py-3 space-y-1">
-                
-                {!user ? (
-                  <div className="flex flex-col space-y-2 mt-4">
-                    <Link
-                      href="/auth/login"
-                      className="px-6 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] font-medium transition-all duration-300 hover:bg-[#FFF5F0] text-center"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('nav.login')}
-                    </Link>
-                    <Link
-                      href="/auth/register"
-                      className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
-                        transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('nav.register')}
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-2 mt-4 border-t border-[#FFE5D9] pt-4">
-
-
-                    <Link
-                      href="/profil"
-                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span>{t('nav.profile')}</span>
-                    </Link>
-                    <Link
-                      href="/bildirimler"
-                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <div className="relative">
-                        <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                          />
-                        </svg>
-                        {unreadNotifications > 0 && (
-                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-                        )}
-                      </div>
-                      <span>{t('nav.notifications')}</span>
-                      {unreadNotifications > 0 && (
-                        <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center md:text-xs md:h-5 md:w-5 text-[10px] h-4 w-4">
-                          {unreadNotifications > 9 ? '9+' : unreadNotifications}
-                        </span>
-                      )}
-                    </Link>
-                    <Link
-                      href="/mesajlarim"
-                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <div className="relative">
-                        <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                        </svg>
-                        {unreadMessages > 0 && (
-                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-                        )}
-                      </div>
-                      <span>{t('nav.messages')}</span>
-                    </Link>
-                    <Link
-                      href="/derslerim"
-                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span>{t('nav.myLessons')}</span>
-                    </Link>
-                    <Link
-                      href="/projelerim"
-                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7m-6 4l-4 4-4-4" />
-                      </svg>
-                      <span>{t('nav.myProjects')}</span>
-                    </Link>
-                    <Link
-                      href="/kuluplerim"
-                      className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M12 20v-2a4 4 0 013-3.87M7 20H2v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z" />
-                      </svg>
-                      <span>{(t('nav.myClub') || 'Kulübüm')}</span>
-                    </Link>
-                    {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
-                      <>
-                        <Link
-                          href="/ilanlarim"
-                          className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                            pathname === '/' && isScrolled ? 'text-[#994D1C]' : 'text-[#994D1C]'
-                          } hover:text-[#6B3416] hover:bg-[#FFF5F0]`}
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                          <span>{t('nav.myListings')}</span>
-                        </Link>
-                      </>
-                    )}
-                    {/* Mobilde çıkış yap butonu */}
+{/* Mobilde çıkış yap butonu */}
                     <button
                       onClick={() => {
                         logout();
@@ -677,15 +472,14 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
-            </div>
+            )}
           )}
         </nav>
       </div>
     );
   };
 
-  // Sunucu ve istemci tarafı render arasındaki farkı gidermek için
-  // useEffect içinde mounted state'ini güncellediğimiz için, bu component ilk render edildiğinde
+  // Sunucu ve istemci rafı render arasındaki farkı gidermek için
   // mounted false olacak ve sadece sunucu tarafında render edilebilecek içeriği göstereceğiz
   if (!mounted) {
     // Sunucu tarafında, client ile aynı ana DOM hiyerarşisini döndür (nav yapısı dahil)

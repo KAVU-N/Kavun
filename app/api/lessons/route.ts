@@ -1,18 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Lesson from '@/models/Lesson';
 import User from '@/models/User';
 import { verifyToken } from '@/lib/jwt';
 import mongoose from 'mongoose';
 
-// Veritabanı bağlantısı
 connectDB();
 
-// Ders oluşturma (eğitmen ve öğrenci)
 export async function POST(request: NextRequest) {
   try {
-    // JWT doğrulama
-    const token = request.headers.get('Authorization')?.split(' ')[1];
+    const tokenHeader = request.headers.get('Authorization');
+    const token = tokenHeader?.split(' ')[1];
+
     if (!token) {
       return NextResponse.json({ error: 'Yetkilendirme hatası: Token bulunamadı' }, { status: 401 });
     }
@@ -22,110 +21,130 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Yetkilendirme hatası: Geçersiz token' }, { status: 401 });
     }
 
-    // Kullanıcı rolünü kontrol et
     const user = await User.findById(decoded.id);
     if (!user) {
       return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
     }
 
-    // İstek gövdesinden veri al
     const data = await request.json();
+    const {
+      teacherId,
+      title,
+      description,
+      price,
+      duration,
+      scheduledAt,
+      lessonType,
+      groupSize
+    } = data;
 
-    if (user.role === 'instructor') {
-      // Eğitmen yeni ders açıyor
-      // Gerekli alanları doğrula
-      if (!data.title || !data.description || !data.price || !data.duration) {
+    const isBooking = teacherId && String(teacherId) !== String(user._id);
+
+    if (isBooking) {
+      if (!title || !description || !price || !duration || !scheduledAt) {
         return NextResponse.json({ error: 'Lütfen tüm gerekli alanları doldurun' }, { status: 400 });
       }
-      // Yeni ders oluştur
-      const newLesson = await Lesson.create({
-        teacherId: user._id,
-        title: data.title,
-        description: data.description,
-        price: data.price,
-        duration: data.duration,
-        status: 'open'
-      });
-      return NextResponse.json({ 
-        message: 'Ders başarıyla oluşturuldu', 
-        lesson: newLesson 
-      }, { status: 201 });
-    } else if (user.role === 'student') {
-      // Öğrenci rezervasyon ile ders oluşturuyor
-      // Gerekli alanları doğrula
-      if (!data.title || !data.description || !data.price || !data.duration || !data.teacherId || !data.scheduledAt) {
-        return NextResponse.json({ error: 'Lütfen tüm gerekli alanları doldurun (öğrenci rezervasyonu)' }, { status: 400 });
-      }
+
       try {
-        const teacherObjectId = new mongoose.Types.ObjectId(data.teacherId);
+        const teacherObjectId = new mongoose.Types.ObjectId(teacherId);
         const newLesson = await Lesson.create({
           teacherId: teacherObjectId,
           studentId: user._id,
-          title: data.title,
-          description: data.description,
-          price: data.price,
-          duration: data.duration,
+          title,
+          description,
+          price,
+          duration,
           status: 'scheduled',
-          scheduledAt: data.scheduledAt,
-          lessonType: data.lessonType || 'individual',
-          groupSize: data.groupSize || undefined
+          scheduledAt,
+          lessonType: lessonType || 'individual',
+          groupSize: groupSize || undefined
         });
+
         return NextResponse.json({
-          message: 'Ders rezervasyonu başarıyla oluşturuldu',
+          message: 'Ders rezervasyonu başarılı',
           lesson: newLesson
         }, { status: 201 });
-      } catch (err) {
-        console.error('Öğrenci rezervasyonunda hata:', err);
-        return NextResponse.json({ error: 'Ders rezervasyonunda sunucu hatası', details: err instanceof Error ? err.message : err }, { status: 500 });
+      } catch (error) {
+        console.error('Ders rezervasyonunda hata:', error);
+        return NextResponse.json({ error: 'Ders rezervasyonunda bir hata oluştu' }, { status: 500 });
       }
-    } else {
-      return NextResponse.json({ error: 'Bu işlem için yetkiniz yok' }, { status: 403 });
     }
 
+    if (!title || !description || !price || !duration) {
+      return NextResponse.json({ error: 'Lütfen tüm gerekli alanları doldurun' }, { status: 400 });
+    }
+
+    const newLesson = await Lesson.create({
+      teacherId: user._id,
+      title,
+      description,
+      price,
+      duration,
+      status: 'open',
+      scheduledAt: scheduledAt || null,
+      lessonType: lessonType || 'individual',
+      groupSize: groupSize || undefined
+    });
+
+    return NextResponse.json({
+      message: 'Ders başarıyla oluşturuldu',
+      lesson: newLesson
+    }, { status: 201 });
   } catch (error) {
     console.error('Ders oluşturma hatası:', error);
     return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
   }
 }
 
-// Tüm dersleri getir (filtreleme ile)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    
-    // Filtre parametreleri
+
     const status = searchParams.get('status');
     const teacherId = searchParams.get('teacherId');
+    const studentId = searchParams.get('studentId');
+    const userId = searchParams.get('userId');
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
-    
-    // Filtre objesini oluştur
-    const filter: any = {};
-    
-    if (status) filter.status = status;
-    if (teacherId) filter.teacherId = teacherId;
-    if (minPrice) filter.price = { $gte: parseFloat(minPrice) };
-    if (maxPrice) {
-      if (filter.price) {
-        filter.price.$lte = parseFloat(maxPrice);
-      } else {
-        filter.price = { $lte: parseFloat(maxPrice) };
+
+    const filter: Record<string, any> = {};
+
+    if (userId) {
+      const userObjectId = new mongoose.Types.ObjectId(userId);
+      filter.$or = [
+        { teacherId: userObjectId },
+        { studentId: userObjectId }
+      ];
+    } else {
+      if (teacherId) {
+        filter.teacherId = teacherId;
+      }
+      if (studentId) {
+        filter.studentId = studentId;
+      }
+      if (status) {
+        filter.status = status;
       }
     }
-    
-    // Açık durumundaki dersleri göster
-    if (!status) {
+
+    if (minPrice) {
+      filter.price = { ...(filter.price || {}), $gte: parseFloat(minPrice) };
+    }
+    if (maxPrice) {
+      filter.price = { ...(filter.price || {}), $lte: parseFloat(maxPrice) };
+    }
+
+    if (!status && !teacherId && !studentId && !userId) {
       filter.status = 'open';
     }
-    
-    // Dersleri getir
+
     const lessons = await Lesson.find(filter)
       .populate('teacherId', 'name email university expertise')
+      .populate('studentId', 'name email university')
       .sort({ createdAt: -1 })
       .limit(50);
-    
+
     return NextResponse.json(lessons);
-    
   } catch (error) {
     console.error('Dersleri getirme hatası:', error);
     return NextResponse.json({ error: 'Sunucu hatası' }, { status: 500 });
