@@ -75,8 +75,9 @@ export default function IlanlarPage() {
         }
         
         // API endpoint'e istek at
+        const isAdmin = Boolean((user as any)?.isAdmin);
         let url: string;
-        if (user.role === 'admin') {
+        if (isAdmin) {
           url = searchTerm
             ? `/api/ilanlar?search=${encodeURIComponent(searchTerm)}`
             : `/api/ilanlar`;
@@ -177,8 +178,7 @@ export default function IlanlarPage() {
   </div>
   <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3">
     <h1 className="text-4xl font-bold text-[#6B3416]">{t('listings.universityListings')}</h1>
-    {(user.role === 'instructor' || user.role === 'teacher' || user.role === 'admin') && (
-      <Link
+    <Link
         href="/ilan-ver"
         className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md hover:scale-105 transition-transform md:ml-4"
       >
@@ -187,7 +187,6 @@ export default function IlanlarPage() {
         </svg>
         <span>{t('nav.createListing')}</span>
       </Link>
-    )}
   </div>
   <p className="text-[#994D1C] max-w-2xl md:mx-0 mx-auto">
     {t('listings.exploreTeacherLessons')}

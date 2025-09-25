@@ -23,11 +23,7 @@ import Image from 'next/image';
 import { universities } from '@/data/universities';
 import { departments } from './departments';
 import { useLanguage } from '@/src/contexts/LanguageContext';
-
-type Role = 'student' | 'instructor';
-
 import { Suspense } from 'react';
-
 
 function RegisterPageInner() {
   // --- YENİ STATE ---
@@ -78,7 +74,6 @@ function RegisterPageInner() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const defaultRole = searchParams?.get('role') as Role || 'student';
   const universityFromParam = searchParams?.get('university') || '';
   const { register } = useAuth();
   const [error, setError] = useState('');
@@ -88,7 +83,6 @@ function RegisterPageInner() {
   const [localUniversities, setLocalUniversities] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [selectedUniversity, setSelectedUniversity] = useState('');
-  const [selectedRole, setSelectedRole] = useState<Role>(defaultRole); // searchParams null olabilir, ?. ile güvenli erişim
   const [expertise, setExpertise] = useState('');
   const [otherExpertise, setOtherExpertise] = useState('');
   const [showDepartmentDropdown, setShowDepartmentDropdown] = useState(false);
@@ -138,7 +132,6 @@ function RegisterPageInner() {
     if (expertise === 'Diğer') {
       finalExpertise = otherExpertise;
     }
-    console.log("Formdan seçilen rol:", selectedRole);
     console.log("Backend'e gönderilecek name:", name, JSON.stringify(name));
 
     if (password !== passwordConfirm) {
@@ -166,14 +159,14 @@ function RegisterPageInner() {
     try {
       console.log('[DEBUG] register fonksiyonu çağrılıyor');
       await register(
-            name,
-            email,
-            password,
-            selectedRole,
-            university,
-            finalExpertise,
-            grade
-          ); // 7 parametre, AuthContext ile uyumlu
+        name,
+        email,
+        password,
+        university,
+        finalExpertise,
+        grade,
+        token
+      );
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
       setError(err.message || t('errors.registrationError') || 'Kayıt olurken bir hata oluştu');
@@ -352,23 +345,6 @@ function RegisterPageInner() {
               minLength={8}
               className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
             />
-          </div>
-
-          <div>
-            <label htmlFor="role" className="block text-sm font-medium text-[#6B3416] mb-1">
-              {t('auth.role')}
-            </label>
-            <select
-              id="role"
-              name="role"
-              required
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value as Role)}
-              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5 appearance-none bg-white"
-            >
-              <option value="student">{t('auth.student')}</option>
-              <option value="instructor">{t('auth.instructor')}</option>
-            </select>
           </div>
 
           <div>

@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'kavunla-secret-key-for-jwt-authent
 export interface UserJwtPayload {
   id: string;
   email: string;
-  role: string;
+  isAdmin: boolean;
   name?: string;
 }
 
@@ -83,7 +83,7 @@ export async function getUserFromToken(requestOrToken: Request | { headers: { au
 interface UserWithId {
   _id: { toString: () => string };
   email: string;
-  role: string;
+  isAdmin: boolean;
   name?: string;
 }
 
@@ -97,7 +97,7 @@ export function generateToken(user: UserWithId): string {
   const payload: UserJwtPayload = {
     id: user._id.toString(),
     email: user.email,
-    role: user.role,
+    isAdmin: Boolean(user.isAdmin),
     name: user.name
   };
   
@@ -120,7 +120,7 @@ export async function verifyUser(token: string): Promise<any> {
     return {
       id: userWithId._id.toString(),
       email: userWithId.email,
-      role: userWithId.role,
+      isAdmin: Boolean(userWithId.isAdmin),
       name: userWithId.name
     };
   } catch (error) {

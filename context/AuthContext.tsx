@@ -2,37 +2,41 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import type { User as BaseUser } from '../src/types/User';
 
-interface User {
-  _id: string;
-  email: string;
-  name?: string;
-}
+type AuthUser = BaseUser & {
+  _id?: string;
+  isAdmin?: boolean;
+  role?: string;
+};
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   login: (email: string, password: string) => Promise<void>;
   register: (
     name: string,
     email: string,
     password: string,
-    role: string,
     university: string,
     expertise: string,
     grade: number | undefined,
     recaptchaToken: string
   ) => Promise<boolean>;
   logout: () => Promise<void>;
+  updateUser: (updatedUser: AuthUser) => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const checkAuth = async () => {
+      setLoading(true);
       try {
         const response = await fetch('/api/auth/me');
         if (response.ok) {
@@ -41,6 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         setUser(null);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -51,7 +57,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     name: string,
     email: string,
     password: string,
-    role: string,
     university: string,
     expertise: string,
     grade: number | undefined,
@@ -64,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ name, email, password, role, university, expertise, grade, recaptchaToken }),
+        body: JSON.stringify({ name, email, password, university, expertise, grade, recaptchaToken }),
       });
 
       const data = await response.json();
@@ -76,6 +81,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return true;
     } catch (error: any) {
       throw new Error(error.message || 'Kayıt olurken bir hata oluştu');
+    }
+  };
+
+  const updateUser = (updatedUser: AuthUser) => {
+    setUser(updatedUser);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user', JSON.stringify(updatedUser));
     }
   };
 
@@ -94,7 +106,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(data.error || 'Giriş başarısız');
       }
 
-      // Token'ı sakla
       if (typeof window !== 'undefined' && data.token) {
         localStorage.setItem('token', data.token);
       }
@@ -120,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, updateUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,19 +6,20 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: 'student' | 'instructor' | 'teacher' | 'admin';
+  isAdmin: boolean;
   university: string;
-  grade?: number; // Kaçıncı sınıf olduğu bilgisi
+  grade?: number;
   isVerified: boolean;
   verificationCode?: string;
   verificationCodeExpires?: Date;
   resetPasswordCode?: string;
   resetPasswordExpires?: Date;
-  expertise?: string; // Okuduğu bölüm
-  profilePhotoUrl?: string; // Profil fotoğrafı URL'si
-  viewQuota?: number; // Kullanıcının kaynak görme hakkı
+  expertise?: string;
+  profilePhotoUrl?: string;
+  viewQuota?: number;
   createdAt: Date;
   welcomeNotificationDeleted: boolean;
+  role?: 'student' | 'teacher' | 'instructor' | 'admin';
 }
 
 // Şema tanımı
@@ -33,7 +34,6 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: [true, 'Email alanı zorunludur'],
-    // unique: true, // Buradaki unique'i kaldırıyoruz, aşağıda index olarak tanımlıyoruz
     trim: true,
     lowercase: true,
     validate: {
@@ -49,13 +49,9 @@ const userSchema = new Schema({
     minlength: [8, 'Şifre en az 8 karakter olmalıdır'],
     select: false
   },
-  role: {
-    type: String,
-    required: [true, 'Rol alanı zorunludur'],
-    enum: {
-      values: ['student', 'instructor', 'teacher', 'admin'],
-      message: 'Geçerli bir rol seçiniz'
-    }
+  isAdmin: {
+    type: Boolean,
+    default: false
   },
   university: {
     type: String,
@@ -96,29 +92,30 @@ const userSchema = new Schema({
   profilePhotoUrl: {
     type: String,
     default: ''
+  },
+  role: {
+    type: String,
+    enum: ['student', 'teacher', 'instructor', 'admin'],
+    default: 'student'
   }
 }, {
   timestamps: true,
   strict: true,
   strictQuery: true,
-  collection: 'users' // Koleksiyon adını açıkça belirt
+  collection: 'users'
 });
 
 // Email için index oluştur
 userSchema.index({ email: 1 }, { unique: true });
 
-// Modeli oluşturmadan önce koleksiyonun varlığını kontrol et
 let User: mongoose.Model<IUser>;
 
-// Modeli oluştur
 try {
-  // Önce mevcut modeli temizle
   mongoose.deleteModel('User');
 } catch (error) {
   // Model zaten silinmiş olabilir, hatayı yoksay
 }
 
-// Yeni model oluştur
 User = mongoose.model<IUser>('User', userSchema);
 
 export default User;

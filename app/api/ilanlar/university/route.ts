@@ -78,8 +78,8 @@ export async function GET(request: Request) {
     // Önce belirtilen üniversitedeki eğitmenleri bul - case insensitive arama yap
     // Hem 'teacher' hem de 'instructor' rolüne sahip kullanıcıları getir
     const teachers = await User.find({
-      university: { $regex: new RegExp('^' + university + '$', 'i') },
-      role: { $in: ['teacher', 'instructor'] }
+      university: { $regex: new RegExp('^' + university + '$', 'i') }
+      // role filtresini kaldırdık
     }).select('_id');
     
     console.log('University API - Found teachers/instructors:', teachers.length);
@@ -113,8 +113,8 @@ export async function GET(request: Request) {
     // Her ilan için öğretmen bilgilerini ekle
     const ilanlarWithTeachers = await Promise.all(
       ilanlar.map(async (ilan) => {
-        const teacher = await User.findOne({ _id: ilan.userId })
-          .select('name email university expertise profilePhotoUrl');
+        const teacher = await User.findOne({ _id: new mongoose.Types.ObjectId(ilan.userId) })
+          .select('name email university expertise profilePhotoUrl role');
         
         return {
           ...ilan.toObject(),

@@ -21,15 +21,17 @@ export default function IlanVerPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.push('/auth/login');
-      } else if (!['instructor', 'teacher', 'admin'].includes(user.role)) {
-        router.push('/');
-      }
-    }
-  }, [user, loading, router]);
+  // 1) useEffect bloğunu sadeleştirin
+useEffect(() => {
+  if (!loading && !user) {
+    router.push('/auth/login');
+  }
+}, [user, loading, router]);
+
+// 2) Rol kontrolü yapan return bloğunu giriş kontrolüyle değiştirin
+if (!user) {
+  return null;
+}
 
   if (loading) {
     return <div className="flex justify-center items-center h-96 text-xl">Yükleniyor...</div>;
@@ -215,25 +217,6 @@ export default function IlanVerPage() {
     }
   }
 
-  // Kullanıcı giriş yapmamış veya eğitmen değilse içeriği gösterme
-  if (!user || (user.role !== 'instructor' && user.role !== 'teacher' && user.role !== 'admin')) {
-    return (
-      <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h1 className="text-3xl font-bold text-[#6B3416] mb-4">{t('general.accessDenied')}</h1>
-            <p className="text-[#994D1C] mb-6">{t('general.accessDeniedMessage')}</p>
-            <button
-              onClick={() => router.push('/')}
-              className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-lg"
-            >
-              {t('general.goToHomepage')}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">

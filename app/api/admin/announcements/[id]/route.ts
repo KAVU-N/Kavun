@@ -8,8 +8,8 @@ async function checkAdminAuth() {
   const token = cookies().get('admin-token')?.value;
   if (!token) return false;
   try {
-    const decoded = verify(token, process.env.JWT_SECRET || 'kavun-admin-secret') as { role: string };
-    return decoded.role === 'admin';
+    verify(token, process.env.JWT_SECRET || 'kavun-admin-secret');
+    return true;
   } catch {
     return false;
   }

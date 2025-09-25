@@ -427,39 +427,30 @@ export default function Navbar() {
                           </div>
                         </Link>
                         <Link
-                          href="/derslerim"
+                          href="/ilanlarim"
                           className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
+                          onClick={() => setIsMenuOpen(false)}
                         >
+                          <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
                           <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
-                          <span>Derslerim</span>
+                          <span>İlanlarım</span>
+                          </div>
                         </Link>
                         <Link
                           href="/projelerim"
                           className="block px-4 py-2 text-sm text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300 md:block md:px-4 md:py-2 md:text-sm text-xs px-2 py-1"
                         >
+                          <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
                           <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7m-6 4l-4 4-4-4" />
                           </svg>
                           <span>{t('nav.myProjects')}</span>
+                          </div>
                         </Link>
-                        {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
-                          <>
-                            <Link
-                              href="/ilanlarim"
-                              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                                pathname === '/' && isScrolled ? 'text-[#994D1C]' : 'text-[#994D1C]'
-                              } hover:text-[#6B3416] hover:bg-[#FFF5F0]`}
-                              onClick={() => setIsMenuOpen(false)}
-                            >
-                              <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                              <span>İlanlarım</span>
-                            </Link>
-                          </>
-                        )}
+                        
+                        
                         {/* Mobilde çıkış yap butonu */}
                         <button
                           onClick={() => {
@@ -500,18 +491,7 @@ export default function Navbar() {
                       <span>{link.label}</span>
                     </Link>
                   ))}
-                  {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
-  <Link
-    href="/ilan-ver"
-    className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20"
-    onClick={() => setIsMenuOpen(false)}
-  >
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-    </svg>
-    <span>{t('nav.createListing')}</span>
-  </Link>
-)}
+                  
                 </div>
               )}
               <div className="flex justify-end px-4 pt-2">
@@ -608,10 +588,12 @@ export default function Navbar() {
                       className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0]"
                       onClick={() => setIsMenuOpen(false)}
                     >
+                      <div className="relative">
                       <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       <span>Derslerim</span>
+                      </div>
                     </Link>
                     <Link
                       href="/projelerim"
@@ -623,22 +605,7 @@ export default function Navbar() {
                       </svg>
                       <span>{t('nav.myProjects')}</span>
                     </Link>
-                    {user && (typedUser?.role === 'teacher' || typedUser?.role === 'instructor' || typedUser?.role === 'admin') && (
-                      <>
-                        <Link
-                          href="/ilanlarim"
-                          className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                            pathname === '/' && isScrolled ? 'text-[#994D1C]' : 'text-[#994D1C]'
-                          } hover:text-[#6B3416] hover:bg-[#FFF5F0]`}
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                          <span>İlanlarım</span>
-                        </Link>
-                      </>
-                    )}
+                    
                     {/* Mobilde çıkış yap butonu */}
                     <button
                       onClick={() => {
