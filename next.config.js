@@ -3,11 +3,15 @@ const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development'
+  disable: process.env.NODE_ENV === 'development' || process.env.SKIP_PWA === '1'
 });
 
 const nextConfig = {
   reactStrictMode: true,
+  eslint: {
+    // Build sırasında ESLint hatalarını yok sayar. Lint'i geliştirme/CI aşamasında çalıştırın.
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       {

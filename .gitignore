@@ -90,3 +90,8 @@ Thumbs.db
 .vercel
 
 .vercel
+
+# PWA generated files (avoid run watcher loop)
+public/sw.js
+public/workbox-*.js
+public/workbox-*.js.map

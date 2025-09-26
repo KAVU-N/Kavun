@@ -11,6 +11,7 @@ export interface UserJwtPayload {
   email: string;
   isAdmin: boolean;
   name?: string;
+  role?: 'student' | 'teacher' | 'instructor' | 'admin';
 }
 
 // Token'dan kullanıcı bilgilerini çıkaran fonksiyon (hem Request/NextRequest hem string token destekler)
@@ -85,6 +86,7 @@ interface UserWithId {
   email: string;
   isAdmin: boolean;
   name?: string;
+  role?: 'student' | 'teacher' | 'instructor' | 'admin';
 }
 
 // Yeni token oluşturan fonksiyon
@@ -98,7 +100,8 @@ export function generateToken(user: UserWithId): string {
     id: user._id.toString(),
     email: user.email,
     isAdmin: Boolean(user.isAdmin),
-    name: user.name
+    name: user.name,
+    role: user.role
   };
   
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
@@ -109,19 +112,19 @@ export async function verifyUser(token: string): Promise<any> {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as UserJwtPayload;
     const user = await User.findById(decoded.id);
-    
+
     if (!user) {
       throw new Error('Kullanıcı bulunamadı');
     }
-    
     // TypeScript hatasını önlemek için user'i UserWithId olarak işaretle
     const userWithId = user as unknown as UserWithId;
-    
+
     return {
       id: userWithId._id.toString(),
       email: userWithId.email,
       isAdmin: Boolean(userWithId.isAdmin),
-      name: userWithId.name
+      name: userWithId.name,
+      role: userWithId.role,
     };
   } catch (error) {
     console.error('Kullanıcı doğrulama hatası:', error);
