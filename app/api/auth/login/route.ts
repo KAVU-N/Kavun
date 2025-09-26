@@ -137,7 +137,8 @@ export async function POST(req: Request) {
         id: user._id ? user._id.toString() : '', 
         email: user.email,
         isAdmin: Boolean(user.isAdmin),
-        name: user.name 
+        name: user.name,
+        role: user.role || 'student',
       },
       jwtSecret,
       { expiresIn: '7d' }

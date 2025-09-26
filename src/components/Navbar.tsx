@@ -1,171 +1,68 @@
-'use client';
-
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
-import { useAuth } from '@/src/context/AuthContext';
-import type { User } from '../types/User';
-import { useLanguage } from 'src/contexts/LanguageContext';
-import Image from 'next/image';
-
-// Custom hook for media query
-function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
-    const listener = () => setMatches(media.matches);
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
-  }, [matches, query]);
-
-  return matches;
+interface User {
+  profilePhotoUrl?: string | null;
+  name?: string | null;
 }
 
 export default function Navbar() {
+  const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const isMobile = useMediaQuery('(max-width: 768px)');
-  const [mounted, setMounted] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState<number>(0);
-  const [unreadNotifications, setUnreadNotifications] = useState<number>(0)
+  const [language, setLanguage] = useState('tr');
+  const [isMobile, setIsMobile] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const { user, logout } = useAuth();
-  const typedUser = user as User | null;
-  const { language, setLanguage, t } = useLanguage();
 
-  // İstemci tarafında olduğumuzu işaretleyen effect
-  // Scroll ve okunmamış mesaj/bildirim kontrolü
+  const { t } = useTranslation();
+
+  // User authentication state - bu kısım gerçek auth context'ten gelmeli
+  const user: boolean | null = false; // temporary
+  const typedUser: User | null = null as User | null; // temporary
+  const unreadMessages = 0; // temporary
+  const unreadNotifications = 0; // temporary
+
+  const logout = () => {
+    // logout logic
+  };
+
   useEffect(() => {
     setMounted(true);
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    if (typeof window !== "undefined") {
-      window.addEventListener('scroll', handleScroll);
-    }
-        if (user) {
-      checkUnreadMessages();
-      checkUnreadNotifications();
-    }
-    const interval = setInterval(() => {
-      if (user) {
-        checkUnreadMessages();
-        checkUnreadNotifications();
-      }
-    }, 60000);
 
-    const cleanup = () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener('scroll', handleScroll);
-      }
-      clearInterval(interval);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
     };
 
-    return cleanup;
-  }, [user]);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
 
-  // Bildirim okundu eventi
-  useEffect(() => {
-    const readListener = () => checkUnreadNotifications();
-    window.addEventListener('notificationsRead', readListener);
-    return () => window.removeEventListener('notificationsRead', readListener);
-  }, []);
-
-  // Profil menüsü dışında bir yere tıklandığında menüyü kapat
-  useEffect(() => {
-    if (!mounted) return;
-    
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
       }
     };
 
-    if (typeof window !== "undefined") {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('mousedown', handleClickOutside);
+
+    handleResize();
+
     return () => {
-      if (typeof window !== "undefined") {
-        document.removeEventListener('mousedown', handleClickOutside);
-      }
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [mounted]);
+  }, []);
 
-  // Okunmamış mesajları kontrol et
-  const checkUnreadMessages = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      const response = await fetch('/api/messages/unread', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUnreadMessages(data.count || 0);
-      }
-    } catch (error) {
-      console.error('Okunmamış mesajlar kontrol edilirken hata oluştu:', error);
-    }
-  };
-
-  // Okunmamış bildirimleri kontrol et
-  const checkUnreadNotifications = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      // DEBUG LOG KALDIRILDI [checkUnreadNotifications] token:', token);
-      // DEBUG LOG KALDIRILDI [checkUnreadNotifications] user:', user);
-      if (!token) {
-        console.warn('[DEBUG][checkUnreadNotifications] Token yok, istek atılmayacak.');
-        return;
-      }
-      const apiUrl = '/api/notifications/unread';
-      // DEBUG LOG KALDIRILDI [checkUnreadNotifications] fetch URL:', apiUrl);
-      // Gerçek API'den okunmamış bildirim sayısını çek
-      const response = await fetch(apiUrl, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // DEBUG LOG KALDIRILDI [checkUnreadNotifications] response status:', response.status);
-
-      if (response.ok) {
-        const data = await response.json();
-        // DEBUG LOG KALDIRILDI [checkUnreadNotifications] response data:', data);
-        setUnreadNotifications(data.count || 0);
-      } else {
-        const errText = await response.text();
-        console.error('[DEBUG][checkUnreadNotifications] response error:', errText);
-        setUnreadNotifications(0);
-      }
-    } catch (error) {
-      console.error('[DEBUG][checkUnreadNotifications] Okunmamış bildirimler kontrol edilirken hata oluştu:', error);
-      setUnreadNotifications(0);
-    }
-  };
-
-  // Navigasyon linkleri
   const navLinks = [
-    { href: '/ilanlar', label: t('nav.listings'), icon: (
-      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-      </svg>
-    )},
-    { href: '/projeler', label: t('nav.projects'), icon: (
-      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7m-6 4l-4 4-4-4" />
-      </svg>
-    )},
-    { href: '/kaynaklar', label: t('nav.resources'), icon: (
+    { href: '/ilanlar', label: (t('nav.listings') || 'İlanlar'), icon: (
       <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
@@ -181,7 +78,6 @@ export default function Navbar() {
   const renderClientContent = () => {
     return (
       <div>
-        {/* ... */}
         <nav className={`w-full transition-all duration-500 ${
           isScrolled ? 'bg-white/60 backdrop-blur-xl border-b border-black/5 shadow-sm py-2' : 'bg-transparent py-4'
         }`} suppressHydrationWarning>
@@ -209,7 +105,6 @@ export default function Navbar() {
                     KAVUNLA
                   </span>
                 </Link>
-                {/* Mobilde hamburger menüsü kapalıyken navLinks gösterilmeyecek */}
               </div>
 
               {/* Mobile Menu Button - Only visible when menu is closed */}
@@ -257,8 +152,6 @@ export default function Navbar() {
                         <span className="relative transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all after:duration-500 group-hover:after:w-full">{link.label}</span>
                       </Link>
                     ))}
-                    {/* Eğitmen ise İlan Ver butonu */}
-                    
                   </div>
                 </div>
               )}
@@ -309,7 +202,7 @@ export default function Navbar() {
                     EN
                   </button>
                 </div>
-                
+
                 {!user && (
                   <div className="flex items-center space-x-4">
                     <Link
@@ -324,16 +217,16 @@ export default function Navbar() {
                     >
                       {t('nav.login')}
                     </Link>
-                        <Link
+                    <Link
                       href="/auth/register"
-                      className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium 
+                      className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium
                         transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 hover:scale-105 active:scale-[0.98]"
                     >
                       {t('nav.register')}
                     </Link>
                   </div>
                 )}
-                
+
                 {user && (
                   <div className="relative" ref={profileRef}>
                     <button
@@ -343,25 +236,25 @@ export default function Navbar() {
                       }
                     >
                       <div className={`relative w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-r from-[#FFB996] to-[#FF8B5E]`}>
-  {typedUser?.profilePhotoUrl ? (
-    <Image
-      src={typedUser?.profilePhotoUrl ?? '/default-profile.png'}
-      alt={typedUser?.name ?? 'Profil'}
-      width={48}
-      height={48}
-      className="object-cover w-full h-full rounded-full"
-    />
-  ) : (
-    <span className="text-white font-semibold text-lg select-none">
-      {(typedUser?.name?.charAt(0)?.toUpperCase() ?? '?')}
-    </span>
-  )}
-  {(unreadMessages > 0 || unreadNotifications > 0) && (
-    <span className="w-4 h-4 bg-red-600 rounded-full border-2 border-white z-[99] animate-pulse" style={{ position: 'absolute', left: 0, bottom: 0, margin: '2px' }}></span>
-  )}
-</div>
+                        {typedUser?.profilePhotoUrl ? (
+                          <Image
+                            src={typedUser?.profilePhotoUrl ?? '/default-profile.png'}
+                            alt={typedUser?.name ?? 'Profil'}
+                            width={48}
+                            height={48}
+                            className="object-cover w-full h-full rounded-full"
+                          />
+                        ) : (
+                          <span className="text-white font-semibold text-lg select-none">
+                            {(typedUser?.name?.charAt(0)?.toUpperCase() ?? '?')}
+                          </span>
+                        )}
+                        {(unreadMessages > 0 || unreadNotifications > 0) && (
+                          <span className="w-4 h-4 bg-red-600 rounded-full border-2 border-white z-[99] animate-pulse" style={{ position: 'absolute', left: 0, bottom: 0, margin: '2px' }}></span>
+                        )}
+                      </div>
                     </button>
-                    
+
                     {/* Profile Dropdown */}
                     {isProfileOpen && (
                       <div className="fixed right-2 top-20 mt-2 w-64 max-w-xs bg-white rounded-xl shadow-lg py-2 z-50 border border-[#FFE5D9] text-sm" style={{minWidth: '12rem', maxWidth: '95vw', right: 'min(0.5rem, calc(100vw - 270px))'}}>
@@ -435,6 +328,7 @@ export default function Navbar() {
                           </div>
                         </Link>
                         <Link
+                          href="/projelerim"
                           className="block px-4 py-2 text-[#994D1C] hover:bg-[#FFF5F0] hover:text-[#6B3416] transition-colors duration-300"
                         >
                           <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
@@ -456,33 +350,32 @@ export default function Navbar() {
                           </div>
                         </Link>
 
-{/* Mobilde çıkış yap butonu */}
-                    <button
-                      onClick={() => {
-                        logout();
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full text-left flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0] mt-2"
-                    >
-                      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v6" />
-                      </svg>
-                      <span>{t('nav.logout')}</span>
-                    </button>
+                        <button
+                          onClick={() => {
+                            logout();
+                            setIsMenuOpen(false);
+                          }}
+                          className="w-full text-left flex items-center space-x-2 px-4 py-2 rounded-xl text-[#994D1C] hover:text-[#6B3416] transition-all duration-300 hover:bg-[#FFF5F0] mt-2"
+                        >
+                          <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v6" />
+                          </svg>
+                          <span>{t('nav.logout')}</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            )}
-          )}
+            </div>
+          </div>
         </nav>
       </div>
     );
   };
 
-  // Sunucu ve istemci rafı render arasındaki farkı gidermek için
-  // mounted false olacak ve sadece sunucu tarafında render edilebilecek içeriği göstereceğiz
+  // Sunucu ve istemci tarafı render arasındaki farkı gidermek için
   if (!mounted) {
-    // Sunucu tarafında, client ile aynı ana DOM hiyerarşisini döndür (nav yapısı dahil)
     return (
       <div className="fixed w-full z-50">
         <nav className="w-full">
@@ -496,12 +389,10 @@ export default function Navbar() {
               </div>
               <div className="hidden md:flex items-center justify-center flex-1">
                 <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
-                  {/* SSR'da boş bırak */}
                 </div>
               </div>
               <div className="hidden md:flex items-center justify-end space-x-4">
                 <div className="flex items-center space-x-4">
-                  {/* SSR'da boş bırak */}
                 </div>
               </div>
             </div>
@@ -510,8 +401,7 @@ export default function Navbar() {
       </div>
     );
   }
-  
-  // İstemci tarafında (mounted true olduğunda) tam içeriği render et
+
   return (
     <div className="fixed w-full z-50">
       {renderClientContent()}

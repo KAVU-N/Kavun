@@ -9,6 +9,8 @@ export interface DecodedToken {
   email: string;
   name?: string;
   university?: string;
+  isAdmin?: boolean;
+  role?: 'student' | 'teacher' | 'instructor' | 'admin';
 }
 
 // Token oluştur
