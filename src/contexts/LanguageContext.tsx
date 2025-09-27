@@ -218,6 +218,8 @@ const translations: Record<Language, Record<string, string>> = {
     'common.edit': 'Düzenle',
     'common.delete': 'Sil',
     'common.createProject': 'Proje Ekle',
+    'project.position': 'Pozisyon',
+    'project.positionPlaceholder': 'ör. React Geliştirici',
     'category.all': 'Tüm Kategoriler',
     'category.general': 'Genel',
     'category.web': 'Web',
