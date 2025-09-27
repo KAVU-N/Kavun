@@ -62,10 +62,12 @@ export default function MyProjectsPage() {
         {loading && <p>Yükleniyor...</p>}
         {error && <p className="text-red-500">{error}</p>}
         {projects.length === 0 && !loading ? (
-          <p className="text-gray-700">
-            Henüz projeniz yok. {" "}
-            <Link href="/projeler/olustur" className="text-[#994D1C] underline hover:text-[#6B3416]">Yeni proje ekleyin</Link>
-          </p>
+          <div className="text-gray-700">
+            {t('myProjects.noProjects')}{" "}
+            <Link href="/projeler/olustur" className="text-[#994D1C] underline hover:text-[#6B3416] font-medium">
+              {t('myProjects.addNewProject')}
+            </Link>
+          </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((p) => (

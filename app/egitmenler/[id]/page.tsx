@@ -46,14 +46,14 @@ export default function EgitmenProfilPage({ params }: PageProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Öğretmen bilgileri getirilemedi');
+        throw new Error(t('instructor.error'));
       }
 
       const data = await response.json();
       setTeacher(data);
     } catch (err) {
       console.error('Öğretmen bilgileri getirme hatası:', err);
-      setError('Öğretmen bilgileri yüklenirken bir hata oluştu');
+      setError(t('instructor.error'));
     } finally {
       setLoading(false);
     }
@@ -68,16 +68,16 @@ export default function EgitmenProfilPage({ params }: PageProps) {
       if (!res.ok) return;
       const lessons = await res.json();
       const mine = Array.isArray(lessons)
-        ? (user?.role === 'admin' 
-            ? lessons 
-            : lessons.filter((l: any) => l.studentId === user?.id || l?.studentId?._id === user?.id))
+        ? (user?.id 
+            ? lessons.filter((l: any) => l.studentId === user?.id || l?.studentId?._id === user?.id)
+            : lessons)
         : [];
       setEligibleLessons(mine);
       if (mine.length > 0) setSelectedLessonId(mine[0]._id);
     } catch (e) {
       console.error('Uygun dersler alınamadı', e);
     }
-  }, [id, user?.role, user?.id]);
+  }, [id, user?.id]);
 
   const fetchTeacherLessons = useCallback(async () => {
     try {
@@ -239,7 +239,7 @@ export default function EgitmenProfilPage({ params }: PageProps) {
             </div>
             
             <div className="border-t border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-[#994D1C] mb-4">İletişim</h2>
+              <h2 className="text-lg font-bold text-[#994D1C] mb-4">{t('instructor.contact')}</h2>
               
               {user ? (
                 <button
@@ -247,14 +247,14 @@ export default function EgitmenProfilPage({ params }: PageProps) {
                   onClick={() => setShowChat(true)}
                   className="w-full block text-center bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-medium py-3 px-4 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300"
                 >
-                  Mesaj Gönder
+                  {t('instructor.sendMessage')}
                 </button>
               ) : (
                 <Link
                   href="/auth/login"
                   className="w-full block text-center bg-gray-200 text-gray-600 font-medium py-3 px-4 rounded-md hover:bg-gray-300 transition-all duration-300"
                 >
-                  Mesaj göndermek için giriş yapın
+                  {t('auth.login')}
                 </Link>
               )}
 
@@ -267,17 +267,12 @@ export default function EgitmenProfilPage({ params }: PageProps) {
                       router.push('/auth/login');
                       return;
                     }
-                    if (user.role === 'student' || user.role === 'admin') {
-                      setShowReview(v => !v);
-                    }
+                    setShowReview(v => !v);
                   }}
                   className="w-full inline-flex items-center justify-center px-4 py-2 bg-[#FFF5F0] text-[#994D1C] rounded-md hover:bg-[#FFE5D9] transition-colors"
                 >
-                  {showReview ? 'Değerlendirmeyi Gizle' : 'Değerlendir'}
+                  {showReview ? t('instructor.hideReview') : t('instructor.writeReview')}
                 </button>
-                {user && user.role !== 'student' && user.role !== 'admin' && (
-                  <p className="mt-2 text-xs text-gray-500 text-center">Değerlendirme yalnızca öğrenciler ve adminler tarafından yapılabilir.</p>
-                )}
               </div>
             </div>
           </div>
@@ -287,11 +282,11 @@ export default function EgitmenProfilPage({ params }: PageProps) {
         <div className="md:col-span-2">
           {/* İlanlar */}
           <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <h2 className="text-xl font-bold text-[#994D1C] mb-6">İlanlar</h2>
+            <h2 className="text-xl font-bold text-[#994D1C] mb-6">{t('instructor.lessons')}</h2>
             
             {openLessons.length === 0 ? (
               <div className="bg-gray-100 p-6 rounded-md text-center">
-                <p className="text-gray-500">Bu eğitmenin şu anda aktif ilanı bulunmuyor.</p>
+                <p className="text-gray-500">{t('instructor.noLessons')}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -313,24 +308,18 @@ export default function EgitmenProfilPage({ params }: PageProps) {
                     
                     <div className="mt-4">
                       {user ? (
-                        user.role === 'student' ? (
-                          <Link
-                            href={`/dersler/${lesson._id}/rezervasyon`}
-                            className="block text-center bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-medium py-2 px-4 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300"
-                          >
-                            Rezervasyon Yap
-                          </Link>
-                        ) : (
-                          <span className="block text-center bg-gray-200 text-gray-600 font-medium py-2 px-4 rounded-md">
-                            Yalnızca öğrenciler rezervasyon yapabilir
-                          </span>
-                        )
+                        <Link
+                          href={`/dersler/${lesson._id}/rezervasyon`}
+                          className="block text-center bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-medium py-2 px-4 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300"
+                        >
+                          Rezervasyon Yap
+                        </Link>
                       ) : (
                         <Link
                           href="/auth/login"
                           className="block text-center bg-gray-200 text-gray-600 font-medium py-2 px-4 rounded-md hover:bg-gray-300 transition-all duration-300"
                         >
-                          Rezervasyon için giriş yapın
+                          {t('auth.login')}
                         </Link>
                       )}
                     </div>
@@ -339,19 +328,17 @@ export default function EgitmenProfilPage({ params }: PageProps) {
               </div>
             )}
           </div>
-          
-          {/* Değerlendirme Paneli (buton solda) */}
 
-          {showReview && user && (user.role === 'student' || user.role === 'admin') && (
+          {showReview && user && (
             <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-              <h3 className="text-lg font-bold text-[#994D1C] mb-4">Eğitmeni Değerlendir</h3>
+              <h3 className="text-lg font-bold text-[#994D1C] mb-4">{t('instructor.review')}</h3>
               {eligibleLessons.length === 0 ? (
                 <div className="bg-gray-100 p-4 rounded-md text-gray-600">
                   Bu eğitmenle tamamlanmış dersiniz bulunamadı. Değerlendirme yapabilmek için tamamlanmış bir dersiniz olmalı.
                 </div>
               ) : (
                 <>
-                  <label className="block text-sm text-gray-700 mb-2">Dersi seçin</label>
+                  <label className="block text-sm text-gray-700 mb-2">{t('instructor.selectLesson')}</label>
                   <select
                     value={selectedLessonId}
                     onChange={(e) => setSelectedLessonId(e.target.value)}
@@ -389,7 +376,7 @@ export default function EgitmenProfilPage({ params }: PageProps) {
             name: teacher.name || 'Eğitmen',
             email: teacher.email || '',
             university: teacher.university || '',
-            role: teacher.role || 'instructor',
+            role: 'instructor',
             price: teacher.price
           }}
           onClose={() => setShowChat(false)}

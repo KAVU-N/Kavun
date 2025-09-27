@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 import { universities } from '@/data/universities';
 import ClubContactActions from '@/src/components/ClubContactActions';
 
@@ -17,6 +18,7 @@ type Club = {
 };
 
 export default function ClubsPage() {
+  const { t } = useLanguage();
   const [q, setQ] = useState('');
   const [category, setCategory] = useState('');
   const [university, setUniversity] = useState('');
@@ -54,24 +56,24 @@ export default function ClubsPage() {
     <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
       <div className="max-w-6xl mx-auto px-4 relative z-10">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#994D1C]">Kulüpler</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#994D1C]">{t('clubs.title')}</h1>
           <Link
             href="/kulupler/olustur"
             className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#FF8B5E] to-[#994D1C] text-white px-4 py-2 shadow hover:opacity-95 transition"
           >
-            Kulüp Ekle
+            {t('clubs.addClub')}
           </Link>
         </div>
 
         {/* Filtreler */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-          <input value={q} onChange={e=>setQ(e.target.value)} className="px-4 py-3 rounded-lg border border-black/10 bg-white/60 backdrop-blur placeholder:text-black/50" placeholder="Ara (isim, anahtar kelime)" />
+          <input value={q} onChange={e=>setQ(e.target.value)} className="px-4 py-3 rounded-lg border border-black/10 bg-white/60 backdrop-blur placeholder:text-black/50" placeholder={t('clubs.searchPlaceholder')} />
           <select value={category} onChange={e=>setCategory(e.target.value)} className="px-4 py-3 rounded-lg border border-black/10 bg-white/60 backdrop-blur">
-            <option value="">Kategori (Tümü)</option>
+            <option value="">{t('clubs.categoryAll')}</option>
             {categories.map((c)=>(<option key={c} value={c}>{c}</option>))}
           </select>
           <select value={university} onChange={e=>setUniversity(e.target.value)} className="px-4 py-3 rounded-lg border border-black/10 bg-white/60 backdrop-blur">
-            <option value="">Üniversite (Tümü)</option>
+            <option value="">{t('clubs.universityAll')}</option>
             {universities.map((u)=>(<option key={u} value={u}>{u}</option>))}
           </select>
         </div>
@@ -90,7 +92,7 @@ export default function ClubsPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {clubs.length === 0 ? (
-              <div className="col-span-full text-center text-black/70">Kriterlere uygun kulüp bulunamadı.</div>
+              <div className="col-span-full text-center text-black/70">{t('clubs.noResults')}</div>
             ) : clubs.map((club) => (
               <div key={club._id} className="relative rounded-xl bg-white/70 border border-black/10 p-4 pb-16 shadow-sm hover:shadow transition flex items-start gap-3">
                 <div className="w-12 h-12 rounded-md bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center text-sm text-black/50">

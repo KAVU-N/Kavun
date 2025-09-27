@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/context/AuthContext';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 import Image from 'next/image';
 
 export default function CreateClubPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [university, setUniversity] = useState('');
   const [category, setCategory] = useState('');
@@ -31,7 +33,7 @@ export default function CreateClubPage() {
       return;
     }
     if (!name.trim()) {
-      setError('Lütfen kulüp adını girin.');
+      setError(t('general.clubNameRequired'));
       return;
     }
     if (!user?.university) {
@@ -77,17 +79,17 @@ export default function CreateClubPage() {
   return (
     <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
       <div className="max-w-3xl mx-auto px-4 relative z-10">
-        <Link href="/kulupler" className="text-[#994D1C] hover:underline">← Kulüplere dön</Link>
+        <Link href="/kulupler" className="text-[#994D1C] hover:underline">← {t('nav.clubs')}</Link>
         <form onSubmit={onSubmit} className="mt-4 rounded-2xl bg-white/70 border border-black/10 p-6 shadow space-y-4">
-          <h1 className="text-2xl font-bold text-[#994D1C]">Kulüp Ekle</h1>
+          <h1 className="text-2xl font-bold text-[#994D1C]">{t('clubs.addClub')}</h1>
           {error && <div className="text-red-600 text-sm">{error}</div>}
-          <input value={name} onChange={e=>setName(e.target.value)} placeholder="Kulüp adı" className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white" />
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder={t('general.clubName')} className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white" />
           <div>
-            <input value={university} disabled placeholder="Üniversite" title="Üniversite bilginiz profilinizden otomatik gelir" className="w-full px-4 py-3 rounded-lg border border-black/10 bg-gray-100 text-black/70" />
+            <input value={university} disabled placeholder={t('general.clubUniversity')} title="Üniversite bilginiz profilinizden otomatik gelir" className="w-full px-4 py-3 rounded-lg border border-black/10 bg-gray-100 text-black/70" />
             <p className="text-xs text-black/60 mt-1">Üniversite bilginiz profilinizden otomatik alınır ve değiştirilemez.</p>
           </div>
-          <input value={category} onChange={e=>setCategory(e.target.value)} placeholder="Kategori" className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white" />
-          <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Açıklama" className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white min-h-28" />
+          <input value={category} onChange={e=>setCategory(e.target.value)} placeholder={t('general.clubCategory')} className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white" />
+          <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder={t('general.clubDescription')} className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white min-h-28" />
           {/* Logo yükleme */}
           <div className="pt-2">
             <label className="block text-sm font-medium text-black/80 mb-1">Kulüp Logosu (Maks. 1MB, JPG/PNG/WebP)</label>
@@ -120,7 +122,7 @@ export default function CreateClubPage() {
               className="block w-full text-sm text-black/80 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#FFE5D9] file:text-[#994D1C] hover:file:bg-[#FFD8C7]"
             />
           </div>
-          <button disabled={loading} type="submit" className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#FF8B5E] to-[#994D1C] text-white px-4 py-2 shadow hover:opacity-95 transition disabled:opacity-60">{loading ? 'Oluşturuluyor...' : 'Oluştur'}</button>
+          <button disabled={loading} type="submit" className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#FF8B5E] to-[#994D1C] text-white px-4 py-2 shadow hover:opacity-95 transition disabled:opacity-60">{loading ? 'Oluşturuluyor...' : t('general.clubCreate')}</button>
         </form>
       </div>
     </div>

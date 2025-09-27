@@ -1,35 +1,33 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
-interface User {
-  profilePhotoUrl?: string | null;
-  name?: string | null;
-}
+import type { User } from '../types/User';
 
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [language, setLanguage] = useState('tr');
   const [isMobile, setIsMobile] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  const { t } = useTranslation();
+  // Language context'i kullan
+  const { language, setLanguage, t } = useLanguage();
 
-  // User authentication state - bu kısım gerçek auth context'ten gelmeli
-  const user: boolean | null = false; // temporary
-  const typedUser: User | null = null as User | null; // temporary
+  // Auth context'i kullan
+  const { user, logout } = useAuth();
+
+  // Geçici state'ler - daha sonra gerçek context'ten gelecek
+  const typedUser = user;
   const unreadMessages = 0; // temporary
   const unreadNotifications = 0; // temporary
-
-  const logout = () => {
-    // logout logic
-  };
 
   useEffect(() => {
     setMounted(true);
@@ -62,12 +60,22 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { href: '/ilanlar', label: (t('nav.listings') || 'İlanlar'), icon: (
+    { href: '/ilanlar', label: t('nav.listings'), icon: (
       <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
     )},
-    { href: '/kulupler', label: (t('nav.clubs') || 'Kulüpler'), icon: (
+    { href: '/projeler', label: t('nav.projects'), icon: (
+      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    )},
+    { href: '/kaynaklar', label: t('nav.resources'), icon: (
+      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    )},
+    { href: '/kulupler', label: t('nav.clubs'), icon: (
       <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M12 20v-2a4 4 0 013-3.87M7 20H2v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z" />
       </svg>
@@ -346,7 +354,7 @@ export default function Navbar() {
                             <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M12 20v-2a4 4 0 013-3.87M7 20H2v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z" />
                             </svg>
-                            <span>{(t('nav.myClub') || 'Kulübüm')}</span>
+                            <span>{t('nav.myClub')}</span>
                           </div>
                         </Link>
 

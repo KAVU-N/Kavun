@@ -9,4 +9,5 @@ export interface User {
   grade?: string | number;
   profilePhotoUrl?: string;
   downloadRight?: number;
+  role?: string;
 }
