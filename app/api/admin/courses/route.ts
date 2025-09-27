@@ -4,6 +4,7 @@ import Course from '@/models/Course'
 import User from '@/models/User'
 import { cookies } from 'next/headers'
 import { verify } from 'jsonwebtoken'
+import { Types } from 'mongoose'
 
 // Admin yetkisi kontrolü için yardımcı fonksiyon
 async function checkAdminAuth() {
@@ -72,8 +73,12 @@ export async function GET(request: NextRequest) {
       courses.map(async (course) => {
         let instructorName = '';
         if (course.instructor) {
-          const instructor = await User.findById(course.instructor).select('name');
-          instructorName = instructor ? instructor.name : '';
+          if (Types.ObjectId.isValid(course.instructor)) {
+            const instructor = await User.findById(course.instructor).select('name');
+            instructorName = instructor ? instructor.name : '';
+          } else if (typeof course.instructor === 'string') {
+            instructorName = course.instructor;
+          }
         }
         
         const courseObj = course.toObject();
