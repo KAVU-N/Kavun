@@ -1,29 +1,27 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from 'src/context/AuthContext';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function NotificationsPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const { t } = useLanguage();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>('all'); // 'all', 'unread', 'read'
 
-  useEffect(() => {
-    // user varsa bildirimleri getir
-    if (user) fetchNotifications();
-  }, [user]);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       if (!user) {
-        setError('Giriş yapmalısınız');
+        setError(t('notifications.loginRequired'));
         setLoading(false);
         return;
       }
@@ -42,7 +40,7 @@ export default function NotificationsPage() {
       if (!response.ok) {
         const errText = await response.text();
         // DEBUG LOG KALDIRILDI [fetchNotifications] response error:', errText);
-        throw new Error('Bildirimler getirilemedi');
+        throw new Error(t('notifications.error'));
       }
 
       const data = await response.json();
@@ -55,11 +53,16 @@ export default function NotificationsPage() {
       setLoading(false);
     } catch (error) {
       // DEBUG LOG KALDIRILDI Bildirimler getirme hatası:', error);
-      setError('Bildirimler yüklenirken bir hata oluştu');
+      setError(t('notifications.error'));
       setNotifications([]);
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    // user varsa bildirimleri getir
+    if (user) fetchNotifications();
+  }, [user, fetchNotifications]);
 
   const markAsRead = async (id: string) => {
     try {
@@ -155,11 +158,11 @@ export default function NotificationsPage() {
     const diffDays = Math.round(diffMs / 86400000);
     
     if (diffMins < 60) {
-      return `${diffMins} dakika önce`;
+      return t('notifications.timeAgo.minutes', { count: diffMins });
     } else if (diffHours < 24) {
-      return `${diffHours} saat önce`;
+      return t('notifications.timeAgo.hours', { count: diffHours });
     } else {
-      return `${diffDays} gün önce`;
+      return t('notifications.timeAgo.days', { count: diffDays });
     }
   };
 
@@ -249,13 +252,13 @@ export default function NotificationsPage() {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-[#FF8B5E] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
-          <h1 className="text-2xl font-bold text-[#994D1C] mb-4">Giriş Yapmanız Gerekiyor</h1>
-          <p className="text-gray-600 mb-6">Bildirimlerinizi görüntülemek için lütfen giriş yapın.</p>
+          <h1 className="text-2xl font-bold text-[#994D1C] mb-4">{t('notifications.loginRequired')}</h1>
+          <p className="text-gray-600 mb-6">{t('notifications.empty')}</p>
           <Link
             href="/auth/login"
             className="inline-block bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium py-3 px-6 rounded-md hover:shadow-lg hover:shadow-[#FFB996]/20 transition-all duration-300"
           >
-            Giriş Yap
+            {t('notifications.goToLogin')}
           </Link>
         </div>
       </div>
@@ -266,7 +269,7 @@ export default function NotificationsPage() {
   const debugToken = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
   return (
     <div className="pt-24 pb-8 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold text-[#994D1C] mb-8">Bildirimler</h1>
+      <h1 className="text-3xl font-bold text-[#994D1C] mb-8">{t('notifications.title')}</h1>
       
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Filters and Actions */}
@@ -280,7 +283,7 @@ export default function NotificationsPage() {
                   : 'text-[#994D1C] hover:bg-[#FFF5F0]'
               }`}
             >
-              Tümü
+              {t('notifications.all')}
             </button>
             <button
               onClick={() => setFilter('unread')}
@@ -290,7 +293,7 @@ export default function NotificationsPage() {
                   : 'text-[#994D1C] hover:bg-[#FFF5F0]'
               }`}
             >
-              Okunmamış
+              {t('notifications.unread')}
               {notifications.filter(n => !n.read).length > 0 && (
                 <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center">
                   {notifications.filter(n => !n.read).length}
@@ -305,7 +308,7 @@ export default function NotificationsPage() {
                   : 'text-[#994D1C] hover:bg-[#FFF5F0]'
               }`}
             >
-              Okunmuş
+              {t('notifications.read')}
             </button>
           </div>
           
@@ -314,7 +317,7 @@ export default function NotificationsPage() {
             className="text-[#994D1C] hover:text-[#FF8B5E] text-sm font-medium"
             disabled={!notifications.some(n => !n.read)}
           >
-            Tümünü Okundu İşaretle
+            {t('notifications.markAllAsRead')}
           </button>
         </div>
         
@@ -324,13 +327,13 @@ export default function NotificationsPage() {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            <h2 className="text-xl font-medium text-gray-500 mb-2">Bildirim Bulunamadı</h2>
+            <h2 className="text-xl font-medium text-gray-500 mb-2">{t('notifications.noNotifications')}</h2>
             <p className="text-gray-400">
               {filter === 'all' 
-                ? 'Henüz hiç bildiriminiz yok.' 
+                ? t('notifications.empty') 
                 : filter === 'unread' 
-                  ? 'Okunmamış bildiriminiz yok.' 
-                  : 'Okunmuş bildiriminiz yok.'}
+                  ? t('notifications.unread') + ' bildirim yok.' 
+                  : t('notifications.read') + ' bildirim yok.'}
             </p>
           </div>
         ) : (
@@ -360,13 +363,12 @@ export default function NotificationsPage() {
                         href={notification.actionUrl}
                         className="text-sm font-medium text-[#FF8B5E] hover:text-[#994D1C] transition-colors cursor-pointer"
                         onClick={e => {
-                          // Okundu işaretle
                           markAsRead(notification._id);
                         }}
                         scroll={true}
                         shallow={false}
                       >
-                        Detayları Görüntüle
+                        {t('notifications.viewDetails')}
                       </Link>
                     ) : <span />}
                     
@@ -376,14 +378,14 @@ export default function NotificationsPage() {
                           onClick={() => markAsRead(notification._id)}
                           className="text-sm text-gray-500 hover:text-[#994D1C] transition-colors"
                         >
-                          Okundu İşaretle
+                          {t('notifications.markAsRead')}
                         </button>
                       )}
                       <button
                         onClick={() => deleteNotification(notification._id)}
                         className="text-sm text-gray-500 hover:text-red-500 transition-colors"
                       >
-                        Sil
+                        {t('notifications.delete')}
                       </button>
                     </div>
                   </div>

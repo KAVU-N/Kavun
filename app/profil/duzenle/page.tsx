@@ -9,6 +9,7 @@ import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import Image from 'next/image';
 
 export default function ProfileEditPage() {
   const { t } = useLanguage();
@@ -17,7 +18,7 @@ export default function ProfileEditPage() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const router = useRouter();
   
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
@@ -95,9 +96,9 @@ export default function ProfileEditPage() {
         throw new Error(data.error || 'Profil güncellenirken bir hata oluştu');
       }
       
-      // Kullanıcı bilgilerini güncelle
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(data.user));
+      // Kullanıcı bilgilerini global AuthContext'te güncelle
+      if (data?.user) {
+        updateUser(data.user);
       }
       
       setSuccess(t('profile.updateSuccess'));
@@ -158,7 +159,9 @@ export default function ProfileEditPage() {
   <div className="flex flex-col items-center">
     <div className="border-2 border-[#E4E2F5] rounded-xl bg-[#FFF5F0] p-4 mb-4 w-[340px] h-[340px] flex items-center justify-center">
       {profilePhoto ? (
-        <img src={profilePhoto} alt="Image preview" className="w-full h-full object-cover rounded-xl" />
+        <div className="relative w-full h-full">
+          <Image src={profilePhoto} alt="Image preview" fill sizes="340px" className="object-cover rounded-xl" />
+        </div>
       ) : (
         <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
           <span className="text-7xl mb-4">📷</span>

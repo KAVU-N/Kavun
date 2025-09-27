@@ -39,3 +39,14 @@ model Resource {
   @@index([university])
   @@index([format])
 }
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  title     String
+  message   String
+  type      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  actionUrl String?
+}

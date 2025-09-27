@@ -3,8 +3,8 @@ import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 import User from '@/models/User';
 
-// JWT_SECRET değişkenini doğru şekilde al
-const JWT_SECRET = process.env.JWT_SECRET || 'kavunla-secret-key-for-jwt-authentication';
+// JWT_SECRET değişkenini doğru şekilde al (login route ile aynı fallback)
+const JWT_SECRET = process.env.JWT_SECRET || 'default-secret';
 
 export interface UserJwtPayload {
   id: string;
@@ -15,45 +15,45 @@ export interface UserJwtPayload {
 }
 
 // Token'dan kullanıcı bilgilerini çıkaran fonksiyon (hem Request/NextRequest hem string token destekler)
-export async function getUserFromToken(requestOrToken: Request | { headers: { authorization?: string } } | string): Promise<UserJwtPayload | null> {
+export async function getUserFromToken(requestOrToken: Request | { headers: { authorization?: string; cookie?: string } } | string): Promise<UserJwtPayload | null> {
   try {
     let token = '';
     if (typeof requestOrToken === 'string') {
       // Direkt token geldi (pages/api)
       token = requestOrToken.replace('Bearer ', '');
-    } else if ('headers' in requestOrToken && typeof requestOrToken.headers === 'object') {
-      // Eğer headers bir Headers nesnesiyse (ör: new Headers())
+    } else if (requestOrToken instanceof Request || ('headers' in requestOrToken && typeof requestOrToken.headers === 'object')) {
+      // Önce Authorization header'dan dene
       let authHeader: string | undefined;
-      if (requestOrToken.headers instanceof Headers) {
+      if (requestOrToken instanceof Request) {
         authHeader = requestOrToken.headers.get('authorization') || requestOrToken.headers.get('Authorization') || undefined;
       } else {
-        // Normal obje ise (ör: { authorization: ... })
-        authHeader = (requestOrToken.headers as any)['authorization'] || (requestOrToken.headers as any)['Authorization'];
-      }
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        console.log('Token bulunamadı veya geçersiz format');
-        return null;
-      }
-      token = authHeader.split(' ')[1];
-    } else if (requestOrToken instanceof Request) {
-      // app router: Request
-      const authHeader = requestOrToken.headers.get('Authorization');
-    }
-    // Eğer Authorization başlığı yoksa veya token halen boşsa, cookie içinden almaya çalış
-    if (!token) {
-      let cookieHeader = '';
-      if (requestOrToken instanceof Request) {
-        cookieHeader = requestOrToken.headers.get('cookie') || '';
-      } else if (typeof requestOrToken !== 'string' && 'headers' in requestOrToken) {
-        if (requestOrToken.headers instanceof Headers) {
-          cookieHeader = requestOrToken.headers.get('cookie') || '';
+        const h = (requestOrToken as any).headers;
+        if (h instanceof Headers) {
+          authHeader = h.get('authorization') || h.get('Authorization') || undefined;
         } else {
-          cookieHeader = (requestOrToken.headers as any)['cookie'] || '';
+          authHeader = h['authorization'] || h['Authorization'];
         }
       }
-      const match = cookieHeader.match(/token=([^;]+)/);
-      if (match) {
-        token = match[1];
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      }
+      // Authorization yoksa veya format yanlışsa cookie'den dene
+      if (!token) {
+        let cookieHeader = '';
+        if (requestOrToken instanceof Request) {
+          cookieHeader = requestOrToken.headers.get('cookie') || '';
+        } else {
+          const h = (requestOrToken as any).headers;
+          if (h instanceof Headers) {
+            cookieHeader = h.get('cookie') || '';
+          } else {
+            cookieHeader = h['cookie'] || '';
+          }
+        }
+        const match = cookieHeader.match(/token=([^;]+)/);
+        if (match) {
+          token = match[1];
+        }
       }
     }
     if (!token) {

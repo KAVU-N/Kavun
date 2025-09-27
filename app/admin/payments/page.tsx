@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useLanguage } from '@/src/contexts/LanguageContext'
 import { toast } from 'react-hot-toast'
 
@@ -30,7 +30,7 @@ const PaymentsPage = () => {
   const [statusFilter, setStatusFilter] = useState('')
   const { t } = useLanguage()
   
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(
@@ -51,11 +51,11 @@ const PaymentsPage = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, searchTerm, statusFilter, t])
 
   useEffect(() => {
     fetchPayments()
-  }, [page, searchTerm, statusFilter])
+  }, [fetchPayments])
 
   const handleViewDetails = (payment: Payment) => {
     setSelectedPayment(payment)

@@ -31,6 +31,7 @@ export default function ProjectsPage() {
   const [onlyMine, setOnlyMine] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const myId = (user as any)?._id || (user as any)?.id;
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -52,20 +53,25 @@ export default function ProjectsPage() {
     return projects.filter((p) => {
       const inSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) || (p.position ?? '').toLowerCase().includes(searchTerm.toLowerCase());
       const inCategory = categoryFilter ? p.category === categoryFilter : true;
-      const isMine = onlyMine ? p.ownerId === user?._id : true;
+      const isMine = onlyMine ? p.ownerId === myId : true;
       const inPosition = positionFilter ? (p.position ?? '').toLowerCase().includes(positionFilter.toLowerCase()) : true;
        return inSearch && inCategory && isMine && inPosition;
     });
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pt-28 pb-12">
+    <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+      <div className="max-w-6xl mx-auto px-4 relative z-10">
+      <div className="bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
         <h1 className="text-3xl font-bold text-[#994D1C]">
           {t("nav.projects")}
         </h1>
         {user && (
-          <Link href="/projeler/olustur" className="bg-[#994D1C] text-white px-4 py-2 rounded hover:bg-[#7e3f17] transition whitespace-nowrap">
+          <Link
+            href="/projeler/olustur"
+            className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white px-4 py-2 rounded-lg hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 whitespace-nowrap"
+          >
             + {t('common.createProject')}
           </Link>
         )}
@@ -148,6 +154,8 @@ export default function ProjectsPage() {
           ))}
         </div>
       )}
+      </div>
+      </div>
     </div>
   );
 }

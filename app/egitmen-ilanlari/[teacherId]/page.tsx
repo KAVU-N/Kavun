@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -45,40 +45,40 @@ export default function EgitmenIlanlariPage({ params }: { params: { teacherId: s
     }
   }, [user, loading, router]);
 
-  useEffect(() => {
-    const fetchTeacherIlanlar = async () => {
-      if (!user || !params.teacherId) return;
-      
-      try {
-        setIsLoading(true);
-        const token = localStorage.getItem('token');
-        const response = await fetch(`/api/ilanlar?teacherId=${params.teacherId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(t('general.errorLoadingListings'));
+  const fetchTeacherIlanlar = useCallback(async () => {
+    if (!user || !params.teacherId) return;
+    
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/ilanlar?teacherId=${params.teacherId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
+      });
 
-        const data = await response.json();
-        setIlanlar(data);
-        
-        // Eğitmen bilgisini al (ilk ilandan)
-        if (data.length > 0 && data[0].teacher) {
-          setTeacher(data[0].teacher);
-        }
-      } catch (err) {
-        console.error(t('general.errorLoadingTeacherListings'), err);
-        setError(t('general.errorLoadingListings'));
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error(t('general.errorLoadingListings'));
       }
-    };
 
+      const data = await response.json();
+      setIlanlar(data);
+      
+      // Eğitmen bilgisini al (ilk ilandan)
+      if (data.length > 0 && data[0].teacher) {
+        setTeacher(data[0].teacher);
+      }
+    } catch (err) {
+      console.error(t('general.errorLoadingTeacherListings'), err);
+      setError(t('general.errorLoadingListings'));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [params.teacherId, user, t]);
+
+  useEffect(() => {
     fetchTeacherIlanlar();
-  }, [params.teacherId, user]);
+  }, [fetchTeacherIlanlar]);
 
   if (loading || isLoading) {
     return (

@@ -3,14 +3,56 @@
 @tailwind utilities;
 
 :root {
+  /* Legacy vars (kept for compatibility) */
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 255, 255, 255;
+
+  /* Brand palette */
+  --brand-primary: #FF8B5E;
+  --brand-primary-light: #FFB996;
+  --brand-brown: #6B3416;
+  --brand-bg: #FFF7F2;
+  --brand-accent-bg: #FFF5F0;
+  --brand-border: #FFE5D9;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
+  background: var(--brand-bg);
+}
+
+/* Fallback keyframes for background pan (in case Tailwind doesn't emit it) */
+@keyframes slowpan {
+  0% { transform: scale(1) translate3d(0, 0, 0); }
+  50% { transform: scale(1.05) translate3d(0, -2%, 0); }
+  100% { transform: scale(1) translate3d(0, 0, 0); }
+}
+
+/* Mobile-specific lighter pan */
+@keyframes slowpanMobile {
+  0% { transform: scale(1) translate3d(0, 0, 0); }
+  50% { transform: scale(1.03) translate3d(0, -1%, 0); }
+  100% { transform: scale(1) translate3d(0, 0, 0); }
+}
+
+/* Accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .animated-bg { animation: none !important; }
+}
+
+/* Mobile tuning: shorter duration and smaller scale */
+@media (max-width: 768px) {
+  .animated-bg { animation: slowpanMobile 18s ease-in-out infinite !important; }
+}
+
+@layer utilities {
+  .bg-brand-gradient {
+    background-image: linear-gradient(to right, var(--brand-primary-light), var(--brand-primary));
+  }
+  .text-brand-brown { color: var(--brand-brown); }
+  .bg-brand-accent { background-color: var(--brand-accent-bg); }
+  .border-brand { border-color: var(--brand-border); }
 }
 
 /* Email Verification Page Styles */

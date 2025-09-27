@@ -1,18 +1,21 @@
 import { Inter } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 import { AuthProvider } from 'src/context/AuthContext'
 import { LanguageProvider } from '@/src/contexts/LanguageContext'
-import Navbar from '@/src/components/Navbar'
 import Footer from '@/src/components/Footer'
 import CookieConsentBar from '@/src/components/CookieConsentBar'
-import AnalyticsLoader from '@/src/components/AnalyticsLoader'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import ClientOnly from '@/src/components/ClientOnly'
+const Navbar = dynamic(() => import('@/src/components/Navbar'), { ssr: false })
+const AnalyticsLoader = dynamic(() => import('@/src/components/AnalyticsLoader'), { ssr: false })
+const RouteBackgroundHost = dynamic(() => import('@/src/components/RouteBackgroundHost'), { ssr: false })
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Kavunla - Geleceğe Adım At',
   description: 'Kavunla resmi web sitesi',
   manifest: '/manifest.json',
@@ -25,11 +28,15 @@ export const metadata = {
     capable: true,
     statusBarStyle: 'default',
     title: 'Kavunla'
-  }
+  },
 };
 
-export const viewport = 'width=device-width, initial-scale=1, maximum-scale=1';
-export const themeColor = '#ffffff';
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: 'var(--brand-bg)'
+};
 
 export default function RootLayout({
   children,
@@ -37,50 +44,52 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" style={{backgroundColor: '#ffffff !important'}}>
+    <html lang="en" style={{ backgroundColor: 'var(--brand-bg) !important' }}>
       <head>
         <link rel="icon" href="/logo.ico" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ffffff" />
+        {/* theme-color artık viewport.themeColor ile yönetiliyor */}
+
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Kavunla" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <style>{`
           html, body {
-            background-color: #ffffff !important;
-            background: #ffffff !important;
+            background-color: var(--brand-bg) !important;
+            background: var(--brand-bg) !important;
           }
         `}</style>
       </head>
-      <body className={inter.className} style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
+      <body className={inter.className}>
         <AuthProvider>
           <LanguageProvider>
-            <div className="flex flex-col min-h-screen" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
+            <div className="flex flex-col min-h-screen">
               <ClientOnly hideOnAdmin>
                 <Navbar />
+                <RouteBackgroundHost />
                 <AnalyticsLoader />
               </ClientOnly>
-              <div className="flex-grow" style={{backgroundColor: '#ffffff !important', background: '#ffffff !important'}}>
+              <div className="flex-grow">
                 <Toaster 
                   position="top-right"
                   toastOptions={{
                     duration: 3000,
                     style: {
-                      background: '#ffffff',
-                      color: '#6B3416',
-                      border: '1px solid #FFE5D9',
+                      background: 'var(--brand-bg)',
+                      color: 'var(--brand-brown)',
+                      border: '1px solid var(--brand-border)',
                     },
                     success: {
                       iconTheme: {
-                        primary: '#6B3416',
-                        secondary: '#FFF5F0',
+                        primary: 'var(--brand-brown)',
+                        secondary: 'var(--brand-accent-bg)',
                       },
                     },
                     error: {
                       iconTheme: {
-                        primary: '#FF8B5E',
-                        secondary: '#FFF5F0',
+                        primary: 'var(--brand-primary)',
+                        secondary: 'var(--brand-accent-bg)',
                       },
                     },
                   }}
@@ -88,8 +97,10 @@ export default function RootLayout({
                 {children}
               </div>
               <ClientOnly hideOnAdmin>
-                <CookieConsentBar />
-                <Footer />
+                <div className="relative z-10">
+                  <CookieConsentBar />
+                  <Footer />
+                </div>
               </ClientOnly>
             </div>
           </LanguageProvider>

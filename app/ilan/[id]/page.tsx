@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher, FaCalendarAlt, FaArrowLeft, FaEnvelope, FaCalendarCheck } from 'react-icons/fa';
-import ChatBox from '@/src/components/ChatBox';
+const ChatBox = dynamic(() => import('@/src/components/ChatBox'), { ssr: false });
 
 interface Teacher {
   _id: string;
@@ -15,6 +17,7 @@ interface Teacher {
   university: string;
   expertise: string;
   role: string;
+  profilePhotoUrl?: string;
 }
 
 interface Ilan {
@@ -39,6 +42,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeChat, setActiveChat] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -63,7 +67,23 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
         
         const data = await response.json();
         setIlan(data);
+        setPhotoError(false);
         setError('');
+
+        // Öğretmenin en güncel profilini public endpoint'ten çek ve teacher alanını güncelle
+        const teacherId = data?.userId || data?.teacher?._id || data?.teacher?.id;
+        if (teacherId) {
+          try {
+            const tuRes = await fetch(`/api/users/public/${teacherId}`);
+            if (tuRes.ok) {
+              const teacherPublic = await tuRes.json();
+              setIlan((prev) => prev ? { ...prev, teacher: teacherPublic } as Ilan : prev);
+              setPhotoError(false);
+            }
+          } catch (e) {
+            console.warn('Öğretmen public profili alınamadı:', e);
+          }
+        }
       } catch (err: any) {
         console.error('İlan detayları yüklenirken hata oluştu:', err);
         setError('İlan detayları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
@@ -77,14 +97,27 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
     }
   }, [params.id]);
 
+  // Foto URL değişince hata durumunu sıfırla
+  useEffect(() => {
+    if (ilan?.teacher?.profilePhotoUrl) {
+      setPhotoError(false);
+    }
+  }, [ilan?.teacher?.profilePhotoUrl]);
+
+  // Görsel URL’i: öğretmenin URL’i yoksa ve ilan kullanıcı ID’si oturumdaki kullanıcıya eşitse, AuthContext’teki kullanıcı fotoğrafını yedek al
+  const fallbackUserPhoto = user?.id && ilan?.userId === user.id ? (user as any)?.profilePhotoUrl : undefined;
+  const displayPhotoUrl = !photoError ? (ilan?.teacher?.profilePhotoUrl || fallbackUserPhoto) : undefined;
+
 
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-white pt-20">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center py-12">
-            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+      <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+        <div className="max-w-5xl mx-auto px-4 relative z-10">
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <div className="flex justify-center items-center py-8">
+              <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -92,9 +125,12 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
+    <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
+        <div className="mb-6">
+          <div className="hidden">{/* boşluk koruyucu */}</div>
+        </div>
+        <div className="">
           <div className="mb-6">
             <button 
               onClick={() => router.back()} 
@@ -110,7 +146,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
             </div>
           ) : error ? (
-            <div className="bg-white p-8 rounded-xl shadow-md text-center border border-red-100">
+            <div className="bg-white p-8 rounded-2xl shadow-lg text-center border border-red-100">
               <div className="text-red-500 text-5xl mb-4 flex justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-16 h-16">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -126,7 +162,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               </button>
             </div>
           ) : !ilan ? (
-            <div className="bg-white p-8 rounded-xl shadow-md text-center border border-[#FFE5D9]">
+            <div className="bg-white p-8 rounded-2xl shadow-lg text-center border border-[#FFE5D9]">
               <p className="text-[#994D1C] mb-4">{t('general.noListingFound')}</p>
               <Link 
                 href="/ilanlar"
@@ -136,7 +172,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               </Link>
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               {/* Header Section */}
               <div className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] p-6 text-white">
                 <div className="flex items-center mb-2">
@@ -151,7 +187,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                   </div>
                   <div className="flex items-center">
                     <FaCalendarAlt className="mr-2" />
-                    <span>{t('general.createdAt')}: {new Date(ilan.createdAt).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
+                    <span>{t('general.postDate')}: {new Date(ilan.createdAt).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
                   </div>
                 </div>
               </div>
@@ -191,15 +227,29 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                 <div className="mb-8">
                   <h2 className="text-xl font-bold text-[#6B3416] mb-4">{t('general.teacherInfo')}</h2>
                   <div className="bg-[#FFF9F5] p-6 rounded-lg flex items-start">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white text-2xl font-bold mr-4">
-                      {ilan.teacher?.name.charAt(0).toUpperCase()}
-                    </div>
+                    {displayPhotoUrl ? (
+                      <Image
+                        src={displayPhotoUrl}
+                        alt={(ilan.teacher?.name || 'Eğitmen') + ' profil fotoğrafı'}
+                        width={64}
+                        height={64}
+                        className="w-16 h-16 rounded-full object-cover mr-4"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        onError={() => setPhotoError(true)}
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white text-2xl font-bold mr-4">
+                        {ilan.teacher?.name?.charAt(0)?.toUpperCase()}
+                      </div>
+                    )}
                     <div>
                       <h3 className="text-lg font-bold text-[#6B3416] mb-1">{ilan.teacher?.name}</h3>
                       <p className="text-[#994D1C] mb-2">{ilan.teacher?.university}</p>
                       <p className="text-gray-600 mb-4">{ilan.teacher?.expertise || t('general.notSpecified')}</p>
                       <Link 
                         href={`/egitmen-ilanlari/${ilan.teacher?._id}`}
+                        prefetch={false}
                         className="inline-flex items-center text-[#FF8B5E] hover:text-[#FF6B1A] font-medium"
                       >
                         <span>{t('general.showAllListings')}</span>

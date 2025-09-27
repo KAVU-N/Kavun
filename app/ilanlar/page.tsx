@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import Link from 'next/link';
-import Image from 'next/image';
 import { FaSearch, FaFilter, FaUniversity, FaClock, FaMoneyBillWave, FaChalkboardTeacher } from 'react-icons/fa';
+import ListingCard from '@/src/components/ListingCard';
 
 
 interface Teacher {
@@ -42,12 +42,17 @@ export default function IlanlarPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [photoErrors, setPhotoErrors] = useState<Record<string, boolean>>({});
   const [filters, setFilters] = useState({
     method: '',
     priceMin: '',
     priceMax: '',
     sortBy: 'en-yeni',
   });
+
+  const onAvatarError = useCallback((id: string) => {
+    setPhotoErrors(prev => ({ ...prev, [id]: true }));
+  }, []);
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
@@ -99,8 +104,26 @@ export default function IlanlarPage() {
         const data = await response.json();
         console.log('Received listings data:', data);
         console.log('Number of listings found:', data.length);
-        
-        setIlanlar(data);
+
+        // Öğretmenin en güncel profilini public endpoint'ten çek ve teacher alanını güncelle
+        const enriched = await Promise.all(
+          (data || []).map(async (ilan: Ilan) => {
+            const teacherId = (ilan as any)?.userId || (ilan as any)?.teacher?._id || (ilan as any)?.teacher?.id;
+            if (teacherId) {
+              try {
+                const tuRes = await fetch(`/api/users/public/${teacherId}`);
+                if (tuRes.ok) {
+                  const tPublic = await tuRes.json();
+                  return { ...ilan, teacher: tPublic } as Ilan;
+                }
+              } catch (_) {}
+            }
+            return ilan;
+          })
+        );
+
+        setIlanlar(enriched);
+        setPhotoErrors({});
         setError('');
       } catch (err: any) {
         console.error('İlanlar yüklenirken hata oluştu:', err);
@@ -125,73 +148,52 @@ export default function IlanlarPage() {
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
-  const filteredIlanlar = ilanlar.filter(ilan => {
-    // Metod filtresi
-    if (filters.method && ilan.method !== filters.method) {
-      return false;
-    }
-    
-    // Fiyat aralığı filtresi
-    if (filters.priceMin && ilan.price < Number(filters.priceMin)) {
-      return false;
-    }
-    
-    if (filters.priceMax && ilan.price > Number(filters.priceMax)) {
-      return false;
-    }
-    
-    return true;
-  }).sort((a, b) => {
-    // Sıralama filtresi
-    if (filters.sortBy === 'en-yeni') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    } else if (filters.sortBy === 'en-eski') {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-    } else if (filters.sortBy === 'fiyat-artan') {
-      return a.price - b.price;
-    } else if (filters.sortBy === 'fiyat-azalan') {
-      return b.price - a.price;
-    }
-    return 0;
-  });
+  const filteredIlanlar = useMemo(() => {
+    const list = ilanlar.filter(ilan => {
+      if (filters.method && ilan.method !== filters.method) return false;
+      if (filters.priceMin && ilan.price < Number(filters.priceMin)) return false;
+      if (filters.priceMax && ilan.price > Number(filters.priceMax)) return false;
+      return true;
+    });
+    return list.sort((a, b) => {
+      if (filters.sortBy === 'en-yeni') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (filters.sortBy === 'en-eski') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      if (filters.sortBy === 'fiyat-artan') return a.price - b.price;
+      if (filters.sortBy === 'fiyat-azalan') return b.price - a.price;
+      return 0;
+    });
+  }, [ilanlar, filters.method, filters.priceMin, filters.priceMax, filters.sortBy]);
 
-  if (isLoading || !user) {
-    return (
-      <div className="min-h-screen bg-white pt-20">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center py-12">
-            <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Projeler/Kaynaklar ile tutarlılık için erken dönüş yapılmıyor; 
+  // loading durumu içerikte gösterilecek.
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
+    <div className="relative min-h-screen pt-24 pb-16 overflow-hidden">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
           <div className="mb-8 text-center md:text-left">
-  <div className="inline-block mb-3 px-4 py-1 bg-[#FFF5F0] rounded-full text-[#994D1C] text-sm font-medium">
-    <FaUniversity className="inline-block mr-2" />
-    {user.university}
-  </div>
-  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3">
-    <h1 className="text-4xl font-bold text-[#6B3416]">{t('listings.universityListings')}</h1>
-    <Link
-        href="/ilan-ver"
-        className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md hover:scale-105 transition-transform md:ml-4"
-      >
-        <svg className="w-5 h-5 md:w-5 md:h-5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        <span>{t('nav.createListing')}</span>
-      </Link>
-  </div>
-  <p className="text-[#994D1C] max-w-2xl md:mx-0 mx-auto">
-    {t('listings.exploreTeacherLessons')}
-  </p>
-</div>
+            <div className="inline-block mb-3 px-4 py-1 bg-[#FFF5F0] rounded-full text-[#994D1C] text-sm font-medium">
+              <FaUniversity className="inline-block mr-2" />
+              {user?.university}
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3">
+              <h1 className="text-4xl font-bold text-[#6B3416]">{t('listings.universityListings')}</h1>
+              {user && (
+                <Link
+                  href="/ilan-ver"
+                  className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md hover:scale-105 transition-transform md:ml-4"
+                >
+                  <svg className="w-5 h-5 md:w-5 md:h-5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span>{t('nav.createListing')}</span>
+                </Link>
+              )}
+            </div>
+            <p className="text-[#994D1C] max-w-2xl md:mx-0 mx-auto">
+              {t('listings.exploreTeacherLessons')}
+            </p>
+          </div>
 
           {/* Arama ve Filtre */}
           <div className="mb-8">
@@ -319,8 +321,8 @@ export default function IlanlarPage() {
           
           {/* İçerik */}
           {isLoading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
             </div>
           ) : error ? (
             <div className="bg-white p-8 rounded-xl shadow-md text-center border border-red-100">
@@ -365,93 +367,18 @@ export default function IlanlarPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredIlanlar.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((ilan) => (
-                <div key={ilan._id} className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#FFE5D9] transition-all duration-300">
-                  {/* Üst Kısım - Başlık ve Fiyat */}
-                  <div className="flex justify-between items-start mb-3">
-                    <h2 className="text-xl font-bold text-[#6B3416] line-clamp-1 group-hover:text-[#FF8B5E] transition-colors duration-200">
-                      {ilan.title}
-                    </h2>
-                    <div className="bg-[#FFF5F0] px-3 py-1 rounded-full text-[#FF8B5E] font-bold text-sm">
-                      {ilan.price} {t('general.currency')}
-                    </div>
-                  </div>
-                  
-                  {/* {t('general.description')} */}
-                  <p className="text-gray-600 mb-4 line-clamp-2 text-sm">{ilan.description}</p>
-                  
-                  {/* {t('general.divider')} */}
-                  <div className="border-t border-gray-100 my-4"></div>
-                  
-                  {/* {t('general.teacherInfo')} */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] flex items-center justify-center text-white font-medium mr-3 shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden">
-                        {ilan.teacher?.profilePhotoUrl ? (
-                          <img
-                            src={ilan.teacher.profilePhotoUrl}
-                            alt={ilan.teacher ? ilan.teacher.name : t('general.unknown')}
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          ilan.teacher?.name.charAt(0).toUpperCase()
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-800">{ilan.teacher?.name}</p>
-                        <p className="text-xs text-gray-500">{ilan.teacher?.expertise || t('general.teacher')}</p>
-                      </div>
-                    </div>
-                    <Link 
-                      href={ilan.teacher ? `/egitmen-ilanlari/${ilan.teacher._id}` : '#'}
-                      className="text-sm text-[#FF8B5E] hover:text-[#FF6B1A] hover:underline transition-colors flex items-center"
-                    >
-                      <span>{t('general.allListings')}</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </div>
-                  
-                  {/* {t('general.features')} */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="flex items-center bg-gray-50 p-2 rounded-lg">
-                      <FaMoneyBillWave className="text-green-600 mr-2" />
-                      <span className="text-gray-800 text-sm">{ilan.price} {t('general.currency')}/{t('general.hour')}</span>
-                    </div>
-                    <div className="flex items-center bg-gray-50 p-2 rounded-lg">
-                      <FaChalkboardTeacher className="text-purple-600 mr-2" />
-                      <span className="text-gray-800 text-sm capitalize">{ilan.method}</span>
-                    </div>
-                    <div className="flex items-center bg-gray-50 p-2 rounded-lg">
-                      <FaUniversity className="text-orange-600 mr-2" />
-                      <span className="text-gray-800 text-sm line-clamp-1">{user.university}</span>
-                    </div>
-                    {ilan.instructorFrom && (
-                      <div className="flex items-center bg-gray-50 p-2 rounded-lg">
-                        <FaChalkboardTeacher className="text-indigo-600 mr-2" />
-                        <span className="text-gray-800 text-sm line-clamp-1">Eğitmen: {ilan.instructorFrom}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* {t('general.button')} */}
-                  <div className="flex gap-2">
-                    <Link 
-                      href={`/ilan/${ilan._id}`}
-                      className="block flex-1 text-center py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg font-medium hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 transform group-hover:translate-y-[-2px]"
-                    >
-                      {t('general.viewDetails')}
-                    </Link>
-                    <Link 
-                      href={ilan.teacher ? `/egitmen-ilanlari/${ilan.teacher._id}` : '#'}
-                      className="block py-3 px-3 bg-[#FFF5F0] text-[#FF8B5E] rounded-lg font-medium hover:bg-[#FFE5D9] transition-all duration-300 transform group-hover:translate-y-[-2px]"
-                    >
-                      <FaChalkboardTeacher size={18} />
-                    </Link>
-                  </div>
-                </div>
-              ))}
+              {filteredIlanlar
+                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                .map((ilan) => (
+                  <ListingCard
+                    key={ilan._id}
+                    ilan={ilan as any}
+                    t={t as any}
+                    userUniversity={user?.university}
+                    photoError={!!photoErrors[ilan._id]}
+                    onAvatarError={onAvatarError}
+                  />
+                ))}
             </div>
           )}
 

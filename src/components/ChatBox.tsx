@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import io, { Socket } from 'socket.io-client';
 import { useAuth } from 'src/context/AuthContext';
@@ -52,6 +52,7 @@ type Instructor = {
   email: string;
   university: string;
   role: string;
+  avatarUrl?: string;
   price?: number;
 };
 
@@ -71,7 +72,6 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);
   const [socketConnected, setSocketConnected] = useState(false);
-  const [sendError, setSendError] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatBoxRef = useRef<HTMLDivElement>(null);
@@ -83,12 +83,62 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
   // Ders oluşturma ile ilgili state'ler
   const [showLessonModal, setShowLessonModal] = useState(false);
 
-  // Mesajları yükleme
+  // Mesajları getirme (fetchMessages) - önce tanımla
+  const fetchMessages = useCallback(async () => {
+    if (instructor._id && user) {
+      setLoading(true);
+      try {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        const response = await fetch(`/api/messages?receiverId=${instructor._id}`, {
+          credentials: 'include',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Mesajlar yüklenirken bir hata oluştu: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // API yanıtını kontrol et
+        console.log('API yanıtı:', data);
+        
+        // Mesajları kullanıcı perspektifinden işaretle
+        if (data && Array.isArray(data.messages)) {
+          // API messages dizisi döndürüyorsa
+          const processedMessages = data.messages.map((msg: any) => ({
+            ...msg,
+            isMine: msg.sender === user?.id
+          }));
+          setMessages(processedMessages);
+        } else if (data && Array.isArray(data)) {
+          // API doğrudan mesaj dizisi döndürüyorsa
+          const processedMessages = data.map((msg: any) => ({
+            ...msg,
+            isMine: msg.sender === user?.id
+          }));
+          setMessages(processedMessages);
+        } else {
+          console.error('Beklenmeyen API yanıt formatı:', data);
+          setMessages([]);
+        }
+        
+        // Mesajlar yüklendikten sonra kaydırma işlemi
+        setTimeout(scrollToBottom, 300);
+      } catch (error) {
+        console.error('Mesajlar yüklenirken hata oluştu:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }, [instructor._id, user]);
+
+  // Mesajları yükleme effect'i
   useEffect(() => {
     if (instructor._id && user) {
       fetchMessages();
     }
-  }, [instructor._id, user]);
+  }, [fetchMessages, instructor._id, user]);
 
   // Socket.io bağlantısını kurma
   useEffect(() => {
@@ -203,6 +253,13 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     }
   }, [instructor._id, user]);
 
+  // Mesajları yükleme
+  useEffect(() => {
+    if (instructor._id && user) {
+      fetchMessages();
+    }
+  }, [fetchMessages, instructor._id, user]);
+
   // Tam yüksekliği hesapla
   useEffect(() => {
     if (chatBoxRef.current) {
@@ -211,114 +268,74 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     }
   }, [messages]);
 
-  // Yerel depolamadan JWT token al
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
-  // Mesajları getirme
-  const fetchMessages = async () => {
-    if (instructor._id && user) {
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/messages?receiverId=${instructor._id}`, {
-          credentials: 'include',
-            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Mesajlar yüklenirken bir hata oluştu: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        // API yanıtını kontrol et
-        console.log('API yanıtı:', data);
-        
-        // Mesajları kullanıcı perspektifinden işaretle
-        if (data && Array.isArray(data.messages)) {
-          // API messages dizisi döndürüyorsa
-          const processedMessages = data.messages.map((msg: any) => ({
-            ...msg,
-            isMine: msg.sender === user?.id
-          }));
-          setMessages(processedMessages);
-        } else if (data && Array.isArray(data)) {
-          // API doğrudan mesaj dizisi döndürüyorsa
-          const processedMessages = data.map((msg: any) => ({
-            ...msg,
-            isMine: msg.sender === user?.id
-          }));
-          setMessages(processedMessages);
-        } else {
-          console.error('Beklenmeyen API yanıt formatı:', data);
-          setMessages([]);
-        }
-        
-        // Mesajlar yüklendikten sonra kaydırma işlemi
-        setTimeout(scrollToBottom, 300);
-      } catch (error) {
-        console.error('Mesajlar yüklenirken hata oluştu:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
+  // (fetchMessages tanımı yukarı taşındı)
 
   // Mesaj gönderme
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation(); // Sayfa kaydırmasını önlemek için event'i durdur
-    setSendError(null);
+    
     if (!newMessage.trim() || !user) return;
     
-    // Mesajı önce UI'da göster
-    const tempId = Math.random().toString(36).substr(2, 9);
-    const tempMessage: Message = {
-      _id: tempId,
-      sender: user.id,
-      receiver: instructor._id,
-      content: newMessage.trim(),
-      createdAt: new Date(),
-      read: false,
-      isMine: true
-    };
-    setMessages(prev => [...prev, tempMessage]);
-    setNewMessage('');
-    setTimeout(scrollToBottom, 100);
-
-    // Socket.io ile mesajı gönder
-    if (socketRef.current) {
-      socketRef.current.emit('send-message', {
+    try {
+      // Mesajı önce UI'da göster
+      const tempMessage: Message = {
         sender: user.id,
         receiver: instructor._id,
         content: newMessage.trim(),
-      });
-    }
-
-    // API'ye mesajı kaydet
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    try {
+        createdAt: new Date(),
+        read: false,
+        isMine: true
+      };
+      
+      setMessages(prev => [...prev, tempMessage]);
+      setNewMessage('');
+      
+      // Mesaj gönderildikten sonra kaydırma işlemi
+      setTimeout(scrollToBottom, 100);
+      
+      // Socket.io ile mesajı gönder
+      if (socketRef.current) {
+        socketRef.current.emit('send-message', {
+          sender: user.id,
+          receiver: instructor._id,
+          content: newMessage.trim()
+        });
+      }
+      
+      // API'ye mesajı kaydet
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: {
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
           'Content-Type': 'application/json'
         },
         credentials: 'include',
         body: JSON.stringify({
           receiver: instructor._id,
-          content: tempMessage.content
+          content: newMessage.trim()
         })
       });
+      
       if (!response.ok) {
-        setSendError('Mesaj gönderilemedi. Lütfen tekrar deneyin.');
-        // Optimistic mesajı UI'dan kaldır
-        setMessages(prev => prev.filter(m => m._id !== tempId));
+        console.error('Mesaj gönderilirken bir hata oluştu:', response.status);
       }
     } catch (error) {
-      setSendError('Mesaj gönderilemedi. Lütfen tekrar deneyin.');
-      setMessages(prev => prev.filter(m => m._id !== tempId));
+      console.error('Mesaj gönderilirken hata oluştu:', error);
     }
   };
+
+  // Enter tuşu ile mesaj gönderme
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      e.stopPropagation(); // Sayfa kaydırmasını önlemek için event'i durdur
+      sendMessage(e);
+    }
+  };
+
+  // Yazıyor... bildirimi gönderme
   const handleTyping = () => {
     if (socketRef.current && user) {
       socketRef.current.emit('typing', {
@@ -332,15 +349,6 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-    }
-  };
-
-  // Enter tuşu ile mesaj gönderme
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      e.stopPropagation();
-      sendMessage(e as any);
     }
   };
 
@@ -415,8 +423,18 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
         onClick={() => !embedded && setIsMinimized(!isMinimized)} // Sadece embedded olmadığında minimize özelliği aktif
       >
         <div className="flex items-center">
-          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mr-3 relative">
-            <span className="text-[#FF8B5E] font-bold">{instructor.name.charAt(0)}</span>
+          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mr-3 relative overflow-hidden">
+            {instructor.avatarUrl ? (
+              <Image
+                src={instructor.avatarUrl}
+                alt={instructor.name}
+                width={32}
+                height={32}
+                className="rounded-full object-cover"
+              />
+            ) : (
+              <span className="text-[#FF8B5E] font-bold">{instructor.name.charAt(0)}</span>
+            )}
             {Array.isArray(messages) && messages.filter(msg => !msg.read && msg.sender === instructor._id).length > 0 && (
               <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white font-bold">
                 {messages.filter(msg => !msg.read && msg.sender === instructor._id).length}
@@ -527,9 +545,6 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {sendError && (
-              <div className="mb-2 text-red-600 text-sm font-medium">{sendError}</div>
-            )}
             {/* Ders Al butonu - Sadece öğrenci için göster ve eğitmen rolüne sahip kişilerle konuşurken */}
             {user?.role === 'student' && instructor.role === 'instructor' && (
               <div className="mb-3">
@@ -544,37 +559,30 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
                 </button>
               </div>
             )}
-            {!user ? (
-              <div className="w-full text-center text-red-500 font-medium py-3">
-                Mesaj göndermek için giriş yapmalısınız.
+            <form onSubmit={sendMessage} className="w-full h-full">
+              <div className="flex items-center w-full h-full space-x-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={t('messages.typeMessagePlaceholder')}
+                  className="flex-1 border border-[#FFE5D9] rounded-xl py-2 px-4 focus:outline-none focus:border-[#FF8B5E] transition-colors duration-300"
+                  autoComplete="off"
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim()}
+                  className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white p-2 rounded-xl disabled:opacity-50 flex items-center justify-center w-[42px] h-[42px] hover:shadow-md transition-all duration-300"
+                  aria-label="Mesaj gönder"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
               </div>
-            ) : (
-              <form onSubmit={sendMessage} className="w-full h-full">
-                <div className="flex items-center w-full h-full space-x-2">
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Mesajınızı yazın..."
-                    className="flex-1 border border-[#FFE5D9] rounded-xl py-2 px-4 focus:outline-none focus:border-[#FF8B5E] transition-colors duration-300"
-                    autoComplete="off"
-                    onClick={(e) => e.stopPropagation()}
-                    disabled={!user}
-                  />
-                  <button
-                    type="submit"
-                    disabled={!newMessage.trim() || !user}
-                    className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white p-2 rounded-xl disabled:opacity-50 flex items-center justify-center w-[42px] h-[42px] hover:shadow-md transition-all duration-300"
-                    aria-label="Mesaj gönder"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                  </button>
-                </div>
-              </form>
-            )}
+            </form>
           </div>
         </>
       )}

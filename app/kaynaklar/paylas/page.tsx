@@ -70,8 +70,9 @@ export default function KaynakPaylasPage() {
   // Kullanıcı giriş yapmamışsa giriş sayfasına yönlendir
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-8">
+      <div className="relative min-h-screen pt-24 pb-16 overflow-hidden">
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-8">
           <div className="text-[#994D1C] text-5xl mb-4">
             <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -96,6 +97,7 @@ export default function KaynakPaylasPage() {
             >
               {t('general.goBack')}
             </Link>
+          </div>
           </div>
         </div>
       </div>
@@ -225,8 +227,9 @@ export default function KaynakPaylasPage() {
   
   if (success) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-8">
+      <div className="relative min-h-screen pt-24 pb-16 overflow-hidden">
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-8">
           <div className="text-green-500 text-5xl mb-4">
             <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -239,14 +242,17 @@ export default function KaynakPaylasPage() {
           <p className="text-[#6B3416] mb-6">
             Kaynaklar sayfasına yönlendiriliyorsunuz...
           </p>
+          </div>
         </div>
       </div>
     );
   }
   
   return (
-    <div className="pt-24 pb-8 max-w-2xl mx-auto">
-      <div className="flex items-center mb-8">
+    <div className="relative min-h-screen pt-24 pb-16 overflow-hidden">
+      <div className="relative z-10 container mx-auto px-4">
+        <div className="max-w-2xl mx-auto">
+        <div className="flex items-center mb-8">
         <Link href="/kaynaklar" className="mr-4 text-[#994D1C] hover:text-[#6B3416] transition-colors duration-300">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -486,5 +492,7 @@ export default function KaynakPaylasPage() {
         </form>
       </div>
     </div>
-  );
+  </div>
+ </div>
+);
 }

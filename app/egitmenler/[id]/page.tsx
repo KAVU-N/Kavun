@@ -1,11 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import ReviewsList from '@/components/reviews/ReviewsList';
 import StarRating from '@/components/reviews/StarRating';
+import ChatBox from 'src/components/ChatBox';
+import ReviewForm from '@/components/reviews/ReviewForm';
+import { useLanguage } from 'src/contexts/LanguageContext';
 
 interface PageProps {
   params: { id: string };
@@ -15,12 +19,7 @@ export default function EgitmenProfilPage({ params }: PageProps) {
   const { id } = params;
   const { user } = useAuth();
   const router = useRouter();
-
-  // Eğer kullanıcı giriş yapmamışsa login sayfasına yönlendir
-  if (typeof window !== 'undefined' && !user) {
-    router.push(`/auth/login?redirect=/egitmenler/${id}`);
-    return null; // Component render etme
-  }
+  const { t } = useLanguage();
   
   const [teacher, setTeacher] = useState<any>(null);
   const [openLessons, setOpenLessons] = useState<any[]>([]);
@@ -28,60 +27,79 @@ export default function EgitmenProfilPage({ params }: PageProps) {
   const [error, setError] = useState<string | null>(null);
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [showNotifications, setShowNotifications] = useState(false);
+  
+  // Chat modal visibility
+  const [showChat, setShowChat] = useState(false);
+  
+  // Review section state
+  const [showReview, setShowReview] = useState(false);
+  const [eligibleLessons, setEligibleLessons] = useState<any[]>([]);
+  const [selectedLessonId, setSelectedLessonId] = useState<string>('');
 
-  useEffect(() => {
-    fetchTeacherDetails();
-    fetchTeacherLessons();
-    fetchTeacherRating();
-    fetchNotifications();
-  }, [id]);
 
-  const fetchTeacherDetails = async () => {
+  const fetchTeacherDetails = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`/api/users/${id}`, {
-        headers: {
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-        },
-        credentials: 'include' // Cookie tabanlı kimlik doğrulama için
-      });
-
-      if (!response.ok) {
-        throw new Error('Öğretmen bilgileri getirilemedi');
-      }
-
-      const data = await response.json();
-      setTeacher(data);
-    } catch (err) {
-      console.error('Öğretmen bilgileri getirme hatası:', err);
-      setError('Öğretmen bilgileri yüklenirken bir hata oluştu');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchTeacherLessons = async () => {
-    try {
-      const response = await fetch(`/api/lessons?teacherId=${id}&status=open`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
       if (!response.ok) {
-        throw new Error('Dersler getirilemedi');
+        throw new Error(t('instructor.error'));
+      }
+
+      const data = await response.json();
+      setTeacher(data);
+    } catch (err) {
+      console.error('Öğretmen bilgileri getirme hatası:', err);
+      setError(t('instructor.error'));
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  // Get completed lessons for this teacher; if student filter to current student, if admin show all
+  const fetchEligibleLessons = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/lessons?status=completed&teacherId=${id}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      if (!res.ok) return;
+      const lessons = await res.json();
+      const mine = Array.isArray(lessons)
+        ? (user?.id 
+            ? lessons.filter((l: any) => l.studentId === user?.id || l?.studentId?._id === user?.id)
+            : lessons)
+        : [];
+      setEligibleLessons(mine);
+      if (mine.length > 0) setSelectedLessonId(mine[0]._id);
+    } catch (e) {
+      console.error('Uygun dersler alınamadı', e);
+    }
+  }, [id, user?.id]);
+
+  const fetchTeacherLessons = useCallback(async () => {
+    try {
+      // Öğretmenin aktif ilanlarını getir
+      const response = await fetch(`/api/ilanlar/teacher?teacherId=${id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('İlanlar getirilemedi');
       }
 
       const data = await response.json();
       setOpenLessons(data);
     } catch (err) {
-      console.error('Dersler getirme hatası:', err);
+      console.error('İlanlar getirme hatası:', err);
     }
-  };
+  }, [id]);
 
-  const fetchTeacherRating = async () => {
+  const fetchTeacherRating = useCallback(async () => {
     try {
       const response = await fetch(`/api/reviews?teacherId=${id}&limit=1`, {
         headers: {
@@ -99,45 +117,23 @@ export default function EgitmenProfilPage({ params }: PageProps) {
     } catch (err) {
       console.error('Değerlendirmeler getirme hatası:', err);
     }
-  };
+  }, [id]);
 
-  // Bildirimleri getir
-  const fetchNotifications = async () => {
-    try {
-      // Gerçek uygulamada API'den bildirimleri çekeceksiniz
-      // Burada örnek bildirimler oluşturuyoruz
-      const mockNotifications = [
-        {
-          _id: '1',
-          title: 'Yeni Ders Talebi',
-          message: 'Matematik dersi için yeni bir talebiniz var.',
-          date: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 dakika önce
-          read: false,
-          type: 'lesson_request'
-        },
-        {
-          _id: '2',
-          title: 'Randevu Hatırlatması',
-          message: 'Yarın saat 14:00\'da Fizik dersiniz var.',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 saat önce
-          read: true,
-          type: 'appointment_reminder'
-        },
-        {
-          _id: '3',
-          title: 'Yeni Değerlendirme',
-          message: 'Bir öğrenciniz size 5 yıldız verdi!',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 gün önce
-          read: false,
-          type: 'new_review'
-        }
-      ];
-      
-      setNotifications(mockNotifications);
-    } catch (err) {
-      console.error('Bildirimler getirme hatası:', err);
+  
+
+  // Run initial data fetches once callbacks are defined
+  useEffect(() => {
+    fetchTeacherDetails();
+    fetchTeacherLessons();
+    fetchTeacherRating();
+  }, [fetchTeacherDetails, fetchTeacherLessons, fetchTeacherRating]);
+
+  // When opening review section, fetch completed lessons with this teacher
+  useEffect(() => {
+    if (showReview && user?.id) {
+      fetchEligibleLessons();
     }
-  };
+  }, [showReview, user?.id, fetchEligibleLessons]);
 
   if (loading) {
     return (
@@ -165,7 +161,7 @@ export default function EgitmenProfilPage({ params }: PageProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 pt-24 pb-8">
       <div className="mb-6">
         <Link href="/egitmenler" className="text-[#994D1C] hover:underline inline-flex items-center">
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -180,9 +176,15 @@ export default function EgitmenProfilPage({ params }: PageProps) {
         <div className="md:col-span-1">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="p-6 text-center">
-              <div className="w-24 h-24 rounded-full bg-[#FFB996] flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 overflow-hidden">
+              <div className="w-24 h-24 rounded-full bg-[#FFB996] flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 overflow-hidden relative">
                 {teacher.profilePhotoUrl ? (
-                  <img src={teacher.profilePhotoUrl} alt={teacher.name || 'Eğitmen'} className="w-full h-full object-cover rounded-full" />
+                  <Image 
+                    src={teacher.profilePhotoUrl}
+                    alt={teacher.name || 'Eğitmen'}
+                    fill
+                    sizes="96px"
+                    className="object-cover rounded-full"
+                  />
                 ) : (
                   teacher.name?.charAt(0) || '?'
                 )}
@@ -196,170 +198,95 @@ export default function EgitmenProfilPage({ params }: PageProps) {
               
               <p className="text-gray-600">{teacher.expertise || 'Uzmanlık alanı belirtilmemiş'}</p>
               <p className="text-gray-500 text-sm mt-1">{teacher.university || 'Üniversite belirtilmemiş'}</p>
-              
-              {/* Bildirimler Butonu */}
-              <div className="mt-4">
-                <button 
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative inline-flex items-center justify-center px-4 py-2 bg-[#FFF5F0] text-[#994D1C] rounded-md hover:bg-[#FFE5D9] transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                  Bildirimler
-                  {notifications.filter(n => !n.read).length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                      {notifications.filter(n => !n.read).length}
-                    </span>
-                  )}
-                </button>
-              </div>
-              
-              {/* Bildirimler Paneli */}
-              {showNotifications && (
-                <div className="mt-4 bg-white rounded-lg shadow-lg border border-gray-200 max-h-80 overflow-y-auto">
-                  <div className="p-3 border-b border-gray-200 flex justify-between items-center">
-                    <h3 className="font-medium text-[#994D1C]">Bildirimler</h3>
-                    <button 
-                      onClick={() => setShowNotifications(false)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  {notifications.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">
-                      Bildirim bulunmuyor
-                    </div>
+              {/* Ek Bilgiler: E-posta, Bölüm, Sınıf */}
+              <div className="mt-4 text-left space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 mr-2">{t('profile.email')}:</span>
+                  {teacher.email ? (
+                    <a href={`mailto:${teacher.email}`} className="text-[#994D1C] hover:underline break-all">{teacher.email}</a>
                   ) : (
-                    <div>
-                      {notifications.map((notification) => {
-                        // Tarih formatını ayarla
-                        const date = new Date(notification.date);
-                        const now = new Date();
-                        const diffMs = now.getTime() - date.getTime();
-                        const diffMins = Math.round(diffMs / 60000);
-                        const diffHours = Math.round(diffMs / 3600000);
-                        const diffDays = Math.round(diffMs / 86400000);
-                        
-                        let timeAgo;
-                        if (diffMins < 60) {
-                          timeAgo = `${diffMins} dakika önce`;
-                        } else if (diffHours < 24) {
-                          timeAgo = `${diffHours} saat önce`;
-                        } else {
-                          timeAgo = `${diffDays} gün önce`;
-                        }
-                        
-                        // Bildirim tipine göre ikon belirle
-                        let icon;
-                        switch(notification.type) {
-                          case 'lesson_request':
-                            icon = (
-                              <div className="bg-blue-100 p-2 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
-                              </div>
-                            );
-                            break;
-                          case 'appointment_reminder':
-                            icon = (
-                              <div className="bg-green-100 p-2 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                              </div>
-                            );
-                            break;
-                          case 'new_review':
-                            icon = (
-                              <div className="bg-yellow-100 p-2 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                </svg>
-                              </div>
-                            );
-                            break;
-                          default:
-                            icon = (
-                              <div className="bg-gray-100 p-2 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                              </div>
-                            );
-                        }
-                        
-                        return (
-                          <div 
-                            key={notification._id} 
-                            className={`p-4 border-b border-gray-100 flex items-start hover:bg-gray-50 cursor-pointer ${!notification.read ? 'bg-[#FFF9F5]' : ''}`}
-                          >
-                            <div className="mr-3">
-                              {icon}
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex justify-between items-start">
-                                <h4 className={`font-medium ${!notification.read ? 'text-[#994D1C]' : 'text-gray-700'}`}>
-                                  {notification.title}
-                                </h4>
-                                <span className="text-xs text-gray-500">{timeAgo}</span>
-                              </div>
-                              <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                            </div>
-                            {!notification.read && (
-                              <div className="ml-2 w-2 h-2 bg-[#FF8B5E] rounded-full"></div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <span className="text-gray-600">{t('general.noEmail')}</span>
                   )}
-                  
-                  <div className="p-3 border-t border-gray-200 text-center">
-                    <button className="text-sm text-[#FF8B5E] hover:text-[#994D1C] font-medium">
-                      Tüm Bildirimleri Gör
-                    </button>
-                  </div>
                 </div>
-              )}
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 mr-2">{t('profile.department')}:</span>
+                  <span className="text-gray-700">{
+                    (() => {
+                      const dept = (teacher.department || teacher.expertise || '').toString().trim();
+                      return dept ? dept : t('general.notSpecified');
+                    })()
+                  }</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500 mr-2">{t('profile.class')}:</span>
+                  <span className="text-gray-700">{
+                    (() => {
+                      const g = Number(teacher.grade);
+                      if (!g) return t('general.notSpecified');
+                      const keyMap: Record<number, string> = {
+                        1: 'profile.firstYear',
+                        2: 'profile.secondYear',
+                        3: 'profile.thirdYear',
+                        4: 'profile.fourthYear',
+                        5: 'profile.fifthYear',
+                        6: 'profile.sixthYear',
+                      };
+                      return t(keyMap[g] || 'general.notSpecified');
+                    })()
+                  }</span>
+                </div>
+              </div>
             </div>
             
             <div className="border-t border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-[#994D1C] mb-4">İletişim</h2>
+              <h2 className="text-lg font-bold text-[#994D1C] mb-4">{t('instructor.contact')}</h2>
               
               {user ? (
-                <Link
-                  href={`/mesajlarim?recipient=${teacher._id}`}
+                <button
+                  type="button"
+                  onClick={() => setShowChat(true)}
                   className="w-full block text-center bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-medium py-3 px-4 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300"
                 >
-                  Mesaj Gönder
-                </Link>
+                  {t('instructor.sendMessage')}
+                </button>
               ) : (
                 <Link
                   href="/auth/login"
                   className="w-full block text-center bg-gray-200 text-gray-600 font-medium py-3 px-4 rounded-md hover:bg-gray-300 transition-all duration-300"
                 >
-                  Mesaj göndermek için giriş yapın
+                  {t('auth.login')}
                 </Link>
               )}
+
+              {/* Değerlendir butonu - Mesaj Gönder'in hemen altında */}
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!user) {
+                      router.push('/auth/login');
+                      return;
+                    }
+                    setShowReview(v => !v);
+                  }}
+                  className="w-full inline-flex items-center justify-center px-4 py-2 bg-[#FFF5F0] text-[#994D1C] rounded-md hover:bg-[#FFE5D9] transition-colors"
+                >
+                  {showReview ? t('instructor.hideReview') : t('instructor.writeReview')}
+                </button>
+              </div>
             </div>
           </div>
         </div>
         
-        {/* Sağ Sütun - Dersler ve Değerlendirmeler */}
+        {/* Sağ Sütun - İlanlar ve Değerlendirmeler */}
         <div className="md:col-span-2">
-          {/* Açık Dersler */}
+          {/* İlanlar */}
           <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <h2 className="text-xl font-bold text-[#994D1C] mb-6">Açık Dersler</h2>
+            <h2 className="text-xl font-bold text-[#994D1C] mb-6">{t('instructor.lessons')}</h2>
             
             {openLessons.length === 0 ? (
               <div className="bg-gray-100 p-6 rounded-md text-center">
-                <p className="text-gray-500">Bu öğretmenin şu anda açık dersi bulunmuyor.</p>
+                <p className="text-gray-500">{t('instructor.noLessons')}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -381,24 +308,18 @@ export default function EgitmenProfilPage({ params }: PageProps) {
                     
                     <div className="mt-4">
                       {user ? (
-                        user.role === 'student' ? (
-                          <Link
-                            href={`/dersler/${lesson._id}/rezervasyon`}
-                            className="block text-center bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-medium py-2 px-4 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300"
-                          >
-                            Rezervasyon Yap
-                          </Link>
-                        ) : (
-                          <span className="block text-center bg-gray-200 text-gray-600 font-medium py-2 px-4 rounded-md">
-                            Yalnızca öğrenciler rezervasyon yapabilir
-                          </span>
-                        )
+                        <Link
+                          href={`/dersler/${lesson._id}/rezervasyon`}
+                          className="block text-center bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] text-white font-medium py-2 px-4 rounded-md hover:from-[#994D1C] hover:to-[#FF8B5E] transition-all duration-300"
+                        >
+                          Rezervasyon Yap
+                        </Link>
                       ) : (
                         <Link
                           href="/auth/login"
                           className="block text-center bg-gray-200 text-gray-600 font-medium py-2 px-4 rounded-md hover:bg-gray-300 transition-all duration-300"
                         >
-                          Rezervasyon için giriş yapın
+                          {t('auth.login')}
                         </Link>
                       )}
                     </div>
@@ -407,11 +328,60 @@ export default function EgitmenProfilPage({ params }: PageProps) {
               </div>
             )}
           </div>
-          
+
+          {showReview && user && (
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+              <h3 className="text-lg font-bold text-[#994D1C] mb-4">{t('instructor.review')}</h3>
+              {eligibleLessons.length === 0 ? (
+                <div className="bg-gray-100 p-4 rounded-md text-gray-600">
+                  Bu eğitmenle tamamlanmış dersiniz bulunamadı. Değerlendirme yapabilmek için tamamlanmış bir dersiniz olmalı.
+                </div>
+              ) : (
+                <>
+                  <label className="block text-sm text-gray-700 mb-2">{t('instructor.selectLesson')}</label>
+                  <select
+                    value={selectedLessonId}
+                    onChange={(e) => setSelectedLessonId(e.target.value)}
+                    className="w-full mb-4 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+                  >
+                    {eligibleLessons.map((l) => (
+                      <option key={l._id} value={l._id}>
+                        {l.title} — {new Date(l.scheduledAt || l.createdAt).toLocaleDateString('tr-TR')}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedLessonId && (
+                    <ReviewForm
+                      lessonId={selectedLessonId}
+                      teacherId={id}
+                      onSuccess={() => {
+                        fetchTeacherRating();
+                      }}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
           {/* Değerlendirmeler */}
           <ReviewsList teacherId={id} limit={5} showPagination={true} />
         </div>
       </div>
+      {/* Floating ChatBox (diğer chatboxlar gibi) */}
+      {showChat && teacher && (
+        <ChatBox
+          instructor={{
+            _id: teacher._id,
+            name: teacher.name || 'Eğitmen',
+            email: teacher.email || '',
+            university: teacher.university || '',
+            role: 'instructor',
+            price: teacher.price
+          }}
+          onClose={() => setShowChat(false)}
+        />
+      )}
     </div>
   );
 }

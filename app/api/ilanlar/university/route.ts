@@ -39,7 +39,8 @@ const ilanSchema = new mongoose.Schema({
     default: 'active',
   },
   userId: {
-    type: String,
+    // Bazı kayıtlarda ObjectId, bazılarında String olabilir
+    type: mongoose.Schema.Types.Mixed,
     required: true,
   },
 }, { timestamps: true });
@@ -54,6 +55,7 @@ const userSchema = new mongoose.Schema({
   role: String,
   university: String,
   expertise: String,
+  profilePhotoUrl: String,
 });
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
@@ -67,6 +69,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const university = searchParams.get('university');
     const searchTerm = searchParams.get('search') || '';
+    console.log('[University API] university param:', university, ' search:', searchTerm);
     
     if (!university) {
       return NextResponse.json(
@@ -76,22 +79,32 @@ export async function GET(request: Request) {
     }
     
     // Önce belirtilen üniversitedeki eğitmenleri bul - case insensitive arama yap
-    // Hem 'teacher' hem de 'instructor' rolüne sahip kullanıcıları getir
-    const teachers = await User.find({
-      university: { $regex: new RegExp('^' + university + '$', 'i') }
-      // role filtresini kaldırdık
-    }).select('_id');
+    // Üniversiteyi normalize ederek toleranslı bir regex oluştur (fazla boşlukları yoksay, case-insensitive)
+    const uniInput = (university || '').trim();
+    const uniPattern = new RegExp(
+      uniInput
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // regex kaçış
+        .replace(/\s+/g, '\\s*'), // birden fazla boşluğu toleranslı
+      'i'
+    );
+    console.log('[University API] normalized pattern:', uniPattern);
     
-    console.log('University API - Found teachers/instructors:', teachers.length);
+    const teachers = await User.find({
+      university: { $regex: uniPattern }
+    }).select('_id');
+
+    console.log('[University API] Found teachers/instructors:', teachers.length);
     
     const teacherIds = teachers.map(teacher => teacher._id);
-    // teacherIds are ObjectIds; we'll query with them directly
-    
-    // Arama filtresi oluştur
+    // hem ObjectId hem String olarak listeler oluştur
+    const teacherIdsStr = teacherIds.map((id: any) => id.toString());
+    console.log('[University API] teacherIdsStr length:', teacherIdsStr.length);
     // Varsayılan olarak tüm ilanları getir. İstenirse URL parametresi ile status=active gönderilirse filtre uygula
+    // userId bazı kayıtlarda ObjectId, bazılarında String olabilir; ikisini de dene
     let query: any = {
-      userId: { $in: teacherIds }
+      userId: { $in: [...teacherIds, ...teacherIdsStr] as any[] }
     };
+    console.log('[University API] query base:', { inCount: [...teacherIds, ...teacherIdsStr].length, hasSearch: !!searchTerm });
     const statusParam = searchParams.get('status');
     if (statusParam) {
       query.status = statusParam;
@@ -107,8 +120,7 @@ export async function GET(request: Request) {
     
     // İlanları bul
     const ilanlar = await Ilan.find(query).sort({ createdAt: -1 });
-    
-    console.log('University API - Found listings:', ilanlar.length);
+    console.log('[University API] Found listings:', ilanlar.length);
     
     // Her ilan için öğretmen bilgilerini ekle
     const ilanlarWithTeachers = await Promise.all(

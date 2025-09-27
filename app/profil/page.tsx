@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import Image from 'next/image';
 
 import { useMemo } from 'react';
 
@@ -13,7 +14,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const { t } = useLanguage();
   const [state, setState] = useState(null);
-  const roleLabel = useMemo(() => authUser?.role === 'student' ? t('auth.student') : t('auth.instructor'), [authUser?.role, t]);
   const userInitial = useMemo(() => authUser?.name?.[0]?.toUpperCase() || 'U', [authUser?.name]);
   const shouldRedirect = !authUser;
   useEffect(() => {
@@ -29,9 +29,15 @@ export default function ProfilePage() {
   // Profil fotoğrafı componenti
   function ProfilePhoto() {
     return (
-      <div className="w-24 h-24 rounded-full bg-[#191921] flex items-center justify-center text-white text-4xl font-bold border-4 border-[#FF9B6A]" style={{letterSpacing: '2px'}}>
+      <div className="w-24 h-24 rounded-full bg-[#191921] flex items-center justify-center text-white text-4xl font-bold border-4 border-[#FF9B6A] relative overflow-hidden" style={{letterSpacing: '2px'}}>
         {(authUser as any).profilePhotoUrl ? (
-          <img src={(authUser as any).profilePhotoUrl} alt="Profil Fotoğrafı" className="w-full h-full object-cover rounded-full" />
+          <Image 
+            src={(authUser as any).profilePhotoUrl}
+            alt="Profil Fotoğrafı"
+            fill
+            sizes="96px"
+            className="object-cover rounded-full"
+          />
         ) : (
           userInitial
         )}
@@ -72,13 +78,12 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF5F0] pt-20">
+    <div className="min-h-screen bg-[#FFF5F0] pt-28 pb-20">
       <div className="max-w-4xl mx-auto px-6">
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#EEE8FC]">
           {/* Modern üst blok */}
           <div className="flex flex-col md:flex-row items-center justify-between mb-8">
             <div className="mb-6 md:mb-0">
-              <div className="text-xs tracking-widest text-[#6B3416] font-semibold uppercase mb-1">{roleLabel}</div>
               <div className="text-2xl md:text-3xl font-bold text-[#6B3416]">{authUser.name}</div>
             </div>
             <div className="flex flex-col items-center bg-white rounded-2xl shadow-md p-8 border border-[#EEE8FC]">
@@ -112,13 +117,6 @@ export default function ProfilePage() {
             <div>
               <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.university')}</h2>
               <p className="mt-1 text-lg text-[#6B3416]">{authUser.university}</p>
-            </div>
-
-            <div>
-              <h2 className="text-sm font-medium text-[#994D1C]">{t('profile.role')}</h2>
-              <p className="mt-1 text-lg text-[#6B3416] capitalize">
-                {authUser.role === 'student' ? t('auth.student') : t('auth.instructor')}
-              </p>
             </div>
 
             <div>

@@ -219,15 +219,18 @@ export default function KaynakDetayPage() {
   
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-16 flex justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
+      <div className="relative min-h-screen overflow-hidden pt-28 pb-8">
+        <div className="container mx-auto px-4 relative z-10 flex justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
+        </div>
       </div>
     );
   }
   
   if (error || !resource) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
+      <div className="relative min-h-screen overflow-hidden pt-28 pb-8">
+        <div className="container mx-auto px-4 relative z-10 text-center">
         <div className="max-w-md mx-auto bg-white rounded-xl shadow-md p-8">
           <div className="text-[#994D1C] text-5xl mb-4">
             <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,20 +249,24 @@ export default function KaynakDetayPage() {
             {t('general.goBack')}
           </Link>
         </div>
+        </div>
       </div>
     );
   }
   
   return (
-    <div className="container mx-auto px-4 pt-24 pb-8">
-      <div className="mb-6">
-        <Link href="/kaynaklar" className="text-[#994D1C] hover:text-[#6B3416] transition-colors duration-300 flex items-center">
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="relative min-h-screen overflow-hidden pt-28 pb-8">
+      <div className="container mx-auto px-4 relative z-10">
+      <div className="relative">
+        <Link
+          href="/kaynaklar"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#994D1C]/30 text-[#994D1C] bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md hover:border-[#6B3416]/40 transition-all duration-300 absolute top-0 -left-3 -translate-x-full"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          {t('general.goBack')}
+          <span className="font-medium">{t('general.goBack')}</span>
         </Link>
-      </div>
       
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
         <div className="p-6">
@@ -387,6 +394,7 @@ export default function KaynakDetayPage() {
           </div>
         </div>
       </div>
+      </div>
       
       {relatedResources.length > 0 && (
         <div className="mt-12">
@@ -439,6 +447,7 @@ export default function KaynakDetayPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -4,8 +4,10 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLanguage } from "@/src/contexts/LanguageContext";
-import ChatBox from "@/src/components/ChatBox";
+import dynamic from "next/dynamic";
 import { useAuth } from "@/src/context/AuthContext";
+
+const ChatBox = dynamic(() => import("@/src/components/ChatBox"), { ssr: false });
 
 interface Project {
   position?: string;
@@ -51,7 +53,7 @@ export default function ProjectDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const fetchedRef = useRef(false);
   const [activeChat, setActiveChat] = useState(false);
-  const [instructor, setInstructor] = useState<{ _id: string; name: string; email: string; university: string; role: string; grade?: number } | null>(null);
+  const [instructor, setInstructor] = useState<{ _id: string; name: string; email: string; university: string; role: string } | null>(null);
 
   useEffect(() => {
     if (!id || fetchedRef.current) return;
@@ -73,8 +75,7 @@ export default function ProjectDetailPage() {
                 name: userData.name,
                 email: userData.email,
                 university: userData.university,
-                role: userData.role,
-                grade: userData.grade
+                role: userData.role
               });
             }
           } catch (e) {
@@ -90,9 +91,9 @@ export default function ProjectDetailPage() {
     fetchProject();
   }, [id]);
 
-  if (loading) return <div className="pt-28 text-center">Yükleniyor...</div>;
+  if (loading) return <div className="pt-28 text-center">{t('general.loading')}</div>;
   if (error) return <div className="pt-28 text-center text-red-600">{error}</div>;
-  if (!project) return <div className="pt-28 text-center">Proje bulunamadı</div>;
+  if (!project) return <div className="pt-28 text-center">{t('project.notFound')}</div>;
 
   return (
     <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
@@ -160,12 +161,6 @@ export default function ProjectDetailPage() {
                   {t('general.sendEmail')}
                 </a>
               )}
-              {instructor?.grade !== undefined && (
-                <div className="mt-2">
-                  <span className="font-semibold">{t('project.ownerGrade')}: </span>
-                  <span>{instructor.grade}</span>
-                </div>
-              )}
               {project.ownerId && (
                 <button
                   onClick={() => {
@@ -193,73 +188,6 @@ export default function ProjectDetailPage() {
             )}
           </div>
         </div>
-        {activeChat && instructor && (
-          <ChatBox
-            instructor={instructor}
-            onClose={() => setActiveChat(false)}
-          />
-        )}
-        {project.position && (
-          <p><span className="font-semibold">{t('project.position')}: </span>{project.position}</p>
-        )}
-        {project.benefits && (
-          <div>
-            <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.benefits')}</h2>
-            <p className="whitespace-pre-line">{project.benefits}</p>
-          </div>
-        )}
-        {project.technologies && project.technologies.length > 0 && (
-          <div>
-            <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.technologies')}</h2>
-            <ul className="list-disc list-inside">
-              {project.technologies.map((tech) => (
-                <li key={tech}>{tech}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        <div>
-          <h2 className="font-semibold mb-2 text-[#994D1C]">{t('project.contact')}</h2>
-          <p>{project.contact}</p>
-          {project.contact?.includes('@') && (
-            <a 
-              href={isLoggedIn ? `mailto:${project.contact}` : '#'}
-              onClick={(e) => {
-                if (!isLoggedIn) {
-                  e.preventDefault();
-                  router.push('/auth/login');
-                }
-              }}
-              className="inline-block mt-2 bg-[#994D1C] hover:bg-[#7e3f17] text-white font-semibold px-4 py-2 rounded transition"
-             >
-              İletişime Geç
-            </a>
-          )}
-          {project.ownerId && (
-            <button
-              onClick={() => {
-                if (!isLoggedIn) {
-                  router.push('/auth/login');
-                } else {
-                  setActiveChat(true);
-                }
-              }}
-              className="inline-block mt-2 ml-3 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded transition"
-            >
-              Site İçinden Mesaj Gönder
-            </button>
-          )}
-          {project.projectUrl && (
-            <p><span className="font-semibold">{t('project.url')}: </span><Link href={project.projectUrl} target="_blank" className="text-blue-600 underline break-all">{project.projectUrl}</Link></p>
-          )}
-        </div>
-        {project.linkedinUrl && (
-          <div>
-            <Link href={project.linkedinUrl} target="_blank" className="inline-block bg-[#FF8B5E] hover:bg-[#FFD7A8] text-white font-semibold px-4 py-2 rounded transition">
-              LinkedIn
-            </Link>
-          </div>
-        )}
       </div>
     {activeChat && instructor && (
       <ChatBox

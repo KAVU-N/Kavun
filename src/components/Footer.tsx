@@ -114,9 +114,10 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright ve Dil Değiştirme Butonları aynı satırda */}
+        {/* Copyright ve Dil Değiştirme Butonları aynı satırda */
+        }
         <div className="flex flex-col md:flex-row items-center justify-between border-t border-[#FFCDB2] pt-4 mt-8 gap-2">
-          <span className="text-[#994D1C] text-sm">© {currentYear} KAVUNLA. Tüm hakları saklıdır.</span>
+          <span className="text-[#994D1C] text-sm">© {currentYear} KAVUNLA. {t('footer.allRightsReserved')}</span>
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setLanguage('tr')}

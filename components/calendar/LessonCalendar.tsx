@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import moment from 'moment';
@@ -44,16 +44,7 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({ onSelectEvent }) => {
   const [view, setView] = useState(Views.MONTH);
   const [date, setDate] = useState(new Date());
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/auth/login');
-      return;
-    }
-
-    fetchLessons();
-  }, [user, router]);
-
-  const fetchLessons = async () => {
+  const fetchLessons = useCallback(async () => {
     setLoading(true);
     try {
       if (!user) return; // Guard: user is possibly null
@@ -108,7 +99,16 @@ const LessonCalendar: React.FC<LessonCalendarProps> = ({ onSelectEvent }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/auth/login');
+      return;
+    }
+
+    fetchLessons();
+  }, [user, router, fetchLessons]);
 
   // Etkinliklerin renk ve stil belirlemesi
   const eventStyleGetter = (event: CalendarEvent) => {

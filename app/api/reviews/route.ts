@@ -29,9 +29,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Kullanıcı bulunamadı' }, { status: 404 });
     }
 
-    // Öğrenci kontrolü
-    if (user.role !== 'student') {
-      return NextResponse.json({ error: 'Yalnızca öğrenciler değerlendirme yapabilir' }, { status: 403 });
+    // Rol kontrolü: öğrenci veya admin olabilir
+    if (user.role !== 'student' && user.role !== 'admin') {
+      return NextResponse.json({ error: 'Yalnızca öğrenciler ve adminler değerlendirme yapabilir' }, { status: 403 });
     }
 
     // İstek verilerini al
@@ -60,9 +60,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Öğretmen bulunamadı' }, { status: 404 });
     }
 
-    // Dersin öğrencisi olduğunu doğrula
-    if (!lesson.studentId || lesson.studentId.toString() !== String(user._id)) {
-      return NextResponse.json({ error: 'Bu dersi değerlendirme yetkiniz yok' }, { status: 403 });
+    // Dersin öğrencisi olduğunu doğrula (sadece öğrenci rolü için)
+    if (user.role === 'student') {
+      if (!lesson.studentId || lesson.studentId.toString() !== String(user._id)) {
+        return NextResponse.json({ error: 'Bu dersi değerlendirme yetkiniz yok' }, { status: 403 });
+      }
     }
 
     // Dersin tamamlanmış olduğunu kontrol et
@@ -88,7 +90,7 @@ export async function POST(request: NextRequest) {
     // Yeni değerlendirme oluştur
     const newReview = await Review.create({
       lessonId,
-      studentId: user._id,
+      studentId: user._id, // admin ise adminin id'si yazılır
       teacherId,
       rating,
       comment

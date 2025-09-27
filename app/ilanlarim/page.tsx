@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 import { useAuth } from 'src/context/AuthContext';
 import Notification from './Notification';
@@ -24,6 +25,7 @@ interface Ilan {
 export default function IlanlarimPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const { t, language } = useLanguage();
   const [ilanlar, setIlanlar] = useState<Ilan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -95,23 +97,22 @@ export default function IlanlarimPage() {
       setDeleting(false);
     }
   };
-
   if (!user) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
+    <div className="min-h-screen bg-white pt-24 pb-16 relative z-[1]">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-[#6B3416]">İlanlarım</h1>
+            <h1 className="text-3xl font-bold text-[#6B3416]">{t('myListings.myListings')}</h1>
             <button
               onClick={() => router.push('/ilan-ver')}
               className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg flex items-center gap-2 hover:shadow-lg transition-all duration-300"
             >
               <FaPlus />
-              <span>Yeni İlan Ekle</span>
+              <span>{t('myListings.addNewListing')}</span>
             </button>
           </div>
 
@@ -123,13 +124,13 @@ export default function IlanlarimPage() {
             <Notification type="error" message={error} onClose={() => setError('')} />
           ) : ilanlar.length === 0 ? (
             <div className="bg-white p-8 rounded-xl shadow-md text-center">
-              <p className="text-[#994D1C] mb-4">Henüz hiç ilan oluşturmadınız.</p>
+              <p className="text-[#994D1C] mb-4">{t('myListings.noListingsYet')}</p>
               <button
                 onClick={() => router.push('/ilan-ver')}
                 className="px-4 py-2 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg inline-flex items-center gap-2 hover:shadow-lg transition-all duration-300"
               >
                 <FaPlus />
-                <span>İlk İlanınızı Ekleyin</span>
+                <span>{t('myListings.addYourFirstListing')}</span>
               </button>
             </div>
           ) : (
@@ -146,29 +147,52 @@ export default function IlanlarimPage() {
 
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
-                          <p className="text-sm text-gray-600">Ücret</p>
-                          <p className="font-medium text-[#6B3416]">{ilan.price} ₺/Saat</p>
+                          <p className="text-sm text-gray-600">{t('general.priceLabel')}</p>
+                          {(() => {
+                            const locale = language === 'en' ? 'en-US' : 'tr-TR';
+                            const currency = language === 'en' ? 'USD' : 'TRY';
+                            const formatted = new Intl.NumberFormat(locale, { style: 'currency', currency }).format(ilan.price);
+                            return (
+                              <p className="font-medium text-[#6B3416]">{formatted} {t('general.perHour')}</p>
+                            );
+                          })()}
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Yöntem</p>
-                          <p className="font-medium text-[#6B3416] capitalize">{ilan.method}</p>
+                          <p className="text-sm text-gray-600">{t('general.methodLabel')}</p>
+                          <p className="font-medium text-[#6B3416] capitalize">{
+                            ilan.method === 'online' || ilan.method === 'Online'
+                              ? t('general.online')
+                              : ilan.method === 'face-to-face' || ilan.method === 'face_to_face' || ilan.method === 'Yüz Yüze'
+                                ? t('general.faceToFace')
+                                : ilan.method === 'hybrid' ? t('general.hybrid') : ilan.method
+                          }</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Sıklık</p>
-                          <p className="font-medium text-[#6B3416] capitalize">{ilan.frequency}</p>
+                          <p className="text-sm text-gray-600">{t('general.frequencyLabel')}</p>
+                          <p className="font-medium text-[#6B3416] capitalize">{
+                            ilan.frequency === 'daily' || ilan.frequency === 'Daily'
+                              ? t('frequency.daily')
+                              : ilan.frequency === 'weekly' || ilan.frequency === 'Weekly'
+                                ? t('frequency.weekly')
+                                : ilan.frequency === 'monthly' || ilan.frequency === 'Monthly'
+                                  ? t('frequency.monthly')
+                                  : ilan.frequency === 'flexible' || ilan.frequency === 'Flexible'
+                                    ? t('frequency.flexible')
+                                    : ilan.frequency
+                          }</p>
                         </div>
                         {ilan.instructorFrom && (
                           <div>
-                            <p className="text-sm text-gray-600">Dersi Aldığım Eğitmen</p>
+                            <p className="text-sm text-gray-600">{t('general.instructorFromLabel')}</p>
                             <p className="font-medium text-[#6B3416]">{ilan.instructorFrom}</p>
                           </div>
                         )}
                       </div>
 
                       <div className="text-sm text-gray-500">
-                        <span>Oluşturulma: {new Date(ilan.createdAt).toLocaleDateString('tr-TR')}</span>
+                        <span>{t('general.createdAt')}: {new Date(ilan.createdAt).toLocaleDateString(language === 'en' ? 'en-US' : 'tr-TR')}</span>
                         <span className="mx-2">•</span>
-                        <span>Güncelleme: {new Date(ilan.updatedAt).toLocaleDateString('tr-TR')}</span>
+                        <span>{t('general.updatedAt')}: {new Date(ilan.updatedAt).toLocaleDateString(language === 'en' ? 'en-US' : 'tr-TR')}</span>
                       </div>
                     </div>
                     <div className="flex space-x-2">
@@ -187,20 +211,18 @@ export default function IlanlarimPage() {
                     </div>
                   </div>
                   <div className="mt-4 flex justify-between items-center">
-                    <div
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        ilan.status === 'active'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {ilan.status === 'active' ? 'Aktif' : 'Pasif'}
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      ilan.status === 'active' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {ilan.status === 'active' ? t('status.active') : t('status.inactive')}
                     </div>
                     <button
                       className="px-4 py-1.5 bg-[#FFE5D9] text-[#994D1C] rounded-lg text-sm hover:bg-[#FFB996] hover:text-white transition-colors duration-300"
                       onClick={() => router.push('/cok-yakinda')}
                     >
-                      Başvuruları Görüntüle
+                      {t('myListings.viewApplications')}
                     </button>
                   </div>
                 </div>
@@ -209,31 +231,31 @@ export default function IlanlarimPage() {
           )}
         </div>
       </div>
-
-      {deleteModalIlanId && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full">
-            <h2 className="text-xl font-bold mb-4 text-[#6B3416]">İlanı Silmek İstiyor musunuz?</h2>
-            <p className="mb-6 text-[#994D1C]">Bu işlem geri alınamaz. Emin misiniz?</p>
-            <div className="flex justify-end gap-3">
-              <button
-                className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-60"
-                onClick={() => handleDelete(deleteModalIlanId)}
-                disabled={deleting}
-              >
-                {deleting ? 'Siliniyor...' : 'Evet, Sil'}
-              </button>
-              <button
-                className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
-                onClick={() => setDeleteModalIlanId(null)}
-                disabled={deleting}
-              >
-                Hayır
-              </button>
-            </div>
+    {/* Silme Onay Modalı */}
+    {deleteModalIlanId && (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-sm w-full">
+          <h2 className="text-xl font-bold mb-4 text-[#6B3416]">{t('myListings.deleteConfirmTitle')}</h2>
+          <p className="mb-6 text-[#994D1C]">{t('myListings.deleteConfirmDesc')}</p>
+          <div className="flex justify-end gap-3">
+            <button
+              className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-60"
+              onClick={() => handleDelete(deleteModalIlanId)}
+              disabled={deleting}
+            >
+              {deleting ? t('myListings.deleting') : t('myListings.deleteYes')}
+            </button>
+            <button
+              className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+              onClick={() => setDeleteModalIlanId(null)}
+              disabled={deleting}
+            >
+              {t('myListings.deleteNo')}
+            </button>
           </div>
         </div>
-      )}
+      </div>
+    )}
     </div>
   );
 }

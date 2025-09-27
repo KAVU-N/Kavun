@@ -5,6 +5,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { FaPaperPlane } from 'react-icons/fa';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import Link from 'next/link';
 
 export default function IlanVerPage() {
   const { user, loading } = useAuth();
@@ -15,7 +16,6 @@ export default function IlanVerPage() {
     description: '',
     price: '',
     method: 'online', // 'online', 'yüzyüze' veya 'hibrit'
-    gecmeNotu: '', // Dersi kaç notla geçtiğiniz
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -149,10 +149,6 @@ if (!user) {
       setError(t('errors.priceRequired') || 'Lütfen ücret bilgisi girin');
       return;
     }
-    if (!formData.gecmeNotu.trim()) {
-      setError('Lütfen dersi kaç notla geçtiğinizi girin');
-      return;
-    }
 
     try {
       setIsSubmitting(true);
@@ -201,7 +197,6 @@ if (!user) {
         description: '',
         price: '',
         method: 'online',
-        gecmeNotu: '',
       });
       
       // İlan oluşturulduktan sonra ilanlarım sayfasına yönlendir
@@ -236,107 +231,104 @@ if (!user) {
             </div>
           ) : null}
           
-          <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md">
-            <div className="space-y-6">
-              <div>
-                <label htmlFor="title" className="block text-[#6B3416] font-medium mb-2">
-                  {t('general.listingTitle')}
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder={t('general.listingTitlePlaceholder')}
-                  className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="description" className="block text-[#6B3416] font-medium mb-2">
-                  {t('general.listingDescription')}
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder={t('general.listingDescriptionPlaceholder')}
-                  className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996] min-h-[150px]"
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="relative">
+            <Link
+              href="/ilanlar"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#994D1C]/30 text-[#994D1C] bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md hover:border-[#6B3416]/40 transition-all duration-300 absolute top-0 -left-3 -translate-x-full"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span className="font-medium">Geri Dön</span>
+            </Link>
+            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md">
+              <div className="space-y-6">
                 <div>
-                  <label htmlFor="price" className="block text-[#6B3416] font-medium mb-2">
-                    {t('general.hourlyPrice')}
+                  <label htmlFor="title" className="block text-[#6B3416] font-medium mb-2">
+                    {t('general.listingTitle')}
                   </label>
                   <input
                     type="text"
-                    id="price"
-                    name="price"
-                    value={formData.price}
+                    id="title"
+                    name="title"
+                    value={formData.title}
                     onChange={handleChange}
-                    placeholder={t('general.hourlyPricePlaceholder')}
+                    placeholder={t('general.listingTitlePlaceholder')}
                     className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
                   />
                 </div>
                 
                 <div>
-                  <label htmlFor="method" className="block text-[#6B3416] font-medium mb-2">
-                    {t('general.lessonMethod')}
+                  <label htmlFor="description" className="block text-[#6B3416] font-medium mb-2">
+                    {t('general.listingDescription')}
                   </label>
-                  <select
-                    id="method"
-                    name="method"
-                    value={formData.method}
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
-                  >
-                    <option value="online">{t('general.online')}</option>
-                    <option value="yüzyüze">{t('general.faceToFace')}</option>
-                    <option value="hibrit">{t('general.hybrid')}</option>
-                  </select>
-                </div>
-                <div className="md:col-span-2">
-                  <label htmlFor="gecmeNotu" className="block text-[#6B3416] font-medium mb-2">
-                    Dersi kaç notla geçtiğiniz <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    id="gecmeNotu"
-                    name="gecmeNotu"
-                    value={formData.gecmeNotu}
-                    onChange={handleChange}
-                    placeholder="Örn: 70"
-                    min="0"
-                    max="100"
-                    required
-                    className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
+                    placeholder={t('general.listingDescriptionPlaceholder')}
+                    className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996] min-h-[150px]"
                   />
                 </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="price" className="block text-[#6B3416] font-medium mb-2">
+                      {t('general.hourlyPrice')}
+                    </label>
+                    <input
+                      type="text"
+                      id="price"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleChange}
+                      placeholder={t('general.hourlyPricePlaceholder')}
+                      className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="method" className="block text-[#6B3416] font-medium mb-2">
+                      {t('general.lessonMethod')}
+                    </label>
+                    <select
+                      id="method"
+                      name="method"
+                      value={formData.method}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border border-[#FFE5D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFB996]"
+                    >
+                      <option value="online">{t('general.online')}</option>
+                      <option value="yüzyüze">{t('general.faceToFace')}</option>
+                      <option value="hibrit">{t('general.hybrid')}</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`w-full px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-lg flex items-center justify-center space-x-2 
+                      transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-[#FF8B5E] rounded-full animate-spin"></div>
+                        <span>{t('general.processing')}</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaPaperPlane />
+                        <span>{t('general.publishListing')}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`w-full px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-medium rounded-lg flex items-center justify-center space-x-2 
-                transition-all duration-300 hover:shadow-lg hover:shadow-[#FFB996]/20 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-[#FF8B5E] rounded-full animate-spin"></div>
-                  <span>{t('general.processing')}</span>
-                </>
-              ) : (
-                <>
-                  <FaPaperPlane />
-                  <span>{t('general.publishListing')}</span>
-                </>
-              )}
-            </button>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </div>

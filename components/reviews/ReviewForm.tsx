@@ -85,8 +85,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     }
   };
 
-  // Öğrenci değilse veya giriş yapılmamışsa formu gösterme
-  if (!user || user.role !== 'student') {
+  // Yalnızca öğrenci veya adminler değerlendirme yapabilir
+  if (!user || (user.role !== 'student' && user.role !== 'admin')) {
     return null;
   }
 
