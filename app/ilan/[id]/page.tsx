@@ -44,11 +44,16 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   const [activeChat, setActiveChat] = useState(false);
   const [photoError, setPhotoError] = useState(false);
 
-  useEffect(() => {
-    if (!loading && !user) {
+  const handleContactTeacher = () => {
+    if (!user) {
       router.push('/auth/login');
+      return;
     }
-  }, [user, loading, router]);
+
+    if (ilan?.teacher) {
+      setActiveChat(true);
+    }
+  };
 
   useEffect(() => {
     const fetchIlanDetay = async () => {
@@ -66,18 +71,38 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
         }
         
         const data = await response.json();
-        setIlan(data);
+
+        const normalizedTeacher = data?.teacher
+          ? {
+              ...data.teacher,
+              _id: data.teacher._id || data.teacher.id || data.userId,
+            }
+          : data?.userId
+            ? { _id: data.userId }
+            : undefined;
+
+        setIlan({
+          ...data,
+          teacher: normalizedTeacher,
+        });
         setPhotoError(false);
         setError('');
 
         // Öğretmenin en güncel profilini public endpoint'ten çek ve teacher alanını güncelle
-        const teacherId = data?.userId || data?.teacher?._id || data?.teacher?.id;
+        const teacherId = normalizedTeacher?._id;
         if (teacherId) {
           try {
             const tuRes = await fetch(`/api/users/public/${teacherId}`);
             if (tuRes.ok) {
               const teacherPublic = await tuRes.json();
-              setIlan((prev) => prev ? { ...prev, teacher: teacherPublic } as Ilan : prev);
+              setIlan((prev) => {
+                if (!prev) return prev;
+                const normalizedPublic = {
+                  ...teacherPublic,
+                  _id: teacherPublic._id || teacherPublic.id || teacherId,
+                };
+                return { ...prev, teacher: { ...prev.teacher, ...normalizedPublic } } as Ilan;
+              });
               setPhotoError(false);
             }
           } catch (e) {
@@ -269,7 +294,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
                     {t('general.showAllListings')}
                   </Link>
                   <button 
-                    onClick={() => setActiveChat(true)}
+                    onClick={handleContactTeacher}
                     className="px-6 py-3 bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white rounded-lg hover:shadow-md transition-all duration-300 flex items-center"
                   >
                     <FaEnvelope className="mr-2" />
@@ -293,7 +318,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
     {activeChat && ilan?.teacher && (
       <ChatBox 
         instructor={{
-          _id: ilan.teacher._id,
+          _id: ilan.teacher._id || (ilan.teacher as any)?.id || ilan.userId,
           name: ilan.teacher.name,
           email: ilan.teacher.email,
           university: ilan.teacher.university,

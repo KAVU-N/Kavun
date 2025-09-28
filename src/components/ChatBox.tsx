@@ -147,11 +147,18 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
     
     try {
       console.log('Socket.io bağlantısı kuruluyor...');
-      
-      // Socket.io bağlantısını kur - 5000 portuna bağlan
-      const socketUrl =
-        process.env.NEXT_PUBLIC_SOCKET_URL ||
-        (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5000');
+
+      const defaultSocketUrl = 'http://localhost:5000';
+      let socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+
+      if (!socketUrl) {
+        if (typeof window !== 'undefined') {
+          const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+          socketUrl = isLocalhost ? defaultSocketUrl : window.location.origin;
+        } else {
+          socketUrl = defaultSocketUrl;
+        }
+      }
 
       const socket = io(socketUrl, {
         transports: ['websocket', 'polling'], // Önce websocket, sonra polling dene
@@ -510,7 +517,7 @@ const ChatBox = ({ instructor, onClose, containerStyles, embedded = false }: Cha
                   height={100} 
                   className="mb-4 opacity-50"
                 />
-                <p className="text-sm">Henüz mesaj yok. Sohbeti başlatmak için bir mesaj gönder!</p>
+                <p className="text-sm">{t('chat.emptyConversation')}</p>
               </div>
             ) : (
               <>

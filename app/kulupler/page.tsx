@@ -26,7 +26,17 @@ export default function ClubsPage() {
   const [clubs, setClubs] = useState<Club[]>([]);
 
   const categories = useMemo(
-    () => ['Genel', 'Web', 'Mobil', 'Masaüstü', 'Yapay Zeka', 'Oyun', 'Veri Bilimi', 'Siber Güvenlik', 'Diğer'],
+    () => [
+      { value: 'Genel', labelKey: 'clubs.category.general' },
+      { value: 'Web', labelKey: 'clubs.category.web' },
+      { value: 'Mobil', labelKey: 'clubs.category.mobile' },
+      { value: 'Masaüstü', labelKey: 'clubs.category.desktop' },
+      { value: 'Yapay Zeka', labelKey: 'clubs.category.ai' },
+      { value: 'Oyun', labelKey: 'clubs.category.game' },
+      { value: 'Veri Bilimi', labelKey: 'clubs.category.dataScience' },
+      { value: 'Siber Güvenlik', labelKey: 'clubs.category.cyberSecurity' },
+      { value: 'Diğer', labelKey: 'clubs.category.other' },
+    ],
     []
   );
 
@@ -70,7 +80,7 @@ export default function ClubsPage() {
           <input value={q} onChange={e=>setQ(e.target.value)} className="px-4 py-3 rounded-lg border border-black/10 bg-white/60 backdrop-blur placeholder:text-black/50" placeholder={t('clubs.searchPlaceholder')} />
           <select value={category} onChange={e=>setCategory(e.target.value)} className="px-4 py-3 rounded-lg border border-black/10 bg-white/60 backdrop-blur">
             <option value="">{t('clubs.categoryAll')}</option>
-            {categories.map((c)=>(<option key={c} value={c}>{c}</option>))}
+            {categories.map((c)=>(<option key={c.value} value={c.value}>{t(c.labelKey)}</option>))}
           </select>
           <select value={university} onChange={e=>setUniversity(e.target.value)} className="px-4 py-3 rounded-lg border border-black/10 bg-white/60 backdrop-blur">
             <option value="">{t('clubs.universityAll')}</option>

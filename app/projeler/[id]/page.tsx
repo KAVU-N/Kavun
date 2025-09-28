@@ -29,13 +29,39 @@ interface Project {
 }
 
 export default function ProjectDetailPage() {
-  const categoryKey: Record<string,string> = {
-    'Web':'category.web',
-    'Mobil':'category.mobile',
-    'Masaüstü':'category.desktop',
-    'Yapay Zeka':'category.ai',
-    'Genel':'category.general',
-    'Diğer':'category.other'
+  const categoryValueMap: Record<string, string[]> = {
+    'category.general': ['category.general', 'Genel', 'General'],
+    'category.web': ['category.web', 'Web'],
+    'category.mobile': ['category.mobile', 'Mobil', 'Mobile'],
+    'category.desktop': ['category.desktop', 'Masaüstü', 'Desktop'],
+    'category.ai': ['category.ai', 'Yapay Zeka', 'Artificial Intelligence'],
+    'category.game': ['category.game', 'Oyun', 'Game'],
+    'category.dataScience': ['category.dataScience', 'Veri Bilimi', 'Data Science'],
+    'category.cyberSecurity': ['category.cyberSecurity', 'Siber Güvenlik', 'Cyber Security'],
+    'category.blockchain': ['category.blockchain', 'Blockchain'],
+    'category.iot': ['category.iot', 'IoT'],
+    'category.arvr': ['category.arvr', 'AR/VR'],
+    'category.robotics': ['category.robotics', 'Robotik', 'Robotics'],
+    'category.ecommerce': ['category.ecommerce', 'E-Ticaret', 'E-Commerce'],
+    'category.fintech': ['category.fintech', 'FinTech'],
+    'category.health': ['category.health', 'Sağlık', 'Health'],
+    'category.education': ['category.education', 'Eğitim', 'Education'],
+    'category.cloud': ['category.cloud', 'Cloud'],
+    'category.devops': ['category.devops', 'DevOps'],
+    'category.dataEngineering': ['category.dataEngineering', 'Data Engineering'],
+    'category.hardware': ['category.hardware', 'Donanım', 'Hardware'],
+    'category.other': ['category.other', 'Diğer', 'Other'],
+  };
+
+  const mapCategoryToKey = (value: string) => {
+    if (!value) return value;
+    const normalized = value.toLowerCase();
+    for (const [key, labels] of Object.entries(categoryValueMap)) {
+      if (labels.some((label) => label.toLowerCase() === normalized)) {
+        return key;
+      }
+    }
+    return value;
   };
   const statusKey: Record<string,string> = {
     'Devam Ediyor':'status.ongoing',
@@ -116,7 +142,7 @@ export default function ProjectDetailPage() {
             <h1 className="text-3xl font-bold text-[#994D1C] -mt-2">{project.title}</h1>
             <p className="text-[#6B3416] whitespace-pre-line leading-relaxed text-lg">{project.description}</p>
             <div className="flex flex-wrap gap-2 text-sm">
-              <span className="bg-[#FF8B5E] text-white px-3 py-1 rounded-full text-xs font-medium">{t(categoryKey[project.category] ?? project.category)}</span>
+              <span className="bg-[#FF8B5E] text-white px-3 py-1 rounded-full text-xs font-medium">{t(mapCategoryToKey(project.category))}</span>
               {project.status && <span className="bg-[#FFE5D9] text-[#994D1C] px-3 py-1 rounded-full text-xs font-medium">{t(statusKey[project.status] ?? project.status)}</span>}
             </div>
             {project.requirements && (

@@ -37,7 +37,9 @@ export default function Navbar() {
     };
 
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile) setIsMenuOpen(false);
     };
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -58,6 +60,12 @@ export default function Navbar() {
       window.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    // Route değiştiğinde mobil menü ve profil menüsünü kapat
+    setIsMenuOpen(false);
+    setIsProfileOpen(false);
+  }, [pathname]);
 
   const navLinks = [
     { href: '/ilanlar', label: t('nav.listings'), icon: (
@@ -378,6 +386,183 @@ export default function Navbar() {
             </div>
           </div>
         </nav>
+        {isMobile && isMenuOpen && (
+          <>
+            {/* Overlay */}
+            <div
+              className="fixed inset-0 bg-black/40 z-[55] md:hidden"
+              onClick={() => setIsMenuOpen(false)}
+            />
+            {/* Slide-in Panel */}
+            <div className="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white z-[60] shadow-xl md:hidden transition-transform duration-300 translate-x-0">
+              <div className="flex items-center justify-between p-4 border-b border-[#FFE5D9]">
+                <span className="text-lg font-semibold text-[#994D1C]">Menü</span>
+                <button
+                  aria-label="Kapat"
+                  className="p-2 rounded-lg hover:bg-[#FFF5F0]"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <svg className="w-6 h-6 text-[#994D1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <nav className="p-4">
+                <ul className="space-y-2">
+                  {navLinks.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-[#994D1C] hover:bg-[#FFF5F0] transition ${
+                          pathname === link.href ? 'bg-[#FFE5D9] font-semibold' : ''
+                        }`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <span className="shrink-0">{link.icon}</span>
+                        <span>{link.label}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-6 border-t border-[#FFE5D9] pt-4 flex items-center gap-2">
+                  <button
+                    onClick={() => setLanguage('tr')}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 ${language === 'tr' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
+                  >
+                    TR
+                  </button>
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 ${language === 'en' ? 'bg-[#FF8B5E] text-white' : 'text-[#994D1C] hover:bg-[#FFE5D9]'}`}
+                  >
+                    EN
+                  </button>
+                </div>
+                <div className="mt-4">
+                  {!user ? (
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href="/auth/login"
+                        className="px-4 py-3 rounded-xl text-[#994D1C] hover:bg-[#FFF5F0] transition"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {t('nav.login')}
+                      </Link>
+                      <Link
+                        href="/auth/register"
+                        className="px-4 py-3 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white text-center font-medium"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {t('nav.register')}
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        href="/profil"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#994D1C] hover:bg-[#FFF5F0] transition"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A9 9 0 1112 21a8.963 8.963 0 01-6.879-3.196zM15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span className="flex-1">{t('nav.profile')}</span>
+                      </Link>
+                      <Link
+                        href="/bildirimler"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#994D1C] hover:bg-[#FFF5F0] transition"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <div className="relative">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                            />
+                          </svg>
+                          {unreadNotifications > 0 && (
+                            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                          )}
+                        </div>
+                        <span className="flex-1">{t('nav.notifications')}</span>
+                        {unreadNotifications > 0 && (
+                          <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                          </span>
+                        )}
+                      </Link>
+                      <Link
+                        href="/mesajlarim"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#994D1C] hover:bg-[#FFF5F0] transition"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <div className="relative">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                          </svg>
+                          {unreadMessages > 0 && (
+                            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                          )}
+                        </div>
+                        <span className="flex-1">{t('nav.messages')}</span>
+                        {unreadMessages > 0 && (
+                          <span className="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {unreadMessages > 9 ? '9+' : unreadMessages}
+                          </span>
+                        )}
+                      </Link>
+                      <Link
+                        href="/ilanlarim"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#994D1C] hover:bg-[#FFF5F0] transition"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <span className="flex-1">{t('nav.myListings')}</span>
+                      </Link>
+                      <Link
+                        href="/projelerim"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#994D1C] hover:bg-[#FFF5F0] transition"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7m-6 4l-4 4-4-4" />
+                        </svg>
+                        <span className="flex-1">{t('nav.myProjects')}</span>
+                      </Link>
+                      <Link
+                        href="/kuluplerim"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#994D1C] hover:bg-[#FFF5F0] transition"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M12 20v-2a4 4 0 013-3.87M7 20H2v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z" />
+                        </svg>
+                        <span className="flex-1">{t('nav.myClub')}</span>
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsMenuOpen(false);
+                          setIsProfileOpen(false);
+                        }}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[#994D1C] hover:bg-[#FFF5F0] transition mt-1"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v6" />
+                        </svg>
+                        <span>{t('nav.logout')}</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </nav>
+            </div>
+          </>
+        )}
       </div>
     );
   };

@@ -1,9 +1,10 @@
 {
-  "name": "Kavun",
+  "name": "kavun",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "socket": "ts-node --project server/tsconfig.server.json server/index.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

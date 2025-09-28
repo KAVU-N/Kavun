@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { useLanguage } from "@/src/contexts/LanguageContext";
@@ -12,43 +12,6 @@ import { useAuth } from "@/src/context/AuthContext";
 export default function ProjectsPage() {
   const { t } = useLanguage();
   const { user } = useAuth();
-
-  const categoryValueMap: Record<string, string[]> = {
-    'category.general': ['category.general', 'Genel', 'General'],
-    'category.web': ['category.web', 'Web'],
-    'category.mobile': ['category.mobile', 'Mobil', 'Mobile'],
-    'category.desktop': ['category.desktop', 'Masaüstü', 'Desktop'],
-    'category.ai': ['category.ai', 'Yapay Zeka', 'Artificial Intelligence'],
-    'category.game': ['category.game', 'Oyun', 'Game'],
-    'category.dataScience': ['category.dataScience', 'Veri Bilimi', 'Data Science'],
-    'category.cyberSecurity': ['category.cyberSecurity', 'Siber Güvenlik', 'Cyber Security'],
-    'category.blockchain': ['category.blockchain', 'Blockchain'],
-    'category.iot': ['category.iot', 'IoT'],
-    'category.arvr': ['category.arvr', 'AR/VR'],
-    'category.robotics': ['category.robotics', 'Robotik', 'Robotics'],
-    'category.ecommerce': ['category.ecommerce', 'E-Ticaret', 'E-Commerce'],
-    'category.fintech': ['category.fintech', 'FinTech'],
-    'category.health': ['category.health', 'Sağlık', 'Health'],
-    'category.education': ['category.education', 'Eğitim', 'Education'],
-    'category.cloud': ['category.cloud', 'Cloud'],
-    'category.devops': ['category.devops', 'DevOps'],
-    'category.dataEngineering': ['category.dataEngineering', 'Data Engineering'],
-    'category.hardware': ['category.hardware', 'Donanım', 'Hardware'],
-    'category.other': ['category.other', 'Diğer', 'Other'],
-  };
-
-  const categoryOptions = Object.keys(categoryValueMap).map((key) => ({ value: key, labelKey: key }));
-
-  const mapCategoryToKey = (value: string) => {
-    if (!value) return value;
-    const normalized = value.toLowerCase();
-    for (const [key, labels] of Object.entries(categoryValueMap)) {
-      if (labels.some((label) => label.toLowerCase() === normalized)) {
-        return key;
-      }
-    }
-    return value;
-  };
   interface Project {
     _id: string;
     title: string;
@@ -74,7 +37,7 @@ export default function ProjectsPage() {
     const fetchProjects = async () => {
       try {
         const res = await fetch("/api/projects");
-        if (!res.ok) throw new Error("Projeler alınamadı");
+        if (!res.ok) throw new Error("Projeler al─▒namad─▒");
         const data = await res.json();
         setProjects(data);
       } catch (err: any) {
@@ -89,8 +52,7 @@ export default function ProjectsPage() {
   const filteredProjects = () => {
     return projects.filter((p) => {
       const inSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase()) || (p.position ?? '').toLowerCase().includes(searchTerm.toLowerCase());
-      const currentCategoryKey = mapCategoryToKey(p.category);
-      const inCategory = categoryFilter ? categoryFilter === currentCategoryKey : true;
+      const inCategory = categoryFilter ? p.category === categoryFilter : true;
       const isMine = onlyMine ? p.ownerId === myId : true;
       const inPosition = positionFilter ? (p.position ?? '').toLowerCase().includes(positionFilter.toLowerCase()) : true;
        return inSearch && inCategory && isMine && inPosition;
@@ -129,9 +91,27 @@ export default function ProjectsPage() {
            className="w-full md:w-40 px-4 py-3 rounded-xl border-[#FFB996] focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 transition"
          >
           <option value="">{t('category.all')}</option>
-          {categoryOptions.map((option) => (
-            <option key={option.value} value={option.value}>{t(option.labelKey)}</option>
-          ))}
+           <option value="Genel">{t('category.general')}</option>
+           <option value="Web">{t('category.web')}</option>
+           <option value="Mobil">{t('category.mobile')}</option>
+           <option value="Masa├╝st├╝">Masa├╝st├╝</option>
+           <option value="Yapay Zeka">Yapay Zeka</option>
+           <option value="Oyun">Oyun</option>
+           <option value="Veri Bilimi">Veri Bilimi</option>
+           <option value="Siber G├╝venlik">Siber G├╝venlik</option>
+           <option value="Blockchain">Blockchain</option>
+           <option value="IoT">IoT</option>
+           <option value="AR/VR">AR/VR</option>
+           <option value="Robotik">Robotik</option>
+           <option value="E-Ticaret">E-Ticaret</option>
+           <option value="FinTech">FinTech</option>
+           <option value="Sa─şl─▒k">Sa─şl─▒k</option>
+           <option value="E─şitim">E─şitim</option>
+           <option value="Cloud">Cloud</option>
+           <option value="DevOps">DevOps</option>
+           <option value="Data Engineering">Data Engineering</option>
+           <option value="Donan─▒m">Donan─▒m</option>
+           <option value="Di─şer">Di─şer</option>
         </select>
         <input
           type="text"
@@ -154,7 +134,7 @@ export default function ProjectsPage() {
       )}
       {error && <p className="text-red-500">{error}</p>}
       {filteredProjects().length === 0 && !loading ? (
-        <p className="text-gray-600 italic">Henüz proje bulunamadı.</p>
+        <p className="text-gray-600 italic">Hen├╝z proje bulunamad─▒.</p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredProjects().map((p) => (
@@ -162,9 +142,7 @@ export default function ProjectsPage() {
 
               <div className="flex justify-between items-start mb-2">
                 <h2 className="text-lg font-semibold text-[#994D1C] line-clamp-2 flex-1 pr-2">{p.title}</h2>
-                <span className="bg-[#FF8B5E] text-white text-xs px-2 py-1 rounded-lg flex-shrink-0">
-                  {t(mapCategoryToKey(p.category))}
-                </span>
+                <span className="bg-[#FF8B5E] text-white text-xs px-2 py-1 rounded-lg flex-shrink-0">{p.category}</span>
               </div>
               <p className="text-sm text-gray-700 line-clamp-3 mb-1 flex-1">{p.description}</p>
               {p.position && <p className="text-xs text-gray-600 mb-3">{t('project.position')}: {p.position}</p>}

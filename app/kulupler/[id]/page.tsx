@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { headers } from 'next/headers';
 import ClubContactActions from '@/src/components/ClubContactActions';
 import Image from 'next/image';
+import TranslatedHeading from '@/src/components/TranslatedHeading';
 
 async function getClub(id: string) {
   const h = headers();
@@ -54,14 +55,22 @@ export default async function ClubDetailPage({ params }: { params: { id: string 
 
                   {club.description && (
                     <div>
-                      <h2 className="font-semibold mb-1">Hakkında</h2>
+                      <TranslatedHeading
+                        i18nKey="clubs.about"
+                        fallback="Hakkında"
+                        className="font-semibold mb-1"
+                      />
                       <p className="text-black/80 whitespace-pre-wrap">{club.description}</p>
                     </div>
                   )}
 
                   {(owner?.name || owner?.email) && (
                     <div>
-                      <h2 className="font-semibold mb-1">İletişim</h2>
+                      <TranslatedHeading
+                        i18nKey="clubs.contact"
+                        fallback="İletişim"
+                        className="font-semibold mb-1"
+                      />
                       <div className="text-black/80">
                         {owner?.name && <div>Ekleyen: {owner.name}</div>}
                         {owner?.email && (
