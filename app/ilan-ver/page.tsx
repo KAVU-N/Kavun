@@ -214,9 +214,10 @@ if (!user) {
 
 
   return (
-    <div className="min-h-screen bg-[#FFF5F0] pt-24 pb-16">
-      <div className="container mx-auto px-4">
+    <div className="relative min-h-screen overflow-hidden pt-24 pb-16 bg-transparent">
+      <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-2xl mx-auto">
+
           <h1 className="text-3xl font-bold text-[#6B3416] mb-8">{t('general.createListingTitle')}</h1>
           
           {success ? (

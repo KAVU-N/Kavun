@@ -48,6 +48,7 @@ export default function KaynakPaylasPage() {
     category: '',
     format: '',
     level: '',
+    course: '',
     tags: '',
     resourceType: 'file', // 'file' veya 'link'
     link: '',
@@ -160,6 +161,7 @@ export default function KaynakPaylasPage() {
       if (!formData.description.trim()) throw new Error(t('errors.descriptionRequired') || 'Lütfen bir açıklama girin');
       if (!formData.category) throw new Error('Lütfen bir kategori seçin');
       if (!formData.level) throw new Error('Lütfen bir seviye seçin');
+      if (!formData.course.trim()) throw new Error(t('errors.courseRequired') || 'Lütfen ders adını girin');
       if (formData.resourceType === 'file' && !file) throw new Error('Lütfen bir dosya yükleyin');
       if (formData.resourceType === 'link' && !formData.link.trim()) throw new Error('Lütfen bir bağlantıyı girin');
 
@@ -167,6 +169,7 @@ export default function KaynakPaylasPage() {
       if (containsForbidden(formData.title)) throw new Error('Başlıkta uygunsuz içerik tespit edildi.');
       if (containsForbidden(formData.description)) throw new Error('Açıklamada uygunsuz içerik tespit edildi.');
       if (containsForbidden(formData.tags)) throw new Error('Etiketlerde uygunsuz içerik tespit edildi.');
+      if (containsForbidden(formData.course)) throw new Error('Ders alanında uygunsuz içerik tespit edildi.');
 
       // Dosya varsa base64'e çevir
       let fileDataUrl = '';
@@ -193,6 +196,7 @@ export default function KaynakPaylasPage() {
         category: formData.category,
         format: formData.format,
         level: formData.level,
+        course: formData.course.trim(),
         fileSize: file ? `${(file.size / (1024 * 1024)).toFixed(2)} MB` : 'N/A',
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
         url: formData.resourceType === 'link' ? formData.link : '#',
@@ -335,18 +339,37 @@ export default function KaynakPaylasPage() {
             </div>
             
             <div className="md:col-span-2">
-              <label htmlFor="tags" className="block text-sm font-medium text-[#6B3416] mb-1">
-                {t('general.resourceTags')} (virgülle ayırın)
-              </label>
-              <input
-                type="text"
-                id="tags"
-                name="tags"
-                value={formData.tags}
-                onChange={handleInputChange}
-                placeholder="matematik, calculus, türev, integral"
-                className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="tags" className="block text-sm font-medium text-[#6B3416] mb-1">
+                    {t('general.resourceTags')} (virgülle ayırın)
+                  </label>
+                  <input
+                    type="text"
+                    id="tags"
+                    name="tags"
+                    value={formData.tags}
+                    onChange={handleInputChange}
+                    placeholder={t('general.tagsPlaceholder')}
+                    className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="course" className="block text-sm font-medium text-[#6B3416] mb-1">
+                    {t('general.course')} *
+                  </label>
+                  <input
+                    type="text"
+                    id="course"
+                    name="course"
+                    value={formData.course}
+                    onChange={handleInputChange}
+                    placeholder={t('general.coursePlaceholder')}
+                    required
+                    className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-4 py-3"
+                  />
+                </div>
+              </div>
             </div>
             
             <div className="md:col-span-2">

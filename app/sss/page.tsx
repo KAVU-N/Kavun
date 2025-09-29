@@ -70,14 +70,14 @@ const faqTopics = [
         answer: 'Kişisel verileriniz, KVKK ve GDPR gibi yasal düzenlemelere uygun olarak güvenli bir şekilde saklanır ve asla üçüncü kişilerle paylaşılmaz.'
       },
     ]
-  },
+  }
 ];
 
 const SSSPage = () => {
   const [openTopic, setOpenTopic] = useState<number | null>(null);
 
   return (
-    <div className="container mx-auto px-4 pt-28 pb-20 min-h-screen bg-gradient-to-br from-[#FFF5F0] via-[#FFF8F2] to-[#FFE5D9]">
+    <div className="container mx-auto px-4 pt-28 pb-20 min-h-screen relative z-10">
       <h1 className="text-4xl font-bold mb-12 text-center text-[#994D1C] tracking-tight drop-shadow-lg">
         Sıkça Sorulan Sorular
       </h1>

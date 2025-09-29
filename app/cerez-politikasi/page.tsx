@@ -6,7 +6,7 @@ export default function CookiePolicyPage() {
   const { t, language } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFF6ED] to-[#FFE5D9] flex items-center justify-center pt-24 pb-8 px-2">
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center pt-24 pb-8 px-2">
       <div className="w-full max-w-3xl rounded-3xl shadow-2xl bg-white/90 border border-[#FFD6BA] p-6 sm:p-10 relative overflow-hidden">
         <div className="flex items-center gap-3 mb-8">
           <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#FFB996] shadow-lg">

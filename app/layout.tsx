@@ -66,11 +66,13 @@ export default function RootLayout({
           <LanguageProvider>
             <div className="flex flex-col min-h-screen">
               <ClientOnly hideOnAdmin>
-                <Navbar />
+                <div className="relative z-50">
+                  <Navbar />
+                </div>
                 <RouteBackgroundHost />
                 <AnalyticsLoader />
               </ClientOnly>
-              <div className="flex-grow">
+              <div className="flex-grow relative z-10">
                 <Toaster 
                   position="top-right"
                   toastOptions={{
@@ -78,20 +80,20 @@ export default function RootLayout({
                     style: {
                       background: 'var(--brand-bg)',
                       color: 'var(--brand-brown)',
-                      border: '1px solid var(--brand-border)',
+                      border: '1px solid var(--brand-border)'
                     },
                     success: {
                       iconTheme: {
                         primary: 'var(--brand-brown)',
-                        secondary: 'var(--brand-accent-bg)',
-                      },
+                        secondary: 'var(--brand-accent-bg)'
+                      }
                     },
                     error: {
                       iconTheme: {
                         primary: 'var(--brand-primary)',
-                        secondary: 'var(--brand-accent-bg)',
-                      },
-                    },
+                        secondary: 'var(--brand-accent-bg)'
+                      }
+                    }
                   }}
                 />
                 {children}

@@ -137,44 +137,54 @@ export default function EgitmenProfilPage({ params }: PageProps) {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-10 flex justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
+      <div className="relative min-h-screen pt-24 pb-16 overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-8 flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error || !teacher) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <div className="bg-red-100 text-red-600 p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold mb-2">Hata</h2>
-          <p className="mb-4">{error || 'Öğretmen bilgileri bulunamadı'}</p>
-          <Link
-            href="/egitmenler"
-            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors inline-block"
-          >
-            Eğitmenler Sayfasına Dön
-          </Link>
+      <div className="relative min-h-screen pt-24 pb-16 overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-8">
+            <div className="bg-red-100 text-red-600 p-6 rounded-lg shadow-md">
+              <h2 className="text-xl font-bold mb-2">Hata</h2>
+              <p className="mb-4">{error || 'Öğretmen bilgileri bulunamadı'}</p>
+              <Link
+                href="/egitmenler"
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors inline-block"
+              >
+                Eğitmenler Sayfasına Dön
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 pt-24 pb-8">
-      <div className="mb-6">
-        <Link href="/egitmenler" className="text-[#994D1C] hover:underline inline-flex items-center">
-          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
-          </svg>
-          Eğitmenler Sayfasına Dön
-        </Link>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Sol Sütun - Öğretmen Bilgileri */}
-        <div className="md:col-span-1">
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="relative min-h-screen pt-24 pb-16 overflow-hidden">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
+          <div className="mb-6">
+            <Link href="/egitmenler" className="text-[#994D1C] hover:underline inline-flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              Eğitmenler Sayfasına Dön
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Sol Sütun - Öğretmen Bilgileri */}
+            <div className="md:col-span-1">
+              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="p-6 text-center">
               <div className="w-24 h-24 rounded-full bg-[#FFB996] flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 overflow-hidden relative">
                 {teacher.profilePhotoUrl ? (
@@ -275,13 +285,13 @@ export default function EgitmenProfilPage({ params }: PageProps) {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-        
-        {/* Sağ Sütun - İlanlar ve Değerlendirmeler */}
-        <div className="md:col-span-2">
-          {/* İlanlar */}
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+              </div>
+            </div>
+            
+            {/* Sağ Sütun - İlanlar ve Değerlendirmeler */}
+            <div className="md:col-span-2">
+              {/* İlanlar */}
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
             <h2 className="text-xl font-bold text-[#994D1C] mb-6">{t('instructor.lessons')}</h2>
             
             {openLessons.length === 0 ? (
@@ -327,61 +337,66 @@ export default function EgitmenProfilPage({ params }: PageProps) {
                 ))}
               </div>
             )}
-          </div>
+              </div>
 
-          {showReview && user && (
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-              <h3 className="text-lg font-bold text-[#994D1C] mb-4">{t('instructor.review')}</h3>
-              {eligibleLessons.length === 0 ? (
-                <div className="bg-gray-100 p-4 rounded-md text-gray-600">
-                  Bu eğitmenle tamamlanmış dersiniz bulunamadı. Değerlendirme yapabilmek için tamamlanmış bir dersiniz olmalı.
-                </div>
-              ) : (
-                <>
-                  <label className="block text-sm text-gray-700 mb-2">{t('instructor.selectLesson')}</label>
-                  <select
-                    value={selectedLessonId}
-                    onChange={(e) => setSelectedLessonId(e.target.value)}
-                    className="w-full mb-4 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
-                  >
-                    {eligibleLessons.map((l) => (
-                      <option key={l._id} value={l._id}>
-                        {l.title} — {new Date(l.scheduledAt || l.createdAt).toLocaleDateString('tr-TR')}
-                      </option>
-                    ))}
-                  </select>
-                  {selectedLessonId && (
-                    <ReviewForm
-                      lessonId={selectedLessonId}
-                      teacherId={id}
-                      onSuccess={() => {
-                        fetchTeacherRating();
-                      }}
-                    />
+              {showReview && user && (
+                <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                  <h3 className="text-lg font-bold text-[#994D1C] mb-4">{t('instructor.review')}</h3>
+                  {eligibleLessons.length === 0 ? (
+                    <div className="bg-gray-100 p-4 rounded-md text-gray-600">
+                      Bu eğitmenle tamamlanmış dersiniz bulunamadı. Değerlendirme yapabilmek için tamamlanmış bir dersiniz olmalı.
+                    </div>
+                  ) : (
+                    <>
+                      <label className="block text-sm text-gray-700 mb-2">{t('instructor.selectLesson')}</label>
+                      <select
+                        value={selectedLessonId}
+                        onChange={(e) => setSelectedLessonId(e.target.value)}
+                        className="w-full mb-4 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+                      >
+                        {eligibleLessons.map((l) => (
+                          <option key={l._id} value={l._id}>
+                            {l.title} — {new Date(l.scheduledAt || l.createdAt).toLocaleDateString('tr-TR')}
+                          </option>
+                        ))}
+                      </select>
+                      {selectedLessonId && (
+                        <ReviewForm
+                          lessonId={selectedLessonId}
+                          teacherId={id}
+                          onSuccess={() => {
+                            fetchTeacherRating();
+                          }}
+                        />
+                      )}
+                    </>
                   )}
-                </>
+                </div>
               )}
-            </div>
-          )}
 
-          {/* Değerlendirmeler */}
-          <ReviewsList teacherId={id} limit={5} showPagination={true} />
+            {/* Değerlendirmeler */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <ReviewsList teacherId={id} limit={5} showPagination={true} />
+            </div>
+          </div>
+          </div>
         </div>
+        {/* Floating ChatBox (diğer chatboxlar gibi) */}
+        {showChat && teacher && (
+          <ChatBox
+            instructor={{
+              _id: teacher._id,
+              name: teacher.name || 'Eğitmen',
+              email: teacher.email || '',
+              university: teacher.university || '',
+              role: 'instructor',
+              price: teacher.price,
+            }}
+            onClose={() => setShowChat(false)}
+          />
+        )}
       </div>
-      {/* Floating ChatBox (diğer chatboxlar gibi) */}
-      {showChat && teacher && (
-        <ChatBox
-          instructor={{
-            _id: teacher._id,
-            name: teacher.name || 'Eğitmen',
-            email: teacher.email || '',
-            university: teacher.university || '',
-            role: 'instructor',
-            price: teacher.price
-          }}
-          onClose={() => setShowChat(false)}
-        />
-      )}
     </div>
   );
 }
+

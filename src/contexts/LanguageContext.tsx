@@ -153,6 +153,8 @@ const translations: Record<Language, Record<string, string>> = {
     'general.uploadResource': 'Kaynak Yükle',
     'general.resourceCategory': 'Kategori',
     'general.resourceSubject': 'Konu',
+    'general.course': 'Ders',
+    'general.coursePlaceholder': 'ör. Matematik I / Calculus',
     'general.resourceLevel': 'Seviye',
     'general.resourceLanguage': 'Dil',
     'general.resourceFormat': 'Format',
@@ -751,6 +753,7 @@ const translations: Record<Language, Record<string, string>> = {
     'errors.invalidLinkedInUrl': 'LinkedIn URL geçersiz',
     'errors.prohibitedContentDetected': 'Uygunsuz içerik tespit edildi. Lütfen metni düzenleyin.',
     'errors.projectCreationFailed': 'Proje oluşturulamadı',
+    'errors.courseRequired': 'Lütfen ders adını girin',
     
     // Footer
     'footer.platformDescription': 'Kavunla, öğrencileri eğitmenlerle buluşturan ve eğitimin geleceğini şekillendiren platform.',
@@ -997,6 +1000,8 @@ const translations: Record<Language, Record<string, string>> = {
     'general.uploadResource': 'Upload Resource',
     'general.resourceCategory': 'Category',
     'general.resourceSubject': 'Subject',
+    'general.course': 'Course',
+    'general.coursePlaceholder': 'e.g. Mathematics I / Calculus',
     'general.resourceLevel': 'Level',
     'general.resourceLanguage': 'Language',
     'general.resourceFormat': 'Format',
@@ -1392,6 +1397,7 @@ const translations: Record<Language, Record<string, string>> = {
     'errors.invalidLinkedInUrl': 'Invalid LinkedIn URL',
     'errors.prohibitedContentDetected': 'Inappropriate content detected. Please edit the text.',
     'errors.projectCreationFailed': 'Failed to create project',
+    'errors.courseRequired': 'Please enter the course name',
     
     // Footer
     'footer.platformDescription': 'Kavunla is a platform that brings students together with instructors and shapes the future of education.',

@@ -15,9 +15,24 @@ export default function RouteBackgroundHost() {
   const enabled = (
     pathname?.startsWith("/ilan") ||
     pathname?.startsWith("/ilanlar") ||
+    pathname?.startsWith("/ilanlarim") ||
     pathname?.startsWith("/projeler") ||
     pathname?.startsWith("/kaynaklar") ||
-    pathname?.startsWith("/kulupler")
+    pathname?.startsWith("/kulupler") ||
+    pathname?.startsWith("/egitmenler") ||
+    pathname?.startsWith("/profil") ||
+    pathname?.startsWith("/profilim") ||
+    pathname?.startsWith("/bildirimler") ||
+    pathname?.startsWith("/mesajlar") ||
+    pathname?.startsWith("/mesajlarim") ||
+    pathname?.startsWith("/yakinda") ||
+    pathname?.startsWith("/ilan-ver") ||
+    pathname?.startsWith("/iletisim") ||
+    pathname?.startsWith("/sss") ||
+    pathname?.startsWith("/kullanim-kosullari") ||
+    pathname?.startsWith("/gizlilik-politikasi") ||
+    pathname?.startsWith("/cerez-politikasi") ||
+    pathname?.startsWith("/kvkk")
   );
 
   useEffect(() => {

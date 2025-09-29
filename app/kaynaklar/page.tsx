@@ -51,6 +51,7 @@ type Resource = {
   format: string;
   university: string;
   department: string;
+  course?: string;
   academicLevel: string;
   uploadDate: string;
   createdAt: string;
@@ -202,6 +203,8 @@ export default function KaynaklarPage() {
   const [selectedFormat, setSelectedFormat] = useState('');
   const [selectedUniversity, setSelectedUniversity] = useState<string>('all');
   const [selectedAcademicLevel, setSelectedAcademicLevel] = useState<string>('Hepsi');
+  const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [courseTerm, setCourseTerm] = useState('');
   const [sortBy, setSortBy] = useState('date');
   // Favoriler
   const [showFavorites, setShowFavorites] = useState(false);
@@ -224,6 +227,8 @@ export default function KaynaklarPage() {
       if (selectedFormat) params.append('format', selectedFormat);
       if (selectedUniversity && selectedUniversity !== 'all') params.append('university', selectedUniversity);
       if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') params.append('academicLevel', selectedAcademicLevel);
+      if (selectedDepartment) params.append('department', selectedDepartment);
+      if (courseTerm) params.append('course', courseTerm);
       const query = params.toString() ? `?${params.toString()}` : '';
       const response = await fetch(`/api/resources/count${query}`);
       if (!response.ok) throw new Error('API hatası');
@@ -232,7 +237,7 @@ export default function KaynaklarPage() {
     } catch (error) {
       setTotalResourceCount(0);
     }
-  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
+  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, selectedDepartment, courseTerm]);
   useEffect(() => {
     fetchTotalResourceCount();
   }, [fetchTotalResourceCount]);
@@ -254,6 +259,17 @@ export default function KaynaklarPage() {
     if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') {
       filtered = filtered.filter(r => r.academicLevel === selectedAcademicLevel);
     }
+    if (selectedDepartment) {
+      filtered = filtered.filter(r => (r as any).department === selectedDepartment);
+    }
+    if (courseTerm) {
+      const term = courseTerm.toLowerCase();
+      filtered = filtered.filter(r => {
+        const courseStr = ((r as any).course || '').toString().toLowerCase();
+        const tagsMatch = Array.isArray(r.tags) && r.tags.some(tag => (tag || '').toLowerCase().includes(term));
+        return courseStr.includes(term) || tagsMatch;
+      });
+    }
     // Sıralama
     filtered.sort((a, b) => {
       if (sortBy === 'date') {
@@ -272,7 +288,7 @@ export default function KaynaklarPage() {
       filtered = filtered.filter(r => favorites.includes(r._id || ''));
     }
     return filtered;
-  }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, sortBy, sortOrder, favorites, showFavorites]);
+  }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, selectedDepartment, courseTerm, sortBy, sortOrder, favorites, showFavorites]);
 
   // Toplam sayfa sayısı
   const totalPages = Math.ceil(totalResourceCount / resourcesPerPage);
@@ -282,7 +298,7 @@ export default function KaynaklarPage() {
   // Sayfa veya filtre değişince otomatik olarak en başa dön
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel]);
+  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, selectedDepartment, courseTerm]);
 
   // Eğer mevcut sayfa, toplam sayfa sayısından büyükse düzelt
   useEffect(() => {
@@ -303,6 +319,8 @@ export default function KaynaklarPage() {
       if (selectedFormat) params.append('format', selectedFormat);
       if (selectedUniversity && selectedUniversity !== 'all') params.append('university', selectedUniversity);
       if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') params.append('academicLevel', selectedAcademicLevel);
+      if (selectedDepartment) params.append('department', selectedDepartment);
+      if (courseTerm) params.append('course', courseTerm);
       params.append('page', currentPage.toString());
       params.append('limit', resourcesPerPage.toString());
       const query = params.toString() ? `?${params.toString()}` : '';
@@ -319,7 +337,7 @@ export default function KaynaklarPage() {
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, currentPage]);
+  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, selectedDepartment, courseTerm, currentPage]);
 
 
   // Sayfa yüklendiğinde ve filtre/arama veya sayfa değiştiğinde kaynakları getir
@@ -582,6 +600,30 @@ export default function KaynaklarPage() {
                 ))}
               </select>
             </div>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-[#6B3416] mb-1">
+                {t('general.department')}
+              </label>
+              <input
+                type="text"
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
+                placeholder={t('general.allDepartments')}
+                className="w-full px-3 py-2 rounded-lg border-[#FFB996] focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+              />
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-[#6B3416] mb-1">
+                {t('general.course')}
+              </label>
+              <input
+                type="text"
+                value={courseTerm}
+                onChange={(e) => setCourseTerm(e.target.value)}
+                placeholder={t('general.coursePlaceholder')}
+                className="w-full px-3 py-2 rounded-lg border-[#FFB996] focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50"
+              />
+            </div>
           </div>
         )}
       </div>
@@ -782,6 +824,11 @@ export default function KaynaklarPage() {
                   </div>
                 </div>
                 <p className="text-sm text-[#6B3416] mb-3 line-clamp-2">{resource.description}</p>
+                {(resource as any).course && (
+                  <div className="text-xs text-[#6B3416] mb-2">
+                    <span className="font-medium">{t('general.course')}:</span> {(resource as any).course}
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-1 mb-3">
                   {resource.tags.slice(0, 3).map((tag: string, index: number) => (
                     <span key={index} className="bg-[#FFE5D9] text-[#994D1C] text-xs px-2 py-1 rounded-full">

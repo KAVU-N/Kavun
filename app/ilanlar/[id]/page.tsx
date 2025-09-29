@@ -154,7 +154,18 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   return (
     <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
       <div className="max-w-5xl mx-auto px-4 relative z-10">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="relative">
+          <button
+            onClick={() => router.back()}
+            aria-label="Geri Dön"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#994D1C]/30 text-[#994D1C] bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white hover:shadow-md hover:border-[#6B3416]/40 transition-all duration-300 absolute top-0 -left-3 -translate-x-full"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span className="font-medium">Geri Dön</span>
+          </button>
+          <div className="relative bg-white rounded-2xl shadow-lg p-8 space-y-6">
           {/* İçerik */}
           {error ? (
             <div className="p-6">
@@ -258,6 +269,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
               <div className="text-sm text-gray-500">İlan Tarihi: {formatDate(ilan.createdAt)}</div>
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>

@@ -50,6 +50,20 @@ const nextConfig = {
     }
     return config;
   },
+  async redirects() {
+    return [
+      {
+        source: '/kulupler',
+        destination: '/yakinda',
+        permanent: false,
+      },
+      {
+        source: '/kuluplerim',
+        destination: '/yakinda',
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     const allowedOrigins = process.env.NODE_ENV === 'production' 
       ? ['https://www.kavunla.com']

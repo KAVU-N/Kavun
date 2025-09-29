@@ -268,7 +268,7 @@ export default function NotificationsPage() {
   // DEBUG PANEL
   const debugToken = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
   return (
-    <div className="pt-24 pb-8 max-w-3xl mx-auto">
+    <div className="relative pt-24 pb-8 max-w-3xl mx-auto z-10">
       <h1 className="text-3xl font-bold text-[#994D1C] mb-8">{t('notifications.title')}</h1>
       
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">

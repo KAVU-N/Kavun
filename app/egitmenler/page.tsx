@@ -110,8 +110,8 @@ export default function InstructorsPage() {
   // Eğer kullanıcı localStorage'dan yüklenmediyse loading göster
   if (!authChecked) {
     return (
-      <div className="min-h-screen bg-white pt-20">
-        <div className="container mx-auto px-4">
+      <div className="relative min-h-screen overflow-hidden pt-20">
+        <div className="container mx-auto px-4 relative z-10">
           <div className="flex justify-center items-center py-12">
             <div className="w-12 h-12 border-4 border-[#FFB996] border-t-[#FF8B5E] rounded-full animate-spin"></div>
           </div>
@@ -124,8 +124,8 @@ export default function InstructorsPage() {
   if (authChecked && !user) return null;
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="container mx-auto px-4">
+    <div className="relative min-h-screen overflow-hidden pt-24 pb-16">
+      <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-[#6B3416] mb-2">{t('instructors.title')}</h1>

@@ -165,8 +165,8 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="container mx-auto px-4 py-8 pt-24 flex-shrink-0">
+    <div className="relative min-h-screen overflow-hidden flex flex-col">
+      <div className="container mx-auto px-4 py-8 pt-24 flex-shrink-0 relative z-10">
         <h1 className="text-3xl font-bold text-gray-800 mb-8">{t('messages.myMessages')}</h1>
         
         {loading ? (

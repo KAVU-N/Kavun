@@ -19,6 +19,7 @@ type Resource = {
   level: string;
   university: string;
   department: string;
+  course?: string;
   uploadDate: string;
   createdAt: string;
   downloadCount: number;
@@ -268,8 +269,8 @@ export default function KaynakDetayPage() {
           <span className="font-medium">{t('general.goBack')}</span>
         </Link>
       
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="p-6">
+      <div className="bg-white rounded-2xl shadow-lg">
+        <div className="p-8 space-y-6">
           <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -306,6 +307,11 @@ export default function KaynakDetayPage() {
               {resource.department && (
                 <div className="text-sm text-[#6B3416] mb-2">
                   <span className="font-medium">{t('general.department')}:</span> {resource.department}
+                </div>
+              )}
+              {resource.course && (
+                <div className="text-sm text-[#6B3416] mb-2">
+                  <span className="font-medium">{t('general.course')}:</span> {resource.course}
                 </div>
               )}
               

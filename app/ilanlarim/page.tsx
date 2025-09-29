@@ -102,8 +102,8 @@ export default function IlanlarimPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-24 pb-16 relative z-[1]">
-      <div className="container mx-auto px-4">
+    <div className="relative min-h-screen overflow-hidden pt-24 pb-16">
+      <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-[#6B3416]">{t('myListings.myListings')}</h1>

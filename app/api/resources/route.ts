@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
     const format = searchParams.get('format') || '';
     const university = searchParams.get('university') || '';
     const academicLevel = searchParams.get('academicLevel') || '';
+    const department = searchParams.get('department') || '';
+    const course = searchParams.get('course') || '';
     // Pagination parametreleri
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '9', 10);
@@ -59,7 +61,9 @@ export async function GET(request: NextRequest) {
     if (category) query.category = category;
     if (format) query.format = format;
     if (university) query.university = university;
-    if (academicLevel) query.academicLevel = academicLevel;
+    if (academicLevel) query.level = academicLevel;
+    if (department) query.department = department;
+    if (course) query.tags = { $elemMatch: { $regex: course, $options: 'i' } };
 
     // Toplam kaynak sayısı (filtreye göre)
     const totalCount = await Resource.countDocuments(query);
