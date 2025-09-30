@@ -34,7 +34,7 @@ interface Ilan {
 }
 
 export default function IlanDetayPage({ params }: { params: { id: string } }) {
-  const { user } = useAuth();
+  const { user, authChecked, loading } = useAuth();
   const router = useRouter();
   const [ilan, setIlan] = useState<Ilan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,11 +42,12 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   const [photoError, setPhotoError] = useState(false);
 
   useEffect(() => {
-    // user null olduğunda login sayfasına yönlendir
-    if (user === null) {
+    // Yalnızca auth durumu kontrol edildikten sonra yönlendir
+    if (!authChecked) return;
+    if (!user) {
       router.push('/auth/login');
     }
-  }, [user, router]);
+  }, [user, authChecked, router]);
 
   useEffect(() => {
     const fetchIlanDetay = async () => {
@@ -137,7 +138,7 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   const fallbackUserPhoto = user?.id && ilan?.userId === user.id ? (user as any)?.profilePhotoUrl : undefined;
   const displayPhotoUrl = !photoError ? (ilan?.teacher?.profilePhotoUrl || fallbackUserPhoto) : undefined;
 
-  if (isLoading || !user) {
+  if (isLoading || !authChecked) {
     return (
       <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
         <div className="max-w-5xl mx-auto px-4 relative z-10">
@@ -150,6 +151,8 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
       </div>
     );
   }
+  // authChecked tamamlandı ve kullanıcı yoksa yönlendirme çalıştıktan sonra boş dön
+  if (authChecked && !user) return null;
 
   return (
     <div className="relative min-h-screen overflow-hidden pt-28 pb-12">

@@ -7,6 +7,14 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useAuth } from 'src/context/AuthContext';
 import Link from 'next/link';
 
+// TR büyük/küçük harf dönüşümü için yardımcı
+function turkishToLower(text: string): string {
+  return text
+    .replace(/\u0130/g, 'i') // İ -> i
+    .replace(/I/g, 'ı')       // I -> ı
+    .toLowerCase();
+}
+
 // Kaynak kategorileri
 // Çok dilli kategori anahtarları
 const categoryKeys = [
@@ -245,7 +253,8 @@ export default function KaynaklarPage() {
   const filteredResources = useMemo(() => {
     let filtered = [...resources];
     if (searchTerm) {
-      filtered = filtered.filter(r => r.title.toLowerCase().includes(searchTerm.toLowerCase()) || r.description.toLowerCase().includes(searchTerm.toLowerCase()));
+      const st = turkishToLower(searchTerm);
+      filtered = filtered.filter(r => turkishToLower(r.title || '').includes(st) || turkishToLower(r.description || '').includes(st));
     }
     if (selectedCategory) {
       filtered = filtered.filter(r => r.category === selectedCategory);
@@ -260,13 +269,14 @@ export default function KaynaklarPage() {
       filtered = filtered.filter(r => r.academicLevel === selectedAcademicLevel);
     }
     if (selectedDepartment) {
-      filtered = filtered.filter(r => (r as any).department === selectedDepartment);
+      const dep = turkishToLower(selectedDepartment);
+      filtered = filtered.filter(r => turkishToLower(((r as any).department || '').toString()).includes(dep));
     }
     if (courseTerm) {
-      const term = courseTerm.toLowerCase();
+      const term = turkishToLower(courseTerm);
       filtered = filtered.filter(r => {
-        const courseStr = ((r as any).course || '').toString().toLowerCase();
-        const tagsMatch = Array.isArray(r.tags) && r.tags.some(tag => (tag || '').toLowerCase().includes(term));
+        const courseStr = turkishToLower(((r as any).course || '').toString());
+        const tagsMatch = Array.isArray(r.tags) && r.tags.some(tag => turkishToLower(tag || '').includes(term));
         return courseStr.includes(term) || tagsMatch;
       });
     }
@@ -369,13 +379,7 @@ export default function KaynaklarPage() {
     return '-';
   };
   
-  // Türkçe karakterler için özel dönüşüm fonksiyonu
-  const turkishToLower = (text: string): string => {
-    return text
-      .replace(/\u0130/g, 'i') // İ = 'İ'
-      .replace(/I/g, 'ı')  // I -> ı = 'ı'
-      .toLowerCase();
-  };
+ 
 
   // Önizleme türü tespiti: PDF | Image | Video | Audio
   const detectKind = (r: Resource): 'pdf' | 'image' | 'video' | 'audio' | null => {

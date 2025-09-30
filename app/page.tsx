@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
@@ -154,7 +154,7 @@ export default function Home() {
             <div className="flex flex-col items-center">
               <div className="w-full max-w-6xl text-center mb-12">
                 {/* Glass wrapper start */}
-                <div className="mx-auto w-full rounded-3xl border border-white/20 bg-white/10 backdrop-blur-md shadow-xl shadow-black/10 p-10 sm:p-12 md:p-14 overflow-visible">
+                <div className="mx-auto w-full rounded-3xl border-0 bg-transparent backdrop-blur-0 shadow-none p-0 sm:p-0 md:p-0 overflow-visible">
                   <h1 className="text-4xl md:text-6xl font-bold text-[#FFE8D8] mb-8 leading-[1.15] drop-shadow-lg opacity-0" data-reveal data-delay="0">
                     {t('home.mainTitle')}
                   </h1>
@@ -316,6 +316,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+                {/* removed glass wrapper end */}
                 {/* Glass wrapper end */}
               </div>
             </div>

@@ -62,8 +62,14 @@ export async function GET(request: NextRequest) {
     if (format) query.format = format;
     if (university) query.university = university;
     if (academicLevel) query.level = academicLevel;
-    if (department) query.department = department;
-    if (course) query.tags = { $elemMatch: { $regex: course, $options: 'i' } };
+    if (department) query.department = { $regex: department, $options: 'i' };
+    if (course) {
+      const courseRegex = new RegExp(course, 'i');
+      query.$and = [
+        ...(query.$and || []),
+        { $or: [ { course: courseRegex }, { tags: { $elemMatch: courseRegex } } ] }
+      ];
+    }
 
     // Toplam kaynak sayısı (filtreye göre)
     const totalCount = await Resource.countDocuments(query);
@@ -248,6 +254,7 @@ export async function POST(request: NextRequest) {
       // university ve department frontend'den alınmayacak, user profilinden çekilecek
       university: userDoc?.university || '',
       department: userDoc?.expertise || null,
+      course: data.course || '',
       level: data.level || '',
       fileSize: data.fileSize || null,
       tags: data.tags || [],

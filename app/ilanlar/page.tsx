@@ -57,53 +57,44 @@ export default function IlanlarPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
-  useEffect(() => {
-    // user null olduğunda login sayfasına yönlendir
-    if (user === null) {
-      router.push('/auth/login');
-    }
-  }, [user, router]);
+  // İlanlar sayfası herkese açık olmalı; yönlendirme kaldırıldı
 
   useEffect(() => {
     const fetchIlanlar = async () => {
-      if (!user || !user.university) return;
-      
       try {
         setIsLoading(true);
-        
+
         // URL'den search parametresini kontrol et
         const searchParams = new URLSearchParams(window.location.search);
         const searchFromUrl = searchParams.get('search');
-        
         if (searchFromUrl) {
           setSearchTerm(searchFromUrl);
         }
-        
+
         // API endpoint'e istek at
-        const isAdmin = Boolean((user as any)?.isAdmin);
         let url: string;
-        if (isAdmin) {
+        if (user && (user as any)?.isAdmin) {
           url = searchTerm
             ? `/api/ilanlar?search=${encodeURIComponent(searchTerm)}`
             : `/api/ilanlar`;
-        } else {
-          url = searchTerm 
-            ? `/api/ilanlar/university?university=${encodeURIComponent(user.university)}&search=${encodeURIComponent(searchTerm)}` 
+        } else if (user?.university) {
+          url = searchTerm
+            ? `/api/ilanlar/university?university=${encodeURIComponent(user.university)}&search=${encodeURIComponent(searchTerm)}`
             : `/api/ilanlar/university?university=${encodeURIComponent(user.university)}`;
+        } else {
+          // Giriş yapmamış kullanıcılar için herkese açık ilanlar
+          url = searchTerm
+            ? `/api/ilanlar?search=${encodeURIComponent(searchTerm)}`
+            : `/api/ilanlar`;
         }
-        
-        console.log('Fetching listings from URL:', url);
-        
+
         const response = await fetch(url);
-        
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || 'İlanlar getirilirken bir hata oluştu');
         }
-        
+
         const data = await response.json();
-        console.log('Received listings data:', data);
-        console.log('Number of listings found:', data.length);
 
         // Öğretmenin en güncel profilini public endpoint'ten çek ve teacher alanını güncelle
         const enriched = await Promise.all(
@@ -133,9 +124,7 @@ export default function IlanlarPage() {
       }
     };
 
-    if (user && user.university) {
-      fetchIlanlar();
-    }
+    fetchIlanlar();
   }, [user, searchTerm]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -172,10 +161,12 @@ export default function IlanlarPage() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-sm border border-[var(--brand-border)] rounded-2xl shadow-sm p-6 md:p-8">
           <div className="mb-8 text-center md:text-left">
-            <div className="inline-block mb-3 px-4 py-1 bg-[#FFF5F0] rounded-full text-[#994D1C] text-sm font-medium">
-              <FaUniversity className="inline-block mr-2" />
-              {user?.university}
-            </div>
+            {user?.university && (
+              <div className="inline-block mb-3 px-4 py-1 bg-[#FFF5F0] rounded-full text-[#994D1C] text-sm font-medium">
+                <FaUniversity className="inline-block mr-2" />
+                {user.university}
+              </div>
+            )}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3">
               <h1 className="text-4xl font-bold text-[#6B3416]">{t('listings.universityListings')}</h1>
               {user && (

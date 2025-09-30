@@ -9,6 +9,7 @@ export interface IResource extends Document {
   level?: string;
   university?: string;
   department?: string;
+  course?: string;
   fileSize?: string;
   tags: string[];
   url?: string;
@@ -30,6 +31,7 @@ const ResourceSchema = new Schema<IResource>({
   level: { type: String },
   university: { type: String },
   department: { type: String },
+  course: { type: String },
   fileSize: { type: String },
   tags: { type: [String], default: [] },
   url: { type: String },

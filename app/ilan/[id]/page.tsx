@@ -43,6 +43,13 @@ export default function IlanDetayPage({ params }: { params: { id: string } }) {
   const [error, setError] = useState('');
   const [activeChat, setActiveChat] = useState(false);
   const [photoError, setPhotoError] = useState(false);
+  
+  // Giriş yapmayan kullanıcıları login sayfasına yönlendir
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/login');
+    }
+  }, [user, loading, router]);
 
   const handleContactTeacher = () => {
     if (!user) {

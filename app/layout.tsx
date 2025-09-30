@@ -72,7 +72,7 @@ export default function RootLayout({
                 <RouteBackgroundHost />
                 <AnalyticsLoader />
               </ClientOnly>
-              <div className="flex-grow relative z-10">
+              <div className="flex-grow relative z-30">
                 <Toaster 
                   position="top-right"
                   toastOptions={{
