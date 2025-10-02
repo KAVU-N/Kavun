@@ -38,7 +38,10 @@ function RegisterPageInner() {
   const nameRuleChecks = {
     capitalized: name.trim().length > 0 && name.trim().split(' ').filter(Boolean).every(word => word[0] && word[0] === word[0]?.toLocaleUpperCase('tr')),
     onlyLetters: name.trim().length > 0 && /^[A-Za-zÇĞİÖŞÜçğıöşü ]+$/.test(name),
-    twoWords: name.trim().length > 0 && name.trim().split(' ').filter(Boolean).length >= 2,
+    twoWords: name.trim().length > 0 && (() => {
+      const words = name.trim().split(' ').filter(Boolean);
+      return words.length >= 2 && words.length <= 3;
+    })(),
   };
 
   const emailRuleChecks = {
@@ -77,6 +80,7 @@ function RegisterPageInner() {
   const universityFromParam = searchParams?.get('university') || '';
   const { register } = useAuth();
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState(universityFromParam);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -89,11 +93,80 @@ function RegisterPageInner() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
 
+  const clearFieldError = (field: string) => {
+    setFieldErrors(prev => {
+      if (!prev[field]) return prev;
+      const updated = { ...prev };
+      delete updated[field];
+      return updated;
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     console.log("[DEBUG] Form submit edildi");
     e.preventDefault();
     setError('');
+    setFieldErrors({});
     setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+
+    const nameValue = (formData.get('name') as string)?.trim() ?? '';
+    const passwordValue = formData.get('password') as string;
+    const passwordConfirmValue = formData.get('passwordConfirm') as string;
+
+    const nameValidationMessages: string[] = [];
+    if (!nameRuleChecks.capitalized) {
+      nameValidationMessages.push(t('nameRule.capitalized') || 'Her kelime baş harfi büyük olmalıdır.');
+    }
+    if (!nameRuleChecks.onlyLetters) {
+      nameValidationMessages.push(t('nameRule.onlyLetters') || 'Sadece harf ve boşluk kullanın.');
+    }
+    const nameWords = nameValue.split(' ').filter(Boolean);
+    if (nameWords.length < 2 || nameWords.length > 3) {
+      nameValidationMessages.push('Ad soyad 2 veya 3 kelimeden oluşmalıdır.');
+    }
+    if (nameValidationMessages.length > 0) {
+      setFieldErrors(prev => ({ ...prev, name: true }));
+      setError(nameValidationMessages.join(' '));
+      setLoading(false);
+      return;
+    }
+
+    const missingPasswordRules: string[] = [];
+    if (!passwordRuleChecks.minLength) {
+      missingPasswordRules.push(t('passwordRule.minLength') || 'En az 8 karakter içer melidir.');
+    }
+    if (!passwordRuleChecks.uppercase) {
+      missingPasswordRules.push(t('passwordRule.uppercase') || 'En az bir büyük harf içermelidir.');
+    }
+    if (!passwordRuleChecks.lowercase) {
+      missingPasswordRules.push(t('passwordRule.lowercase') || 'En az bir küçük harf içermelidir.');
+    }
+    if (!passwordRuleChecks.digit) {
+      missingPasswordRules.push(t('passwordRule.digit') || 'En az bir rakam içermelidir.');
+    }
+    if (!passwordRuleChecks.special) {
+      missingPasswordRules.push(t('passwordRule.special') || 'En az bir özel karakter içermelidir.');
+    }
+
+    if (missingPasswordRules.length > 0) {
+      setFieldErrors(prev => ({ ...prev, password: true, passwordConfirm: true }));
+      const prefixTranslation = t('errors.passwordRequirements');
+      const prefix = prefixTranslation && prefixTranslation.startsWith('errors.')
+        ? 'Şifre aşağıdaki kuralları sağlamalı:'
+        : (prefixTranslation || 'Şifre aşağıdaki kuralları sağlamalı:');
+      setError(`${prefix} ${missingPasswordRules.join(' ')}`);
+      setLoading(false);
+      return;
+    }
+
+    if (passwordValue !== passwordConfirmValue) {
+      setFieldErrors(prev => ({ ...prev, password: true, passwordConfirm: true }));
+      setError(t('errors.passwordsDoNotMatch') || 'Şifreler eşleşmiyor');
+      setLoading(false);
+      return;
+    }
 
     if (!(window as any).grecaptcha) {
       console.log("[DEBUG] window.grecaptcha YOK");
@@ -101,7 +174,6 @@ function RegisterPageInner() {
       setLoading(false);
       return;
     }
-    const formData = new FormData(e.currentTarget);
     console.log('[DEBUG] grecaptcha.ready çağrılıyor');
     (window as any).grecaptcha.ready(() => {
       console.log('[DEBUG] grecaptcha.ready içi çalıştı');
@@ -134,23 +206,21 @@ function RegisterPageInner() {
     }
     console.log("Backend'e gönderilecek name:", name, JSON.stringify(name));
 
-    if (password !== passwordConfirm) {
-      setError(t('errors.passwordsDoNotMatch') || 'Şifreler eşleşmiyor');
-      setLoading(false);
-      return;
-    }
     const emailDomain = email.split('@')[1];
     if (emailDomain !== 'std.ankaramedipol.edu.tr') {
+      setFieldErrors(prev => ({ ...prev, email: true }));
       setError('Sadece @std.ankaramedipol.edu.tr uzantılı e-posta adresleri ile kayıt olabilirsiniz');
       setLoading(false);
       return;
     }
     if (!universities.includes(university)) {
+      setFieldErrors(prev => ({ ...prev, university: true }));
       setError(t('errors.invalidUniversity') || 'Lütfen geçerli bir üniversite seçin');
       setLoading(false);
       return;
     }
     if (!departments.includes(expertise)) {
+      setFieldErrors(prev => ({ ...prev, expertise: true }));
       setError(t('errors.invalidDepartment') || 'Lütfen geçerli bir bölüm seçin');
       setLoading(false);
       return;
@@ -169,7 +239,28 @@ function RegisterPageInner() {
       );
       router.push(`/auth/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {
-      setError(err.message || t('errors.registrationError') || 'Kayıt olurken bir hata oluştu');
+      const message = err?.message || t('errors.registrationError') || 'Kayıt olurken bir hata oluştu';
+      setError(message);
+      const backendFieldErrors: Record<string, boolean> = {};
+      const loweredMessage = message.toLocaleLowerCase('tr');
+      if (loweredMessage.includes('ad') || loweredMessage.includes('isim')) {
+        backendFieldErrors.name = true;
+      }
+      if (loweredMessage.includes('email') || loweredMessage.includes('e-posta')) {
+        backendFieldErrors.email = true;
+      }
+      if (loweredMessage.includes('şifre')) {
+        backendFieldErrors.password = true;
+      }
+      if (loweredMessage.includes('üniversite')) {
+        backendFieldErrors.university = true;
+      }
+      if (loweredMessage.includes('bölüm')) {
+        backendFieldErrors.expertise = true;
+      }
+      if (Object.keys(backendFieldErrors).length > 0) {
+        setFieldErrors(prev => ({ ...prev, ...backendFieldErrors }));
+      }
     } finally {
       setLoading(false);
     }
@@ -247,8 +338,11 @@ function RegisterPageInner() {
     type="text"
     required
     value={name}
-    onChange={e => setName(e.target.value)}
-    className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
+    onChange={e => {
+      setName(e.target.value);
+      clearFieldError('name');
+    }}
+    className={`block w-full rounded-md shadow-sm px-3 py-1.5 border focus:ring focus:ring-opacity-50 ${fieldErrors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-[#FFB996] focus:border-[#FF8B5E] focus:ring-[#FF8B5E]'}`}
   />
 </div>
 
@@ -282,8 +376,11 @@ function RegisterPageInner() {
     type="email"
     required
     value={email}
-    onChange={e => setEmail(e.target.value)}
-    className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
+    onChange={e => {
+      setEmail(e.target.value);
+      clearFieldError('email');
+    }}
+    className={`block w-full rounded-md shadow-sm px-3 py-1.5 border focus:ring focus:ring-opacity-50 ${fieldErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-[#FFB996] focus:border-[#FF8B5E] focus:ring-[#FF8B5E]'}`}
   />
 </div>
 
@@ -327,8 +424,11 @@ function RegisterPageInner() {
     required
     minLength={8}
     value={password}
-    onChange={e => setPassword(e.target.value)}
-    className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
+    onChange={e => {
+      setPassword(e.target.value);
+      clearFieldError('password');
+    }}
+    className={`block w-full rounded-md shadow-sm px-3 py-1.5 border focus:ring focus:ring-opacity-50 ${fieldErrors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-[#FFB996] focus:border-[#FF8B5E] focus:ring-[#FF8B5E]'}`}
   />
   <p className="mt-1 text-xs text-[#6B3416]">{t('auth.passwordRequirement')}</p>
 </div>
@@ -343,7 +443,8 @@ function RegisterPageInner() {
               type="password"
               required
               minLength={8}
-              className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
+              onChange={() => clearFieldError('passwordConfirm')}
+              className={`block w-full rounded-md shadow-sm px-3 py-1.5 border focus:ring focus:ring-opacity-50 ${fieldErrors.passwordConfirm ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-[#FFB996] focus:border-[#FF8B5E] focus:ring-[#FF8B5E]'}`}
             />
           </div>
 
@@ -363,12 +464,13 @@ function RegisterPageInner() {
                   setSearchTerm(e.target.value);
                   setShowDropdown(true);
                   setSelectedUniversity(e.target.value);
+                  clearFieldError('university');
                 }}
                 onFocus={() => setShowDropdown(true)}
                 onBlur={() => {
                   setTimeout(() => setShowDropdown(false), 200);
                 }}
-                className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
+                className={`block w-full rounded-md shadow-sm px-3 py-1.5 border focus:ring focus:ring-opacity-50 ${fieldErrors.university ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-[#FFB996] focus:border-[#FF8B5E] focus:ring-[#FF8B5E]'}`}
               />
               {showDropdown && (
                 <div 
@@ -415,12 +517,13 @@ function RegisterPageInner() {
                 onChange={e => {
                   setExpertise(e.target.value);
                   setShowDepartmentDropdown(true);
+                  clearFieldError('expertise');
                 }}
                 onFocus={() => setShowDepartmentDropdown(true)}
                 onBlur={() => {
                   setTimeout(() => setShowDepartmentDropdown(false), 200);
                 }}
-                className="block w-full rounded-md border-[#FFB996] shadow-sm focus:border-[#FF8B5E] focus:ring focus:ring-[#FF8B5E] focus:ring-opacity-50 px-3 py-1.5"
+                className={`block w-full rounded-md shadow-sm px-3 py-1.5 border focus:ring focus:ring-opacity-50 ${fieldErrors.expertise ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-[#FFB996] focus:border-[#FF8B5E] focus:ring-[#FF8B5E]'}`}
               />
               {showDepartmentDropdown && (
                 <div

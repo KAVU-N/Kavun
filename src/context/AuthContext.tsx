@@ -117,8 +117,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Kayıt başarısız');
+        const error = await response.json().catch(() => ({}));
+        const errorMessage =
+          typeof error === 'string'
+            ? error
+            : error?.message || error?.error || 'Kayıt başarısız';
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
