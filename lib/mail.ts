@@ -13,10 +13,14 @@ const createTransporter = () => {
 
   console.log('Email ayarları kontrol edildi:', { emailUser });
 
+  const host = process.env.EMAIL_HOST || 'smtp.gmail.com';
+  const port = Number(process.env.EMAIL_PORT || '465');
+  const secure = (process.env.EMAIL_SECURE ?? 'true') === 'true';
+
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    host: host,
+    port: port,
+    secure: secure,
     auth: {
       user: emailUser,
       pass: emailPassword
@@ -51,8 +55,8 @@ export const sendVerificationEmail = async (email: string, code: string) => {
 
     const mailOptions = {
       from: {
-        name: 'Kavunla',
-        address: process.env.EMAIL_USER!
+        name: process.env.EMAIL_FROM_NAME ?? 'Kavunla',
+        address: process.env.EMAIL_FROM ?? process.env.EMAIL_USER!
       },
       to: email,
       subject: 'E-posta Doğrulama Kodu - Kavunla',
@@ -115,8 +119,8 @@ export const sendPasswordResetEmail = async (email: string, code: string) => {
 
     const mailOptions = {
       from: {
-        name: 'Kavunla',
-        address: process.env.EMAIL_USER!
+        name: process.env.EMAIL_FROM_NAME ?? 'Kavunla',
+        address: process.env.EMAIL_FROM ?? process.env.EMAIL_USER!
       },
       to: email,
       subject: 'Şifre Sıfırlama - Kavunla',
