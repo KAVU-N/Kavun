@@ -54,8 +54,10 @@ export default function LoginPage() {
             {t('auth.login')}
           </h2>
           <p className="mt-2 text-sm text-[#6B3416]">
-  {t('auth.noAccount')}
-</p>
+            <Link href="/auth/register" className="text-[#FF8B5E] hover:text-[#994D1C] transition-colors font-medium">
+              {t('auth.noAccount')}
+            </Link>
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
