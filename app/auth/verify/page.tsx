@@ -114,7 +114,7 @@ function VerifyContent() {
             Email Doğrulama
           </h2>
           <p className="mt-1 text-sm text-[#6B3416] text-center">
-            Email adresinize gönderilen 6 haneli doğrulama kodunu giriniz.
+            Email adresinize gönderilen 6 haneli doğrulama kodunu giriniz. Kod spam klasörüne düşmüş olabilir, lütfen spam kutunuzu da kontrol edin.
           </p>
         </div>
 
