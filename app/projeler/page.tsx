@@ -57,6 +57,8 @@ export default function ProjectsPage() {
     linkedinUrl: string;
     category: string;
     ownerId: string;
+    ownerName?: string;
+    ownerUniversity?: string;
     position?: string;
     views?: number;
   }
@@ -76,7 +78,42 @@ export default function ProjectsPage() {
         const res = await fetch("/api/projects");
         if (!res.ok) throw new Error("Projeler alınamadı");
         const data = await res.json();
-        setProjects(data);
+
+        const ownerIds = Array.from(
+          new Set(
+            (data as Project[])
+              .map((project) => project.ownerId)
+              .filter((id): id is string => Boolean(id))
+          )
+        );
+
+        const ownerDetails: Record<string, { university?: string; name?: string }> = {};
+
+        await Promise.all(
+          ownerIds.map(async (id) => {
+            try {
+              const ownerRes = await fetch(`/api/users/public/${id}`);
+              if (ownerRes.ok) {
+                ownerDetails[id] = await ownerRes.json();
+              } else {
+                ownerDetails[id] = {};
+              }
+            } catch (error) {
+              ownerDetails[id] = {};
+            }
+          })
+        );
+
+        const enrichedProjects = (data as Project[]).map((project) => {
+          const ownerInfo = ownerDetails[project.ownerId] || {};
+          return {
+            ...project,
+            ownerUniversity: ownerInfo.university || project.ownerUniversity,
+            ownerName: ownerInfo.name || project.ownerName,
+          };
+        });
+
+        setProjects(enrichedProjects);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -105,14 +142,12 @@ export default function ProjectsPage() {
         <h1 className="text-3xl font-bold text-[#994D1C]">
           {t("nav.projects")}
         </h1>
-        {user && (
-          <Link
-            href="/projeler/olustur"
-            className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white px-4 py-2 rounded-lg hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 whitespace-nowrap"
-          >
-            + {t('common.createProject')}
-          </Link>
-        )}
+        <Link
+          href={user ? '/projeler/olustur' : '/auth/login'}
+          className="bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white px-4 py-2 rounded-lg hover:shadow-md hover:shadow-[#FFB996]/20 transition-all duration-300 whitespace-nowrap"
+        >
+          + {t('common.createProject')}
+        </Link>
       </div>
        {/* Arama ve Filtreleme */}
        <div className="bg-white rounded-xl shadow-md p-4 mb-8 flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
@@ -167,7 +202,8 @@ export default function ProjectsPage() {
                 </span>
               </div>
               <p className="text-sm text-gray-700 line-clamp-3 mb-1 flex-1">{p.description}</p>
-              {p.position && <p className="text-xs text-gray-600 mb-3">{t('project.position')}: {p.position}</p>}
+              {p.position && <p className="text-xs text-gray-600 mb-1">{t('project.position')}: {p.position}</p>}
+              <p className="text-xs text-gray-600 mb-3">{t('auth.university')}: {p.ownerUniversity || t('general.notSpecified')}</p>
               <div className="flex justify-between items-center mt-auto pt-2">
                 <span className="text-xs text-gray-500 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>{p.views || 0}</span>
                 <Link href={`/projeler/${p._id}`} className="bg-[#FF8B5E] hover:bg-[#FFD7A8] text-white font-semibold py-2 px-3 rounded-lg text-center transition">{t('project.detail')}</Link>

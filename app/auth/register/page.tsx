@@ -46,7 +46,7 @@ function RegisterPageInner() {
 
   const emailRuleChecks = {
     validFormat: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
-    correctDomain: email.endsWith('@std.ankaramedipol.edu.tr'),
+    correctDomain: email.endsWith('.edu.tr'),
   };
   const passwordRuleChecks = {
     minLength: password.length >= 8,
@@ -206,10 +206,10 @@ function RegisterPageInner() {
     }
     console.log("Backend'e gönderilecek name:", name, JSON.stringify(name));
 
-    const emailDomain = email.split('@')[1];
-    if (emailDomain !== 'std.ankaramedipol.edu.tr') {
+    const emailDomain = email.split('@')[1] || '';
+    if (!emailDomain.endsWith('.edu.tr')) {
       setFieldErrors(prev => ({ ...prev, email: true }));
-      setError('Sadece @std.ankaramedipol.edu.tr uzantılı e-posta adresleri ile kayıt olabilirsiniz');
+      setError('Sadece .edu.tr uzantılı e-posta adresleri ile kayıt olabilirsiniz');
       setLoading(false);
       return;
     }
