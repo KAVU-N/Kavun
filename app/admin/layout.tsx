@@ -83,6 +83,10 @@ export default function AdminLayout({
                 className={`block px-4 py-2 hover:bg-blue-700 transition ${pathname?.startsWith('/admin/projects') ? 'bg-blue-700' : ''}`}>{t('projects') || 'Projeler'}</Link>
             </li>
             <li>
+              <Link href="/admin/listings"
+                className={`block px-4 py-2 hover:bg-blue-700 transition ${pathname?.startsWith('/admin/listings') ? 'bg-blue-700' : ''}`}>{t('listings') || 'İlanlar'}</Link>
+            </li>
+            <li>
               <Link href="/admin/announcements"
                 className={`block px-4 py-2 hover:bg-blue-700 transition ${pathname?.startsWith('/admin/announcements') ? 'bg-blue-700' : ''}`}>{t('announcements') || 'İlanlar'}</Link>
             </li>

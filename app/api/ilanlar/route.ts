@@ -1,60 +1,7 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import mongoose from 'mongoose';
-
-// İlan şeması
-const ilanSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, 'Başlık zorunludur'],
-    trim: true,
-  },
-  description: {
-    type: String,
-    required: [true, 'Açıklama zorunludur'],
-    trim: true,
-  },
-  price: {
-    type: Number,
-    required: [true, 'Ücret zorunludur'],
-  },
-  method: {
-    type: String,
-    enum: ['online', 'yüzyüze', 'hibrit'],
-    default: 'online',
-  },
-  duration: {
-    type: Number,
-    default: 1, // Default to 1 hour
-  },
-  durationHours: {
-    type: Number,
-    default: 0,
-  },
-  durationMinutes: {
-    type: Number,
-    default: 0,
-  },
-  frequency: {
-    type: String,
-    enum: ['daily', 'weekly', 'monthly', 'flexible'],
-    default: 'weekly',
-  },
-  status: {
-    type: String,
-    enum: ['active', 'inactive'],
-    default: 'active',
-  },
-  // instructorFrom field has been removed
-  userId: {
-    type: String,
-    required: true,
-  },
-}, { timestamps: true });
-
-// Model oluştur veya varsa kullan
-const Ilan = mongoose.models.Ilan || mongoose.model('Ilan', ilanSchema);
+import Ilan from '@/models/Ilan';
 
 // GET - Tüm ilanları veya belirli bir kullanıcının ilanlarını getir
 export async function GET(req: Request) {
@@ -63,21 +10,31 @@ export async function GET(req: Request) {
     
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
+    const search = searchParams.get('search');
+    const status = searchParams.get('status');
+    const method = searchParams.get('method');
     
     console.log('API GET ilanlar - Requested userId:', userId);
     
-    let query = {};
+    const query: Record<string, any> = {};
     if (userId) {
-      // userId'yi string olarak kullan ve MongoDB ObjectId formatında olabileceğini dikkate al
-      // Hem direkt eşleşme hem de string içerme durumlarını kontrol et
-      query = { 
-        $or: [
-          { userId: userId.toString() },
-          { userId: { $regex: userId, $options: 'i' } }
-        ]
-      };
-      
-      console.log('GET ilanlar - Sorgu:', JSON.stringify(query));
+      query.$or = [
+        { userId: userId.toString() },
+        { userId: { $regex: userId, $options: 'i' } }
+      ];
+    }
+    if (search) {
+      query.$or = [
+        ...(query.$or || []),
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+    if (status) {
+      query.status = status;
+    }
+    if (method) {
+      query.method = method;
     }
     
     // Hata ayıklama için tüm ilanları kontrol et

@@ -1,71 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import mongoose from 'mongoose';
-
-// İlan şeması (app/api/ilanlar/route.ts ile aynı)
-const ilanSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, 'Başlık zorunludur'],
-    trim: true,
-  },
-  description: {
-    type: String,
-    required: [true, 'Açıklama zorunludur'],
-    trim: true,
-  },
-  price: {
-    type: Number,
-    required: [true, 'Ücret zorunludur'],
-  },
-  method: {
-    type: String,
-    enum: ['online', 'yüzyüze', 'hibrit'],
-    default: 'online',
-  },
-  duration: {
-    type: Number,
-    default: 1, // Default to 1 hour
-  },
-  durationHours: {
-    type: Number,
-    default: 0,
-  },
-  durationMinutes: {
-    type: Number,
-    default: 0,
-  },
-  frequency: {
-    type: String,
-    enum: ['daily', 'weekly', 'monthly', 'flexible'],
-    default: 'weekly',
-  },
-  status: {
-    type: String,
-    enum: ['active', 'inactive'],
-    default: 'active',
-  },
-  userId: {
-    type: String,
-    required: true,
-  },
-}, { timestamps: true });
-
-// Model oluştur veya varsa kullan
-const Ilan = mongoose.models.Ilan || mongoose.model('Ilan', ilanSchema);
-
-// Kullanıcı modeli
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  role: String,
-  university: String,
-  expertise: String,
-  profilePhotoUrl: String,
-  grade: String,
-});
-
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+import Ilan from '@/models/Ilan';
+import User from '@/models/User';
 
 // GET - Belirli bir ilanın detaylarını getir
 export async function GET(
