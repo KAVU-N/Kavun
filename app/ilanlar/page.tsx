@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import type { MouseEvent as ReactMouseEvent } from 'react';
 import { useAuth } from 'src/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/src/contexts/LanguageContext';
@@ -56,6 +57,13 @@ export default function IlanlarPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
+
+  const handleCreateListingClick = useCallback((e: ReactMouseEvent<HTMLAnchorElement>) => {
+    if (!user) {
+      e.preventDefault();
+      router.push('/auth/login?redirect=/ilan-ver');
+    }
+  }, [router, user]);
 
   // İlanlar sayfası herkese açık olmalı; yönlendirme kaldırıldı
 
@@ -169,17 +177,16 @@ export default function IlanlarPage() {
             )}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3 gap-3">
               <h1 className="text-4xl font-bold text-[#6B3416]">{t('listings.universityListings')}</h1>
-              {user && (
-                <Link
-                  href="/ilan-ver"
-                  className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md hover:scale-105 transition-transform md:ml-4"
-                >
-                  <svg className="w-5 h-5 md:w-5 md:h-5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <span>{t('nav.createListing')}</span>
-                </Link>
-              )}
+              <Link
+                href="/ilan-ver"
+                onClick={handleCreateListingClick}
+                className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white font-semibold shadow-md hover:scale-105 transition-transform md:ml-4"
+              >
+                <svg className="w-5 h-5 md:w-5 md:h-5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <span>{t('nav.createListing')}</span>
+              </Link>
             </div>
             <p className="text-[#994D1C] max-w-2xl md:mx-0 mx-auto">
               {t('listings.exploreTeacherLessons')}
