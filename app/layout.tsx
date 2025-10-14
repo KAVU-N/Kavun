@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import ClientOnly from '@/src/components/ClientOnly'
 const Navbar = dynamic(() => import('@/src/components/Navbar'), { ssr: false })
+const SidebarMenu = dynamic(() => import('@/src/components/SidebarMenu'), { ssr: false })
 const AnalyticsLoader = dynamic(() => import('@/src/components/AnalyticsLoader'), { ssr: false })
 const RouteBackgroundHost = dynamic(() => import('@/src/components/RouteBackgroundHost'), { ssr: false })
 
@@ -68,6 +69,7 @@ export default function RootLayout({
               <ClientOnly hideOnAdmin>
                 <div className="relative z-50">
                   <Navbar />
+                  <SidebarMenu />
                 </div>
                 <RouteBackgroundHost />
                 <AnalyticsLoader />

@@ -18,6 +18,8 @@ export default function RouteBackgroundHost() {
     pathname?.startsWith("/ilanlarim") ||
     pathname?.startsWith("/projeler") ||
     pathname?.startsWith("/kaynaklar") ||
+    pathname?.startsWith("/not-cikar") ||
+    pathname?.startsWith("/soru-hazirlat") ||
     pathname?.startsWith("/kulupler") ||
     pathname?.startsWith("/egitmenler") ||
     pathname?.startsWith("/profil") ||
