@@ -5,6 +5,7 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verify } from 'jsonwebtoken';
+import { Types } from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import Ilan from '@/models/Ilan';
 import User from '@/models/User';
@@ -52,7 +53,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     if (!owner) {
       return NextResponse.json({ message: 'Belirtilen e-posta ile kullanıcı bulunamadı' }, { status: 404 });
     }
-    updateData.userId = owner._id.toString();
+    const ownerId = owner._id;
+    if (typeof ownerId === 'string') {
+      updateData.userId = ownerId;
+    } else if (ownerId instanceof Types.ObjectId) {
+      updateData.userId = ownerId.toHexString();
+    } else {
+      return NextResponse.json({ message: 'Geçersiz kullanıcı kimliği' }, { status: 400 });
+    }
   }
 
   const updated = await Ilan.findByIdAndUpdate(params.id, { $set: updateData }, { new: true, runValidators: true });

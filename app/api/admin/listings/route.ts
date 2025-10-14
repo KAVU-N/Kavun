@@ -5,6 +5,7 @@ export const revalidate = 0;
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verify } from 'jsonwebtoken';
+import { Types } from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import Ilan from '@/models/Ilan';
 import User from '@/models/User';
@@ -66,7 +67,12 @@ export async function GET(request: NextRequest) {
 
   const ownerMap = new Map<string, typeof owners[number]>();
   owners.forEach((owner) => {
-    ownerMap.set(owner._id.toString(), owner);
+    const ownerId = owner._id;
+    if (typeof ownerId === 'string') {
+      ownerMap.set(ownerId, owner);
+    } else if (ownerId instanceof Types.ObjectId) {
+      ownerMap.set(ownerId.toHexString(), owner);
+    }
   });
 
   const response = listings.map((listing) => ({
@@ -97,6 +103,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Belirtilen e-posta ile kullanıcı bulunamadı' }, { status: 404 });
   }
 
+  const ownerId = owner._id;
+  let ownerIdString: string | null = null;
+  if (typeof ownerId === 'string') {
+    ownerIdString = ownerId;
+  } else if (ownerId instanceof Types.ObjectId) {
+    ownerIdString = ownerId.toHexString();
+  }
+
+  if (!ownerIdString) {
+    return NextResponse.json({ message: 'Geçersiz kullanıcı kimliği' }, { status: 400 });
+  }
+
   const newListing = await Ilan.create({
     title,
     description,
@@ -104,7 +122,7 @@ export async function POST(request: NextRequest) {
     method: method || 'online',
     frequency: frequency || 'weekly',
     status: status || 'active',
-    userId: owner._id.toString(),
+    userId: ownerIdString,
   });
 
   return NextResponse.json(newListing, { status: 201 });
