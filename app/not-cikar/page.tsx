@@ -132,8 +132,8 @@ export default function NotesGeneratorPage() {
             </p>
           </header>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <section className="lg:col-span-2 bg-white/85 backdrop-blur-sm border border-[#FFE5D9] rounded-2xl shadow-sm p-6">
+          <div className="grid grid-cols-1 gap-6">
+            <section className="bg-white/85 backdrop-blur-sm border border-[#FFE5D9] rounded-2xl shadow-sm p-6">
               <form className="space-y-6" onSubmit={handleGenerate}>
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-[#6B3416]">
@@ -248,23 +248,6 @@ export default function NotesGeneratorPage() {
                 )}
               </form>
             </section>
-
-            <aside className="bg-white/75 backdrop-blur-sm border border-[#FFE5D9] rounded-2xl shadow-sm p-6 space-y-5">
-              <div>
-                <h2 className="text-lg font-semibold text-[#994D1C] mb-2">{t('ai.notes.howItWorksTitle')}</h2>
-                <p className="text-sm text-[#6B3416] leading-relaxed">
-                  {t('ai.notes.howItWorksDescription')}
-                </p>
-              </div>
-              <div className="bg-[#FFF2EA] border border-[#FFD6B2] rounded-xl p-4 space-y-2 text-sm text-[#6B3416]">
-                <p className="font-semibold text-[#994D1C]">{t('ai.notes.tipTitle')}</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>{t('ai.notes.tipLine1')}</li>
-                  <li>{t('ai.notes.tipLine2')}</li>
-                  <li>{t('ai.notes.tipLine3')}</li>
-                </ul>
-              </div>
-            </aside>
           </div>
 
           <section className="bg-white/85 backdrop-blur-sm border border-[#FFE5D9] rounded-2xl shadow-sm p-6">
