@@ -4,12 +4,10 @@ import { Types } from 'mongoose';
 import { connectDB } from '@/lib/db';
 import Event from '@/models/Event';
 import Club from '@/models/Club';
-import {
-  EVENT_ADMIN_COOKIE_NAME,
-  isValidEventAdminToken,
-} from '@/lib/eventAdminAuth';
+import { EVENT_ADMIN_COOKIE_NAME, isValidEventAdminToken } from '@/lib/eventAdminAuth';
 
 const isObjectId = (value: string) => Types.ObjectId.isValid(value);
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export async function GET(request: Request) {
   try {
@@ -17,7 +15,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
 
     const q = searchParams.get('q')?.trim();
-    const university = searchParams.get('university')?.trim();
+    const locationParam = searchParams.get('location')?.trim();
     const clubId = searchParams.get('club')?.trim();
     const category = searchParams.get('category')?.trim();
     const startDate = searchParams.get('startDate')?.trim();
@@ -32,8 +30,8 @@ export async function GET(request: Request) {
       ];
     }
 
-    if (university) {
-      filter.universities = university;
+    if (locationParam) {
+      filter.location = { $regex: new RegExp(escapeRegex(locationParam), 'i') };
     }
 
     if (category) {
@@ -65,10 +63,12 @@ export async function GET(request: Request) {
       }
     }
 
-    const events = await Event.find(filter)
+    const query = Event.find(filter)
       .sort({ date: 1 })
       .limit(200)
       .populate('clubs', 'name university category logoUrl');
+
+    const events = await query;
 
     return NextResponse.json({ data: events }, { status: 200 });
   } catch (error: any) {
@@ -97,6 +97,7 @@ export async function POST(request: Request) {
       photoUrl,
       resources,
       clubIds,
+      clubName,
     } = body || {};
 
     if (!title?.trim()) {
@@ -116,31 +117,47 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Geçersiz etkinlik tarihi' }, { status: 400 });
     }
 
-    if (!Array.isArray(clubIds) || clubIds.length === 0) {
-      return NextResponse.json({ error: 'En az bir kulüp seçilmelidir' }, { status: 400 });
-    }
+    const receivedClubIds = Array.isArray(clubIds)
+      ? clubIds
+      : typeof clubIds === 'string' && clubIds.trim().length > 0
+      ? [clubIds]
+      : [];
 
-    const validClubIds = clubIds.filter((id: unknown) => typeof id === 'string' && isObjectId(id));
-    if (validClubIds.length !== clubIds.length) {
+    const trimmedClubIds = receivedClubIds
+      .map((id) => (typeof id === 'string' ? id.trim() : ''))
+      .filter((id) => id.length > 0);
+
+    if (!trimmedClubIds.every((id) => isObjectId(id))) {
       return NextResponse.json({ error: 'Geçersiz kulüp kimliği' }, { status: 400 });
     }
 
-    const uniqueClubIds = [...new Set(validClubIds.map((id: string) => id))];
+    let clubs: { _id: Types.ObjectId; university?: string }[] = [];
+    let universities: string[] | undefined;
 
-    const clubs = await Club.find({ _id: { $in: uniqueClubIds } }).select('_id university');
-    if (clubs.length !== uniqueClubIds.length) {
-      return NextResponse.json({ error: 'Bazı kulüpler bulunamadı' }, { status: 404 });
+    if (trimmedClubIds.length > 0) {
+      const uniqueClubIds = [...new Set(trimmedClubIds)];
+      clubs = await Club.find({ _id: { $in: uniqueClubIds } }).select('_id university');
+      if (clubs.length !== uniqueClubIds.length) {
+        return NextResponse.json({ error: 'Bazı kulüpler bulunamadı' }, { status: 404 });
+      }
+
+      const uniSet = new Set(
+        clubs
+          .map((club) => club.university)
+          .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+      );
+      if (uniSet.size > 0) {
+        universities = Array.from(uniSet);
+      }
     }
-
-    const universities = Array.from(
-      new Set(clubs.map((club) => club.university).filter((value): value is string => Boolean(value)))
-    );
 
     const sanitizedResources = Array.isArray(resources)
       ? (resources as unknown[])
           .filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
           .map((item) => item.trim())
       : undefined;
+
+    const sanitizedClubName = typeof clubName === 'string' && clubName.trim().length > 0 ? clubName.trim() : undefined;
 
     const created = await Event.create({
       title: title.trim(),
@@ -152,6 +169,7 @@ export async function POST(request: Request) {
       resources: sanitizedResources,
       clubs: clubs.map((club) => club._id),
       universities,
+      clubName: sanitizedClubName,
     });
 
     return NextResponse.json({ data: created }, { status: 201 });

@@ -8,8 +8,9 @@ export interface IEvent extends Document {
   location?: string;
   photoUrl?: string;
   resources?: string[];
-  clubs: mongoose.Types.ObjectId[];
-  universities: string[];
+  clubs?: mongoose.Types.ObjectId[];
+  universities?: string[];
+  clubName?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,8 +24,9 @@ const eventSchema = new Schema<IEvent>(
     location: { type: String },
     photoUrl: { type: String },
     resources: [{ type: String }],
-    clubs: [{ type: Schema.Types.ObjectId, ref: 'Club', required: true }],
+    clubs: [{ type: Schema.Types.ObjectId, ref: 'Club' }],
     universities: [{ type: String }],
+    clubName: { type: String },
   },
   { timestamps: true }
 );

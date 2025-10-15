@@ -1,22 +1,13 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 
-interface ClubOption {
-  _id: string;
-  name: string;
-  university?: string;
-}
-
 export default function EventAdminAddPage() {
   const { t } = useLanguage();
   const router = useRouter();
-
-  const [clubs, setClubs] = useState<ClubOption[]>([]);
-  const [loadingClubs, setLoadingClubs] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const [title, setTitle] = useState('');
@@ -26,36 +17,20 @@ export default function EventAdminAddPage() {
   const [location, setLocation] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
   const [resourcesText, setResourcesText] = useState('');
-  const [selectedClubIds, setSelectedClubIds] = useState<string[]>([]);
+  const [clubName, setClubName] = useState('');
 
-  useEffect(() => {
-    let ignore = false;
-    const loadClubs = async () => {
-      try {
-        setLoadingClubs(true);
-        const response = await fetch('/api/kulupler?limit=200');
-        if (!response.ok) {
-          throw new Error('Failed to load clubs');
-        }
-        const data = await response.json();
-        if (!ignore) {
-          setClubs(Array.isArray(data?.data) ? data.data : []);
-        }
-      } catch (error: any) {
-        if (!ignore) {
-          toast.error(error?.message || t('events.admin.loadClubsError'));
-        }
-      } finally {
-        if (!ignore) {
-          setLoadingClubs(false);
-        }
-      }
-    };
-
-    loadClubs();
-    return () => {
-      ignore = true;
-    };
+  const categoryOptions = useMemo(() => ['Konser', 'Eğitim', 'Konferans', 'Uzaktan', 'Buluşma'], []);
+  const categoryPlaceholder = useMemo(() => {
+    const value = t('events.admin.categoryPlaceholder');
+    return value && value !== 'events.admin.categoryPlaceholder' ? value : 'Kategori seçin';
+  }, [t]);
+  const clubNameLabel = useMemo(() => {
+    const value = t('events.admin.clubNameLabel');
+    return value && value !== 'events.admin.clubNameLabel' ? value : 'Kulüp Adı (Opsiyonel)';
+  }, [t]);
+  const clubNamePlaceholder = useMemo(() => {
+    const value = t('events.admin.clubNamePlaceholder');
+    return value && value !== 'events.admin.clubNamePlaceholder' ? value : 'Kulüp adını yazın (opsiyonel)';
   }, [t]);
 
   const resourceList = useMemo(() => {
@@ -65,20 +40,10 @@ export default function EventAdminAddPage() {
       .filter((item) => item.length > 0);
   }, [resourcesText]);
 
-  const handleToggleClub = (clubId: string) => {
-    setSelectedClubIds((prev) =>
-      prev.includes(clubId) ? prev.filter((id) => id !== clubId) : [...prev, clubId]
-    );
-  };
-
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!date) {
       toast.error(t('events.admin.dateRequired'));
-      return;
-    }
-    if (selectedClubIds.length === 0) {
-      toast.error(t('events.admin.selectClubError'));
       return;
     }
 
@@ -92,7 +57,7 @@ export default function EventAdminAddPage() {
         location,
         photoUrl,
         resources: resourceList,
-        clubIds: selectedClubIds,
+        clubName,
       };
 
       const response = await fetch('/api/events', {
@@ -113,7 +78,7 @@ export default function EventAdminAddPage() {
       setLocation('');
       setPhotoUrl('');
       setResourcesText('');
-      setSelectedClubIds([]);
+      setClubName('');
     } catch (error: any) {
       toast.error(error?.message || t('events.admin.createError'));
     } finally {
@@ -178,12 +143,19 @@ export default function EventAdminAddPage() {
                   <label className="text-sm font-medium text-[#6B3416]">
                     {t('events.admin.categoryLabel')}
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
-                  />
+                    className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E] bg-white"
+                    required
+                  >
+                    <option value="">{categoryPlaceholder}</option>
+                    {categoryOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -244,47 +216,22 @@ export default function EventAdminAddPage() {
               <h2 className="text-lg font-semibold text-[#994D1C]">
                 {t('events.admin.clubSelectTitle')}
               </h2>
-              {loadingClubs ? (
-                <div className="text-sm text-[#C17B4C] animate-pulse">
-                  {t('events.admin.loadingClubs')}
-                </div>
-              ) : clubs.length === 0 ? (
-                <div className="text-sm text-[#C17B4C]">
-                  {t('events.admin.noClubs')}
-                </div>
-              ) : (
-                <div className="max-h-[400px] overflow-y-auto space-y-3 pr-2">
-                  {clubs.map((club) => {
-                    const inputId = `club-${club._id}`;
-                    const checked = selectedClubIds.includes(club._id);
-                    return (
-                      <label
-                        key={club._id}
-                        htmlFor={inputId}
-                        className={`flex items-start gap-3 rounded-xl border px-4 py-3 transition cursor-pointer ${
-                          checked
-                            ? 'border-[#FF8B5E] bg-[#FFF0E6]'
-                            : 'border-[#FFE5D9] hover:border-[#FFB996] hover:bg-[#FFF8F4]'
-                        }`}
-                      >
-                        <input
-                          id={inputId}
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => handleToggleClub(club._id)}
-                          className="mt-1 h-4 w-4 rounded border-[#FFE5D9] text-[#FF8B5E] focus:ring-[#FF8B5E]"
-                        />
-                        <div className="text-sm leading-5 text-[#6B3416]">
-                          <div className="font-semibold">{club.name}</div>
-                          {club.university && (
-                            <div className="text-xs text-[#C17B4C]">{club.university}</div>
-                          )}
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
-              )}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#6B3416]" htmlFor="clubName">
+                  {clubNameLabel}
+                </label>
+                <input
+                  id="clubName"
+                  type="text"
+                  value={clubName}
+                  onChange={(event) => setClubName(event.target.value)}
+                  placeholder={clubNamePlaceholder}
+                  className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+                />
+                <span className="text-xs text-[#C17B4C] block">
+                  {t('events.admin.clubNameHint') ?? 'Eğer belirli bir kulüp adına bağlıysa buraya yazabilirsiniz.'}
+                </span>
+              </div>
 
               <button
                 type="submit"
