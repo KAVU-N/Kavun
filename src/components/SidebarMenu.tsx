@@ -30,7 +30,8 @@ export default function SidebarMenu() {
     { href: '/ilanlar', label: t('nav.listings'), isComingSoon: true },
     { href: '/projeler', label: t('nav.projects') },
     { href: '/kaynaklar', label: t('nav.resources') },
-    { href: '/kulupler', label: t('nav.clubs'), isComingSoon: true },
+    { href: '/etkinlikler', label: t('nav.events') },
+    { href: '/kulupler', label: t('nav.clubs') },
     { href: '/soru-hazirlat', label: t('nav.aiAssistant') },
     { href: '/not-cikar', label: t('nav.aiNotes') },
   ];

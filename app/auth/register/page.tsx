@@ -209,7 +209,7 @@ function RegisterPageInner() {
     const emailDomain = email.split('@')[1] || '';
     if (!emailDomain.endsWith('.edu.tr')) {
       setFieldErrors(prev => ({ ...prev, email: true }));
-      setError('Sadece .edu.tr uzantılı e-posta adresleri ile kayıt olabilirsiniz');
+      setError('Sadece edu.tr uzantılı e-posta adresleri ile kayıt olabilirsiniz');
       setLoading(false);
       return;
     }
@@ -283,27 +283,28 @@ function RegisterPageInner() {
   }, [universityFromParam, t]);
 
   return (
-    <div className="container mx-auto flex flex-col md:flex-row gap-4">
-      {/* Illustration on the left */}
-      <div className="hidden md:flex md:flex-1 items-center justify-center">
-        <div className="relative w-full max-w-sm">
-          <Image 
-            src="/images/education-illustration.svg"
-            alt="Register Illustration"
-            width={400}
-            height={400}
-            className="object-contain"
-            priority
-          />
-        </div>
-      </div>
-      <div className="flex-1">
-        <div className="mb-2">
-          <h2 className="text-2xl font-bold text-[#994D1C]">
-            {t('auth.register')}
-          </h2>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-2.5">
+    <div className="relative min-h-[calc(100vh-6rem)] flex items-center justify-center py-16 px-4">
+      <div className="relative z-10 w-full max-w-5xl">
+        <div className="flex flex-col md:flex-row gap-10 items-center md:items-center">
+          <div className="hidden md:flex md:flex-1 items-center justify-center">
+            <div className="relative w-full max-w-sm">
+              <Image 
+                src="/images/education-illustration.svg"
+                alt="Register Illustration"
+                width={400}
+                height={400}
+                className="object-contain drop-shadow-xl"
+                priority
+              />
+            </div>
+          </div>
+          <div className="flex-1 w-full max-w-xl px-2 md:px-0">
+            <div className="mb-6 text-center md:text-left">
+              <h2 className="text-3xl md:text-4xl font-bold text-[#FFF0E5] drop-shadow">
+                {t('auth.register')}
+              </h2>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-2.5 bg-white border border-white/60 rounded-2xl p-6 shadow-xl">
           <div className="relative">
   <label htmlFor="name" className="block text-sm font-medium text-[#6B3416] mb-1 flex items-center gap-1">
     {t('auth.fullName')}
@@ -597,7 +598,9 @@ function RegisterPageInner() {
           <p className="mt-2 text-xs text-center text-[#6B3416]">
             {t('auth.termsAgreement') || 'By signing up, you agree to our'} <a href="#" className="text-[#FF8B5E] hover:text-[#994D1C]">{t('auth.termsOfUse') || 'Terms of Use'}</a> {t('auth.and') || 'and'} <a href="#" className="text-[#FF8B5E] hover:text-[#994D1C]">{t('auth.privacyPolicy') || 'Privacy Policy'}</a>.
           </p>
-        </form>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   );

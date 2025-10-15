@@ -1,0 +1,401 @@
+'use client';
+
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useLanguage } from '@/src/contexts/LanguageContext';
+
+interface EventClub {
+  _id?: string;
+  name?: string;
+  university?: string;
+  category?: string;
+}
+
+interface EventItem {
+  _id: string;
+  title: string;
+  description: string;
+  date: string;
+  category?: string;
+  location?: string;
+  photoUrl?: string;
+  resources?: string[];
+  clubs?: EventClub[];
+}
+
+interface ClubSummary {
+  _id: string;
+  name: string;
+  university?: string;
+  category?: string;
+}
+
+export default function EventsPage() {
+  const { t, language } = useLanguage();
+
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [clubs, setClubs] = useState<ClubSummary[]>([]);
+
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const [searchInput, setSearchInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedUniversity, setSelectedUniversity] = useState('');
+  const [selectedClub, setSelectedClub] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  useEffect(() => {
+    let ignore = false;
+    const loadClubs = async () => {
+      try {
+        const response = await fetch('/api/kulupler?limit=200', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Failed to load clubs');
+        const data = await response.json();
+        if (!ignore) {
+          const list = Array.isArray(data?.data) ? data.data : [];
+          setClubs(list);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setClubs([]);
+        }
+      }
+    };
+    loadClubs();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const fetchEvents = useCallback(
+    async (signal: AbortSignal): Promise<void> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams();
+        if (searchTerm.trim()) params.set('q', searchTerm.trim());
+        if (selectedUniversity) params.set('university', selectedUniversity);
+        if (selectedClub) params.set('club', selectedClub);
+        if (selectedCategory) params.set('category', selectedCategory);
+        if (startDate) params.set('startDate', startDate);
+        if (endDate) params.set('endDate', endDate);
+
+        const query = params.toString();
+        const response = await fetch(`/api/events${query ? `?${query}` : ''}`, {
+          signal,
+          cache: 'no-store',
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data?.error || 'Failed to load events');
+        }
+        setEvents(Array.isArray(data?.data) ? data.data : []);
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          setError(err?.message || 'Failed to load events');
+          setEvents([]);
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [searchTerm, selectedUniversity, selectedClub, selectedCategory, startDate, endDate]
+  );
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchEvents(controller.signal);
+    return () => controller.abort();
+  }, [fetchEvents]);
+
+  const handleSearchSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    setSearchTerm(searchInput.trim());
+  };
+
+  const handleResetFilters = () => {
+    setSearchInput('');
+    setSearchTerm('');
+    setSelectedUniversity('');
+    setSelectedClub('');
+    setSelectedCategory('');
+    setStartDate('');
+    setEndDate('');
+  };
+
+  const universities = useMemo(() => {
+    const fromClubs = clubs.map((club) => club.university).filter(Boolean) as string[];
+    const fromEvents = events
+      .flatMap((event) => event.clubs?.map((club) => club?.university).filter(Boolean) ?? []) as string[];
+    return Array.from(new Set([...fromClubs, ...fromEvents])).sort((a, b) => a.localeCompare(b));
+  }, [clubs, events]);
+
+  const categories = useMemo(() => {
+    const items = events
+      .map((event) => event.category)
+      .filter((category): category is string => Boolean(category?.length));
+    return Array.from(new Set(items)).sort((a, b) => a.localeCompare(b));
+  }, [events]);
+
+  const formattedEvents = useMemo(() => {
+    return events.map((event) => {
+      const dateValue = new Date(event.date);
+      let formattedDate = event.date;
+      if (!Number.isNaN(dateValue.getTime())) {
+        formattedDate = new Intl.DateTimeFormat(language === 'tr' ? 'tr-TR' : 'en-US', {
+          dateStyle: 'long',
+          timeStyle: 'short',
+        }).format(dateValue);
+      }
+      return { ...event, formattedDate };
+    });
+  }, [events, language]);
+
+  return (
+    <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
+        <div className="bg-white/85 backdrop-blur rounded-3xl shadow-xl border border-[#FFE5D9] px-8 py-10 space-y-8">
+          <header className="text-center space-y-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-[#994D1C]">{t('events.title')}</h1>
+            <p className="text-base text-[#6B3416]/80">{t('events.subtitle')}</p>
+          </header>
+
+          <div className="space-y-4">
+            <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row gap-3">
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder={t('events.searchPlaceholder')}
+                className="flex-1 rounded-xl border border-[#FFE5D9] bg-[#FFF9F6] px-4 py-2.5 text-sm text-[#6B3416] focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+              />
+              <button
+                type="submit"
+                className="rounded-xl bg-gradient-to-r from-[#FF8B5E] to-[#FFB996] px-6 py-2.5 text-sm font-semibold text-white shadow transition-transform duration-200 hover:scale-[1.01]"
+              >
+                {t('events.searchButton')}
+              </button>
+            </form>
+
+            <div className="rounded-2xl border border-[#FFE5D9] bg-[#FFF9F6] px-4 py-3">
+              <button
+                type="button"
+                onClick={() => setFiltersOpen((prev) => !prev)}
+                className="w-full flex items-center justify-between text-left text-[#994D1C] font-semibold text-sm tracking-wide"
+              >
+                <span>{t('events.filtersTitle')}</span>
+                <svg
+                  className={`h-5 w-5 transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {filtersOpen && (
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-semibold text-[#6B3416]/80 uppercase tracking-wide">
+                      {t('events.filterUniversity')}
+                    </label>
+                    <select
+                      value={selectedUniversity}
+                      onChange={(event) => setSelectedUniversity(event.target.value)}
+                      className="rounded-xl border border-[#FFE5D9] bg-white px-4 py-2.5 text-sm text-[#6B3416] focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+                    >
+                      <option value="">{t('events.allUniversities')}</option>
+                      {universities.map((uni) => (
+                        <option key={uni} value={uni}>
+                          {uni}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-semibold text-[#6B3416]/80 uppercase tracking-wide">
+                      {t('events.filterClub')}
+                    </label>
+                    <select
+                      value={selectedClub}
+                      onChange={(event) => setSelectedClub(event.target.value)}
+                      className="rounded-xl border border-[#FFE5D9] bg-white px-4 py-2.5 text-sm text-[#6B3416] focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+                    >
+                      <option value="">{t('events.allClubs')}</option>
+                      {clubs.map((club) => (
+                        <option key={club._id} value={club._id}>
+                          {club.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-semibold text-[#6B3416]/80 uppercase tracking-wide">
+                      {t('events.filterCategory')}
+                    </label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(event) => setSelectedCategory(event.target.value)}
+                      className="rounded-xl border border-[#FFE5D9] bg-white px-4 py-2.5 text-sm text-[#6B3416] focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+                    >
+                      <option value="">{t('events.allCategories')}</option>
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-semibold text-[#6B3416]/80 uppercase tracking-wide">
+                      {t('events.filterDateFrom')}
+                    </label>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(event) => setStartDate(event.target.value)}
+                      className="rounded-xl border border-[#FFE5D9] bg-white px-4 py-2.5 text-sm text-[#6B3416] focus:outline-none focus:ring-2 focus_RING-[#FF8B5E]"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-semibold text-[#6B3416]/80 uppercase tracking-wide">
+                      {t('events.filterDateTo')}
+                    </label>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(event) => setEndDate(event.target.value)}
+                      className="rounded-xl border border-[#FFE5D9] bg-white px-4 py-2.5 text-sm text-[#6B3416] focus:outline-none focus:ring-2 focus_RING-[#FF8B5E]"
+                    />
+                  </div>
+
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={handleResetFilters}
+                      className="w-full rounded-xl border border-[#FFE5D9] bg-white px-4 py-2.5 text-sm font-semibold text-[#994D1C] shadow-sm transition hover:bg-[#FFF5F0]"
+                    >
+                      {t('events.resetFilters')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <section className="space-y-6">
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="h-12 w-12 animate-spin rounded-full border-2 border-[#FFB996] border-t-[#FF8B5E]" />
+              </div>
+            ) : error ? (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-6 text-center text-sm text-red-700">
+                {error}
+              </div>
+            ) : formattedEvents.length === 0 ? (
+              <div className="rounded-xl border border-[#FFE5D9] bg-[#FFF5F0] px-4 py-6 text-center text-sm text-[#C17B4C]">
+                {t('events.noResults')}
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2">
+                {formattedEvents.map((event) => (
+                  <article
+                    key={event._id}
+                    className="overflow-hidden rounded-2xl border border-[#FFE5D9] bg-white shadow hover:shadow-md transition-shadow flex flex-col"
+                  >
+                    {event.photoUrl ? (
+                      <div className="relative h-32 w-full">
+                        <Image src={event.photoUrl} alt={event.title} fill className="object-cover" />
+                      </div>
+                    ) : null}
+                    <div className="space-y-2 p-4 flex-1 flex flex-col">
+                      <div className="flex items-start justify-between gap-3">
+                        <h2 className="text-lg font-semibold text-[#994D1C]">{event.title}</h2>
+                        {event.category && (
+                          <span className="text-xs font-medium uppercase tracking-wide text-[#FF8B5E] bg-[#FFE5D9] rounded-full px-2 py-1">
+                            {event.category}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs font-medium text-[#C17B4C] uppercase tracking-wide">
+                        {t('events.eventDate')}: {event.formattedDate}
+                      </div>
+                      {event.location && (
+                        <div className="text-xs text-[#6B3416]">
+                          <span className="font-semibold">{t('events.locationLabel')}:</span> {event.location}
+                        </div>
+                      )}
+                      <p className="text-sm text-[#6B3416]/90 line-clamp-3">
+                        {event.description}
+                      </p>
+
+                      {Array.isArray(event.resources) && event.resources.length > 0 && (
+                        <div className="space-y-1">
+                          <div className="text-xs font-semibold uppercase tracking-wide text-[#994D1C]">
+                            {t('events.resourcesLabel')}
+                          </div>
+                          <ul className="space-y-1 text-xs">
+                            {event.resources.map((resource, index) => (
+                              <li key={index}>
+                                <a
+                                  href={resource}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[#FF8B5E] underline break-words"
+                                >
+                                  {resource}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {Array.isArray(event.clubs) && event.clubs.length > 0 && (
+                        <div className="space-y-1 mt-auto">
+                          <div className="text-xs font-semibold uppercase tracking-wide text-[#994D1C]">
+                            {t('events.associatedClubs')}
+                          </div>
+                          <ul className="space-y-1 text-xs">
+                            {event.clubs.map((club) => (
+                              <li key={club._id ?? `${event._id}-${club.name}`}>
+                                {club._id ? (
+                                  <Link
+                                    href={`/kulupler/${club._id}`}
+                                    className="text-[#994D1C] underline hover:text-[#FF8B5E]"
+                                  >
+                                    {club.name}
+                                  </Link>
+                                ) : (
+                                  <span>{club.name}</span>
+                                )}
+                                {club.university && (
+                                  <span className="text-[10px] text-[#C17B4C] block">{club.university}</span>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}

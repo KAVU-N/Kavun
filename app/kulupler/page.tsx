@@ -2,10 +2,12 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { MouseEvent, useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { universities } from '@/data/universities';
 import ClubContactActions from '@/src/components/ClubContactActions';
+import { useAuth } from '@/src/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 type Club = {
   _id: string;
@@ -19,6 +21,8 @@ type Club = {
 
 export default function ClubsPage() {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const router = useRouter();
   const [q, setQ] = useState('');
   const [category, setCategory] = useState('');
   const [university, setUniversity] = useState('');
@@ -68,7 +72,12 @@ export default function ClubsPage() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-[#994D1C]">{t('clubs.title')}</h1>
           <Link
-            href="/kulupler/olustur"
+            href={user ? '/kulupler/olustur' : '#'}
+            onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+              if (user) return;
+              event.preventDefault();
+              router.push(`/auth/login?redirect=${encodeURIComponent('/kulupler/olustur')}`);
+            }}
             className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#FF8B5E] to-[#994D1C] text-white px-4 py-2 shadow hover:opacity-95 transition"
           >
             {t('clubs.addClub')}

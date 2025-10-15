@@ -13,6 +13,9 @@ export default function RouteBackgroundHost() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const enabled = (
+    pathname?.startsWith("/etud") ||
+    pathname?.startsWith("/auth/login") ||
+    pathname?.startsWith("/auth/register") ||
     pathname?.startsWith("/ilan") ||
     pathname?.startsWith("/ilanlar") ||
     pathname?.startsWith("/ilanlarim") ||
@@ -20,6 +23,7 @@ export default function RouteBackgroundHost() {
     pathname?.startsWith("/kaynaklar") ||
     pathname?.startsWith("/not-cikar") ||
     pathname?.startsWith("/soru-hazirlat") ||
+    pathname?.startsWith("/etkinlikler") ||
     pathname?.startsWith("/kulupler") ||
     pathname?.startsWith("/egitmenler") ||
     pathname?.startsWith("/profil") ||

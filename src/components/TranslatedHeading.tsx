@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/src/contexts/LanguageContext';
 
-type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'div' | 'span';
 
 interface TranslatedHeadingProps {
   as?: HeadingLevel;
