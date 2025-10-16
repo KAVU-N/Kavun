@@ -1,9 +1,25 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+
+const readFileAsDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Dosya okunamadı'));
+      }
+    };
+    reader.onerror = () => {
+      reject(reader.error || new Error('Dosya okunamadı'));
+    };
+    reader.readAsDataURL(file);
+  });
 
 export default function EventAdminAddPage() {
   const { t } = useLanguage();
@@ -12,10 +28,13 @@ export default function EventAdminAddPage() {
 
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoInputKey, setPhotoInputKey] = useState(0);
   const [resourcesText, setResourcesText] = useState('');
   const [clubName, setClubName] = useState('');
 
@@ -40,22 +59,54 @@ export default function EventAdminAddPage() {
       .filter((item) => item.length > 0);
   }, [resourcesText]);
 
+  const handlePhotoFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    setPhotoFile(file);
+    if (file) {
+      setPhotoUrl('');
+    }
+  };
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!date) {
+    const trimmedDate = date.trim();
+    if (!trimmedDate) {
       toast.error(t('events.admin.dateRequired'));
       return;
     }
 
     setSaving(true);
     try {
+      const trimmedTime = time.trim();
+      const dateTimeString = trimmedTime ? `${trimmedDate}T${trimmedTime}` : `${trimmedDate}T00:00`;
+      const selectedDate = new Date(dateTimeString);
+      if (Number.isNaN(selectedDate.getTime())) {
+        throw new Error('Geçersiz etkinlik tarihi');
+      }
+      const normalizedDate = selectedDate.toISOString();
+
+      let resolvedPhotoUrl = photoUrl.trim();
+      if (photoFile) {
+        const fileDataUrl = await readFileAsDataUrl(photoFile);
+        const uploadResponse = await fetch('/api/upload/event-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: fileDataUrl }),
+        });
+        const uploadData = await uploadResponse.json();
+        if (!uploadResponse.ok) {
+          throw new Error(uploadData?.error || 'Fotoğraf yüklenemedi');
+        }
+        resolvedPhotoUrl = typeof uploadData?.url === 'string' ? uploadData.url : '';
+      }
+
       const payload = {
         title,
         description,
-        date,
+        date: normalizedDate,
         category,
         location,
-        photoUrl,
+        photoUrl: resolvedPhotoUrl || undefined,
         resources: resourceList,
         clubName,
       };
@@ -77,8 +128,11 @@ export default function EventAdminAddPage() {
       setCategory('');
       setLocation('');
       setPhotoUrl('');
+      setPhotoFile(null);
+      setPhotoInputKey((prev) => prev + 1);
       setResourcesText('');
       setClubName('');
+      setTime('');
     } catch (error: any) {
       toast.error(error?.message || t('events.admin.createError'));
     } finally {
@@ -132,7 +186,7 @@ export default function EventAdminAddPage() {
                     {t('events.admin.dateLabel')}
                   </label>
                   <input
-                    type="datetime-local"
+                    type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
                     className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
@@ -141,22 +195,36 @@ export default function EventAdminAddPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-[#6B3416]">
-                    {t('events.admin.categoryLabel')}
+                    {t('events.admin.timeLabel')}
                   </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E] bg-white"
-                    required
-                  >
-                    <option value="">{categoryPlaceholder}</option>
-                    {categoryOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
+                  <input
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                    className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+                  />
+                  <span className="text-xs text-[#C17B4C] block">
+                    {t('events.admin.timeOptionalHint')}
+                  </span>
                 </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#6B3416]">
+                  {t('events.admin.categoryLabel')}
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E] bg-white"
+                  required
+                >
+                  <option value="">{categoryPlaceholder}</option>
+                  {categoryOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -175,12 +243,31 @@ export default function EventAdminAddPage() {
                   <label className="text-sm font-medium text-[#6B3416]">
                     {t('events.admin.photoLabel')}
                   </label>
-                  <input
-                    type="text"
-                    value={photoUrl}
-                    onChange={(e) => setPhotoUrl(e.target.value)}
-                    className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
-                  />
+                  <div className="space-y-2">
+                    <input
+                      key={photoInputKey}
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoFileChange}
+                      className="w-full text-sm text-[#6B3416]"
+                    />
+                    <input
+                      type="text"
+                      value={photoUrl}
+                      onChange={(e) => {
+                        setPhotoUrl(e.target.value);
+                        if (photoFile) {
+                          setPhotoFile(null);
+                          setPhotoInputKey((prev) => prev + 1);
+                        }
+                      }}
+                      placeholder="https://"
+                      className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+                    />
+                    {photoFile ? (
+                      <span className="text-xs text-[#C17B4C] block">{photoFile.name}</span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
 

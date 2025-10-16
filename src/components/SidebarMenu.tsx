@@ -42,7 +42,6 @@ export default function SidebarMenu() {
     { href: '/mesajlarim', label: t('nav.messages') },
     { href: '/ilanlarim', label: t('nav.myListings') },
     { href: '/projelerim', label: t('nav.myProjects') },
-    { href: '/kuluplerim', label: t('nav.myClub') },
   ];
 
   const linkBaseClass = 'flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 text-sm font-medium';

@@ -1,16 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import Image from 'next/image';
+import { EVENT_ADMIN_EMAIL, EVENT_ADMIN_PASSWORD } from '@/lib/eventAdminAuth';
+import { toast } from 'react-hot-toast';
 
 export default function CreateClubPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { t } = useLanguage();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [university, setUniversity] = useState('');
   const [category, setCategory] = useState('');
@@ -76,54 +83,102 @@ export default function CreateClubPage() {
     }
   };
 
+  const handleAuthSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    setAuthError(null);
+    setAuthLoading(true);
+    try {
+      if (authEmail.trim() === EVENT_ADMIN_EMAIL && authPassword === EVENT_ADMIN_PASSWORD) {
+        setIsAuthorized(true);
+        toast.success('Yetkilendirme başarılı');
+      } else {
+        setAuthError('Yetkilendirme başarısız. Bilgileri kontrol edin.');
+      }
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   return (
     <div className="relative min-h-screen overflow-hidden pt-28 pb-12">
       <div className="max-w-3xl mx-auto px-4 relative z-10">
         <Link href="/kulupler" className="text-[#994D1C] hover:underline">← {t('nav.clubs')}</Link>
-        <form onSubmit={onSubmit} className="mt-4 rounded-2xl bg-white/70 border border-black/10 p-6 shadow space-y-4">
-          <h1 className="text-2xl font-bold text-[#994D1C]">{t('clubs.addClub')}</h1>
-          {error && <div className="text-red-600 text-sm">{error}</div>}
-          <input value={name} onChange={e=>setName(e.target.value)} placeholder={t('general.clubName')} className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white" />
-          <div>
-            <input value={university} disabled placeholder={t('general.clubUniversity')} title="Üniversite bilginiz profilinizden otomatik gelir" className="w-full px-4 py-3 rounded-lg border border-black/10 bg-gray-100 text-black/70" />
-            <p className="text-xs text-black/60 mt-1">Üniversite bilginiz profilinizden otomatik alınır ve değiştirilemez.</p>
-          </div>
-          <input value={category} onChange={e=>setCategory(e.target.value)} placeholder={t('general.clubCategory')} className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white" />
-          <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder={t('general.clubDescription')} className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white min-h-28" />
-          {/* Logo yükleme */}
-          <div className="pt-2">
-            <label className="block text-sm font-medium text-black/80 mb-1">Kulüp Logosu (Maks. 1MB, JPG/PNG/WebP)</label>
-            {logoPreview ? (
-              <div className="w-full h-40 bg-gray-100 rounded-lg overflow-hidden mb-2 relative">
-                <Image src={logoPreview} alt="Logo önizleme" fill sizes="640px" className="object-contain" />
-              </div>
-            ) : null}
+        {!isAuthorized ? (
+          <form onSubmit={handleAuthSubmit} className="mt-4 rounded-2xl bg-white/80 border border-black/10 p-6 shadow space-y-4">
+            <h1 className="text-2xl font-bold text-[#994D1C]">Kulüp Yönetici Girişi</h1>
+            {authError ? <div className="text-red-600 text-sm">{authError}</div> : null}
             <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-                if (!allowed.includes(file.type)) {
-                  setError('Yalnızca JPG, PNG veya WebP yükleyebilirsiniz.');
-                  return;
-                }
-                if (file.size > 1024 * 1024) { // 1MB
-                  setError('Kulüp logosu 1MB altında olmalıdır.');
-                  return;
-                }
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                  setLogoPreview(String(ev.target?.result || ''));
-                };
-                reader.readAsDataURL(file);
-              }}
-              className="block w-full text-sm text-black/80 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#FFE5D9] file:text-[#994D1C] hover:file:bg-[#FFD8C7]"
+              type="text"
+              value={authEmail}
+              onChange={(event) => setAuthEmail(event.target.value)}
+              placeholder="Yönetici E-posta"
+              className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white"
+              autoComplete="off"
+              required
             />
-          </div>
-          <button disabled={loading} type="submit" className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#FF8B5E] to-[#994D1C] text-white px-4 py-2 shadow hover:opacity-95 transition disabled:opacity-60">{loading ? 'Oluşturuluyor...' : t('general.clubCreate')}</button>
-        </form>
+            <input
+              type="password"
+              value={authPassword}
+              onChange={(event) => setAuthPassword(event.target.value)}
+              placeholder="Yönetici Şifre"
+              className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white"
+              autoComplete="off"
+              required
+            />
+            <button
+              type="submit"
+              disabled={authLoading}
+              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#FF8B5E] to-[#994D1C] text-white px-4 py-2 shadow hover:opacity-95 transition disabled:opacity-60"
+            >
+              {authLoading ? 'Kontrol ediliyor...' : 'Giriş Yap'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={onSubmit} className="mt-4 rounded-2xl bg-white/70 border border-black/10 p-6 shadow space-y-4">
+            <h1 className="text-2xl font-bold text-[#994D1C]">{t('clubs.addClub')}</h1>
+            {error && <div className="text-red-600 text-sm">{error}</div>}
+            <input value={name} onChange={e=>setName(e.target.value)} placeholder={t('general.clubName')} className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white" />
+            <div>
+              <input value={university} disabled placeholder={t('general.clubUniversity')} title="Üniversite bilginiz profilinizden otomatik gelir" className="w-full px-4 py-3 rounded-lg border border-black/10 bg-gray-100 text-black/70" />
+              <p className="text-xs text-black/60 mt-1">Üniversite bilginiz profilinizden otomatik alınır ve değiştirilemez.</p>
+            </div>
+            <input value={category} onChange={e=>setCategory(e.target.value)} placeholder={t('general.clubCategory')} className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white" />
+            <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder={t('general.clubDescription')} className="w-full px-4 py-3 rounded-lg border border-black/10 bg-white min-h-28" />
+            {/* Logo yükleme */}
+            <div className="pt-2">
+              <label className="block text-sm font-medium text-black/80 mb-1">Kulüp Logosu (Maks. 1MB, JPG/PNG/WebP)</label>
+              {logoPreview ? (
+                <div className="w-full h-40 bg-gray-100 rounded-lg overflow-hidden mb-2 relative">
+                  <Image src={logoPreview} alt="Logo önizleme" fill sizes="640px" className="object-contain" />
+                </div>
+              ) : null}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+                  if (!allowed.includes(file.type)) {
+                    setError('Yalnızca JPG, PNG veya WebP yükleyebilirsiniz.');
+                    return;
+                  }
+                  if (file.size > 1024 * 1024) { // 1MB
+                    setError('Kulüp logosu 1MB altında olmalıdır.');
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    setLogoPreview(String(ev.target?.result || ''));
+                  };
+                  reader.readAsDataURL(file);
+                }}
+                className="block w-full text-sm text-black/80 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#FFE5D9] file:text-[#994D1C] hover:file:bg-[#FFD8C7]"
+              />
+            </div>
+            <button disabled={loading} type="submit" className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#FF8B5E] to-[#994D1C] text-white px-4 py-2 shadow hover:opacity-95 transition disabled:opacity-60">{loading ? 'Oluşturuluyor...' : t('general.clubCreate')}</button>
+          </form>
+        )}
       </div>
     </div>
   );

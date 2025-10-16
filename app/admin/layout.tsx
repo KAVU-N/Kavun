@@ -87,6 +87,14 @@ export default function AdminLayout({
                 className={`block px-4 py-2 hover:bg-blue-700 transition ${pathname?.startsWith('/admin/listings') ? 'bg-blue-700' : ''}`}>{t('listings') || 'İlanlar'}</Link>
             </li>
             <li>
+              <Link href="/admin/clubs"
+                className={`block px-4 py-2 hover:bg-blue-700 transition ${pathname?.startsWith('/admin/clubs') ? 'bg-blue-700' : ''}`}>{t('adminClubs') || 'Kulüp Yönetimi'}</Link>
+            </li>
+            <li>
+              <Link href="/events-admin"
+                className={`block px-4 py-2 hover:bg-blue-700 transition ${pathname?.startsWith('/events-admin') ? 'bg-blue-700' : ''}`}>{t('nav.eventsAdmin') || 'Etkinlikler'}</Link>
+            </li>
+            <li>
               <Link href="/admin/announcements"
                 className={`block px-4 py-2 hover:bg-blue-700 transition ${pathname?.startsWith('/admin/announcements') ? 'bg-blue-700' : ''}`}>{t('announcements') || 'İlanlar'}</Link>
             </li>
