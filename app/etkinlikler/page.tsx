@@ -182,7 +182,6 @@ export default function EventsPage() {
         <div className="bg-white/85 backdrop-blur rounded-3xl shadow-xl border border-[#FFE5D9] px-10 py-12 space-y-10">
           <header className="text-center space-y-2">
             <h1 className="text-3xl md:text-4xl font-bold text-[#994D1C]">{t('events.title')}</h1>
-            <p className="text-base text-[#6B3416]/80">{t('events.subtitle')}</p>
           </header>
 
           <div className="space-y-4">
@@ -363,40 +362,49 @@ export default function EventsPage() {
                         </div>
                       )}
 
-                      {(event.displayClubs.length > 0 || event.displayClubName) && (
-                        <div className="space-y-1 mt-auto">
-                          <div className="text-xs font-semibold uppercase tracking-wide text-[#994D1C]">
-                            {t('events.associatedClubs')}
+                      <div className="mt-auto space-y-4">
+                        {(event.displayClubs.length > 0 || event.displayClubName) && (
+                          <div className="space-y-1">
+                            <div className="text-xs font-semibold uppercase tracking-wide text-[#994D1C]">
+                              {t('events.associatedClubs')}
+                            </div>
+                            {event.displayClubs.length > 0 ? (
+                              <ul className="space-y-1 text-xs">
+                                {event.displayClubs.map((club) => (
+                                  <li key={club._id ?? `${event._id}-${club.name}`}>
+                                    {club._id ? (
+                                      <Link
+                                        href={`/kulupler/${club._id}`}
+                                        className="text-[#994D1C] underline hover:text-[#FF8B5E]"
+                                      >
+                                        {club.linkName}
+                                      </Link>
+                                    ) : (
+                                      <span>{club.linkName}</span>
+                                    )}
+                                    {club.university ? (
+                                      <span className="text-[10px] text-[#C17B4C] block">{club.university}</span>
+                                    ) : null}
+                                    {club.category ? (
+                                      <span className="text-[10px] text-[#C17B4C] block">{club.category}</span>
+                                    ) : null}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : null}
+                            {event.displayClubName && event.displayClubs.length === 0 ? (
+                              <div className="text-xs text-[#6B3416]">{event.displayClubName}</div>
+                            ) : null}
                           </div>
-                          {event.displayClubs.length > 0 ? (
-                            <ul className="space-y-1 text-xs">
-                              {event.displayClubs.map((club) => (
-                                <li key={club._id ?? `${event._id}-${club.name}`}>
-                                  {club._id ? (
-                                    <Link
-                                      href={`/kulupler/${club._id}`}
-                                      className="text-[#994D1C] underline hover:text-[#FF8B5E]"
-                                    >
-                                      {club.linkName}
-                                    </Link>
-                                  ) : (
-                                    <span>{club.linkName}</span>
-                                  )}
-                                  {club.university ? (
-                                    <span className="text-[10px] text-[#C17B4C] block">{club.university}</span>
-                                  ) : null}
-                                  {club.category ? (
-                                    <span className="text-[10px] text-[#C17B4C] block">{club.category}</span>
-                                  ) : null}
-                                </li>
-                              ))}
-                            </ul>
-                          ) : null}
-                          {event.displayClubName && event.displayClubs.length === 0 ? (
-                            <div className="text-xs text-[#6B3416]">{event.displayClubName}</div>
-                          ) : null}
-                        </div>
-                      )}
+                        )}
+                        <Link
+                          href={`/etkinlikler/${event._id}`}
+                          className="inline-flex items-center gap-2 text-sm font-semibold text-[#994D1C] hover:text-[#FF8B5E]"
+                        >
+                          {t('home.featuredEvents.view')}
+                          <span aria-hidden="true">→</span>
+                        </Link>
+                      </div>
                     </div>
                   </article>
                 ))}
