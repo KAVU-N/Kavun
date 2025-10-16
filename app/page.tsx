@@ -1,5 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { universities } from '@/data/universities';
@@ -275,7 +276,107 @@ export default function Home() {
             </div>
           </div>
         </div>
-        
+
+        {/* Highlights */}
+        <section className="relative z-20 mt-24">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="bg-white/80 backdrop-blur-sm border border-[#FFE5D9] rounded-3xl shadow-xl p-8 md:p-12">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-[#994D1C]">{t('home.highlights.title')}</h2>
+                  <p className="text-[#6B3416]/80 mt-2 md:max-w-xl">{t('home.highlights.subtitle')}</p>
+                </div>
+                <Link
+                  href="/kaynaklar"
+                  className="self-start md:self-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#FFB996] to-[#FF8B5E] text-white text-sm font-semibold shadow hover:shadow-lg transition"
+                >
+                  {t('home.cta.exploreResources')}
+                </Link>
+              </div>
+              <div className="grid gap-6 md:grid-cols-3">
+                <div className="group rounded-2xl border border-[#FFE5D9] bg-white/90 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                  <div className="w-12 h-12 rounded-full bg-[#FFE5D9] text-[#994D1C] flex items-center justify-center font-semibold mb-4">1</div>
+                  <h3 className="text-lg font-semibold text-[#6B3416] mb-2">{t('home.highlights.items.resources.title')}</h3>
+                  <p className="text-sm text-[#6B3416]/80">{t('home.highlights.items.resources.desc')}</p>
+                </div>
+                <div className="group rounded-2xl border border-[#FFE5D9] bg-white/90 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                  <div className="w-12 h-12 rounded-full bg-[#FFE5D9] text-[#994D1C] flex items-center justify-center font-semibold mb-4">2</div>
+                  <h3 className="text-lg font-semibold text-[#6B3416] mb-2">{t('home.highlights.items.ai.title')}</h3>
+                  <p className="text-sm text-[#6B3416]/80">{t('home.highlights.items.ai.desc')}</p>
+                </div>
+                <div className="group rounded-2xl border border-[#FFE5D9] bg-white/90 p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                  <div className="w-12 h-12 rounded-full bg-[#FFE5D9] text-[#994D1C] flex items-center justify-center font-semibold mb-4">3</div>
+                  <h3 className="text-lg font-semibold text-[#6B3416] mb-2">{t('home.highlights.items.projects.title')}</h3>
+                  <p className="text-sm text-[#6B3416]/80">{t('home.highlights.items.projects.desc')}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Quick Tools */}
+        <section className="relative z-20 mt-16">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="mb-8 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-[#994D1C]">{t('home.tools.title')}</h2>
+              <p className="text-[#6B3416]/80 mt-2">{t('home.tools.subtitle')}</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <Link
+                href="/not-cikar"
+                className="group rounded-2xl border border-[#FFE5D9] bg-white/90 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#6B3416]">{t('home.tools.aiNotes')}</h3>
+                    <p className="text-sm text-[#6B3416]/70 mt-2">{t('home.highlights.items.ai.desc')}</p>
+                  </div>
+                  <span className="w-10 h-10 rounded-full bg-[#FFE5D9] text-[#994D1C] flex items-center justify-center font-semibold">AI</span>
+                </div>
+              </Link>
+              <Link
+                href="/soru-hazirlat"
+                className="group rounded-2xl border border-[#FFE5D9] bg-white/90 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#6B3416]">{t('home.tools.aiQuestions')}</h3>
+                    <p className="text-sm text-[#6B3416]/70 mt-2">{t('home.highlights.items.ai.desc')}</p>
+                  </div>
+                  <span className="w-10 h-10 rounded-full bg-[#FFE5D9] text-[#994D1C] flex items-center justify-center font-semibold">Q</span>
+                </div>
+              </Link>
+              <Link
+                href="/kaynaklar"
+                className="group rounded-2xl border border-[#FFE5D9] bg-white/90 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#6B3416]">{t('home.tools.resources')}</h3>
+                    <p className="text-sm text-[#6B3416]/70 mt-2">{t('home.highlights.items.resources.desc')}</p>
+                  </div>
+                  <span className="w-10 h-10 rounded-full bg-[#FFE5D9] text-[#994D1C] flex items-center justify-center font-semibold">📚</span>
+                </div>
+              </Link>
+              <Link
+                href="/projeler"
+                className="group rounded-2xl border border-[#FFE5D9] bg-white/90 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#6B3416]">{t('home.tools.projects')}</h3>
+                    <p className="text-sm text-[#6B3416]/70 mt-2">{t('home.highlights.items.projects.desc')}</p>
+                  </div>
+                  <span className="w-10 h-10 rounded-full bg-[#FFE5D9] text-[#994D1C] flex items-center justify-center font-semibold">🤝</span>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Featured Events */}
+        <FeaturedEvents />
+
       </main>
 
       {showRoleDialog && (
@@ -320,3 +421,101 @@ export default function Home() {
   );
 }
 
+
+function FeaturedEvents() {
+  const { t } = useLanguage();
+  const [events, setEvents] = useState<any[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/events?limit=4');
+        if (!response.ok) throw new Error('Failed to fetch events');
+        const data = await response.json();
+        if (!cancelled) {
+          const list = Array.isArray(data?.data) ? data.data.slice(0, 4) : [];
+          setEvents(list);
+        }
+      } catch (_) {
+        if (!cancelled) setEvents([]);
+      } finally {
+        if (!cancelled) setLoadingEvents(false);
+      }
+    };
+    fetchEvents();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <section className="relative z-20 mt-16 mb-10">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#994D1C]">{t('home.featuredEvents.title')}</h2>
+            <p className="text-[#6B3416]/80 mt-2">{t('home.featuredEvents.subtitle')}</p>
+          </div>
+          <Link
+            href="/etkinlikler"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-[#FFE5D9] text-[#994D1C] font-semibold hover:bg-[#FFE5D9]/60 transition"
+          >
+            {t('home.featuredEvents.cta')}
+          </Link>
+        </div>
+
+        {loadingEvents ? (
+          <div className="flex justify-center py-12">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#FFB996]/40 border-t-[#FF8B5E]" />
+          </div>
+        ) : events.length === 0 ? (
+          <div className="rounded-2xl border border-[#FFE5D9] bg-white/90 p-6 text-center text-[#6B3416]/80">
+            {t('home.featuredEvents.empty')}
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {events.map((event) => {
+              const date = event?.date ? new Date(event.date) : null;
+              const month = date ? date.toLocaleString(t('general.locale') === 'tr' ? 'tr-TR' : 'en-US', { month: 'short' }) : '';
+              const day = date ? date.getDate() : '';
+              return (
+                <div key={event._id} className="group rounded-2xl border border-[#FFE5D9] bg-white/95 shadow-sm overflow-hidden transition hover:-translate-y-1 hover:shadow-lg">
+                  <div className="relative h-40 w-full overflow-hidden">
+                    <Image
+                      src={event.photoUrl || '/images/default-event.jpg'}
+                      alt={event.title || 'Event'}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 25vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute top-4 left-4 bg-white/90 rounded-lg px-3 py-2 text-center text-[#994D1C]">
+                      <div className="text-xs font-semibold uppercase">{month}</div>
+                      <div className="text-lg font-bold leading-none">{day}</div>
+                    </div>
+                  </div>
+                  <div className="p-5 space-y-3">
+                    <div className="text-xs uppercase tracking-wide text-[#FF8B5E] font-semibold">{event.category || 'Etkinlik'}</div>
+                    <h3 className="text-lg font-semibold text-[#6B3416] line-clamp-2">{event.title}</h3>
+                    <p className="text-sm text-[#6B3416]/70 line-clamp-3">{event.description}</p>
+                    <div className="text-xs text-[#6B3416]/60">
+                      {event.location || 'Lokasyon paylaşılmadı'}
+                    </div>
+                    <Link
+                      href={`/etkinlikler/${event._id}`}
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-[#994D1C] hover:text-[#FF8B5E]"
+                    >
+                      {t('home.featuredEvents.view')}
+                      <span aria-hidden="true">→</span>
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}

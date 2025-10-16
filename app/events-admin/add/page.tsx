@@ -33,8 +33,6 @@ export default function EventAdminAddPage() {
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoInputKey, setPhotoInputKey] = useState(0);
   const [resourcesText, setResourcesText] = useState('');
   const [clubName, setClubName] = useState('');
 
@@ -59,14 +57,6 @@ export default function EventAdminAddPage() {
       .filter((item) => item.length > 0);
   }, [resourcesText]);
 
-  const handlePhotoFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] ?? null;
-    setPhotoFile(file);
-    if (file) {
-      setPhotoUrl('');
-    }
-  };
-
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const trimmedDate = date.trim();
@@ -85,20 +75,7 @@ export default function EventAdminAddPage() {
       }
       const normalizedDate = selectedDate.toISOString();
 
-      let resolvedPhotoUrl = photoUrl.trim();
-      if (photoFile) {
-        const fileDataUrl = await readFileAsDataUrl(photoFile);
-        const uploadResponse = await fetch('/api/upload/event-photo', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: fileDataUrl }),
-        });
-        const uploadData = await uploadResponse.json();
-        if (!uploadResponse.ok) {
-          throw new Error(uploadData?.error || 'Fotoğraf yüklenemedi');
-        }
-        resolvedPhotoUrl = typeof uploadData?.url === 'string' ? uploadData.url : '';
-      }
+      const resolvedPhotoUrl = photoUrl.trim();
 
       const payload = {
         title,
@@ -128,8 +105,6 @@ export default function EventAdminAddPage() {
       setCategory('');
       setLocation('');
       setPhotoUrl('');
-      setPhotoFile(null);
-      setPhotoInputKey((prev) => prev + 1);
       setResourcesText('');
       setClubName('');
       setTime('');
@@ -149,7 +124,7 @@ export default function EventAdminAddPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF5F0] px-4 py-10">
+    <div className="min-h-screen bg-[#FFF5F0] px-4 pt-32 pb-10">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-semibold text-[#994D1C]">
@@ -243,31 +218,13 @@ export default function EventAdminAddPage() {
                   <label className="text-sm font-medium text-[#6B3416]">
                     {t('events.admin.photoLabel')}
                   </label>
-                  <div className="space-y-2">
-                    <input
-                      key={photoInputKey}
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoFileChange}
-                      className="w-full text-sm text-[#6B3416]"
-                    />
-                    <input
-                      type="text"
-                      value={photoUrl}
-                      onChange={(e) => {
-                        setPhotoUrl(e.target.value);
-                        if (photoFile) {
-                          setPhotoFile(null);
-                          setPhotoInputKey((prev) => prev + 1);
-                        }
-                      }}
-                      placeholder="https://"
-                      className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
-                    />
-                    {photoFile ? (
-                      <span className="text-xs text-[#C17B4C] block">{photoFile.name}</span>
-                    ) : null}
-                  </div>
+                  <input
+                    type="text"
+                    value={photoUrl}
+                    onChange={(e) => setPhotoUrl(e.target.value)}
+                    placeholder="https://"
+                    className="w-full rounded-lg border border-[#FFE5D9] px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8B5E]"
+                  />
                 </div>
               </div>
 

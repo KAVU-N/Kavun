@@ -205,7 +205,7 @@ export default function EventsAdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF5F0] px-4 py-10">
+    <div className="min-h-screen bg-[#FFF5F0] px-4 pt-32 pb-10">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
