@@ -93,10 +93,27 @@ export default function EventDetailPage() {
   const hasClubs = !!eventData?.clubs && eventData.clubs.length > 0;
   const hasUniversities = !!eventData?.universities && eventData.universities.length > 0;
 
+  const Background = () => (
+    <div className="absolute inset-0">
+      <Image
+        src="/images/homepage-students.jpg"
+        alt="Kütüphanede ders çalışan öğrenciler arka plan"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover animate-slow-pan origin-center motion-reduce:animate-none"
+        style={{ objectPosition: 'center 40%', filter: 'brightness(0.55)', willChange: 'transform', transformOrigin: 'center', animation: 'slowpan 20s ease-in-out infinite' }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/20 to-transparent" />
+      <div className="absolute inset-0 bg-[#994D1C]/20 mix-blend-multiply" />
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFF5F0] px-4 pt-32 pb-10">
-        <div className="max-w-4xl mx-auto flex items-center justify-center">
+      <div className="relative min-h-screen overflow-hidden px-4 pt-32 pb-10">
+        <Background />
+        <div className="relative z-10 max-w-4xl mx-auto flex items-center justify-center">
           <div className="flex flex-col items-center gap-3 text-[#994D1C]">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#FFB996]/40 border-t-[#FF8B5E]" />
             <span className="text-sm font-medium">{t('events.detail.loading')}</span>
@@ -108,8 +125,9 @@ export default function EventDetailPage() {
 
   if (error || !eventData) {
     return (
-      <div className="min-h-screen bg-[#FFF5F0] px-4 pt-32 pb-10">
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border border-[#FFE5D9] p-8 text-center space-y-4">
+      <div className="relative min-h-screen overflow-hidden px-4 pt-32 pb-10">
+        <Background />
+        <div className="relative z-10 max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border border-[#FFE5D9] p-8 text-center space-y-4">
           <h1 className="text-2xl font-semibold text-[#994D1C]">{t('events.detail.notFound')}</h1>
           <p className="text-[#6B3416] text-sm">{error || t('events.detail.error')}</p>
           <div className="flex justify-center gap-3">
@@ -133,8 +151,9 @@ export default function EventDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF5F0] px-4 pt-32 pb-12">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="relative min-h-screen overflow-hidden px-4 pt-32 pb-12">
+      <Background />
+      <div className="relative z-10 max-w-5xl mx-auto space-y-8">
         <div className="flex items-center justify-between">
           <Link
             href="/etkinlikler"
