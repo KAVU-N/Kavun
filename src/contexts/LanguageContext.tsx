@@ -955,8 +955,55 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.register': 'Register',
     'nav.contact': 'Contact',
     'nav.faq': 'Faq',
+    'nav.profile': 'Profile',
+    'nav.messages': 'Messages',
+    'nav.myListings': 'My Listings',
+    'nav.myProjects': 'My Projects',
+    'myProjects.noProjects': 'No projects found',
+    'myProjects.addNewProject': 'Add New Project',
+    'project.title': 'Project Title',
+    'project.description': 'Project Description',
+    'project.linkedinUrlOptional': 'LinkedIn URL (optional)',
+    'project.contactPlaceholder': 'Contact (email, Discord etc.)',
+    'project.applicantRequirements': 'Applicant Requirements',
+    'project.benefitsPlaceholder': 'Benefits',
+    'project.create': 'Create',
+    'project.creating': 'Creating...',
+    'project.createSuccess': 'Project created successfully',
+    'project.createError': 'Failed to create project',
+    'project.edit': 'Edit',
+    'project.editing': 'Editing...',
+    'project.editSuccess': 'Project edited successfully',
+    'project.editError': 'Failed to edit project',
+    'project.delete': 'Delete',
+    'project.deleting': 'Deleting...',
+    'project.deleteSuccess': 'Project deleted successfully',
+    'project.deleteError': 'Failed to delete project',
+    'project.view': 'View',
+    'project.viewing': 'Viewing...',
+    'project.viewSuccess': 'Project viewed successfully',
+    'project.viewError': 'Failed to view project',
+    'project.apply': 'Apply',
+    'project.applying': 'Applying...',
+    'project.applySuccess': 'Project applied successfully',
+    'project.applyError': 'Failed to apply to project',
+    
+    'nav.logout': 'Logout',
     'events.title': 'Events',
     'events.subtitle': 'Discover and filter all club events.',
+    'events.noEvents': 'No events found',
+    'events.addNewEvent': 'Add New Event',
+    'events.eventTitle': 'Event Title',
+    'events.eventDescription': 'Event Description',
+    'events.eventLocation': 'Event Location',
+    'events.eventCategory': 'Event Category',
+    'events.eventClub': 'Event Club',
+    'events.eventUniversity': 'Event University',
+    'events.eventContact': 'Event Contact',
+    'events.eventContactPlaceholder': 'Event Contact (email, Discord etc.)',
+    'events.eventContactOptional': 'Event Contact (optional)',
+    'events.eventContactOptionalPlaceholder': 'Event Contact (optional)',
+    
 
     'events.searchPlaceholder': 'Search events or keywords',
     'events.searchButton': 'Search',
@@ -1111,6 +1158,11 @@ const translations: Record<Language, Record<string, string>> = {
     'notifications.timeAgo.minutes': '{count} minutes ago',
     'notifications.timeAgo.hours': '{count} hours ago', 
     'notifications.timeAgo.days': '{count} days ago',
+    'notifications.timeAgo.weeks': '{count} weeks ago',
+    'notifications.timeAgo.months': '{count} months ago',
+    'notifications.timeAgo.years': '{count} years ago',
+    'notifications.timeAgo.justNow': 'Just now',
+    
     
     // General
     'notifications.viewDetails': 'View Details',
@@ -1376,6 +1428,11 @@ const translations: Record<Language, Record<string, string>> = {
     'general.createdAt': 'Created at',
     'general.updatedAt': 'Updated at',
     'general.perHour': 'Per Hour',
+    'general.perLesson': 'Per Lesson',
+    'general.perMonth': 'Per Month',
+    'general.perYear': 'Per Year',
+    'general.perWeek': 'Per Week',
+    'general.perDay': 'Per Day',
     
     // Homepage (moved to the top EN block)
     
@@ -1401,6 +1458,7 @@ const translations: Record<Language, Record<string, string>> = {
     'profile.sixthYear': '6th Year',
     'profile.graduate': 'Graduate',
     
+    
     // Messages page
     'messages.myMessages': 'My Messages',
     'messages.conversations': 'My Conversations',
@@ -1413,6 +1471,13 @@ const translations: Record<Language, Record<string, string>> = {
     'messages.visitInstructors': 'You can visit instructor profiles to start messaging with them.',
     'messages.exploreInstructors': 'Explore Instructors',
     'chat.emptyConversation': 'No messages yet. Send a message to start the conversation!',
+    'chat.noConversations': 'You don\'t have any conversations yet',
+    'chat.noConversationsDesc': 'You can start messaging with instructors by visiting their profiles.',
+    'chat.noConversationsButton': 'Explore Instructors',
+    'chat.noConversationsButtonDesc': 'You can start messaging with instructors by visiting their profiles.',
+    'chat.noConversationsButtonLink': 'Explore Instructors',
+    'chat.noConversationsButtonLinkDesc': 'You can start messaging with instructors by visiting their profiles.',
+    
     
     // My Listings page
     'myListings.myListings': 'My Listings',
@@ -1425,6 +1490,9 @@ const translations: Record<Language, Record<string, string>> = {
     'myListings.deleteYes': 'Yes, Delete',
     'myListings.deleteNo': 'No',
     'myListings.deleting': 'Deleting...',
+    'myListings.deleteSuccess': 'Listing deleted successfully!',
+    'myListings.deleteError': 'Error deleting listing',
+    
     
     // Authentication pages
     'auth.login': 'Login',
@@ -1463,6 +1531,11 @@ const translations: Record<Language, Record<string, string>> = {
     'auth.fetchingUserDetails': 'Error fetching user details',
     'auth.titleRequired': 'Please enter a title',
     'auth.descriptionRequired': 'Please enter a description',
+    'auth.roleRequired': 'Please select a role',
+    'auth.universityRequired': 'Please select a university',
+    'auth.departmentRequired': 'Please select a department',
+    'auth.classRequired': 'Please select a class',
+    'auth.classPlaceholder': 'Enter your class...',
     
     // My Lessons page
     'lessons.myLessons': 'My Lessons',
@@ -1522,6 +1595,8 @@ const translations: Record<Language, Record<string, string>> = {
     'clubs.category.dataScience': 'Data Science',
     'clubs.category.cyberSecurity': 'Cyber Security',
     'clubs.category.other': 'Other',
+    'clubs.categoryPlaceholder': 'Enter category...',
+    'clubs.universityPlaceholder': 'Enter university...',
 
     // Logs and errors
     'logs.userNotLoggedIn': 'User not logged in, redirecting...',
@@ -1565,6 +1640,14 @@ const translations: Record<Language, Record<string, string>> = {
     'errors.prohibitedContentDetected': 'Inappropriate content detected. Please edit the text.',
     'errors.projectCreationFailed': 'Failed to create project',
     'errors.courseRequired': 'Please enter the course name',
+    'errors.classRequired': 'Please select a class',
+    'errors.classPlaceholder': 'Enter your class...',
+    'errors.departmentRequired': 'Please select a department',
+    'errors.departmentPlaceholder': 'Enter your department...',
+    'errors.universityRequired': 'Please select a university',
+    'errors.universityPlaceholder': 'Enter your university...',
+    'errors.roleRequired': 'Please select a role',
+    'errors.rolePlaceholder': 'Enter your role...',
     
     // Footer
     'footer.platformDescription': 'Kavunla is a platform that brings students together with instructors and shapes the future of education.',
@@ -1579,6 +1662,9 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.support': 'Support',
     'footer.security': 'Security',
     'footer.notification': 'Notification',
+    'footer.about': 'About',
+    'footer.ourTeam': 'Our Team',
+    'footer.ourTeamDescription': 'Our team is made up of passionate individuals who are dedicated to making education accessible to everyone.',
   },
 };
 
