@@ -89,6 +89,28 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   }
 }
 
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const eventId = params?.id;
+
+    if (!eventId || !isObjectId(eventId)) {
+      return NextResponse.json({ error: 'Geçersiz etkinlik kimliği' }, { status: 400 });
+    }
+
+    await connectDB();
+
+    const event = await Event.findById(eventId).populate('clubs', 'name university category logoUrl');
+
+    if (!event) {
+      return NextResponse.json({ error: 'Etkinlik bulunamadı' }, { status: 404 });
+    }
+
+    return NextResponse.json({ data: event }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Sunucu hatası', details: error?.message }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
     const cookieStore = cookies();
