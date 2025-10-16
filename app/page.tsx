@@ -3,10 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { universities } from '@/data/universities';
-import Link from 'next/link';
 import { useLanguage } from '@/src/contexts/LanguageContext';
-import { FiFolder, FiBookOpen, FiUsers } from 'react-icons/fi';
-import { HiOutlineMegaphone } from 'react-icons/hi2';
 
 export default function Home() {
   const router = useRouter();
@@ -270,51 +267,7 @@ export default function Home() {
                   <p className="text-xl text-[#FFD6B2] mb-8 drop-shadow opacity-0 translate-y-2" data-reveal data-delay="100">
                     {t('home.description')}
                   </p>
-                  {/* Small nav cards inside glass */}
-                  <div className="mx-auto w-full px-2 md:px-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                      <Link href="/ilanlar" className="group relative overflow-hidden flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-sm p-4 hover:bg-white/15 hover:-translate-y-0.5 hover:brightness-110 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 opacity-0 translate-y-2" data-reveal data-delay="0">
-                        <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white transition group-hover:bg-white/20 group-hover:border-white/40 animate-float-slow motion-reduce:animate-none">
-                          <HiOutlineMegaphone className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-white font-medium truncate">{t('nav.listings')}</div>
-                          <div className="text-white/70 text-sm truncate">{t('home.cards.listings.subtitle')}</div>
-                        </div>
-                        <span className="pointer-events-none absolute inset-y-0 -skew-x-12 left-[-120%] w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70 will-change-transform group-hover:animate-shine" />
-                      </Link>
-                      <Link href="/projeler" className="group relative overflow-hidden flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-sm p-4 hover:bg-white/15 hover:-translate-y-0.5 hover:brightness-110 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 opacity-0 translate-y-2" data-reveal data-delay="100">
-                        <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white transition group-hover:bg-white/20 group-hover:border-white/40 animate-float-slow motion-reduce:animate-none">
-                          <FiFolder className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-white font-medium truncate">{t('home.cards.projects.title')}</div>
-                          <div className="text-white/70 text-sm truncate">{t('home.cards.projects.subtitle')}</div>
-                        </div>
-                        <span className="pointer-events-none absolute inset-y-0 -skew-x-12 left-[-120%] w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70 will-change-transform group-hover:animate-shine" />
-                      </Link>
-                      <Link href="/kaynaklar" className="group relative overflow-hidden flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-sm p-4 hover:bg-white/15 hover:-translate-y-0.5 hover:brightness-110 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 opacity-0 translate-y-2" data-reveal data-delay="200">
-                        <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white transition group-hover:bg-white/20 group-hover:border-white/40 animate-float-slow motion-reduce:animate-none">
-                          <FiBookOpen className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-white font-medium truncate">{t('home.cards.resources.title')}</div>
-                          <div className="text-white/70 text-sm truncate">{t('home.cards.resources.subtitle')}</div>
-                        </div>
-                        <span className="pointer-events-none absolute inset-y-0 -skew-x-12 left-[-120%] w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70 will-change-transform group-hover:animate-shine" />
-                      </Link>
-                      <Link href="/kulupler" className="group relative overflow-hidden flex items-center gap-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-sm p-4 hover:bg-white/15 hover:-translate-y-0.5 hover:brightness-110 transition shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 opacity-0 translate-y-2" data-reveal data-delay="300">
-                        <div className="shrink-0 h-10 w-10 rounded-full bg-white/15 border border-white/20 flex items-center justify-center text-white/90 group-hover:text-white transition group-hover:bg-white/20 group-hover:border-white/40 animate-float-slow motion-reduce:animate-none">
-                          <FiUsers className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-white font-medium truncate">Kulüpler</div>
-                          <div className="text-white/70 text-sm truncate">Üniversite kulüplerini keşfet</div>
-                        </div>
-                        <span className="pointer-events-none absolute inset-y-0 -skew-x-12 left-[-120%] w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-70 will-change-transform group-hover:animate-shine" />
-                      </Link>
-                    </div>
-                  </div>
+                  
                 </div>
                 {/* removed glass wrapper end */}
                 {/* Glass wrapper end */}
@@ -322,61 +275,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        {/* Özellik Tanıtım Bölümü */}
-        <section className="relative z-20 mt-24 py-16">
-          <div className="max-w-6xl mx-auto px-4 grid gap-8 md:grid-cols-4">
-            {/* İlanlar */}
-            <Link href="/ilanlar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="0">
-              <div className="relative h-60 w-full overflow-hidden">
-                <Image src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=60" alt="Duyuru panosu" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-4">
-                <h3 className="text-white text-lg font-semibold">{t('home.cards.listings.title')}</h3>
-                <p className="text-gray-200 text-sm">{t('home.cards.listings.subtitle')}</p>
-              </div>
-            </Link>
-            {/* Projeler */}
-            <Link href="/projeler" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="100">
-              <div className="relative h-60 w-full overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=60"
-                  alt="Projeler"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-4">
-                <h3 className="text-white text-lg font-semibold">{t('home.cards.projects.title')}</h3>
-                <p className="text-gray-200 text-sm">{t('home.cards.projects.subtitle')}</p>
-              </div>
-            </Link>
-            {/* Kaynaklar */}
-            <Link href="/kaynaklar" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="200">
-              <div className="relative h-60 w-full overflow-hidden">
-                <Image src="/images/kaynaklar.jpg" alt="Kaynaklar" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-4">
-                <h3 className="text-white text-lg font-semibold">{t('home.cards.resources.title')}</h3>
-                <p className="text-gray-200 text-sm">{t('home.cards.resources.subtitle')}</p>
-              </div>
-            </Link>
-            {/* Kulüpler */}
-            <Link href="/kulupler" className="group relative rounded-2xl overflow-hidden shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-2xl opacity-0 translate-y-2" data-reveal data-delay="300">
-              <div className="relative h-60 w-full overflow-hidden">
-                <Image src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=800&q=60" alt="Kulüpler" fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover transition-transform duration-300 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity" />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-4">
-                <h3 className="text-white text-lg font-semibold">Kulüpler</h3>
-                <p className="text-gray-200 text-sm">Üniversite kulüplerini keşfet</p>
-              </div>
-            </Link>
-          </div>
-        </section>
+        
       </main>
 
       {showRoleDialog && (

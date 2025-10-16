@@ -69,34 +69,39 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/ilanlar', label: t('nav.listings'), icon: (
-      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-3 h-3 md:w-3 md:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
     )},
     { href: '/projeler', label: t('nav.projects'), icon: (
-      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-3 h-3 md:w-3 md:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
       </svg>
     )},
     { href: '/kaynaklar', label: t('nav.resources'), icon: (
-      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-3 h-3 md:w-3 md:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
     )},
+    { href: '/etkinlikler', label: t('nav.events'), icon: (
+      <svg className="w-3 h-3 md:w-3 md:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    )},
     { href: '/soru-hazirlat', label: t('nav.aiAssistant'), icon: (
-      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-3 h-3 md:w-3 md:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2l4 4 4-4h2a2 2 0 002-2v-1" />
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 15v2m0 0v2m0-2h2m-2 0h-2" />
       </svg>
     )},
     { href: '/not-cikar', label: t('nav.aiNotes'), icon: (
-      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-3 h-3 md:w-3 md:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20h9" />
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z" />
       </svg>
     )},
     { href: '/kulupler', label: t('nav.clubs'), icon: (
-      <svg className="w-4 h-4 md:w-4 md:h-4 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-3 h-3 md:w-3 md:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M12 20v-2a4 4 0 013-3.87M7 20H2v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z" />
       </svg>
     )}
@@ -162,13 +167,13 @@ export default function Navbar() {
 
               {/* Desktop Navigation - CENTER (Sadece kullanıcı giriş yapmışsa) */}
               {user && (
-                <div className="hidden md:flex items-center justify-center flex-1">
-                  <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
+                <div className="hidden md:flex items-center justify-start flex-1 pl-4 md:pl-6">
+                  <div className="flex items-center space-x-1 md:space-x-1">
                     {navLinks.map((link) => (
                       <Link
                         key={link.href}
                         href={link.href}
-                        className={`group flex items-center space-x-2 px-4 py-2 rounded-xl transform transition-all duration-500 ${
+                        className={`group flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm transform transition-all duration-500 ${
                           pathname === '/' && isScrolled
                             ? 'text-[#994D1C] font-semibold hover:text-[#FF8B5E]'
                             : pathname === link.href
@@ -190,13 +195,13 @@ export default function Navbar() {
 
               {/* Desktop Navigation - RIGHT (Kullanıcı giriş yapmamışsa navLinks login/register'ın hemen solunda, sağa yaslı değil) */}
               {!user && (
-                <div className="hidden md:flex items-center mr-8">
-                  <div className="flex items-center space-x-2 md:space-x-2 space-x-1">
+                <div className="hidden md:flex items-center flex-1 pl-4 md:pl-6">
+                  <div className="flex items-center space-x-1 md:space-x-1">
                     {navLinks.map((link) => (
                       <Link
                         key={link.href}
                         href={link.href}
-                        className={`group flex items-center space-x-2 px-4 py-2 rounded-xl transform transition-all duration-500 ${
+                        className={`group flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm transform transition-all duration-500 ${
                           pathname === '/' && isScrolled
                             ? 'text-[#994D1C] font-semibold hover:text-[#FF8B5E]'
                             : pathname === link.href
@@ -206,7 +211,7 @@ export default function Navbar() {
                                 : 'text-[#FFD6B2] hover:text-white hover:bg-gradient-to-r hover:from-[#FF8B5E] hover:to-[#994D1C] hover:-translate-y-1 hover:shadow-lg')
                         }`}
                       >
-                        <div className="transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
+                        <div className="transition-all duration-500 group-hover:rotate-6 group-hover:scale-105">
                           {link.icon}
                         </div>
                         <span className="relative transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all after:duration-500 group-hover:after:w-full">{link.label}</span>
