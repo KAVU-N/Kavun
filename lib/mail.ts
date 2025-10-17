@@ -13,7 +13,7 @@ const createTransporter = () => {
 
   console.log('Email ayarları kontrol edildi:', { emailUser });
 
-  const host = process.env.EMAIL_HOST || 'smtp.gmail.com';
+  const host = process.env.EMAIL_HOST || 'smtp.zoho.eu';
   const port = Number(process.env.EMAIL_PORT || '465');
   const secure = (process.env.EMAIL_SECURE ?? 'true') === 'true';
 
@@ -24,6 +24,10 @@ const createTransporter = () => {
     auth: {
       user: emailUser,
       pass: emailPassword
+    },
+    requireTLS: true,
+    tls: {
+      minVersion: 'TLSv1.2'
     },
     debug: true
   });
@@ -58,6 +62,7 @@ export const sendVerificationEmail = async (email: string, code: string) => {
         name: process.env.EMAIL_FROM_NAME ?? 'Kavunla',
         address: process.env.EMAIL_FROM ?? process.env.EMAIL_USER!
       },
+      replyTo: process.env.EMAIL_REPLY_TO ?? 'info@kavunla.com',
       to: email,
       subject: 'E-posta Doğrulama Kodu - Kavunla',
       html: `
@@ -122,6 +127,7 @@ export const sendPasswordResetEmail = async (email: string, code: string) => {
         name: process.env.EMAIL_FROM_NAME ?? 'Kavunla',
         address: process.env.EMAIL_FROM ?? process.env.EMAIL_USER!
       },
+      replyTo: process.env.EMAIL_REPLY_TO ?? 'info@kavunla.com',
       to: email,
       subject: 'Şifre Sıfırlama - Kavunla',
       html: `
