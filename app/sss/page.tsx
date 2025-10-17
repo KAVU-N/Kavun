@@ -1,85 +1,86 @@
 'use client';
 import React, { useState } from 'react';
-import { FaQuestionCircle, FaUserPlus, FaBullhorn, FaRegMoneyBillAlt, FaTools, FaShieldAlt, FaUsers } from 'react-icons/fa';
-
-const faqTopics = [
-  {
-    topic: 'Genel Bilgiler',
-    colorFrom: '#FFB996',
-    colorTo: '#FFF5F0',
-    icon: <FaQuestionCircle className="text-3xl text-[#FF8B5E]" />,
-    questions: [
-      {
-        question: 'Kavunla nedir?',
-        answer: 'Kavunla, aynı üniversitede bulunan ders almak ve vermek isteyen öğrencileri bir araya getiren bir eğitim platformudur. Aynı zamanda platformumuz sayesinde öğrenciler dersleri ile alakalı kaynaklara ulaşma imkanı elde edebilecektir.'
-      },
-      {
-        question: 'Kavunla\'ya kimler katılabilir?',
-        answer: 'Kavunla Eğitim Platformu\'na öğrenciler, eğitmenler ve öğrenmeye ilgi duyan kişiler katılabilir. Üyelik tamamen ücretsizdir.'
-      },
-    ]
-  },
-  {
-    topic: 'Kayıt ve Hesap',
-    colorFrom: '#FF8B5E',
-    colorTo: '#FFD6BA',
-    icon: <FaUserPlus className="text-3xl text-[#FFB996]" />,
-    questions: [
-      {
-        question: 'Nasıl kayıt olabilirim?',
-        answer: 'Ana sayfadaki "Kayıt Ol" butonuna tıklayarak üniversite e-posta adresiniz ve yeni oluşturacağınız şifreniz ile hızlıca kayıt olabilirsiniz.'
-      },
-    ]
-  },
-  {
-    topic: 'İlanlar ve Kullanım',
-    colorFrom: '#FFD6BA',
-    colorTo: '#FFB996',
-    icon: <FaBullhorn className="text-3xl text-[#994D1C]" />,
-    questions: [
-      {
-        question: 'Kendi ilanımı nasıl oluşturabilirim?',
-        answer: 'Eğer öğretmenseniz, "İlan Ver" sayfasından ilanınızı oluşturabilir ve yayına alabilirsiniz.'
-      },
-    ]
-  },
-  {
-    topic: 'Ödemeler',
-    colorFrom: '#FFF5F0',
-    colorTo: '#FFD6BA',
-    icon: <FaRegMoneyBillAlt className="text-3xl text-[#6B3416]" />,
-    questions: [
-      {
-        question: 'Ödemeler nasıl gerçekleşiyor?',
-        answer: 'Şu anda platform tamamen gönüllülük esasına dayalı olarak hizmet vermektedir ve herhangi bir ücret alınmamaktadır.'
-      },
-    ]
-  },
-  {
-    topic: 'Destek ve Güvenlik',
-    colorFrom: '#FFB996',
-    colorTo: '#FFE5D9',
-    icon: <FaTools className="text-3xl text-[#FF8B5E]" />,
-    questions: [
-      {
-        question: 'Platformda yaşadığım teknik bir sorunu nasıl bildiririm?',
-        answer: '“İletişim” sayfasındaki formu doldurarak veya destek e-posta adresimize yazarak teknik sorunlarınızı iletebilirsiniz. Destek ekibimiz en kısa sürede sizinle iletişime geçecektir.'
-      },
-      {
-        question: 'Kişisel bilgilerim güvende mi?',
-        answer: 'Kişisel verileriniz, KVKK ve GDPR gibi yasal düzenlemelere uygun olarak güvenli bir şekilde saklanır ve asla üçüncü kişilerle paylaşılmaz.'
-      },
-    ]
-  }
-];
+import { FaQuestionCircle, FaUserPlus, FaBullhorn, FaRegMoneyBillAlt, FaTools } from 'react-icons/fa';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 const SSSPage = () => {
+  const { t } = useLanguage();
+  const faqTopics = [
+    {
+      topic: t('faqPage.topics.general'),
+      colorFrom: '#FFB996',
+      colorTo: '#FFF5F0',
+      icon: <FaQuestionCircle className="text-3xl text-[#FF8B5E]" />,
+      questions: [
+        {
+          question: t('faqPage.general.q1.question'),
+          answer: t('faqPage.general.q1.answer')
+        },
+        {
+          question: t('faqPage.general.q2.question'),
+          answer: t('faqPage.general.q2.answer')
+        },
+      ]
+    },
+    {
+      topic: t('faqPage.topics.account'),
+      colorFrom: '#FF8B5E',
+      colorTo: '#FFD6BA',
+      icon: <FaUserPlus className="text-3xl text-[#FFB996]" />,
+      questions: [
+        {
+          question: t('faqPage.account.q1.question'),
+          answer: t('faqPage.account.q1.answer')
+        },
+      ]
+    },
+    {
+      topic: t('faqPage.topics.listings'),
+      colorFrom: '#FFD6BA',
+      colorTo: '#FFB996',
+      icon: <FaBullhorn className="text-3xl text-[#994D1C]" />,
+      questions: [
+        {
+          question: t('faqPage.listings.q1.question'),
+          answer: t('faqPage.listings.q1.answer')
+        },
+      ]
+    },
+    {
+      topic: t('faqPage.topics.payments'),
+      colorFrom: '#FFF5F0',
+      colorTo: '#FFD6BA',
+      icon: <FaRegMoneyBillAlt className="text-3xl text-[#6B3416]" />,
+      questions: [
+        {
+          question: t('faqPage.payments.q1.question'),
+          answer: t('faqPage.payments.q1.answer')
+        },
+      ]
+    },
+    {
+      topic: t('faqPage.topics.support'),
+      colorFrom: '#FFB996',
+      colorTo: '#FFE5D9',
+      icon: <FaTools className="text-3xl text-[#FF8B5E]" />,
+      questions: [
+        {
+          question: t('faqPage.support.q1.question'),
+          answer: t('faqPage.support.q1.answer')
+        },
+        {
+          question: t('faqPage.support.q2.question'),
+          answer: t('faqPage.support.q2.answer')
+        },
+      ]
+    }
+  ];
   const [openTopic, setOpenTopic] = useState<number | null>(null);
 
   return (
     <div className="container mx-auto px-4 pt-28 pb-20 min-h-screen relative z-10">
       <h1 className="text-4xl font-bold mb-12 text-center text-[#994D1C] tracking-tight drop-shadow-lg">
-        Sıkça Sorulan Sorular
+        {t('faqPage.title')}
       </h1>
       <div className="max-w-3xl mx-auto flex flex-col gap-8">
         {faqTopics.map((topic, idx) => (

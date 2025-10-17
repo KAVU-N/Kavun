@@ -1,11 +1,13 @@
 'use client';
 import { FaInstagram, FaLinkedin, FaEnvelope, FaFacebook, FaTwitter } from 'react-icons/fa';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 export default function ContactPage() {
+  const { t } = useLanguage();
   const contactInfo = [
     {
       icon: FaEnvelope,
-      title: 'E-posta',
+      title: t('contactPage.email'),
       value: 'info@kavunla.com',
       href: 'mailto:info@kavunla.com'
     }
@@ -15,20 +17,20 @@ export default function ContactPage() {
     { 
       icon: FaInstagram, 
       href: 'https://www.instagram.com/kavunlacom/',
-      label: 'Instagram',
-      description: 'Instagram hesabımızı takip edin'
+      label: t('contactPage.instagramLabel'),
+      description: t('contactPage.instagramDescription')
     }
   ];
 
   return (
     <div className="relative min-h-screen overflow-hidden pt-28 pb-16">
       <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <h1 className="text-4xl font-bold text-[#994D1C] text-center mb-12">İletişim</h1>
+        <h1 className="text-4xl font-bold text-[#994D1C] text-center mb-12">{t('contactPage.title')}</h1>
         <div className="bg-white rounded-lg shadow-xl p-8 mb-8 flex flex-col items-center justify-center">
           <div className="flex flex-col items-center justify-center w-full">
             {/* İletişim Bilgileri */}
             <div className="space-y-6 w-full max-w-md">
-              <h2 className="text-2xl font-semibold text-[#994D1C] mb-6 text-center">Bize Ulaşın</h2>
+              <h2 className="text-2xl font-semibold text-[#994D1C] mb-6 text-center">{t('contactPage.contactUs')}</h2>
               {contactInfo.map((info) => (
                 <a
                   href={info.href}
@@ -44,7 +46,7 @@ export default function ContactPage() {
               ))}
 
               <div className="pt-8">
-                <h3 className="font-semibold text-[#6B3416] mb-4 text-center">Sosyal Medya</h3>
+                <h3 className="font-semibold text-[#6B3416] mb-4 text-center">{t('contactPage.socialTitle')}</h3>
                 <div className="flex justify-center space-x-6">
                   {socialLinks.map((link) => (
                     <a

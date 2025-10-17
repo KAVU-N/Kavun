@@ -1,7 +1,66 @@
 "use client";
 import React from "react";
+import { useLanguage } from "@/src/contexts/LanguageContext";
 
 export default function KvkkPage() {
+  const { t } = useLanguage();
+
+  const controllerInfo = [
+    {
+      label: t("kvkkPage.section1.items.company.label"),
+      value: t("kvkkPage.section1.items.company.value")
+    },
+    {
+      label: t("kvkkPage.section1.items.address.label"),
+      value: t("kvkkPage.section1.items.address.value")
+    },
+    {
+      label: t("kvkkPage.section1.items.email.label"),
+      value: t("kvkkPage.section1.items.email.value")
+    },
+    {
+      label: t("kvkkPage.section1.items.phone.label"),
+      value: t("kvkkPage.section1.items.phone.value")
+    }
+  ];
+
+  const personalDataItems = [
+    t("kvkkPage.section2.items.fullName"),
+    t("kvkkPage.section2.items.email"),
+    t("kvkkPage.section2.items.phone"),
+    t("kvkkPage.section2.items.ip"),
+    t("kvkkPage.section2.items.cardInfo"),
+    t("kvkkPage.section2.items.userContent"),
+    t("kvkkPage.section2.items.cookies")
+  ];
+
+  const processingPurposes = [
+    t("kvkkPage.section3.items.membership"),
+    t("kvkkPage.section3.items.payments"),
+    t("kvkkPage.section3.items.contentManagement"),
+    t("kvkkPage.section3.items.serviceImprovement"),
+    t("kvkkPage.section3.items.requests"),
+    t("kvkkPage.section3.items.legal")
+  ];
+
+  const transferTargets = [
+    t("kvkkPage.section5.items.authorities"),
+    t("kvkkPage.section5.items.serviceProviders"),
+    t("kvkkPage.section5.items.foreignProviders")
+  ];
+
+  const rights = [
+    t("kvkkPage.section8.items.item1"),
+    t("kvkkPage.section8.items.item2"),
+    t("kvkkPage.section8.items.item3"),
+    t("kvkkPage.section8.items.item4"),
+    t("kvkkPage.section8.items.item5"),
+    t("kvkkPage.section8.items.item6"),
+    t("kvkkPage.section8.items.item7"),
+    t("kvkkPage.section8.items.item8"),
+    t("kvkkPage.section8.items.item9")
+  ];
+
   return (
     <div className="relative min-h-screen overflow-hidden flex items-center justify-center pt-24 pb-8 px-2">
       <div className="w-full max-w-3xl rounded-3xl shadow-2xl bg-white/90 border border-[#FFD6BA] p-6 sm:p-10 relative overflow-hidden">
@@ -10,87 +69,79 @@ export default function KvkkPage() {
             <svg className="w-7 h-7 text-[#994D1C]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 20h9" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m0 0l-2-2m2 2l2-2" /></svg>
           </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#994D1C] tracking-tight drop-shadow-lg">
-            KAVUNLA KİŞİSEL VERİLERİN KORUNMASI KANUNU (KVKK) AYDINLATMA METNİ
+            {t('kvkkPage.title')}
           </h1>
         </div>
         <div className="prose prose-lg max-w-none text-[#6B3416]">
           <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">1. Veri Sorumlusu ve İletişim Bilgileri</h2>
-            <p>6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) uyarınca, kişisel verileriniz veri sorumlusu sıfatıyla aşağıda bilgileri yer alan Kavunla (“Şirket”) tarafından işlenmektedir.</p>
+            <h2 className="text-xl font-semibold mb-2">{t("kvkkPage.section1.title")}</h2>
+            <p>{t("kvkkPage.section1.paragraph1")}</p>
             <ul className="list-disc pl-6">
-              <li><b>Şirket Unvanı:</b> Kavunla Teknoloji ve Eğitim Hizmetleri A.Ş.</li>
-              <li><b>Adres:</b> [Şirket adresinizi buraya ekleyin]</li>
-              <li><b>E-posta:</b> info@kavunla.com</li>
-              <li><b>Telefon:</b> [Telefon numarası eklenebilir]</li>
+              {controllerInfo.map((item) => (
+                <li key={item.label}>
+                  <b>{item.label}:</b> {item.value}
+                </li>
+              ))}
             </ul>
           </section>
           <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">2. İşlenen Kişisel Veriler</h2>
-            <p>Kavunla olarak, kullanıcılarımızdan aşağıdaki kişisel verileri toplamaktayız:</p>
+            <h2 className="text-xl font-semibold mb-2">{t("kvkkPage.section2.title")}</h2>
+            <p>{t("kvkkPage.section2.paragraph1")}</p>
             <ul className="list-disc pl-6">
-              <li>Ad, soyad</li>
-              <li>E-posta adresi</li>
-              <li>Telefon numarası</li>
-              <li>IP adresi</li>
-              <li>Kart bilgileri (ödeme işlemleri için, güvenli ödeme altyapısı üzerinden ve gerekli güvenlik önlemleri alınarak; kart bilgileriniz sistemlerimizde saklanmaz)</li>
-              <li>Kullanıcı tarafından siteye eklenen kaynaklar ve içerikler (metin, görsel, dosya vb.)</li>
-              <li>Çerez verileri ve işlem geçmişi</li>
+              {personalDataItems.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
           </section>
           <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">3. Kişisel Verilerin İşlenme Amaçları</h2>
-            <p>Toplanan kişisel verileriniz;</p>
+            <h2 className="text-xl font-semibold mb-2">{t("kvkkPage.section3.title")}</h2>
+            <p>{t("kvkkPage.section3.paragraph1")}</p>
             <ul className="list-disc pl-6">
-              <li>Üyelik ve kullanıcı işlemlerinin yürütülmesi</li>
-              <li>Ödeme işlemlerinin güvenli şekilde gerçekleştirilmesi</li>
-              <li>Kullanıcıların eklediği kaynakların yönetilmesi ve yayınlanması</li>
-              <li>Hizmetlerimizin sunulması, geliştirilmesi ve iyileştirilmesi</li>
-              <li>Taleplerin ve şikayetlerin yönetilmesi</li>
-              <li>Yasal yükümlülüklerin yerine getirilmesi</li>
+              {processingPurposes.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
-            <p>amaçlarıyla işlenmektedir.</p>
+            <p>{t("kvkkPage.section3.paragraph2")}</p>
           </section>
           <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">4. Kişisel Verilerin Toplanma Yöntemi ve Hukuki Sebebi</h2>
-            <p>Kişisel verileriniz; web sitemiz, mobil uygulamamız, e-posta, çerezler ve benzeri elektronik ortamlar aracılığıyla, KVKK’nın 5. ve 6. maddelerinde belirtilen hukuki sebeplerle toplanmaktadır.</p>
+            <h2 className="text-xl font-semibold mb-2">{t("kvkkPage.section4.title")}</h2>
+            <p>{t("kvkkPage.section4.paragraph1")}</p>
           </section>
           <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">5. Kişisel Verilerin Aktarılması</h2>
-            <p>Kişisel verileriniz;</p>
+            <h2 className="text-xl font-semibold mb-2">{t("kvkkPage.section5.title")}</h2>
+            <p>{t("kvkkPage.section5.paragraph1")}</p>
             <ul className="list-disc pl-6">
-              <li>Yasal zorunluluklar kapsamında yetkili kamu kurum ve kuruluşları,</li>
-              <li>Ödeme altyapısı sağlayıcıları ve hizmet aldığımız üçüncü kişiler (barındırma, e-posta, analiz, ödeme hizmetleri vb.),</li>
-              <li>Yurt dışında sunucusu bulunan hizmet sağlayıcıları (ör. e-posta, bulut barındırma, analiz hizmetleri)</li>
+              {transferTargets.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
-            <p>ile, KVKK’nın 8. ve 9. maddelerine uygun olarak paylaşılabilir.</p>
+            <p>{t("kvkkPage.section5.paragraph2")}</p>
           </section>
           <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">6. Kişisel Verilerin Saklanma Süresi</h2>
-            <p>Kişisel verileriniz, ilgili mevzuatta öngörülen süreler boyunca veya işleme amacının gerektirdiği süre boyunca saklanacaktır. Örneğin, üyelik sona erdikten sonra yasal saklama süresi kadar daha tutulabilir. Süre sonunda kişisel verileriniz silinir, yok edilir veya anonim hale getirilir.</p>
+            <h2 className="text-xl font-semibold mb-2">{t("kvkkPage.section6.title")}</h2>
+            <p>{t("kvkkPage.section6.paragraph1")}</p>
           </section>
           <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">7. Kişisel Verilerin Güvenliği</h2>
-            <p>Kavunla olarak, kişisel verilerinizin güvenliğini sağlamak amacıyla gerekli tüm teknik ve idari tedbirleri almaktayız. Özellikle kart bilgileriniz, uluslararası güvenlik standartlarına uygun ödeme altyapıları üzerinden ve şifrelenmiş olarak işlenmektedir. Kart bilgileriniz sistemlerimizde saklanmaz, sadece ödeme işlemi sırasında güvenli şekilde iletilir.</p>
+            <h2 className="text-xl font-semibold mb-2">{t("kvkkPage.section7.title")}</h2>
+            <p>{t("kvkkPage.section7.paragraph1")}</p>
           </section>
           <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">8. İlgili Kişinin Hakları</h2>
-            <p>KVKK’nın 11. maddesi kapsamında, kişisel verilerinizle ilgili olarak;</p>
+            <h2 className="text-xl font-semibold mb-2">{t("kvkkPage.section8.title")}</h2>
+            <p>{t("kvkkPage.section8.paragraph1")}</p>
             <ul className="list-disc pl-6">
-              <li>Kişisel veri işlenip işlenmediğini öğrenme</li>
-              <li>İşlenmişse bilgi talep etme</li>
-              <li>Amacına uygun kullanılıp kullanılmadığını öğrenme</li>
-              <li>Yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme</li>
-              <li>Eksik veya yanlış işlenmişse düzeltilmesini isteme</li>
-              <li>Silinmesini veya yok edilmesini isteme</li>
-              <li>Aktarıldığı üçüncü kişilere bildirilmesini isteme</li>
-              <li>İşlenen verilerin münhasıran otomatik sistemler vasıtasıyla analiz edilmesi suretiyle aleyhinize bir sonucun ortaya çıkmasına itiraz etme</li>
-              <li>Zarara uğramanız halinde zararın giderilmesini talep etme</li>
+              {rights.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
-            <p>haklarına sahipsiniz. Başvurularınızı <a href="mailto:info@kavunla.com" className="text-[#FF8B5E] underline">info@kavunla.com</a> adresine iletebilirsiniz.</p>
+            <p>
+              {t("kvkkPage.section8.contactPrefix")}
+              <a href="mailto:info@kavunla.com" className="text-[#FF8B5E] underline">info@kavunla.com</a>
+              {t("kvkkPage.section8.contactSuffix")}
+            </p>
           </section>
           <section>
-            <h2 className="text-xl font-semibold mb-2">9. Değişiklikler</h2>
-            <p>Bu Aydınlatma Metni’nde değişiklik yapma hakkımız saklıdır. Güncel metin web sitemizde yayımlanacaktır.</p>
+            <h2 className="text-xl font-semibold mb-2">{t("kvkkPage.section9.title")}</h2>
+            <p>{t("kvkkPage.section9.paragraph1")}</p>
           </section>
         </div>
       </div>
