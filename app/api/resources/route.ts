@@ -6,6 +6,7 @@ import fs from 'fs';
 import { loadBannedWords, validateTextField } from '../auth/register/nameValidation';
 // Production ortamında test dosyasına erişimi engellemek için yardımcı fonksiyon
 import path from 'path';
+import { Types } from 'mongoose';
 
 
 function readTestPdfIfDev() {
@@ -35,7 +36,6 @@ export async function GET(request: NextRequest) {
     await connectDB();
     const { searchParams } = new URL(request.url);
 
-    // Filtre parametrelerini oku
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || '';
     const format = searchParams.get('format') || '';
@@ -43,46 +43,147 @@ export async function GET(request: NextRequest) {
     const academicLevel = searchParams.get('academicLevel') || '';
     const department = searchParams.get('department') || '';
     const course = searchParams.get('course') || '';
-    // Pagination parametreleri
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '9', 10);
-    const skip = (page - 1) * limit;
+    const cursorParam = searchParams.get('cursor');
+    const includeFile = searchParams.get('includeFile') === 'true';
+    const sortByParam = searchParams.get('sortBy') || 'date';
+    const sortOrderParam = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
+    const sortOrder: 1 | -1 = sortOrderParam === 'asc' ? 1 : -1;
+    const limitParam = parseInt(searchParams.get('limit') || '9', 10);
+    const limit = Math.min(Math.max(limitParam, 1), 50);
 
-    // Sorgu oluştur
-    let query: any = {};
+    let sortField: 'createdAt' | 'downloadCount' | 'viewCount';
+    switch (sortByParam) {
+      case 'download':
+        sortField = 'downloadCount';
+        break;
+      case 'view':
+        sortField = 'viewCount';
+        break;
+      default:
+        sortField = 'createdAt';
+        break;
+    }
+
+    const sort: Record<string, 1 | -1> = { [sortField]: sortOrder, _id: sortOrder };
+    if (sortField !== 'createdAt') {
+      sort.createdAt = sortOrder;
+    }
+
+    const baseQuery: any = {};
     if (search) {
-      query.$or = [
+      baseQuery.$or = [
         { title: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
         { author: { $regex: search, $options: 'i' } },
         { tags: { $elemMatch: { $regex: search, $options: 'i' } } }
       ];
     }
-    if (category) query.category = category;
-    if (format) query.format = format;
-    if (university) query.university = university;
-    if (academicLevel) query.level = academicLevel;
-    if (department) query.department = { $regex: department, $options: 'i' };
+    if (category) baseQuery.category = category;
+    if (format) baseQuery.format = format;
+    if (university) baseQuery.university = university;
+    if (academicLevel && academicLevel !== 'Hepsi' && academicLevel !== 'All') {
+      baseQuery.level = academicLevel;
+    }
+    if (department) baseQuery.department = { $regex: department, $options: 'i' };
     if (course) {
       const courseRegex = new RegExp(course, 'i');
-      query.$and = [
-        ...(query.$and || []),
-        { $or: [ { course: courseRegex }, { tags: { $elemMatch: courseRegex } } ] }
+      baseQuery.$and = [
+        ...(baseQuery.$and || []),
+        { $or: [{ course: courseRegex }, { tags: { $elemMatch: courseRegex } }] }
       ];
     }
 
-    // Toplam kaynak sayısı (filtreye göre)
-    const totalCount = await Resource.countDocuments(query);
+    const fetchQuery: any = { ...baseQuery };
+    if (baseQuery.$and) {
+      fetchQuery.$and = [...baseQuery.$and];
+    }
 
-    // Sadece ilgili sayfanın kaynaklarını aggregate pipeline ile getir
-    const resources = await Resource.aggregate([
-      { $match: query },
-      { $sort: { createdAt: -1 } },
-      { $skip: skip },
-      { $limit: limit }
-    ], { allowDiskUse: true });
+    if (cursorParam) {
+      try {
+        const decoded = JSON.parse(Buffer.from(cursorParam, 'base64').toString('utf-8')) as {
+          sortFieldValue: number | string | null;
+          createdAt: string | null;
+          id: string;
+        };
+        if (decoded && decoded.id && decoded.createdAt) {
+          const cursorId = new Types.ObjectId(decoded.id);
+          const cursorCreatedAt = new Date(decoded.createdAt);
+          const cursorSortValue = decoded.sortFieldValue;
 
-    return NextResponse.json({ resources, totalCount });
+          const primaryComparator = sortOrder === -1 ? '$lt' : '$gt';
+          const secondaryComparator = sortOrder === -1 ? '$lt' : '$gt';
+          const idComparator = sortOrder === -1 ? '$lt' : '$gt';
+
+          const conditions: any[] = [];
+
+          if (sortField === 'createdAt') {
+            conditions.push({ createdAt: { [primaryComparator]: cursorCreatedAt } });
+            conditions.push({ createdAt: cursorCreatedAt, _id: { [idComparator]: cursorId } });
+          } else if (cursorSortValue !== null && cursorSortValue !== undefined) {
+            conditions.push({ [sortField]: { [primaryComparator]: cursorSortValue } });
+            conditions.push({
+              [sortField]: cursorSortValue,
+              createdAt: { [secondaryComparator]: cursorCreatedAt }
+            });
+            conditions.push({
+              [sortField]: cursorSortValue,
+              createdAt: cursorCreatedAt,
+              _id: { [idComparator]: cursorId }
+            });
+          }
+
+          if (conditions.length > 0) {
+            fetchQuery.$and = [...(fetchQuery.$and || []), { $or: conditions }];
+          }
+        }
+      } catch (cursorError) {
+        console.warn('Cursor parse error:', cursorError);
+      }
+    }
+
+    const totalCount = await Resource.countDocuments(baseQuery);
+
+    let resourceQuery = Resource.find(fetchQuery)
+      .sort(sort)
+      .limit(limit + 1);
+
+    if (!includeFile) {
+      resourceQuery = resourceQuery.select('-fileData');
+    }
+
+    let resources = await resourceQuery.lean();
+
+    const hasNextPage = resources.length > limit;
+    if (hasNextPage) {
+      resources = resources.slice(0, limit);
+    }
+
+    const encodeCursor = (resource: any) => {
+      if (!resource) return null;
+      const payload = {
+        sortFieldValue: resource[sortField] ?? null,
+        createdAt: resource.createdAt ? new Date(resource.createdAt).toISOString() : null,
+        id: resource._id?.toString() || null
+      };
+      if (!payload.id || !payload.createdAt) return null;
+      return Buffer.from(JSON.stringify(payload)).toString('base64');
+    };
+
+    const nextCursor = hasNextPage ? encodeCursor(resources[resources.length - 1]) : null;
+
+    const serializedResources = resources.map((resource: any) => ({
+      ...resource,
+      _id: resource._id?.toString() ?? '',
+      createdAt: resource.createdAt ? new Date(resource.createdAt).toISOString() : null,
+      updatedAt: resource.updatedAt ? new Date(resource.updatedAt).toISOString() : null
+    }));
+
+    return NextResponse.json({
+      resources: serializedResources,
+      totalCount,
+      hasNextPage,
+      nextCursor
+    });
   } catch (error: unknown) {
     // Hata detaylarını daha kapsamlı logla
     let details = '';

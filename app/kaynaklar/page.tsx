@@ -51,26 +51,32 @@ import { universities } from '@/data/universities';
 // Kaynak tipi tanımlama
 type Resource = {
   _id?: string;
-  id: number;
+  id?: string | number;
   title: string;
   description: string;
   author: string;
   category: string;
   format: string;
-  university: string;
-  department: string;
+  university?: string;
+  department?: string;
   course?: string;
-  academicLevel: string;
-  uploadDate: string;
-  createdAt: string;
+  academicLevel?: string;
+  uploadDate?: string;
+  createdAt?: string;
   downloadCount: number;
   viewCount: number;
-  fileSize: string;
-  tags: string[];
+  fileSize?: string;
+  tags?: string[];
   url: string;
   fileData?: string; // Base64 formatında dosya verisi
   fileName?: string; // Dosya adı
   fileType?: string; // Dosya tipi (MIME type)
+};
+
+const resolveResourceId = (resource: Resource): string | null => {
+  if (resource._id) return resource._id;
+  if (resource.id !== undefined && resource.id !== null) return resource.id.toString();
+  return null;
 };
 
 export default function KaynaklarPage() {
@@ -125,39 +131,65 @@ export default function KaynaklarPage() {
     return favorites.includes(resourceId);
   };
 
+  const fetchResourceWithFile = useCallback(async (resourceId: string): Promise<Resource | null> => {
+    try {
+      const response = await fetch(`/api/resources/${resourceId}?includeFile=true`);
+      if (!response.ok) throw new Error('Kaynak dosyası getirilemedi');
+      const data = await response.json();
+      return data as Resource;
+    } catch (error) {
+      console.error('Kaynak dosyası yüklenirken hata:', error);
+      return null;
+    }
+  }, []);
+
   // Kaynakları indir
   const handleDownload = async (resource: Resource) => {
     if (!user) {
       window.location.href = '/auth/login';
       return;
     }
+
+    const resourceId = resolveResourceId(resource);
+    if (!resourceId) {
+      alert('Kaynak bulunamadı.');
+      return;
+    }
+
     try {
-      const response = await fetch(`/api/resources/${resource._id}`, {
+      const response = await fetch(`/api/resources/${resourceId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'download', userId: user.id })
       });
+
       if (response.status === 403) {
         setShowPreviewModal(true);
         setPreviewResource(resource);
         setShowPremiumBlock(true);
         return;
       }
+
       if (!response.ok) {
         alert('Bir hata oluştu.');
         return;
       }
-      // Başarılı yanıt: kaynağı indir veya yeni sekmede aç
-      if (resource.fileData) {
+
+      const resourceWithFile = await fetchResourceWithFile(resourceId);
+      const targetResource = resourceWithFile ?? resource;
+
+      if (targetResource.fileData) {
         const link = document.createElement('a');
-        link.href = resource.fileData;
-        const fileName = resource.fileName || `${resource.title}.${resource.format.toLowerCase()}`;
+        link.href = targetResource.fileData;
+        const fileName = targetResource.fileName || `${targetResource.title}.${(targetResource.format || '').toLowerCase()}`;
         link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      } else if (resource.url && resource.url !== '#') {
-        window.open(resource.url, '_blank');
+      } else if (targetResource.url && targetResource.url !== '#') {
+        window.open(targetResource.url, '_blank');
+      } else {
+        alert('İndirilebilir içerik bulunamadı.');
       }
     } catch (error) {
       alert('Bir hata oluştu.');
@@ -170,23 +202,40 @@ export default function KaynaklarPage() {
       window.location.href = '/auth/login';
       return;
     }
+
+    const resourceId = resolveResourceId(resource);
+    if (!resourceId) {
+      alert('Kaynak bulunamadı.');
+      return;
+    }
+
     try {
-      const response = await fetch(`/api/resources/${resource._id}`, {
+      const response = await fetch(`/api/resources/${resourceId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'preview', userId: user.id })
       });
+
       if (response.status === 403) {
         setShowPreviewModal(true);
         setPreviewResource(resource);
         setShowPremiumBlock(true);
         return;
       }
+
       if (!response.ok) {
         alert('Bir hata oluştu.');
         return;
       }
-      setPreviewResource(resource);
+
+      const previewData = await fetchResourceWithFile(resourceId) ?? resource;
+      if (!previewData.fileData && (!previewData.url || previewData.url === '#')) {
+        alert('Kaynak önizlemesi mevcut değil.');
+        return;
+      }
+
+      setShowPremiumBlock(false);
+      setPreviewResource(previewData);
       setShowPreviewModal(true);
     } catch (error) {
       alert('Bir hata oluştu.');
@@ -225,89 +274,34 @@ export default function KaynaklarPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const resourcesPerPage = 9;
   const [totalResourceCount, setTotalResourceCount] = useState(0);
+  const [pageCursors, setPageCursors] = useState<(string | null)[]>([null]);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const activeCursor = useMemo(
+    () => pageCursors[currentPage - 1] ?? null,
+    [pageCursors, currentPage]
+  );
+  const totalPages = useMemo(
+    () => (totalResourceCount > 0 ? Math.ceil(totalResourceCount / resourcesPerPage) : 0),
+    [totalResourceCount]
+  );
 
-  // Filtrelenmiş kaynakları hesapla
-  const fetchTotalResourceCount = useCallback(async () => {
-    try {
-      const params = new URLSearchParams();
-      if (searchTerm) params.append('search', searchTerm);
-      if (selectedCategory) params.append('category', selectedCategory);
-      if (selectedFormat) params.append('format', selectedFormat);
-      if (selectedUniversity && selectedUniversity !== 'all') params.append('university', selectedUniversity);
-      if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') params.append('academicLevel', selectedAcademicLevel);
-      if (selectedDepartment) params.append('department', selectedDepartment);
-      if (courseTerm) params.append('course', courseTerm);
-      const query = params.toString() ? `?${params.toString()}` : '';
-      const response = await fetch(`/api/resources/count${query}`);
-      if (!response.ok) throw new Error('API hatası');
-      const data = await response.json();
-      setTotalResourceCount(data.count || 0);
-    } catch (error) {
-      setTotalResourceCount(0);
-    }
-  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, selectedDepartment, courseTerm]);
-  useEffect(() => {
-    fetchTotalResourceCount();
-  }, [fetchTotalResourceCount]);
-
-  const filteredResources = useMemo(() => {
-    let filtered = [...resources];
-    if (searchTerm) {
-      const st = turkishToLower(searchTerm);
-      filtered = filtered.filter(r => turkishToLower(r.title || '').includes(st) || turkishToLower(r.description || '').includes(st));
-    }
-    if (selectedCategory) {
-      filtered = filtered.filter(r => r.category === selectedCategory);
-    }
-    if (selectedFormat) {
-      filtered = filtered.filter(r => r.format === selectedFormat);
-    }
-    if (selectedUniversity && selectedUniversity !== 'all') {
-      filtered = filtered.filter(r => r.university === selectedUniversity);
-    }
-    if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') {
-      filtered = filtered.filter(r => r.academicLevel === selectedAcademicLevel);
-    }
-    if (selectedDepartment) {
-      const dep = turkishToLower(selectedDepartment);
-      filtered = filtered.filter(r => turkishToLower(((r as any).department || '').toString()).includes(dep));
-    }
-    if (courseTerm) {
-      const term = turkishToLower(courseTerm);
-      filtered = filtered.filter(r => {
-        const courseStr = turkishToLower(((r as any).course || '').toString());
-        const tagsMatch = Array.isArray(r.tags) && r.tags.some(tag => turkishToLower(tag || '').includes(term));
-        return courseStr.includes(term) || tagsMatch;
+  const displayResources = useMemo(() => {
+    let list = [...resources];
+    if (showFavorites) {
+      list = list.filter(r => {
+        const resolvedId = resolveResourceId(r);
+        return resolvedId ? favorites.includes(resolvedId) : false;
       });
     }
-    // Sıralama
-    filtered.sort((a, b) => {
-      if (sortBy === 'date') {
-        return sortOrder === 'asc'
-          ? new Date(a.uploadDate).getTime() - new Date(b.uploadDate).getTime()
-          : new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime();
-      } else if (sortBy === 'download') {
-        return sortOrder === 'asc' ? a.downloadCount - b.downloadCount : b.downloadCount - a.downloadCount;
-      } else if (sortBy === 'view') {
-        return sortOrder === 'asc' ? a.viewCount - b.viewCount : b.viewCount - a.viewCount;
-      }
-      return 0;
-    });
-    // Favori filtrele
-    if (showFavorites) {
-      filtered = filtered.filter(r => favorites.includes(r._id || ''));
-    }
-    return filtered;
-  }, [resources, searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, selectedDepartment, courseTerm, sortBy, sortOrder, favorites, showFavorites]);
-
-  // Toplam sayfa sayısı
-  const totalPages = Math.ceil(totalResourceCount / resourcesPerPage);
+    return list;
+  }, [resources, showFavorites, favorites]);
 
   // Sadece aktif sayfanın kaynakları
 
   // Sayfa veya filtre değişince otomatik olarak en başa dön
   useEffect(() => {
     setCurrentPage(1);
+    setPageCursors([null]);
   }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, selectedDepartment, courseTerm]);
 
   // Eğer mevcut sayfa, toplam sayfa sayısından büyükse düzelt
@@ -322,7 +316,6 @@ export default function KaynaklarPage() {
     setLoading(true);
     setError(null);
     try {
-      // Query parametrelerini oluştur
       const params = new URLSearchParams();
       if (searchTerm) params.append('search', searchTerm);
       if (selectedCategory) params.append('category', selectedCategory);
@@ -331,23 +324,37 @@ export default function KaynaklarPage() {
       if (selectedAcademicLevel && selectedAcademicLevel !== 'Hepsi' && selectedAcademicLevel !== 'All') params.append('academicLevel', selectedAcademicLevel);
       if (selectedDepartment) params.append('department', selectedDepartment);
       if (courseTerm) params.append('course', courseTerm);
-      params.append('page', currentPage.toString());
       params.append('limit', resourcesPerPage.toString());
+      params.append('sortBy', sortBy);
+      params.append('sortOrder', sortOrder);
+      if (activeCursor) params.append('cursor', activeCursor);
+
       const query = params.toString() ? `?${params.toString()}` : '';
       const response = await fetch(`/api/resources${query}`);
       if (!response.ok) throw new Error('API hatası');
       const data = await response.json();
-      setResources(data.resources);
+
+      setResources(data.resources || []);
       setTotalResourceCount(data.totalCount || 0);
+      setHasNextPage(Boolean(data.hasNextPage));
+      setPageCursors(prev => {
+        const next = [...prev];
+        while (next.length <= currentPage) {
+          next.push(null);
+        }
+        next[currentPage] = data.nextCursor ?? null;
+        return next;
+      });
     } catch (error) {
       console.error('Kaynaklar yüklenirken hata:', error);
       setError('Kaynaklar yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
       setResources([]);
       setTotalResourceCount(0);
+      setHasNextPage(false);
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, selectedDepartment, courseTerm, currentPage]);
+  }, [searchTerm, selectedCategory, selectedFormat, selectedUniversity, selectedAcademicLevel, selectedDepartment, courseTerm, resourcesPerPage, sortBy, sortOrder, activeCursor, currentPage]);
 
 
   // Sayfa yüklendiğinde ve filtre/arama veya sayfa değiştiğinde kaynakları getir
@@ -356,8 +363,10 @@ export default function KaynaklarPage() {
   }, [fetchResources]);
 
   // Formatı insan tarafından okunabilir hale getir
-  const formatFileSize = (sizeInMB: string): string => {
+  const formatFileSize = (sizeInMB?: string): string => {
+    if (!sizeInMB) return '-';
     const size = parseFloat(sizeInMB);
+    if (isNaN(size)) return '-';
     if (size < 1) {
       return `${(size * 1000).toFixed(0)} KB`;
     }
@@ -790,107 +799,107 @@ export default function KaynaklarPage() {
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8B5E]"></div>
         </div>
-      ) : filteredResources.length > 0 ? (
+      ) : displayResources.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredResources.map((resource: Resource) => (
-            <div key={resource._id || resource.id} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-lg font-semibold text-[#994D1C] line-clamp-2 flex-1 mr-2">{resource.title}</h3>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {/* Favorite Star Button */}
-                    <button
-                      onClick={() => toggleFavorite(resource._id || resource.id.toString())}
-                      className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                      title={isFavorited(resource._id || resource.id.toString()) ? 'Favorilerden çıkar' : 'Favorilere ekle'}
-                    >
-                      <svg 
-                        className={`w-5 h-5 transition-colors duration-200 ${
-                          isFavorited(resource._id || resource.id.toString()) 
-                            ? 'text-yellow-500 fill-yellow-500' 
-                            : 'text-gray-400 hover:text-yellow-500'
-                        }`}
-                        fill={isFavorited(resource._id || resource.id.toString()) ? 'currentColor' : 'none'}
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
+          {displayResources.map((resource: Resource) => {
+            const resolvedId = resolveResourceId(resource);
+            if (!resolvedId) return null;
+            const favorited = isFavorited(resolvedId);
+            return (
+              <div key={resolvedId} className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-semibold text-[#994D1C] line-clamp-2 flex-1 mr-2">{resource.title}</h3>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => toggleFavorite(resolvedId)}
+                        className="p-1 hover:bg-gray-100 rounded-full transition-colors duration-200"
+                        title={favorited ? 'Favorilerden çıkar' : 'Favorilere ekle'}
                       >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" 
-                        />
-                      </svg>
-                    </button>
-                    <div className="bg-[#FF8B5E] text-white text-xs px-2 py-1 rounded-lg">
-                      {t(resource.format) || resource.format}
+                        <svg
+                          className={`w-5 h-5 transition-colors duration-200 ${favorited ? 'text-yellow-500 fill-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}
+                          fill={favorited ? 'currentColor' : 'none'}
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                          />
+                        </svg>
+                      </button>
+                      <div className="bg-[#FF8B5E] text-white text-xs px-2 py-1 rounded-lg">
+                        {resource.format ? t(resource.format) ?? resource.format : ''}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <p className="text-sm text-[#6B3416] mb-3 line-clamp-2">{resource.description}</p>
-                {(resource as any).course && (
-                  <div className="text-xs text-[#6B3416] mb-2">
-                    <span className="font-medium">{t('general.course')}:</span> {(resource as any).course}
-                  </div>
-                )}
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {resource.tags.slice(0, 3).map((tag: string, index: number) => (
-                    <span key={index} className="bg-[#FFE5D9] text-[#994D1C] text-xs px-2 py-1 rounded-full">
-                      {tag}
-                    </span>
-                  ))}
-                  {resource.tags.length > 3 && (
-                    <span className="bg-[#FFE5D9] text-[#994D1C] text-xs px-2 py-1 rounded-full">
-                      +{resource.tags.length - 3}
-                    </span>
+                  <p className="text-sm text-[#6B3416] mb-3 line-clamp-2">{resource.description}</p>
+                  {(resource as any).course && (
+                    <div className="text-xs text-[#6B3416] mb-2">
+                      <span className="font-medium">{t('general.course')}:</span> {(resource as any).course}
+                    </div>
                   )}
-                </div>
-                <div className="flex justify-between items-center text-xs text-[#6B3416] mb-3">
-                  <div>{resource.author}</div>
-                  <div>
-                    <span className="text-xs text-gray-500">
-                      {formatDate(resource.uploadDate || resource.createdAt)}
-                    </span>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {(resource.tags || []).slice(0, 3).map((tag: string, index: number) => (
+                      <span key={index} className="bg-[#FFE5D9] text-[#994D1C] text-xs px-2 py-1 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                    {(resource.tags || []).length > 3 && (
+                      <span className="bg-[#FFE5D9] text-[#994D1C] text-xs px-2 py-1 rounded-full">
+                        +{(resource.tags || []).length - 3}
+                      </span>
+                    )}
                   </div>
-                </div>
-                <div className="flex justify-between items-center text-xs text-[#6B3416] mb-4">
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    {resource.viewCount}
-                  </div>
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    {resource.downloadCount}
-                  </div>
-                  <div>{formatFileSize(resource.fileSize)}</div>
-                </div>
-                <div className="flex justify-between gap-2">
-                  <Link key={resource._id || resource.id} href={`/kaynaklar/${resource._id || resource.id}`}>
-                    <div className="flex-1 px-4 py-2 bg-[#FFF5F0] text-[#994D1C] text-center rounded-lg border border-[#FFB996] hover:bg-[#FFE5D9] transition-colors duration-300 text-sm">
-                      {t('general.resourceView')}
+                  <div className="flex justify-between items-center text-xs text-[#6B3416] mb-3">
+                    <div>{resource.author}</div>
+                    <div>
+                      <span className="text-xs text-gray-500">
+                        {formatDate(resource.uploadDate ?? resource.createdAt ?? '')}
+                      </span>
                     </div>
-                  </Link>
-                  <button
-                    onClick={() => handlePreview(resource)}
-                    className="flex-1 px-4 py-2 bg-[#FFB996] text-white text-center rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300 text-sm hidden md:block"
-                  >
-                    {t('general.preview')}
-                  </button>
-                  <button
-                    onClick={() => handleDownload(resource)}
-                    className="flex-1 px-4 py-2 bg-[#FF8B5E] text-white text-center rounded-lg hover:bg-[#FF7A45] transition-colors duration-300 text-sm cursor-pointer"
-                  >
-                    {t('general.resourceDownload')}
-                  </button>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-[#6B3416] mb-4">
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      {resource.viewCount}
+                    </div>
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      {resource.downloadCount}
+                    </div>
+                    <div>{resource.fileSize ? formatFileSize(resource.fileSize) : '-'}</div>
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <Link href={`/kaynaklar/${resolvedId}`}>
+                      <div className="flex-1 px-4 py-2 bg-[#FFF5F0] text-[#994D1C] text-center rounded-lg border border-[#FFB996] hover:bg-[#FFE5D9] transition-colors duration-300 text-sm">
+                        {t('general.resourceView')}
+                      </div>
+                    </Link>
+                    <button
+                      onClick={() => handlePreview(resource)}
+                      className="flex-1 px-4 py-2 bg-[#FFB996] text-white text-center rounded-lg hover:bg-[#FF8B5E] transition-colors duration-300 text-sm hidden md:block"
+                    >
+                      {t('general.preview')}
+                    </button>
+                    <button
+                      onClick={() => handleDownload(resource)}
+                      className="flex-1 px-4 py-2 bg-[#FF8B5E] text-white text-center rounded-lg hover:bg-[#FF7A45] transition-colors duration-300 text-sm cursor-pointer"
+                    >
+                      {t('general.resourceDownload')}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           
         </div>
       ) : (

@@ -46,5 +46,12 @@ const ResourceSchema = new Schema<IResource>({
 
 // createdAt alanına index ekle
 ResourceSchema.index({ createdAt: -1 });
+ResourceSchema.index({ createdAt: -1, _id: -1 });
+ResourceSchema.index({ category: 1, createdAt: -1 });
+ResourceSchema.index({ format: 1, createdAt: -1 });
+ResourceSchema.index({ university: 1, createdAt: -1 });
+ResourceSchema.index({ level: 1, createdAt: -1 });
+ResourceSchema.index({ department: 1, createdAt: -1 });
+ResourceSchema.index({ tags: 1 });
 
 export default models.Resource || model<IResource>('Resource', ResourceSchema);
