@@ -381,6 +381,7 @@ function RegisterPageInner() {
       setEmail(e.target.value);
       clearFieldError('email');
     }}
+    placeholder={t('auth.emailPlaceholder')}
     className={`block w-full rounded-md shadow-sm px-3 py-1.5 border focus:ring focus:ring-opacity-50 ${fieldErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-[#FFB996] focus:border-[#FF8B5E] focus:ring-[#FF8B5E]'}`}
   />
 </div>
